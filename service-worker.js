@@ -1,11 +1,10 @@
-const CACHE = "habit-tracker-v3";
+const CACHE = "habit-tracker-v4";
 
-// Added icons and ensuring the path matches GitHub Pages relative structure
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icon-192.png", // Recommended: ensure these match your actual filenames
+  "./icon-192.png",
   "./icon-512.png"
 ];
 
@@ -36,12 +35,15 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
-  // Strategy: Cache falling back to Network
+  // Always fetch index.html fresh from network
+  if (e.request.url.endsWith("index.html") || e.request.url.endsWith("/")) {
+    e.respondWith(fetch(e.request).catch(() => caches.match("./index.html")));
+    return;
+  }
+  // Cache-first for everything else
   e.respondWith(
     caches.match(e.request).then(cached => {
-      return cached || fetch(e.request).catch(() => {
-        // Optional: You could return a custom offline page here if needed
-      });
+      return cached || fetch(e.request).catch(() => {});
     })
   );
 });
