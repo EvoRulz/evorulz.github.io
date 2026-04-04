@@ -165,7 +165,7 @@
 </head>
 <body>
 
-<h1>Habit Tracker <span style="font-size:14px;color:#888;font-weight:normal">v1.0</span></h1>
+<h1>Habit Tracker <span style="font-size:14px;color:#888;font-weight:normal">v1.1</span></h1>
 <div id="app-controls" style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
   <button class="tracker-btn" onclick="appExport()">Export All</button>
   <button class="tracker-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
@@ -205,7 +205,7 @@
       id:        "teeth",
       label:     "Teeth",
       hasSets:   false,
-      hasStreak: (row) => row && row.status !== "",
+      hasStreak: (row) => row && row.status === "yes",
     },
   ];
 
@@ -292,18 +292,24 @@
       save(ds);
     }
 
-    // ── Streak ──
+    // ── Streak (FIXED LOGIC) ──
     function computeStreak(ds) {
-      let streak = 0;
-      let d = new Date(ds);
-      while (true) {
-        const key = dateStr(new Date(d));
-        if (!hasStreak(store[key])) break;
-        streak++;
-        d.setDate(d.getDate() - 1);
-        if (d < MIN_DATE) break;
+      let streakCount = 0;
+      let curr = new Date(ds);
+      
+      // We check the current day, if it satisfies the streak, we continue backwards
+      while (curr >= MIN_DATE) {
+        const key = dateStr(curr);
+        const data = store[key];
+        
+        if (hasStreak(data)) {
+          streakCount++;
+          curr.setDate(curr.getDate() - 1);
+        } else {
+          break;
+        }
       }
-      return streak;
+      return streakCount;
     }
 
     // ── View / sort ──
@@ -370,15 +376,19 @@
 
     // ── Update helpers ──
     function updateBars() {
-      if (!hasSets) return;
       const tbody = sel("tbody");
       if (!tbody) return;
-      for (let col = 0; col < 9; col++) {
-        const inputs = [...tbody.querySelectorAll(`tr td:nth-child(${col + 6}) input`)];
-        inputs.forEach(i => {
-          const pct = Math.min(Number(i.value || 0), SET_BAR_MAX) / SET_BAR_MAX * 100;
-          i.parentElement.querySelector(".bar").style.width = pct + "%";
-        });
+      
+      // Update individual set bars
+      if (hasSets) {
+        for (let col = 0; col < 9; col++) {
+          const inputs = [...tbody.querySelectorAll(`tr td:nth-child(${col + 6}) input`)];
+          inputs.forEach(i => {
+            const pct = Math.min(Number(i.value || 0), SET_BAR_MAX) / SET_BAR_MAX * 100;
+            const bar = i.parentElement.querySelector(".bar");
+            if(bar) bar.style.width = pct + "%";
+          });
+        }
       }
     }
 
@@ -386,14 +396,17 @@
       const tbody = sel("tbody");
       if (!tbody) return;
       const rows     = [...tbody.querySelectorAll("tr")];
-      const startIdx = fromDs ? Math.max(0, rows.findIndex(r => r.dataset.date === fromDs)) : 0;
-      rows.slice(startIdx).forEach(row => {
+      
+      // When one row changes, all subsequent rows might have their streak changed
+      rows.forEach(row => {
         const ds    = row.dataset.date;
         const cells = row.querySelectorAll("td");
         const streak    = computeStreak(ds);
         const streakPct = Math.min(streak, STREAK_BAR_MAX) / STREAK_BAR_MAX * 100;
+        
         cells[3].querySelector("div").textContent         = streak || "";
         cells[3].querySelector(".bar-streak").style.width = streakPct + "%";
+        
         if (hasSets) {
           const total    = sum(store[ds]?.sets || []);
           const totalPct = Math.min(total, TOTAL_BAR_MAX) / TOTAL_BAR_MAX * 100;
