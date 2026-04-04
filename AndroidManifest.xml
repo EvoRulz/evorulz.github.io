@@ -13,13 +13,12 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.github.evorulz.twa">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-    <!-- Required to launch external apps like Samsung My Files via intent URLs -->
+    <!-- Required to launch Samsung My Files -->
     <queries>
         <package android:name="com.sec.android.app.myfiles" />
     </queries>
@@ -61,7 +60,8 @@
         <activity android:name="LauncherActivity"
             android:alwaysRetainTaskState="true"
             android:label="@string/launcherName"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTop">
             <meta-data android:name="android.support.customtabs.trusted.DEFAULT_URL"
                 android:value="@string/launchUrl" />
 
@@ -122,6 +122,14 @@
                     android:host="@string/hostName"
                     android:pathPrefix="/HabitTracker/"
                 />
+            </intent-filter>
+
+            <!-- Handles myfiles:// URLs from the web app to launch Samsung My Files natively -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="myfiles" />
             </intent-filter>
 
         </activity>
