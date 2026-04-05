@@ -39,33 +39,38 @@ public class LauncherActivity
         Uri data = intent.getData();
         // Intercept myfiles:// URLs and launch Samsung My Files natively
         if (data != null && "myfiles".equals(data.getScheme())) {
-            try {
-                File downloadsDir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOWNLOADS);
-                String downloadsPath = downloadsDir.getAbsolutePath();
+            if ("downloads".equals(data.getHost())) {
+                // Try to open My Files directly to the Downloads folder.
+                // FLAG_ACTIVITY_CLEAR_TASK forces a fresh start so path extras are respected.
+                try {
+                    File downloadsDir = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_DOWNLOADS);
+                    String downloadsPath = downloadsDir.getAbsolutePath();
 
-                Intent myFilesIntent;
-
-                if ("downloads".equals(data.getHost())) {
-                    // Use ACTION_VIEW with a file URI — My Files responds to this for folder navigation.
-                    // Also include every known extra key variant as a belt-and-suspenders measure.
-                    myFilesIntent = new Intent(Intent.ACTION_VIEW);
-                    myFilesIntent.setDataAndType(Uri.fromFile(downloadsDir), "resource/folder");
+                    Intent myFilesIntent = new Intent(Intent.ACTION_MAIN);
+                    myFilesIntent.addCategory(Intent.CATEGORY_LAUNCHER);
                     myFilesIntent.setComponent(new ComponentName(
                             "com.sec.android.app.myfiles",
                             "com.sec.android.app.myfiles.external.ui.MainActivity"));
                     myFilesIntent.putExtra("current_path", downloadsPath);
                     myFilesIntent.putExtra("path",         downloadsPath);
                     myFilesIntent.putExtra("rootName",     "Downloads");
-                } else {
-                    // Plain open — no folder targeting
-                    myFilesIntent = new Intent(Intent.ACTION_MAIN);
-                    myFilesIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-                    myFilesIntent.setComponent(new ComponentName(
-                            "com.sec.android.app.myfiles",
-                            "com.sec.android.app.myfiles.external.ui.MainActivity"));
+                    myFilesIntent.addFlags(
+                            Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(myFilesIntent);
+                    return;
+                } catch (Exception e) {
+                    // Fall through to plain open below
                 }
+            }
 
+            // Plain open (no folder targeting, or fallback if Downloads targeting failed)
+            try {
+                Intent myFilesIntent = new Intent(Intent.ACTION_MAIN);
+                myFilesIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                myFilesIntent.setComponent(new ComponentName(
+                        "com.sec.android.app.myfiles",
+                        "com.sec.android.app.myfiles.external.ui.MainActivity"));
                 myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(myFilesIntent);
             } catch (Exception e) {
