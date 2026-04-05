@@ -49,8 +49,9 @@
       width: 100%;
       box-sizing: border-box;
       padding: 12px 20px;
-      background: #444;
-      color: white;
+      background: var(--btn-bg, #444);
+      color: var(--btn-fg, #fff);
+      font-family: var(--btn-font, sans-serif);
       border: none;
       border-radius: 6px;
       cursor: pointer;
@@ -208,6 +209,51 @@
       font-size: 13px; align-self: flex-start;
     }
     #confirm-cancel:hover { background: #444; }
+    /* ── Settings cog & panel ── */
+    #settings-cog {
+      position: fixed; top: 14px; right: 14px;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #2a2a2a; border: 1px solid #444;
+      color: #999; cursor: pointer; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s; padding: 0;
+    }
+    #settings-cog:hover { background: #3a3a3a; color: #fff; }
+    #settings-cog svg { width: 16px; height: 16px; fill: currentColor; }
+    #settings-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78); z-index: 9998;
+      align-items: center; justify-content: center;
+    }
+    #settings-overlay.active { display: flex; }
+    #settings-panel {
+      background: #1c1c1c; border: 1px solid #555; border-radius: 10px;
+      padding: 26px 28px; max-width: 320px; width: 90%;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    #settings-panel h2 { margin: 0; font-size: 15px; color: #fff; font-weight: 600; }
+    .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .settings-row label { font-size: 13px; color: #bbb; white-space: nowrap; }
+    .settings-row input[type="color"] {
+      width: 42px; height: 28px; border: 1px solid #555; border-radius: 4px;
+      background: none; cursor: pointer; padding: 2px 3px;
+    }
+    .settings-row select {
+      background: #111; color: white; border: 1px solid #555;
+      padding: 5px 8px; font-size: 13px; border-radius: 4px; flex: 1; max-width: 180px;
+    }
+    #settings-btn-preview {
+      padding: 10px 16px; border-radius: 6px; border: none;
+      font-size: 15px; text-align: center; pointer-events: none; cursor: default;
+    }
+    #settings-footer { display: flex; gap: 8px; margin-top: 4px; }
+    #settings-close, #settings-reset {
+      padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;
+    }
+    #settings-close { background: #333; color: #ccc; }
+    #settings-close:hover { background: #444; }
+    #settings-reset { background: #2a1a1a; color: #ff9999; }
+    #settings-reset:hover { background: #3a2020; }
   </style>
 </head>
 <body>
@@ -223,8 +269,46 @@
   </div>
 </div>
 
+<!-- Settings cog -->
+<button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
+  <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+  </svg>
+</button>
+
+<!-- Settings overlay -->
+<div id="settings-overlay">
+  <div id="settings-panel">
+    <h2>Button Style</h2>
+    <div class="settings-row">
+      <label>Background</label>
+      <input type="color" id="s-bg" oninput="settingsChange()">
+    </div>
+    <div class="settings-row">
+      <label>Text colour</label>
+      <input type="color" id="s-fg" oninput="settingsChange()">
+    </div>
+    <div class="settings-row">
+      <label>Typeface</label>
+      <select id="s-font" onchange="settingsChange()">
+        <option value="sans-serif">Default</option>
+        <option value="system-ui, sans-serif">System UI</option>
+        <option value="Georgia, serif">Serif</option>
+        <option value="'Courier New', monospace">Monospace</option>
+        <option value="Impact, sans-serif">Impact</option>
+        <option value="cursive">Cursive</option>
+      </select>
+    </div>
+    <button id="settings-btn-preview">Preview</button>
+    <div id="settings-footer">
+      <button id="settings-reset" onclick="settingsReset()">Reset</button>
+      <button id="settings-close" onclick="settingsClose()">Done</button>
+    </div>
+  </div>
+</div>
+
 <h1>Habit Tracker
-  <span style="font-size:14px;color:#888;font-weight:normal">v47</span>
+  <span style="font-size:14px;color:#888;font-weight:normal">v48</span>
   <span id="live-clock" style="font-size:13px;color:#666;font-weight:normal;margin-left:18px;letter-spacing:0.02em"></span>
 </h1>
 
@@ -884,6 +968,59 @@
   }
   equalizeButtonSizes();
 
+  // ── Button style settings ──────────────────────────────────
+  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif" };
+  let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
+  try {
+    const saved = JSON.parse(localStorage.getItem("_btnStyle"));
+    if (saved) btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS, saved);
+  } catch {}
+
+  function applyBtnStyle() {
+    buttonsEl.style.setProperty("--btn-bg",   btnStyle.bg);
+    buttonsEl.style.setProperty("--btn-fg",   btnStyle.fg);
+    buttonsEl.style.setProperty("--btn-font", btnStyle.font);
+  }
+  applyBtnStyle();
+
+  function settingsOpen() {
+    document.getElementById("s-bg").value   = btnStyle.bg;
+    document.getElementById("s-fg").value   = btnStyle.fg;
+    document.getElementById("s-font").value = btnStyle.font;
+    settingsUpdatePreview();
+    document.getElementById("settings-overlay").classList.add("active");
+  }
+  function settingsClose() {
+    document.getElementById("settings-overlay").classList.remove("active");
+  }
+  function settingsChange() {
+    btnStyle.bg   = document.getElementById("s-bg").value;
+    btnStyle.fg   = document.getElementById("s-fg").value;
+    btnStyle.font = document.getElementById("s-font").value;
+    localStorage.setItem("_btnStyle", JSON.stringify(btnStyle));
+    applyBtnStyle();
+    settingsUpdatePreview();
+  }
+  function settingsReset() {
+    btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
+    localStorage.removeItem("_btnStyle");
+    document.getElementById("s-bg").value   = btnStyle.bg;
+    document.getElementById("s-fg").value   = btnStyle.fg;
+    document.getElementById("s-font").value = btnStyle.font;
+    applyBtnStyle();
+    settingsUpdatePreview();
+  }
+  function settingsUpdatePreview() {
+    const p = document.getElementById("settings-btn-preview");
+    p.style.background  = btnStyle.bg;
+    p.style.color       = btnStyle.fg;
+    p.style.fontFamily  = btnStyle.font;
+    p.textContent = document.getElementById("s-font").selectedOptions[0].text;
+  }
+  document.getElementById("settings-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("settings-overlay")) settingsClose();
+  });
+
 /// ── Drag-to-reorder (pointer events) ──────────────────────
   // Ghost floats freely. Original stays visibility:hidden (keeps slot + pointer capture).
   // Swaps with whatever slot (button or empty) the ghost centre overlaps.
@@ -987,6 +1124,7 @@
 </script>
 </body>
 </html>
+
 
 
 
