@@ -168,7 +168,7 @@
 </head>
 <body>
 
-<h1>Habit Tracker <!-- version number auto-bumped by utwa (keep in sync with service-worker.js) --><span style="font-size:14px;color:#888;font-weight:normal">v24</span></h1>
+<h1>Habit Tracker <!-- version number auto-bumped by utwa (keep in sync with service-worker.js) --><span style="font-size:14px;color:#888;font-weight:normal">v25</span></h1>
 <div id="app-controls" style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
   <button class="tracker-btn" onclick="appExport()">Export All</button>
   <button class="tracker-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
@@ -205,14 +205,23 @@
   // ── Tracker configs ────────────────────────────────────────
   const TRACKER_CONFIGS = [
     {
-      id:        "pushups",
-      label:     "Pushups",
-      hasSets:   true,
-      hasStreak: (row) => row && sum(row.sets) > 0,
+      id:          "pushups",
+      label:       "Pushups",
+      hasSets:     true,
+      hasStreak:   (row) => row && sum(row.sets) > 0,
+      // Auto-set status to "yes" whenever any sets are entered.
+      // Returns the status to apply, or null to leave status untouched.
+      autoStatus:  (row) => sum(row.sets) > 0 ? "yes" : null,
     },
     {
       id:        "teeth",
       label:     "Teeth",
+      hasSets:   false,
+      hasStreak: (row) => row && row.status === "yes",
+    },
+    {
+      id:        "appdev",
+      label:     "App Development",
       hasSets:   false,
       hasStreak: (row) => row && row.status === "yes",
     },
@@ -260,7 +269,7 @@
 
   // ── Tracker factory ────────────────────────────────────────
   function createTracker(config) {
-    const { id, label, hasSets, hasStreak } = config;
+    const { id, label, hasSets, hasStreak, autoStatus } = config;
     const prefix = id + ":";
 
     const store = {};
@@ -307,16 +316,13 @@
       save(ds);
     }
 
-    // ── Streak (FIXED LOGIC) ──
+    // ── Streak ──
     function computeStreak(ds) {
       let streakCount = 0;
       let curr = new Date(ds);
-      
-      // We check the current day, if it satisfies the streak, we continue backwards
       while (curr >= MIN_DATE) {
-        const key = dateStr(curr);
+        const key  = dateStr(curr);
         const data = store[key];
-        
         if (hasStreak(data)) {
           streakCount++;
           curr.setDate(curr.getDate() - 1);
@@ -393,15 +399,13 @@
     function updateBars() {
       const tbody = sel("tbody");
       if (!tbody) return;
-      
-      // Update individual set bars
       if (hasSets) {
         for (let col = 0; col < 9; col++) {
           const inputs = [...tbody.querySelectorAll(`tr td:nth-child(${col + 6}) input`)];
           inputs.forEach(i => {
             const pct = Math.min(Number(i.value || 0), SET_BAR_MAX) / SET_BAR_MAX * 100;
             const bar = i.parentElement.querySelector(".bar");
-            if(bar) bar.style.width = pct + "%";
+            if (bar) bar.style.width = pct + "%";
           });
         }
       }
@@ -410,23 +414,18 @@
     function updateStreakAndTotal(fromDs) {
       const tbody = sel("tbody");
       if (!tbody) return;
-      const rows     = [...tbody.querySelectorAll("tr")];
-      
-      // When one row changes, all subsequent rows might have their streak changed
-      rows.forEach(row => {
+      [...tbody.querySelectorAll("tr")].forEach(row => {
         const ds    = row.dataset.date;
         const cells = row.querySelectorAll("td");
         const streak    = computeStreak(ds);
         const streakPct = Math.min(streak, STREAK_BAR_MAX) / STREAK_BAR_MAX * 100;
-        
         cells[3].querySelector("div").textContent         = streak || "";
         cells[3].querySelector(".bar-streak").style.width = streakPct + "%";
-        
         if (hasSets) {
           const total    = sum(store[ds]?.sets || []);
           const totalPct = Math.min(total, TOTAL_BAR_MAX) / TOTAL_BAR_MAX * 100;
-          cells[4].querySelector("div").textContent         = total || "";
-          cells[4].querySelector(".bar-total").style.width  = totalPct + "%";
+          cells[4].querySelector("div").textContent        = total || "";
+          cells[4].querySelector(".bar-total").style.width = totalPct + "%";
         }
       });
     }
@@ -461,6 +460,23 @@
 
     function onInput(ds) {
       setRowFromDOM(ds);
+
+      // Auto-set status based on config (e.g. pushups → "yes" when sets > 0).
+      // Only fires from set input, so manual status changes via the dropdown are
+      // never overridden unless the user enters another set value afterwards.
+      if (autoStatus) {
+        const newStatus = autoStatus(store[ds]);
+        if (newStatus !== null) {
+          store[ds].status = newStatus;
+          save(ds);
+          const row = sel(`tr[data-date="${ds}"]`);
+          if (row) {
+            const statusSelect = row.querySelectorAll("td")[1].querySelector("select");
+            if (statusSelect) statusSelect.value = newStatus;
+          }
+        }
+      }
+
       updateStreakAndTotal(ds);
       updateBars();
       updateStats();
@@ -767,7 +783,3 @@
 </script>
 </body>
 </html>
-
-
-
-
