@@ -71,7 +71,6 @@
     .empty-slot {
       width: 100%;
       box-sizing: border-box;
-      padding: 12px 20px;
       border-radius: 6px;
       pointer-events: none;
     }
@@ -225,7 +224,7 @@
 </div>
 
 <h1>Habit Tracker
-  <span style="font-size:14px;color:#888;font-weight:normal">v45</span>
+  <span style="font-size:14px;color:#888;font-weight:normal">v46</span>
   <span id="live-clock" style="font-size:13px;color:#666;font-weight:normal;margin-left:18px;letter-spacing:0.02em"></span>
 </h1>
 
@@ -876,6 +875,15 @@
   });
   padEmptySlots(); // fill any remaining slots up to TOTAL_SLOTS
 
+  function equalizeButtonSizes() {
+    const btns = [...buttonsEl.querySelectorAll('.tracker-btn')];
+    if (!btns.length) return;
+    buttonsEl.style.gridAutoRows = '';
+    const maxH = Math.max(...btns.map(b => b.offsetHeight));
+    buttonsEl.style.gridAutoRows = maxH + 'px';
+  }
+  equalizeButtonSizes();
+
 /// ── Drag-to-reorder (pointer events) ──────────────────────
   // Ghost floats freely. Original stays visibility:hidden (keeps slot + pointer capture).
   // Swaps with whatever slot (button or empty) the ghost centre overlaps.
@@ -979,6 +987,7 @@
 </script>
 </body>
 </html>
+
 
 
 
