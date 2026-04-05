@@ -36,10 +36,9 @@ public class LauncherActivity
     @Override
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
-
+        // Intercept myfiles:// URLs and launch Samsung My Files natively
         if (data != null && "myfiles".equals(data.getScheme())) {
             if ("downloads".equals(data.getHost())) {
-
                 try {
                     Intent dlIntent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
                     dlIntent.setComponent(new ComponentName(
@@ -49,8 +48,11 @@ public class LauncherActivity
                             Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(dlIntent);
                     return;
+                } catch (Exception ignored) {
+                    // Fall through to plain open
                 }
             }
+
             try {
                 Intent myFilesIntent = new Intent(Intent.ACTION_MAIN);
                 myFilesIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -59,6 +61,8 @@ public class LauncherActivity
                         "com.sec.android.app.myfiles.external.ui.MainActivity"));
                 myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(myFilesIntent);
+            } catch (Exception ignored) {
+                // My Files not available on this device
             }
             return;
         }
