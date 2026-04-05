@@ -38,17 +38,18 @@
       color: #ff9999;
     }
 
-    /* ── Tracker toggle buttons in the drag grid ── */
+/* ── Tracker toggle buttons in the drag grid ── */
     #buttons {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-bottom: 12px;
-      min-height: 120px;
-      grid-auto-rows: minmax(52px, auto);
-    }    .tracker-btn {
-      flex: 1 1 calc(33.333% - 6px);
-      min-width: 140px;
+      min-height: 120px; 
+      grid-auto-rows: 52px;
+      align-items: start;
+    }
+    .tracker-btn {
+      width: 100%;
       box-sizing: border-box;
       padding: 12px 20px;
       background: #444;
@@ -59,8 +60,12 @@
       font-size: 16px;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none; /* required for pointer capture on mobile/TWA */
+      touch-action: none;
       transition: box-shadow 0.2s, background 0.2s;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .tracker-btn.active {
       background: #555;
@@ -221,7 +226,7 @@
 </div>
 
 <h1>Habit Tracker
-  <span style="font-size:14px;color:#888;font-weight:normal">v29</span>
+  <span style="font-size:14px;color:#888;font-weight:normal">v30</span>
   <span id="live-clock" style="font-size:13px;color:#666;font-weight:normal;margin-left:18px;letter-spacing:0.02em"></span>
 </h1>
 
@@ -966,5 +971,6 @@
 </script>
 </body>
 </html>
+
 
 
