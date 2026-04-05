@@ -23,7 +23,8 @@
 
     h1 { margin-top: 0; }
 
-    .tracker-btn {
+    /* ── App-level buttons (Export All etc) ── */
+    .app-btn {
       padding: 12px 20px;
       background: #444;
       color: white;
@@ -31,7 +32,41 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
-      margin-right: 8px;
+    }
+    .app-btn.btn-clear-all {
+      background: #5a1a1a;
+      color: #ff9999;
+    }
+
+    /* ── Tracker toggle buttons in the drag grid ── */
+    #buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tracker-btn {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 20px;
+      background: #444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none; /* required for pointer capture on mobile/TWA */
+      transition: box-shadow 0.2s, background 0.2s;
+    }
+    .tracker-btn.active {
+      background: #555;
+      box-shadow: 0 0 16px 5px rgba(150, 90, 255, 0.65);
+    }
+    /* Ghost clone shouldn't inherit transitions */
+    .tracker-btn.drag-ghost {
+      transition: none !important;
     }
 
     .tracker-section {
@@ -46,7 +81,6 @@
       align-items: center;
       flex-wrap: wrap;
     }
-
     .controls select {
       background: #000;
       color: white;
@@ -55,7 +89,6 @@
       font-size: 13px;
       border-radius: 4px;
     }
-
     .controls button {
       padding: 6px 12px;
       background: #444;
@@ -65,6 +98,11 @@
       cursor: pointer;
       font-size: 13px;
     }
+    .controls button.btn-clear {
+      background: #5a1a1a;
+      color: #ff9999;
+    }
+    .controls button.btn-clear:hover { background: #7a2020; }
 
     .stats {
       font-size: 12px;
@@ -82,136 +120,222 @@
     }
     .scroll-container::-webkit-scrollbar { display: none; }
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-
+    table { border-collapse: collapse; width: 100%; }
     th, td {
       border: 1px solid #333;
       padding: 6px;
       text-align: center;
       font-size: 12px;
     }
-
     th {
-      position: sticky;
-      top: 0;
-      background: #000;
-      z-index: 1;
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
+      position: sticky; top: 0;
+      background: #000; z-index: 1;
+      cursor: pointer; user-select: none; white-space: nowrap;
     }
     th:hover { background: #1a1a1a; }
     th.sorted-asc::after  { content: " ▲"; }
     th.sorted-desc::after { content: " ▼"; }
 
-    .bar-container {
-      width: 100%;
-      height: 18px;
-      background: #222;
-    }
+    .bar-container { width: 100%; height: 18px; background: #222; }
     .bar        { height: 100%; background: #7030A0; transition: width 0.2s; }
     .bar-total  { height: 100%; background: #8000ff; transition: width 0.2s; }
-    .bar-streak { height: 100%; background: #375623; transition: width 0.2s; margin-left: auto; }
+    .bar-streak { height: 100%; background: #375623; transition: width 0.2s; }
 
     td.set-cell { padding: 0; }
 
     input[type="number"] {
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box;
-      background: transparent;
-      color: white;
-      border: none;
-      font-size: 13px;
-      text-align: center;
-      outline: none;
-      padding: 4px 0;
-      -moz-appearance: textfield;
+      width: 100%; height: 100%; box-sizing: border-box;
+      background: transparent; color: white;
+      border: none; font-size: 13px; text-align: center;
+      outline: none; padding: 4px 0; -moz-appearance: textfield;
     }
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
     td select {
-      background: transparent;
-      color: white;
-      border: none;
-      font-size: 12px;
-      width: 100%;
-      padding: 4px 2px;
-      outline: none;
-      appearance: none;
-      -webkit-appearance: none;
-      cursor: pointer;
+      background: transparent; color: white; border: none;
+      font-size: 12px; width: 100%; padding: 4px 2px;
+      outline: none; appearance: none; -webkit-appearance: none;
+      cursor: pointer; text-align: center;
     }
-    td select option { background: #111; }
+    td select option { background: #111; color: white; }
 
     td textarea {
-      width: 100%;
-      height: 100%;
-      min-height: 36px;
-      box-sizing: border-box;
-      background: transparent;
-      color: white;
-      border: none;
-      font-size: 12px;
-      resize: none;
-      outline: none;
-      padding: 4px;
+      width: 100%; height: 100%; min-height: 36px;
+      box-sizing: border-box; background: transparent;
+      color: white; border: none; font-size: 12px;
+      resize: none; outline: none; padding: 4px;
       font-family: sans-serif;
     }
 
     .sentinel { height: 1px; }
+
+    /* ── Confirmation overlay ── */
+    #confirm-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78); z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    #confirm-overlay.active { display: flex; }
+    #confirm-box {
+      background: #1c1c1c; border: 1px solid #555;
+      border-radius: 10px; padding: 28px 32px;
+      max-width: 360px; width: 90%;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    #confirm-box p { margin: 0; font-size: 14px; color: #ccc; line-height: 1.6; }
+    #confirm-box strong { color: #fff; }
+    #confirm-input {
+      background: #000; border: 1px solid #555; border-radius: 4px;
+      color: white; font-size: 14px; padding: 8px 10px;
+      outline: none; width: 100%; box-sizing: border-box;
+    }
+    #confirm-input.shake { border-color: #cc0000; animation: shake 0.28s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-7px); }
+      75%      { transform: translateX(7px); }
+    }
+    #confirm-hint { font-size: 12px; color: #cc4444; min-height: 15px; margin-top: -6px; }
+    #confirm-cancel {
+      padding: 8px 18px; background: #333; color: #ccc;
+      border: none; border-radius: 4px; cursor: pointer;
+      font-size: 13px; align-self: flex-start;
+    }
+    #confirm-cancel:hover { background: #444; }
   </style>
 </head>
 <body>
 
-<h1>Habit Tracker <!-- version number auto-bumped by utwa (keep in sync with service-worker.js) --><span style="font-size:14px;color:#888;font-weight:normal">v25</span></h1>
-<div id="app-controls" style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
-  <button class="tracker-btn" onclick="appExport()">Export All</button>
-  <button class="tracker-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
-  <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
-  <button class="tracker-btn" onclick="openMyFiles()">My Files</button>
+<!-- Shared confirmation overlay -->
+<div id="confirm-overlay">
+  <div id="confirm-box">
+    <p id="confirm-msg"></p>
+    <input id="confirm-input" type="text" placeholder="Habit Tracker"
+           autocomplete="off" spellcheck="false">
+    <div id="confirm-hint"></div>
+    <button id="confirm-cancel" onclick="confirmCancel()">Cancel</button>
+  </div>
 </div>
+
+<h1>Habit Tracker
+  <span style="font-size:14px;color:#888;font-weight:normal">v26</span>
+  <span id="live-clock" style="font-size:13px;color:#666;font-weight:normal;margin-left:18px;letter-spacing:0.02em"></span>
+</h1>
+
+<div id="app-controls" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+  <button class="app-btn" onclick="appExport()">Export All</button>
+  <button class="app-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
+  <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
+  <button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button>
+  <button class="app-btn" onclick="openMyFiles()">My Files</button>
+</div>
+
+<!-- Drag-sortable 3-column grid of tracker toggle buttons -->
 <div id="buttons"></div>
+<!-- Tracker sections rendered below buttons -->
 <div id="sections"></div>
 
 <script>
-  // ── My Files (navigates to myfiles://downloads which the TWA intercepts natively) ──
-  function openMyFiles() {
-    window.location.href = "myfiles://downloads";
-  }
+  // ── Live clock ─────────────────────────────────────────────
+  (function() {
+    const el = document.getElementById("live-clock");
+    function tick() {
+      const n  = new Date();
+      const dd = String(n.getDate()).padStart(2,"0");
+      const mm = String(n.getMonth()+1).padStart(2,"0");
+      const yy = n.getFullYear();
+      const hh = String(n.getHours()).padStart(2,"0");
+      const mi = String(n.getMinutes()).padStart(2,"0");
+      const ss = String(n.getSeconds()).padStart(2,"0");
+      el.textContent = `${dd}/${mm}/${yy}  ${hh}:${mi}:${ss}`;
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
 
-  // ── Service Worker Registration ────────────────────────────
+  // ── My Files ───────────────────────────────────────────────
+  function openMyFiles() { window.location.href = "myfiles://downloads"; }
+
+  // ── Service Worker ─────────────────────────────────────────
   if ('serviceWorker' in navigator && !location.hostname.includes('claudeusercontent.com')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('Service Worker registered!', reg))
-        .catch(err => console.error('Service Worker registration failed: ', err));
+        .then(r => console.log('SW registered', r))
+        .catch(err => console.error('SW failed', err));
     });
   }
 
-  // ── Shared constants ───────────────────────────────────────
+  // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
   const MAX_DATE       = new Date("2111-04-19");
-  const STATUSES       = ["yes", "no", "idk", "n/a"];
+  const STATUSES       = ["yes", "no", "idk", "not yet", "n/a"];
   const CHUNK          = 30;
   const SET_BAR_MAX    = 100;
   const TOTAL_BAR_MAX  = 100;
   const STREAK_BAR_MAX = 30;
+  const NUM_SETS       = 10;
+
+  // ── Status colour ──────────────────────────────────────────
+  function applyStatusColor(el) {
+    const v = el.value;
+    if      (v === "yes") { el.style.background = "#90EE90"; el.style.color = "#000"; }
+    else if (v === "no")  { el.style.background = "#cc0000"; el.style.color = "#fff"; }
+    else if (v === "n/a") { el.style.background = "#228B22"; el.style.color = "#fff"; }
+    else if (v === "")    { el.style.background = "transparent"; el.style.color = "#fff"; }
+    else                  { el.style.background = "#FFD580"; el.style.color = "#000"; }
+  }
+
+  // ── Confirmation overlay ───────────────────────────────────
+  let _confirmResolve = null;
+  function confirmClear(bodyHTML) {
+    return new Promise(resolve => {
+      _confirmResolve = resolve;
+      document.getElementById("confirm-msg").innerHTML =
+        bodyHTML + '<br><br>Type <strong>Habit Tracker</strong> and press Enter to confirm.';
+      const input = document.getElementById("confirm-input");
+      input.value = "";
+      document.getElementById("confirm-hint").textContent = "";
+      input.classList.remove("shake");
+      document.getElementById("confirm-overlay").classList.add("active");
+      setTimeout(() => input.focus(), 60);
+    });
+  }
+  function confirmCancel() {
+    document.getElementById("confirm-overlay").classList.remove("active");
+    if (_confirmResolve) { _confirmResolve(false); _confirmResolve = null; }
+  }
+  document.getElementById("confirm-input").addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const input = document.getElementById("confirm-input");
+    const hint  = document.getElementById("confirm-hint");
+    if (input.value === "Habit Tracker") {
+      document.getElementById("confirm-overlay").classList.remove("active");
+      if (_confirmResolve) { _confirmResolve(true); _confirmResolve = null; }
+    } else {
+      hint.textContent = "Incorrect — try again.";
+      input.classList.remove("shake");
+      void input.offsetWidth;
+      input.classList.add("shake");
+    }
+  });
+  document.getElementById("confirm-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("confirm-overlay")) confirmCancel();
+  });
 
   // ── Tracker configs ────────────────────────────────────────
   const TRACKER_CONFIGS = [
     {
-      id:          "pushups",
-      label:       "Pushups",
-      hasSets:     true,
-      hasStreak:   (row) => row && sum(row.sets) > 0,
-      // Auto-set status to "yes" whenever any sets are entered.
-      // Returns the status to apply, or null to leave status untouched.
-      autoStatus:  (row) => sum(row.sets) > 0 ? "yes" : null,
+      id:        "pushups",
+      label:     "Pushups",
+      hasSets:   true,
+      hasStreak: (row) => row && sum(row.sets) > 0,
+      autoStatus: (row) => {
+        if (!row || !row.sets) return null;
+        const allBlank = row.sets.every(s => s === null || s === undefined);
+        if (allBlank) return "";
+        return sum(row.sets) > 0 ? "yes" : "no";
+      },
     },
     {
       id:        "teeth",
@@ -227,446 +351,352 @@
     },
   ];
 
-  // ── Shared utils ───────────────────────────────────────────
+  // ── Utils ──────────────────────────────────────────────────
   function dateStr(d) {
-    const y   = d.getFullYear();
-    const m   = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   }
   function exportDateStr(d) {
-    const day = String(d.getDate()).padStart(2, "0");
-    const m   = String(d.getMonth() + 1).padStart(2, "0");
-    const y   = String(d.getFullYear()).slice(-2);
-    return `${day}-${m}-${y}`;
+    return `${String(d.getDate()).padStart(2,"0")}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getFullYear()).slice(-2)}`;
   }
   function displayDate(iso) {
-    const [y, m, d] = iso.split("-");
+    const [y,m,d] = iso.split("-");
     return `${d}/${m}/${y.slice(-2)}`;
   }
   function offsetDate(base, days) {
-    const d = new Date(base);
-    d.setDate(d.getDate() + days);
-    return d;
+    const d = new Date(base); d.setDate(d.getDate() + days); return d;
   }
   function clamp(d) {
     if (d < MIN_DATE) return new Date(MIN_DATE);
     if (d > MAX_DATE) return new Date(MAX_DATE);
     return d;
   }
-  function sum(sets) { return (sets || []).reduce((a, b) => a + b, 0); }
+  function sum(sets) { return (sets||[]).reduce((a,b) => a + (b??0), 0); }
 
-  // ── Global handler dispatch ────────────────────────────────
+  // ── Global dispatch ────────────────────────────────────────
   const trackers = {};
-  function onSelectChange(id, ds, el) { trackers[id].onSelectChange(ds, el); }
-  function onReasonInput(id, ds, el)  { trackers[id].onReasonInput(ds, el); }
-  function onSetInput(id, ds)          { trackers[id].onInput(ds); }
-  function onHeaderClick(id, key)      { trackers[id].onHeaderClick(key); }
-  function onFilterChange(id, val)    { trackers[id].onFilterChange(val); }
-  function jumpToToday(id)            { trackers[id].jumpToToday(); }
-  function exportData(id)              { trackers[id].exportData(); }
-  function importData(id, el)          { trackers[id].importData(el); }
+  function onSelectChange(id,ds,el) { trackers[id].onSelectChange(ds,el); }
+  function onReasonInput(id,ds,el)  { trackers[id].onReasonInput(ds,el); }
+  function onSetInput(id,ds)         { trackers[id].onInput(ds); }
+  function onHeaderClick(id,key)     { trackers[id].onHeaderClick(key); }
+  function onFilterChange(id,val)   { trackers[id].onFilterChange(val); }
+  function jumpToToday(id)           { trackers[id].jumpToToday(); }
+  function exportData(id)             { trackers[id].exportData(); }
+  function importData(id,el)          { trackers[id].importData(el); }
+  function clearData(id)              { trackers[id].clearData(); }
 
   // ── Tracker factory ────────────────────────────────────────
   function createTracker(config) {
     const { id, label, hasSets, hasStreak, autoStatus } = config;
     const prefix = id + ":";
-
     const store = {};
-    let sortKey      = "date";
-    let sortDir      = 1;
-    let filterStatus = "";
-    let viewDates    = null;
-    let topDate, bottomDate;
+    let sortKey="date", sortDir=1, filterStatus="", viewDates=null, topDate, bottomDate;
 
     function sel(q)    { return document.querySelector(`#section-${id} ${q}`); }
     function selAll(q) { return document.querySelectorAll(`#section-${id} ${q}`); }
 
-    // ── Storage ──
     function loadAll() {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+      for (let i=0;i<localStorage.length;i++) {
+        const key=localStorage.key(i);
         if (!key.startsWith(prefix)) continue;
-        const ds = key.slice(prefix.length);
-        try { store[ds] = JSON.parse(localStorage.getItem(key)); } catch {}
+        const ds=key.slice(prefix.length);
+        try { store[ds]=JSON.parse(localStorage.getItem(key)); } catch {}
       }
     }
-
-    function save(ds) {
-      localStorage.setItem(prefix + ds, JSON.stringify(store[ds]));
-    }
-
+    function save(ds) { localStorage.setItem(prefix+ds, JSON.stringify(store[ds])); }
     function getRow(ds) {
-      if (hasSets) return store[ds] || { status: "", reason: "", sets: Array(9).fill(0) };
-      return store[ds] || { status: "", reason: "" };
+      if (hasSets) return store[ds] || { status:"", reason:"", sets:Array(NUM_SETS).fill(null) };
+      return store[ds] || { status:"", reason:"" };
     }
-
     function setRowFromDOM(ds) {
-      const row = sel(`tr[data-date="${ds}"]`);
-      if (!row) return;
-      const cells  = row.querySelectorAll("td");
-      const status = cells[1].querySelector("select").value;
-      const reason = cells[2].querySelector("textarea").value;
+      const row=sel(`tr[data-date="${ds}"]`); if (!row) return;
+      const cells=row.querySelectorAll("td");
+      const status=cells[1].querySelector("select").value;
+      const reason=cells[2].querySelector("textarea").value;
       if (hasSets) {
-        const sets = [...cells].slice(5).map(c => Number(c.querySelector("input")?.value || 0));
-        store[ds] = { status, reason, sets };
+        const sets=[...cells].slice(5).map(c => {
+          const inp=c.querySelector("input"); if (!inp) return null;
+          const v=inp.value;
+          return (v===""||v===null||v===undefined) ? null : Number(v);
+        });
+        store[ds]={status,reason,sets};
       } else {
-        store[ds] = { status, reason };
+        store[ds]={status,reason};
       }
       save(ds);
     }
 
-    // ── Streak ──
     function computeStreak(ds) {
-      let streakCount = 0;
-      let curr = new Date(ds);
-      while (curr >= MIN_DATE) {
-        const key  = dateStr(curr);
-        const data = store[key];
-        if (hasStreak(data)) {
-          streakCount++;
-          curr.setDate(curr.getDate() - 1);
-        } else {
-          break;
-        }
+      let n=0, curr=new Date(ds);
+      while (curr>=MIN_DATE) {
+        const data=store[dateStr(curr)];
+        if (hasStreak(data)) { n++; curr.setDate(curr.getDate()-1); } else break;
       }
-      return streakCount;
+      return n;
     }
 
-    // ── View / sort ──
     function buildView() {
-      if (filterStatus === "") { viewDates = null; return; }
-      viewDates = Object.entries(store)
-        .filter(([, v]) => v.status === filterStatus)
-        .map(([k]) => k);
-      if (sortKey === "date") {
-        viewDates.sort((a, b) => sortDir * a.localeCompare(b));
-      } else if (sortKey === "total" && hasSets) {
-        viewDates.sort((a, b) => sortDir * (sum(store[a]?.sets) - sum(store[b]?.sets)));
-      } else if (sortKey === "status") {
-        viewDates.sort((a, b) => sortDir * (store[a]?.status || "").localeCompare(store[b]?.status || ""));
-      } else if (sortKey.startsWith("set") && hasSets) {
-        const idx = parseInt(sortKey.slice(3)) - 1;
-        viewDates.sort((a, b) => sortDir * ((store[a]?.sets?.[idx] || 0) - (store[b]?.sets?.[idx] || 0)));
+      if (filterStatus==="") { viewDates=null; return; }
+      viewDates=Object.entries(store).filter(([,v])=>v.status===filterStatus).map(([k])=>k);
+      if (sortKey==="date") viewDates.sort((a,b)=>sortDir*a.localeCompare(b));
+      else if (sortKey==="total"&&hasSets) viewDates.sort((a,b)=>sortDir*(sum(store[a]?.sets)-sum(store[b]?.sets)));
+      else if (sortKey==="status") viewDates.sort((a,b)=>sortDir*(store[a]?.status||"").localeCompare(store[b]?.status||""));
+      else if (sortKey.startsWith("set")&&hasSets) {
+        const idx=parseInt(sortKey.slice(3))-1;
+        viewDates.sort((a,b)=>sortDir*((store[a]?.sets?.[idx]??0)-(store[b]?.sets?.[idx]??0)));
       }
     }
 
-    // ── Row DOM ──
     function makeRow(ds) {
-      const saved     = getRow(ds);
-      const streak    = computeStreak(ds);
-      const streakPct = Math.min(streak, STREAK_BAR_MAX) / STREAK_BAR_MAX * 100;
+      const saved=getRow(ds);
+      const streak=computeStreak(ds);
+      const streakPct=Math.min(streak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+      const statusOpts=`<option value=""></option>`+
+        STATUSES.map(s=>`<option value="${s}"${saved.status===s?" selected":""}>${s}</option>`).join("");
 
-      const statusOpts = `<option value=""></option>` +
-        STATUSES.map(s => `<option value="${s}"${saved.status === s ? " selected" : ""}>${s}</option>`).join("");
-
-      const tr = document.createElement("tr");
-      tr.dataset.date = ds;
-
-      let html = `
+      const tr=document.createElement("tr");
+      tr.dataset.date=ds;
+      let html=`
         <td>${displayDate(ds)}</td>
         <td style="padding:0"><select onchange="onSelectChange('${id}','${ds}',this)">${statusOpts}</select></td>
-        <td style="padding:0"><textarea oninput="onReasonInput('${id}','${ds}',this)">${saved.reason || ""}</textarea></td>
+        <td style="padding:0"><textarea oninput="onReasonInput('${id}','${ds}',this)">${saved.reason||""}</textarea></td>
         <td class="set-cell">
-          <div style="text-align:center;font-size:12px;line-height:18px">${streak || ""}</div>
+          <div style="text-align:center;font-size:12px;line-height:18px">${streak||""}</div>
           <div class="bar-container"><div class="bar-streak" style="width:${streakPct}%"></div></div>
         </td>`;
-
       if (hasSets) {
-        const total    = sum(saved.sets);
-        const totalPct = Math.min(total, TOTAL_BAR_MAX) / TOTAL_BAR_MAX * 100;
-        html += `
-        <td class="set-cell">
-          <div style="text-align:center;font-size:12px;line-height:18px">${total || ""}</div>
+        const total=sum(saved.sets);
+        const totalPct=Math.min(total,TOTAL_BAR_MAX)/TOTAL_BAR_MAX*100;
+        html+=`<td class="set-cell">
+          <div style="text-align:center;font-size:12px;line-height:18px">${total||""}</div>
           <div class="bar-container"><div class="bar-total" style="width:${totalPct}%"></div></div>
         </td>`;
-        for (let s = 0; s < 9; s++) {
-          const val = saved.sets[s] || 0;
-          const pct = Math.min(val, SET_BAR_MAX) / SET_BAR_MAX * 100;
-          html += `<td class="set-cell">
-            <input type="number" min="0" value="${val || ""}" placeholder=""
+        for (let s=0;s<NUM_SETS;s++) {
+          const val=saved.sets[s];
+          const displayVal=(val===null||val===undefined)?"":val;
+          const numVal=val??0;
+          const pct=Math.min(numVal,SET_BAR_MAX)/SET_BAR_MAX*100;
+          html+=`<td class="set-cell">
+            <input type="number" min="0" value="${displayVal}" placeholder=""
               oninput="onSetInput('${id}','${ds}')">
             <div class="bar-container"><div class="bar" style="width:${pct}%"></div></div>
           </td>`;
         }
       }
-
-      tr.innerHTML = html;
+      tr.innerHTML=html;
+      const ss=tr.querySelector("select");
+      if (ss) applyStatusColor(ss);
       return tr;
     }
 
-    // ── Update helpers ──
     function updateBars() {
-      const tbody = sel("tbody");
-      if (!tbody) return;
+      const tbody=sel("tbody"); if (!tbody) return;
       if (hasSets) {
-        for (let col = 0; col < 9; col++) {
-          const inputs = [...tbody.querySelectorAll(`tr td:nth-child(${col + 6}) input`)];
-          inputs.forEach(i => {
-            const pct = Math.min(Number(i.value || 0), SET_BAR_MAX) / SET_BAR_MAX * 100;
-            const bar = i.parentElement.querySelector(".bar");
-            if (bar) bar.style.width = pct + "%";
+        for (let col=0;col<NUM_SETS;col++) {
+          [...tbody.querySelectorAll(`tr td:nth-child(${col+6}) input`)].forEach(i=>{
+            const pct=Math.min(Number(i.value||0),SET_BAR_MAX)/SET_BAR_MAX*100;
+            const bar=i.parentElement.querySelector(".bar");
+            if (bar) bar.style.width=pct+"%";
           });
         }
       }
     }
-
-    function updateStreakAndTotal(fromDs) {
-      const tbody = sel("tbody");
-      if (!tbody) return;
-      [...tbody.querySelectorAll("tr")].forEach(row => {
-        const ds    = row.dataset.date;
-        const cells = row.querySelectorAll("td");
-        const streak    = computeStreak(ds);
-        const streakPct = Math.min(streak, STREAK_BAR_MAX) / STREAK_BAR_MAX * 100;
-        cells[3].querySelector("div").textContent         = streak || "";
-        cells[3].querySelector(".bar-streak").style.width = streakPct + "%";
+    function updateStreakAndTotal() {
+      const tbody=sel("tbody"); if (!tbody) return;
+      [...tbody.querySelectorAll("tr")].forEach(row=>{
+        const ds=row.dataset.date;
+        const cells=row.querySelectorAll("td");
+        const streak=computeStreak(ds);
+        const sp=Math.min(streak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+        cells[3].querySelector("div").textContent=streak||"";
+        cells[3].querySelector(".bar-streak").style.width=sp+"%";
         if (hasSets) {
-          const total    = sum(store[ds]?.sets || []);
-          const totalPct = Math.min(total, TOTAL_BAR_MAX) / TOTAL_BAR_MAX * 100;
-          cells[4].querySelector("div").textContent        = total || "";
-          cells[4].querySelector(".bar-total").style.width = totalPct + "%";
+          const total=sum(store[ds]?.sets||[]);
+          const tp=Math.min(total,TOTAL_BAR_MAX)/TOTAL_BAR_MAX*100;
+          cells[4].querySelector("div").textContent=total||"";
+          cells[4].querySelector(".bar-total").style.width=tp+"%";
         }
       });
     }
-
     function updateStats() {
-      const el = sel(".stats");
-      if (!el) return;
-      const entries    = Object.values(store);
-      const daysLogged = entries.length;
+      const el=sel(".stats"); if (!el) return;
+      const entries=Object.values(store);
       if (hasSets) {
-        const totalReps = entries.reduce((t, r) => t + sum(r.sets), 0);
-        el.textContent = `${daysLogged} days logged · ${totalReps} total reps`;
+        el.textContent=`${entries.length} days logged · ${entries.reduce((t,r)=>t+sum(r.sets),0)} total reps`;
       } else {
-        el.textContent = `${daysLogged} days logged`;
+        el.textContent=`${entries.length} days logged`;
       }
     }
 
-    // ── Handlers ──
-    function onSelectChange(ds, el) {
-      if (!store[ds]) store[ds] = getRow(ds);
-      store[ds].status = el.value;
-      save(ds);
-      updateStreakAndTotal(ds);
-      updateStats();
+    function onSelectChange(ds,el) {
+      if (!store[ds]) store[ds]=getRow(ds);
+      store[ds].status=el.value; save(ds);
+      applyStatusColor(el);
+      updateStreakAndTotal(); updateStats();
     }
-
-    function onReasonInput(ds, el) {
-      if (!store[ds]) store[ds] = getRow(ds);
-      store[ds].reason = el.value;
-      save(ds);
+    function onReasonInput(ds,el) {
+      if (!store[ds]) store[ds]=getRow(ds);
+      store[ds].reason=el.value; save(ds);
     }
-
     function onInput(ds) {
       setRowFromDOM(ds);
-
-      // Auto-set status based on config (e.g. pushups → "yes" when sets > 0).
-      // Only fires from set input, so manual status changes via the dropdown are
-      // never overridden unless the user enters another set value afterwards.
       if (autoStatus) {
-        const newStatus = autoStatus(store[ds]);
-        if (newStatus !== null) {
-          store[ds].status = newStatus;
-          save(ds);
-          const row = sel(`tr[data-date="${ds}"]`);
+        const ns=autoStatus(store[ds]);
+        if (ns!==null) {
+          store[ds].status=ns; save(ds);
+          const row=sel(`tr[data-date="${ds}"]`);
           if (row) {
-            const statusSelect = row.querySelectorAll("td")[1].querySelector("select");
-            if (statusSelect) statusSelect.value = newStatus;
+            const ss=row.querySelectorAll("td")[1].querySelector("select");
+            if (ss) { ss.value=ns; applyStatusColor(ss); }
           }
         }
       }
-
-      updateStreakAndTotal(ds);
-      updateBars();
-      updateStats();
+      updateStreakAndTotal(); updateBars(); updateStats();
     }
-
     function onHeaderClick(key) {
-      if (sortKey === key) sortDir *= -1;
-      else { sortKey = key; sortDir = 1; }
-      buildView();
-      rerenderTable();
-      updateHeaderClasses();
+      if (sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=1; }
+      buildView(); rerenderTable(); updateHeaderClasses();
     }
-
     function updateHeaderClasses() {
-      selAll("th[data-sort]").forEach(th => {
-        th.classList.remove("sorted-asc", "sorted-desc");
-        if (th.dataset.sort === sortKey)
-          th.classList.add(sortDir === 1 ? "sorted-asc" : "sorted-desc");
+      selAll("th[data-sort]").forEach(th=>{
+        th.classList.remove("sorted-asc","sorted-desc");
+        if (th.dataset.sort===sortKey) th.classList.add(sortDir===1?"sorted-asc":"sorted-desc");
       });
     }
+    function onFilterChange(val) { filterStatus=val; buildView(); rerenderTable(); }
 
-    function onFilterChange(val) {
-      filterStatus = val;
-      buildView();
-      rerenderTable();
+    async function clearData() {
+      const ok=await confirmClear(`This will permanently delete all saved data for <strong>${label}</strong>.`);
+      if (!ok) return;
+      const keys=[];
+      for (let i=0;i<localStorage.length;i++) {
+        const k=localStorage.key(i); if (k.startsWith(prefix)) keys.push(k);
+      }
+      keys.forEach(k=>localStorage.removeItem(k));
+      for (const ds in store) delete store[ds];
+      buildView(); rerenderTable(); updateStats();
     }
 
-    // ── Scroll ──
     function scrollToDate(ds) {
-      const container = sel(".scroll-container");
-      const row       = sel(`tr[data-date="${ds}"]`);
-      if (!container || !row) return;
-      const thead       = container.querySelector("thead");
-      const theadHeight = thead ? thead.getBoundingClientRect().height : 0;
-      container.scrollTop += row.getBoundingClientRect().top
-                             - container.getBoundingClientRect().top
-                             - theadHeight;
+      const container=sel(".scroll-container");
+      const row=sel(`tr[data-date="${ds}"]`);
+      if (!container||!row) return;
+      const thead=container.querySelector("thead");
+      const th=thead?thead.getBoundingClientRect().height:0;
+      container.scrollTop+=row.getBoundingClientRect().top-container.getBoundingClientRect().top-th;
     }
-
     function jumpToToday() {
-      filterStatus = "";
-      const filterSel = sel(".filter-select");
-      if (filterSel) filterSel.value = "";
-      buildView();
-      rerenderTable();
-      setTimeout(() => scrollToDate(dateStr(new Date())), 50);
+      filterStatus="";
+      const fs=sel(".filter-select"); if (fs) fs.value="";
+      buildView(); rerenderTable();
+      setTimeout(()=>scrollToDate(dateStr(new Date())),50);
     }
 
-    // ── Render ──
     function buildHeader() {
-      const setHeaders = hasSets
-        ? `<th data-sort="total" onclick="onHeaderClick('${id}','total')">Total</th>` +
-          Array.from({length: 9}, (_, i) =>
+      const sh=hasSets
+        ?`<th data-sort="total" onclick="onHeaderClick('${id}','total')">Total</th>`+
+          Array.from({length:NUM_SETS},(_,i)=>
             `<th data-sort="set${i+1}" onclick="onHeaderClick('${id}','set${i+1}')">Set ${i+1}</th>`
           ).join("")
-        : "";
+        :"";
       return `<thead><tr>
         <th data-sort="date"   onclick="onHeaderClick('${id}','date')">Date</th>
         <th data-sort="status" onclick="onHeaderClick('${id}','status')">Status</th>
-        <th>Reason</th>
-        <th>Streak</th>
-        ${setHeaders}
+        <th>Reason</th><th>Streak</th>${sh}
       </tr></thead>`;
     }
-
     function rerenderTable() {
-      const tbody   = sel("tbody");
-      const sentTop = sel(".sentinel-top");
-      const sentBot = sel(".sentinel-bottom");
-      tbody.innerHTML = "";
-
-      if (viewDates === null) {
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        topDate    = clamp(offsetDate(today, -CHUNK));
-        bottomDate = clamp(offsetDate(today,  CHUNK));
-        for (let d = new Date(topDate); d <= bottomDate; d.setDate(d.getDate() + 1))
+      const tbody=sel("tbody"), st=sel(".sentinel-top"), sb=sel(".sentinel-bottom");
+      tbody.innerHTML="";
+      if (viewDates===null) {
+        const today=new Date(); today.setHours(0,0,0,0);
+        topDate=clamp(offsetDate(today,-CHUNK)); bottomDate=clamp(offsetDate(today,CHUNK));
+        for (let d=new Date(topDate);d<=bottomDate;d.setDate(d.getDate()+1))
           tbody.appendChild(makeRow(dateStr(new Date(d))));
-        sentTop.style.display = "";
-        sentBot.style.display = "";
+        st.style.display=""; sb.style.display="";
         scrollToDate(dateStr(new Date()));
       } else {
-        sentTop.style.display = "none";
-        sentBot.style.display = "none";
-        viewDates.forEach(ds => tbody.appendChild(makeRow(ds)));
+        st.style.display="none"; sb.style.display="none";
+        viewDates.forEach(ds=>tbody.appendChild(makeRow(ds)));
       }
       updateBars();
     }
-
     function setupObservers() {
-      const container = sel(".scroll-container");
-      const opts      = { root: container, threshold: 0 };
-
-      new IntersectionObserver(entries => {
-        if (!entries[0].isIntersecting || viewDates !== null) return;
-        if (topDate <= MIN_DATE) return;
-        const tbody = sel("tbody");
-        const frag  = document.createDocumentFragment();
-        for (let i = 0; i < CHUNK; i++) {
-          topDate = clamp(offsetDate(topDate, -1));
-          if (topDate <= MIN_DATE) break;
+      const container=sel(".scroll-container");
+      const opts={root:container,threshold:0};
+      new IntersectionObserver(entries=>{
+        if (!entries[0].isIntersecting||viewDates!==null||topDate<=MIN_DATE) return;
+        const tbody=sel("tbody"), frag=document.createDocumentFragment();
+        for (let i=0;i<CHUNK;i++) {
+          topDate=clamp(offsetDate(topDate,-1));
+          if (topDate<=MIN_DATE) break;
           frag.appendChild(makeRow(dateStr(new Date(topDate))));
         }
         tbody.prepend(frag);
-        for (let i = 0; i < CHUNK; i++) {
-          const last = tbody.lastElementChild;
-          if (!last) break;
-          tbody.removeChild(last);
-          bottomDate = clamp(offsetDate(bottomDate, -1));
+        for (let i=0;i<CHUNK;i++) {
+          const last=tbody.lastElementChild; if (!last) break;
+          tbody.removeChild(last); bottomDate=clamp(offsetDate(bottomDate,-1));
         }
         updateBars();
-      }, opts).observe(sel(".sentinel-top"));
-
-      new IntersectionObserver(entries => {
-        if (!entries[0].isIntersecting || viewDates !== null) return;
-        if (bottomDate >= MAX_DATE) return;
-        const tbody = sel("tbody");
-        const frag  = document.createDocumentFragment();
-        for (let i = 0; i < CHUNK; i++) {
-          bottomDate = clamp(offsetDate(bottomDate, 1));
-          if (bottomDate >= MAX_DATE) break;
+      },opts).observe(sel(".sentinel-top"));
+      new IntersectionObserver(entries=>{
+        if (!entries[0].isIntersecting||viewDates!==null||bottomDate>=MAX_DATE) return;
+        const tbody=sel("tbody"), frag=document.createDocumentFragment();
+        for (let i=0;i<CHUNK;i++) {
+          bottomDate=clamp(offsetDate(bottomDate,1));
+          if (bottomDate>=MAX_DATE) break;
           frag.appendChild(makeRow(dateStr(new Date(bottomDate))));
         }
         tbody.append(frag);
-        for (let i = 0; i < CHUNK; i++) {
-          const first = tbody.firstElementChild;
-          if (!first) break;
-          tbody.removeChild(first);
-          topDate = clamp(offsetDate(topDate, 1));
+        for (let i=0;i<CHUNK;i++) {
+          const first=tbody.firstElementChild; if (!first) break;
+          tbody.removeChild(first); topDate=clamp(offsetDate(topDate,1));
         }
         updateBars();
-      }, opts).observe(sel(".sentinel-bottom"));
+      },opts).observe(sel(".sentinel-bottom"));
     }
 
-    // ── Export / import ──
     function exportData() {
-      const out = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith(prefix)) out[key] = localStorage.getItem(key);
+      const out={};
+      for (let i=0;i<localStorage.length;i++) {
+        const k=localStorage.key(i); if (k.startsWith(prefix)) out[k]=localStorage.getItem(k);
       }
-      const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
-      const a    = document.createElement("a");
-      a.href     = URL.createObjectURL(blob);
-      a.download = `${id}-${exportDateStr(new Date())}.json`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+      const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob); a.download=`${id}-${exportDateStr(new Date())}.json`;
+      a.click(); URL.revokeObjectURL(a.href);
     }
-
     function importData(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
+      const file=input.files[0]; if (!file) return;
+      const reader=new FileReader();
+      reader.onload=e=>{
         try {
-          const data = JSON.parse(e.target.result);
-          let count  = 0;
-          for (const [key, val] of Object.entries(data)) {
+          const data=JSON.parse(e.target.result); let count=0;
+          for (const [key,val] of Object.entries(data)) {
             if (key.startsWith(prefix)) {
-              localStorage.setItem(key, val);
-              const ds = key.slice(prefix.length);
-              try { store[ds] = JSON.parse(val); } catch {}
+              localStorage.setItem(key,val);
+              const ds=key.slice(prefix.length);
+              try { store[ds]=JSON.parse(val); } catch {}
               count++;
             }
           }
-          input.value = "";
-          buildView();
-          rerenderTable();
-          updateStats();
+          input.value=""; buildView(); rerenderTable(); updateStats();
           alert(`Imported ${count} entries.`);
         } catch { alert("Invalid backup file."); }
       };
       reader.readAsText(file);
     }
 
-    // ── Init ──
     function init() {
-      loadAll();
-      buildView();
-
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      topDate    = clamp(offsetDate(today, -CHUNK));
-      bottomDate = clamp(offsetDate(today,  CHUNK));
-
-      const section = document.getElementById(`section-${id}`);
-      section.innerHTML = `
+      loadAll(); buildView();
+      const today=new Date(); today.setHours(0,0,0,0);
+      topDate=clamp(offsetDate(today,-CHUNK)); bottomDate=clamp(offsetDate(today,CHUNK));
+      const section=document.getElementById(`section-${id}`);
+      section.innerHTML=`
         <div class="controls">
           <label>Filter:
             <select class="filter-select" onchange="onFilterChange('${id}',this.value)">
               <option value="">All</option>
-              ${STATUSES.map(s => `<option value="${s}">${s}</option>`).join("")}
+              ${STATUSES.map(s=>`<option value="${s}">${s}</option>`).join("")}
             </select>
           </label>
           <button onclick="jumpToToday('${id}')">Today</button>
@@ -674,111 +704,262 @@
           <button onclick="document.getElementById('import-${id}').click()">Import</button>
           <input type="file" id="import-${id}" accept=".json" style="display:none"
             onchange="importData('${id}',this)">
+          <button class="btn-clear" onclick="clearData('${id}')">Clear</button>
         </div>
         <div class="stats"></div>
         <div class="scroll-container">
           <div class="sentinel sentinel-top"></div>
-          <table>
-            ${buildHeader()}
-            <tbody></tbody>
-          </table>
+          <table>${buildHeader()}<tbody></tbody></table>
           <div class="sentinel sentinel-bottom"></div>
-        </div>
-      `;
-
-      const tbody = sel("tbody");
-      for (let d = new Date(topDate); d <= bottomDate; d.setDate(d.getDate() + 1))
+        </div>`;
+      const tbody=sel("tbody");
+      for (let d=new Date(topDate);d<=bottomDate;d.setDate(d.getDate()+1))
         tbody.appendChild(makeRow(dateStr(new Date(d))));
-
-      updateBars();
-      updateStats();
-      updateHeaderClasses();
-      setupObservers();
+      updateBars(); updateStats(); updateHeaderClasses(); setupObservers();
       scrollToDate(dateStr(today));
     }
 
-    function reload() {
-      loadAll();
-      buildView();
-      rerenderTable();
-      updateStats();
-    }
+    function reload() { loadAll(); buildView(); rerenderTable(); updateStats(); }
 
-    return {
-      init, reload, onSelectChange, onReasonInput, onInput,
-      onHeaderClick, onFilterChange, jumpToToday,
-      exportData, importData,
-    };
+    return { init, reload, onSelectChange, onReasonInput, onInput,
+             onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
 
-  // ── App-level export / import ──────────────────────────────
-  const APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id + ":");
+  // ── App-level export / import / clear ─────────────────────
+  const APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id+":");
 
   function appExport() {
-    const out = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (APP_PREFIXES.some(p => key.startsWith(p))) out[key] = localStorage.getItem(key);
+    const out={};
+    for (let i=0;i<localStorage.length;i++) {
+      const k=localStorage.key(i);
+      if (APP_PREFIXES.some(p=>k.startsWith(p))) out[k]=localStorage.getItem(k);
     }
-    const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
-    const a    = document.createElement("a");
-    a.href     = URL.createObjectURL(blob);
-    a.download = `all-${exportDateStr(new Date())}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=`all-${exportDateStr(new Date())}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
   }
-
   function appImport(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
+    const file=input.files[0]; if (!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
       try {
-        const data = JSON.parse(e.target.result);
-        let count  = 0;
-        for (const [key, val] of Object.entries(data)) {
-          if (APP_PREFIXES.some(p => key.startsWith(p))) {
-            localStorage.setItem(key, val);
-            count++;
-          }
+        const data=JSON.parse(e.target.result); let count=0;
+        for (const [key,val] of Object.entries(data)) {
+          if (APP_PREFIXES.some(p=>key.startsWith(p))) { localStorage.setItem(key,val); count++; }
         }
-        input.value = "";
-        Object.values(trackers).forEach(t => {
-          if (t.reload) t.reload();
-        });
+        input.value="";
+        Object.values(trackers).forEach(t=>{ if (t.reload) t.reload(); });
         alert(`Imported ${count} entries across all trackers.`);
       } catch { alert("Invalid backup file."); }
     };
     reader.readAsText(file);
+  }
+  async function appClear() {
+    const ok=await confirmClear("This will permanently delete <strong>all data across every tracker</strong>.");
+    if (!ok) return;
+    const keys=[];
+    for (let i=0;i<localStorage.length;i++) {
+      const k=localStorage.key(i);
+      if (APP_PREFIXES.some(p=>k.startsWith(p))) keys.push(k);
+    }
+    keys.forEach(k=>localStorage.removeItem(k));
+    Object.values(trackers).forEach(t=>{ if (t.reload) t.reload(); });
   }
 
   // ── Bootstrap ──────────────────────────────────────────────
   const buttonsEl  = document.getElementById("buttons");
   const sectionsEl = document.getElementById("sections");
 
+  // Pre-create all section divs (always present in DOM so open state survives reorder)
+  const sectionEls = {};
   TRACKER_CONFIGS.forEach(config => {
-    const section      = document.createElement("div");
-    section.id         = `section-${config.id}`;
-    section.className  = "tracker-section";
+    const section = document.createElement("div");
+    section.id        = `section-${config.id}`;
+    section.className = "tracker-section";
     sectionsEl.appendChild(section);
+    sectionEls[config.id] = section;
+  });
 
-    const btn       = document.createElement("button");
-    btn.className   = "tracker-btn";
-    btn.textContent = config.label;
-    let initialized = false;
-    btn.addEventListener("click", () => {
-      if (section.style.display === "block") {
-        section.style.display = "none";
-      } else {
-        section.style.display = "block";
-        if (!initialized) {
-          trackers[config.id] = createTracker(config);
-          trackers[config.id].init();
-          initialized = true;
-        }
-      }
+  // Track which trackers have been lazy-initialised
+  const initializedSet = new Set();
+
+  // ── Active section management ──────────────────────────────
+  // Only one section open at a time; button glows when its section is open.
+  function getActiveSectionId() {
+    return TRACKER_CONFIGS.map(c=>c.id).find(id => sectionEls[id].style.display === "block") || null;
+  }
+
+  function setActiveSection(targetId) {
+    // Close all sections and unglow all buttons
+    TRACKER_CONFIGS.forEach(c => {
+      sectionEls[c.id].style.display = "none";
+      const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${c.id}"]`);
+      if (btn) btn.classList.remove("active");
     });
-    buttonsEl.appendChild(btn);
+
+    if (!targetId) return; // just close everything
+
+    // Open target and glow its button
+    sectionEls[targetId].style.display = "block";
+    const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${targetId}"]`);
+    if (btn) btn.classList.add("active");
+
+    // Lazy-init tracker
+    if (!initializedSet.has(targetId)) {
+      const config = TRACKER_CONFIGS.find(c => c.id === targetId);
+      trackers[targetId] = createTracker(config);
+      trackers[targetId].init();
+      initializedSet.add(targetId);
+    }
+  }
+
+  // ── Button order persistence ───────────────────────────────
+  function loadButtonOrder() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("_buttonOrder"));
+      if (Array.isArray(saved) && saved.every(id => TRACKER_CONFIGS.some(c => c.id === id)))
+        return saved;
+    } catch {}
+    return TRACKER_CONFIGS.map(c => c.id);
+  }
+  function saveButtonOrder() {
+    const order = [...buttonsEl.querySelectorAll(".tracker-btn[data-id]")].map(b => b.dataset.id);
+    localStorage.setItem("_buttonOrder", JSON.stringify(order));
+  }
+
+  // ── Create a tracker toggle button element ─────────────────
+  function makeTrackerBtn(config) {
+    const btn = document.createElement("button");
+    btn.className   = "tracker-btn";
+    btn.dataset.id  = config.id;
+    btn.textContent = config.label;
+    return btn;
+  }
+
+  // Initial button render in saved order
+  loadButtonOrder().forEach(id => {
+    const config = TRACKER_CONFIGS.find(c => c.id === id);
+    if (config) buttonsEl.appendChild(makeTrackerBtn(config));
+  });
+
+  // ── Drag-to-reorder (pointer events) ──────────────────────
+  // Uses a fixed-position ghost + invisible original acting as drop slot.
+  // A movement threshold separates drag from tap/click.
+  const DRAG_THRESHOLD = 6; // px before drag activates
+  let drag = null;
+
+  buttonsEl.addEventListener("pointerdown", e => {
+    const btn = e.target.closest(".tracker-btn[data-id]");
+    if (!btn) return;
+    e.preventDefault();
+    btn.setPointerCapture(e.pointerId);
+    drag = {
+      id:     btn.dataset.id,
+      btn,
+      startX: e.clientX,
+      startY: e.clientY,
+      offX:   e.clientX - btn.getBoundingClientRect().left,
+      offY:   e.clientY - btn.getBoundingClientRect().top,
+      ghost:  null,
+      active: false,
+    };
+  });
+
+  // pointermove fires on buttonsEl because the btn has pointer capture,
+  // and events bubble up. We also listen on document as a safety net.
+  document.addEventListener("pointermove", e => {
+    if (!drag) return;
+
+    if (!drag.active) {
+      const dist = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
+      if (dist < DRAG_THRESHOLD) return;
+
+      // Activate drag
+      drag.active = true;
+      const rect = drag.btn.getBoundingClientRect();
+
+      // Ghost: a floating clone that follows the cursor
+      drag.ghost = drag.btn.cloneNode(true);
+      drag.ghost.classList.add("drag-ghost");
+      Object.assign(drag.ghost.style, {
+        position:      "fixed",
+        left:          rect.left + "px",
+        top:           rect.top  + "px",
+        width:         rect.width + "px",
+        pointerEvents: "none",
+        opacity:       "0.75",
+        zIndex:        "9000",
+        margin:        "0",
+        boxSizing:     "border-box",
+      });
+      document.body.appendChild(drag.ghost);
+
+      // Hide original in place — it acts as the invisible drop slot
+      drag.btn.style.opacity       = "0";
+      drag.btn.style.pointerEvents = "none";
+    }
+
+    // Move ghost
+    drag.ghost.style.left = (e.clientX - drag.offX) + "px";
+    drag.ghost.style.top  = (e.clientY - drag.offY) + "px";
+
+    // Find the nearest visible button and live-reorder the hidden original
+    const siblings = [...buttonsEl.querySelectorAll(".tracker-btn[data-id]")]
+      .filter(b => b !== drag.btn);
+
+    if (siblings.length === 0) return;
+
+    let best = null, bestDist = Infinity;
+    siblings.forEach(b => {
+      const r  = b.getBoundingClientRect();
+      const cx = r.left + r.width  / 2;
+      const cy = r.top  + r.height / 2;
+      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+      if (dist < bestDist) { bestDist = dist; best = b; }
+    });
+
+    if (best) {
+      const r = best.getBoundingClientRect();
+      // Snap decision: insert before or after based on which half of the target the cursor is in.
+      // Use X axis primarily (left/right columns), fall back to Y for same-column detection.
+      const halfW = r.width / 2;
+      const halfH = r.height / 2;
+      const relX  = e.clientX - (r.left + halfW);
+      const relY  = e.clientY - (r.top  + halfH);
+      // Weight X more since columns are the primary snap axis
+      const insertBefore = (relX * 1.5 + relY) < 0;
+      buttonsEl.insertBefore(drag.btn, insertBefore ? best : best.nextSibling);
+    }
+  });
+
+  document.addEventListener("pointerup", e => {
+    if (!drag) return;
+
+    if (drag.active) {
+      // Restore original button
+      drag.btn.style.opacity       = "";
+      drag.btn.style.pointerEvents = "";
+      drag.ghost.remove();
+      saveButtonOrder();
+    } else {
+      // It was a tap/click — toggle section
+      const currentlyOpen = getActiveSectionId();
+      setActiveSection(currentlyOpen === drag.id ? null : drag.id);
+    }
+
+    drag = null;
+  });
+
+  // Cancel drag on pointer cancel (e.g. incoming call on Android)
+  document.addEventListener("pointercancel", () => {
+    if (!drag) return;
+    if (drag.active) {
+      drag.btn.style.opacity       = "";
+      drag.btn.style.pointerEvents = "";
+      if (drag.ghost) drag.ghost.remove();
+    }
+    drag = null;
   });
 </script>
 </body>
