@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v37";
+const CACHE = "habit-tracker-v38";
 
 const ASSETS = [
   "./",
@@ -35,18 +35,17 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
-  // Always fetch index.html fresh from network
   if (e.request.url.endsWith("index.html") || e.request.url.endsWith("/")) {
     e.respondWith(fetch(e.request).catch(() => caches.match("./index.html")));
     return;
   }
-  // Cache-first for everything else
   e.respondWith(
     caches.match(e.request).then(cached => {
       return cached || fetch(e.request).catch(() => {});
     })
   );
 });
+
 
 
 

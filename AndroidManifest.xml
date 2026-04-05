@@ -18,7 +18,6 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-    <!-- Required to launch Samsung My Files -->
     <queries>
         <package android:name="com.sec.android.app.myfiles" />
     </queries>

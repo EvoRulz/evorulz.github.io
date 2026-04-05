@@ -23,6 +23,7 @@
 
     h1 { margin-top: 0; }
 
+    /* ── App-level buttons (Export All etc) ── */
     .app-btn {
       padding: 12px 20px;
       background: #444;
@@ -37,12 +38,12 @@
       color: #ff9999;
     }
 
+    /* ── Tracker toggle buttons in the drag grid ── */
     #buttons {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-bottom: 12px;
-      min-height: 120px; 
     }
     .tracker-btn {
       width: 100%;
@@ -56,14 +57,14 @@
       font-size: 16px;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none;
+      touch-action: none; /* required for pointer capture on mobile/TWA */
       transition: box-shadow 0.2s, background 0.2s;
     }
     .tracker-btn.active {
       background: #555;
       box-shadow: 0 0 16px 5px rgba(150, 90, 255, 0.65);
     }
-
+    /* Ghost clone shouldn't inherit transitions */
     .tracker-btn.drag-ghost {
       transition: none !important;
     }
@@ -169,7 +170,7 @@
 
     .sentinel { height: 1px; }
 
-
+    /* ── Confirmation overlay ── */
     #confirm-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.78); z-index: 9999;
@@ -206,6 +207,7 @@
 </head>
 <body>
 
+<!-- Shared confirmation overlay -->
 <div id="confirm-overlay">
   <div id="confirm-box">
     <p id="confirm-msg"></p>
@@ -217,7 +219,7 @@
 </div>
 
 <h1>Habit Tracker
-  <span style="font-size:14px;color:#888;font-weight:normal">v37</span>
+  <span style="font-size:14px;color:#888;font-weight:normal">v38</span>
   <span id="live-clock" style="font-size:13px;color:#666;font-weight:normal;margin-left:18px;letter-spacing:0.02em"></span>
 </h1>
 
@@ -228,11 +230,14 @@
   <button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button>
   <button class="app-btn" onclick="openMyFiles()">My Files</button>
 </div>
+
+<!-- Drag-sortable 3-column grid of tracker toggle buttons -->
 <div id="buttons"></div>
+<!-- Tracker sections rendered below buttons -->
 <div id="sections"></div>
 
 <script>
-
+  // ── Live clock ─────────────────────────────────────────────
   (function() {
     const el = document.getElementById("live-clock");
     function tick() {
@@ -249,8 +254,10 @@
     setInterval(tick, 1000);
   })();
 
+  // ── My Files ───────────────────────────────────────────────
   function openMyFiles() { window.location.href = "myfiles://downloads"; }
 
+  // ── Service Worker ─────────────────────────────────────────
   if ('serviceWorker' in navigator && !location.hostname.includes('claudeusercontent.com')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
@@ -259,6 +266,7 @@
     });
   }
 
+  // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
   const MAX_DATE       = new Date("2111-04-19");
   const STATUSES       = ["yes", "no", "idk", "not yet", "n/a"];
@@ -268,6 +276,7 @@
   const STREAK_BAR_MAX = 30;
   const NUM_SETS       = 10;
 
+  // ── Status colour ──────────────────────────────────────────
   function applyStatusColor(el) {
     const v = el.value;
     if      (v === "yes") { el.style.background = "#90EE90"; el.style.color = "#000"; }
@@ -277,6 +286,7 @@
     else                  { el.style.background = "#FFD580"; el.style.color = "#000"; }
   }
 
+  // ── Confirmation overlay ───────────────────────────────────
   let _confirmResolve = null;
   function confirmClear(bodyHTML) {
     return new Promise(resolve => {
@@ -313,6 +323,7 @@
     if (e.target === document.getElementById("confirm-overlay")) confirmCancel();
   });
 
+  // ── Tracker configs ────────────────────────────────────────
   const TRACKER_CONFIGS = [
     {
       id:        "pushups",
@@ -340,6 +351,7 @@
     },
   ];
 
+  // ── Utils ──────────────────────────────────────────────────
   function dateStr(d) {
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   }
@@ -360,6 +372,7 @@
   }
   function sum(sets) { return (sets||[]).reduce((a,b) => a + (b??0), 0); }
 
+  // ── Global dispatch ────────────────────────────────────────
   const trackers = {};
   function onSelectChange(id,ds,el) { trackers[id].onSelectChange(ds,el); }
   function onReasonInput(id,ds,el)  { trackers[id].onReasonInput(ds,el); }
@@ -371,6 +384,7 @@
   function importData(id,el)          { trackers[id].importData(el); }
   function clearData(id)              { trackers[id].clearData(); }
 
+  // ── Tracker factory ────────────────────────────────────────
   function createTracker(config) {
     const { id, label, hasSets, hasStreak, autoStatus } = config;
     const prefix = id + ":";
@@ -711,6 +725,7 @@
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
 
+  // ── App-level export / import / clear ─────────────────────
   const APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id+":");
 
   function appExport() {
@@ -752,9 +767,11 @@
     Object.values(trackers).forEach(t=>{ if (t.reload) t.reload(); });
   }
 
+  // ── Bootstrap ──────────────────────────────────────────────
   const buttonsEl  = document.getElementById("buttons");
   const sectionsEl = document.getElementById("sections");
 
+  // Pre-create all section divs (always present in DOM so open state survives reorder)
   const sectionEls = {};
   TRACKER_CONFIGS.forEach(config => {
     const section = document.createElement("div");
@@ -764,26 +781,31 @@
     sectionEls[config.id] = section;
   });
 
+  // Track which trackers have been lazy-initialised
   const initializedSet = new Set();
 
+  // ── Active section management ──────────────────────────────
+  // Only one section open at a time; button glows when its section is open.
   function getActiveSectionId() {
     return TRACKER_CONFIGS.map(c=>c.id).find(id => sectionEls[id].style.display === "block") || null;
   }
 
   function setActiveSection(targetId) {
-
+    // Close all sections and unglow all buttons
     TRACKER_CONFIGS.forEach(c => {
       sectionEls[c.id].style.display = "none";
       const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${c.id}"]`);
       if (btn) btn.classList.remove("active");
     });
 
-    if (!targetId) return;
+    if (!targetId) return; // just close everything
 
+    // Open target and glow its button
     sectionEls[targetId].style.display = "block";
     const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${targetId}"]`);
     if (btn) btn.classList.add("active");
 
+    // Lazy-init tracker
     if (!initializedSet.has(targetId)) {
       const config = TRACKER_CONFIGS.find(c => c.id === targetId);
       trackers[targetId] = createTracker(config);
@@ -792,6 +814,7 @@
     }
   }
 
+  // ── Button order persistence ───────────────────────────────
   function loadButtonOrder() {
     try {
       const saved = JSON.parse(localStorage.getItem("_buttonOrder"));
@@ -805,6 +828,7 @@
     localStorage.setItem("_buttonOrder", JSON.stringify(order));
   }
 
+  // ── Create a tracker toggle button element ─────────────────
   function makeTrackerBtn(config) {
     const btn = document.createElement("button");
     btn.className   = "tracker-btn";
@@ -813,12 +837,17 @@
     return btn;
   }
 
+  // Initial button render in saved order
   loadButtonOrder().forEach(id => {
     const config = TRACKER_CONFIGS.find(c => c.id === id);
     if (config) buttonsEl.appendChild(makeTrackerBtn(config));
   });
 
-  const DRAG_THRESHOLD = 6;
+  // ── Drag-to-reorder (pointer events) ──────────────────────
+  // Ghost floats freely. A placeholder <div> moves through the grid
+  // to show the drop slot. The original button is hidden with display:none
+  // so it never causes a reflow during the drag — this prevents jumping.
+  const DRAG_THRESHOLD = 6; // px before drag activates
   let drag = null;
 
   buttonsEl.addEventListener("pointerdown", e => {
@@ -833,7 +862,8 @@
       startY: e.clientY,
       offX:   e.clientX - btn.getBoundingClientRect().left,
       offY:   e.clientY - btn.getBoundingClientRect().top,
-      ghost:  null,
+      ghost:       null,
+      placeholder: null,
       active: false,
     };
   });
@@ -845,9 +875,11 @@
       const dist = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
       if (dist < DRAG_THRESHOLD) return;
 
+      // Activate drag
       drag.active = true;
       const rect = drag.btn.getBoundingClientRect();
 
+      // Ghost: floating clone that follows the cursor
       drag.ghost = drag.btn.cloneNode(true);
       drag.ghost.classList.add("drag-ghost");
       Object.assign(drag.ghost.style, {
@@ -855,6 +887,7 @@
         left:          rect.left + "px",
         top:           rect.top  + "px",
         width:         rect.width + "px",
+        height:        rect.height + "px",
         pointerEvents: "none",
         opacity:       "0.75",
         zIndex:        "9000",
@@ -863,35 +896,55 @@
       });
       document.body.appendChild(drag.ghost);
 
-      drag.btn.style.opacity       = "0";
-      drag.btn.style.pointerEvents = "none";
+      // Placeholder: a same-size slot that moves through the grid
+      drag.placeholder = document.createElement("div");
+      drag.placeholder.className = "tracker-btn";
+      Object.assign(drag.placeholder.style, {
+        width:         rect.width  + "px",
+        height:        rect.height + "px",
+        background:    "transparent",
+        border:        "2px dashed #666",
+        boxSizing:     "border-box",
+        pointerEvents: "none",
+        opacity:       "0.5",
+        cursor:        "default",
+      });
+      // Insert placeholder where the original is, then hide original
+      drag.btn.parentNode.insertBefore(drag.placeholder, drag.btn);
+      drag.btn.style.display = "none";
     }
 
+    // Move ghost
     drag.ghost.style.left = (e.clientX - drag.offX) + "px";
     drag.ghost.style.top  = (e.clientY - drag.offY) + "px";
 
-    const siblings = [...buttonsEl.querySelectorAll(".tracker-btn[data-id]")]
-      .filter(b => b !== drag.btn);
+    // Determine where to move the placeholder.
+    // Iterate buttons in DOM order; insert before the first one where
+    // the cursor is "above" it (cursor Y < button mid-Y) or on the same
+    // row and to its left (cursor Y inside row, cursor X < button mid-X).
+    const slots = [...buttonsEl.querySelectorAll(".tracker-btn[data-id]")];
 
-    if (siblings.length === 0) return;
+    let target = null; // insert placeholder before this element (null = append)
+    for (const sib of slots) {
+      const r   = sib.getBoundingClientRect();
+      const midX = r.left + r.width  / 2;
+      const midY = r.top  + r.height / 2;
+      if (e.clientY < midY) {
+        // Cursor is above this button's midpoint — always insert before it
+        target = sib;
+        break;
+      }
+      if (e.clientY < r.bottom && e.clientX < midX) {
+        // Same row, cursor is left of its midpoint
+        target = sib;
+        break;
+      }
+    }
 
-    let best = null, bestDist = Infinity;
-    siblings.forEach(b => {
-      const r  = b.getBoundingClientRect();
-      const cx = r.left + r.width  / 2;
-      const cy = r.top  + r.height / 2;
-      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-      if (dist < bestDist) { bestDist = dist; best = b; }
-    });
-
-    if (best) {
-      const r = best.getBoundingClientRect();
-      const halfW = r.width / 2;
-      const halfH = r.height / 2;
-      const relX  = e.clientX - (r.left + halfW);
-      const relY  = e.clientY - (r.top  + halfH);
-      const insertBefore = (relX * 1.5 + relY) < 0;
-      buttonsEl.insertBefore(drag.btn, insertBefore ? best : best.nextSibling);
+    if (target) {
+      buttonsEl.insertBefore(drag.placeholder, target);
+    } else {
+      buttonsEl.appendChild(drag.placeholder);
     }
   });
 
@@ -899,11 +952,14 @@
     if (!drag) return;
 
     if (drag.active) {
-      drag.btn.style.opacity       = "";
-      drag.btn.style.pointerEvents = "";
+      // Move original to where the placeholder ended up, then clean up
+      drag.placeholder.parentNode.insertBefore(drag.btn, drag.placeholder);
+      drag.btn.style.display = "";
+      drag.placeholder.remove();
       drag.ghost.remove();
       saveButtonOrder();
     } else {
+      // Tap/click — toggle section
       const currentlyOpen = getActiveSectionId();
       setActiveSection(currentlyOpen === drag.id ? null : drag.id);
     }
@@ -911,11 +967,16 @@
     drag = null;
   });
 
+  // Cancel drag on pointer cancel (e.g. incoming call on Android)
   document.addEventListener("pointercancel", () => {
     if (!drag) return;
     if (drag.active) {
-      drag.btn.style.opacity       = "";
-      drag.btn.style.pointerEvents = "";
+      // Restore original and clean up
+      if (drag.placeholder && drag.placeholder.parentNode) {
+        drag.placeholder.parentNode.insertBefore(drag.btn, drag.placeholder);
+        drag.placeholder.remove();
+      }
+      drag.btn.style.display = "";
       if (drag.ghost) drag.ghost.remove();
     }
     drag = null;
@@ -923,5 +984,3 @@
 </script>
 </body>
 </html>
-
-
