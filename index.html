@@ -220,17 +220,14 @@
     #settings-cog:hover { background: #3a3a3a; color: #fff; }
     #settings-cog svg { width: 16px; height: 16px; fill: currentColor; }
 
-    #widget-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-    .widget { position: relative; }
-    .widget-handle {
-      display: flex; align-items: center; gap: 8px;
-      cursor: grab; padding: 2px 4px; margin-bottom: 4px;
-      border-radius: 4px; user-select: none; -webkit-user-select: none;
-      touch-action: none;
+    #top-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 12px; align-items: center;
     }
-    .widget-handle:hover { background: #1e1e1e; }
-    .widget-handle .drag-dots { color: #555; font-size: 16px; line-height: 1; }
-    .widget-handle .widget-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.08em; }
+    .top-item {
+      touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab;
+    }
+    .top-item:active { cursor: grabbing; }
     #settings-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.78); z-index: 9998;
@@ -280,50 +277,31 @@
   </div>
 </div>
 
-<div id="widget-grid">
-
-  <div class="widget" data-widget="title">
-    <div class="widget-handle"><span class="drag-dots">⠿</span><span class="widget-label">Title</span></div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <h1 style="margin:0">Habit Tracker
-        <span style="font-size:14px;color:#888;font-weight:normal">v51</span>
-        <span id="live-clock" style="font-size:13px;color:#666;font-weight:normal;margin-left:18px;letter-spacing:0.02em"></span>
-      </h1>
-      <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
-        <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-        </svg>
-      </button>
-    </div>
+<div id="top-grid">
+  <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v52</span></div>
+  <div class="top-item" data-item="clock"><span id="live-clock" style="font-size:13px;color:#666;letter-spacing:0.02em"></span></div>
+  <div class="top-item" data-item="settings">
+    <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
+      <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+    </button>
   </div>
-
-  <div class="widget" data-widget="controls">
-    <div class="widget-handle"><span class="drag-dots">⠿</span><span class="widget-label">Controls</span></div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <button class="app-btn" onclick="appExport()">Export All</button>
-      <button class="app-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
-      <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
-      <button class="app-btn" onclick="exportLayout()">Export Layout</button>
-      <button class="app-btn" onclick="document.getElementById('layout-import-file').click()">Import Layout</button>
-      <input type="file" id="layout-import-file" accept=".json" style="display:none" onchange="importLayout(this)">
-      <button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button>
-      <button class="app-btn" onclick="openMyFiles()">My Files</button>
-    </div>
+  <div class="top-item" data-item="export-all"><button class="app-btn" onclick="appExport()">Export All</button></div>
+  <div class="top-item" data-item="import-all">
+    <button class="app-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
+    <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
   </div>
-
-  <div class="widget" data-widget="habits-toggle">
-    <div class="widget-handle"><span class="drag-dots">⠿</span><span class="widget-label">Habits Toggle</span></div>
-    <button class="app-btn" id="habits-toggle-btn" onclick="toggleHabits()">Hide Habits</button>
+  <div class="top-item" data-item="export-layout"><button class="app-btn" onclick="exportLayout()">Export Layout</button></div>
+  <div class="top-item" data-item="import-layout">
+    <button class="app-btn" onclick="document.getElementById('layout-import-file').click()">Import Layout</button>
+    <input type="file" id="layout-import-file" accept=".json" style="display:none" onchange="importLayout(this)">
   </div>
-
-  <div class="widget" data-widget="habits">
-    <div class="widget-handle"><span class="drag-dots">⠿</span><span class="widget-label">Habits</span></div>
-    <div id="buttons"></div>
-  </div>
-
+  <div class="top-item" data-item="clear-all"><button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button></div>
+  <div class="top-item" data-item="my-files"><button class="app-btn" onclick="openMyFiles()">My Files</button></div>
+  <div class="top-item" data-item="hide-habits"><button class="app-btn" id="hide-habits-btn" onclick="toggleHabits()">Hide Habits</button></div>
 </div>
+<div id="buttons"></div>
 <div id="sections"></div>
-
 <script>
   // ── Live clock ─────────────────────────────────────────────
   (function() {
@@ -1169,103 +1147,106 @@ function appExport() {
   function toggleHabits() {
     habitsVisible = !habitsVisible;
     document.getElementById("buttons").style.display = habitsVisible ? "" : "none";
-    document.getElementById("habits-toggle-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
+    document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
   }
 
-  // ── Widget drag-to-reorder ─────────────────────────────────
-  const widgetGrid = document.getElementById("widget-grid");
-  let wdrag = null;
-  const W_THRESHOLD = 6;
+  // ── Top grid drag-to-reorder ───────────────────────────────
+  const topGrid = document.getElementById("top-grid");
+  let tdrag = null;
+  const T_THRESHOLD = 6;
 
-  widgetGrid.addEventListener("pointerdown", e => {
-    const handle = e.target.closest(".widget-handle");
-    if (!handle) return;
-    const widget = handle.closest(".widget");
-    if (!widget) return;
+  topGrid.addEventListener("pointerdown", e => {
+    const item = e.target.closest(".top-item");
+    if (!item) return;
     e.preventDefault();
-    handle.setPointerCapture(e.pointerId);
-    const rect = widget.getBoundingClientRect();
-    wdrag = {
-      widget, startX: e.clientX, startY: e.clientY,
+    item.setPointerCapture(e.pointerId);
+    const rect = item.getBoundingClientRect();
+    tdrag = {
+      item, startX: e.clientX, startY: e.clientY,
       offX: e.clientX - rect.left, offY: e.clientY - rect.top,
-      h: rect.height, ghost: null, lastOver: null, active: false,
+      w: rect.width, h: rect.height,
+      ghost: null, lastOver: null, active: false,
     };
   });
 
   document.addEventListener("pointermove", e => {
-    if (!wdrag) return;
-    if (!wdrag.active) {
-      if (Math.hypot(e.clientX - wdrag.startX, e.clientY - wdrag.startY) < W_THRESHOLD) return;
-      wdrag.active = true;
-      const rect = wdrag.widget.getBoundingClientRect();
-      wdrag.ghost = wdrag.widget.cloneNode(true);
-      Object.assign(wdrag.ghost.style, {
+    if (!tdrag) return;
+    if (!tdrag.active) {
+      if (Math.hypot(e.clientX - tdrag.startX, e.clientY - tdrag.startY) < T_THRESHOLD) return;
+      tdrag.active = true;
+      const rect = tdrag.item.getBoundingClientRect();
+      tdrag.ghost = tdrag.item.cloneNode(true);
+      Object.assign(tdrag.ghost.style, {
         position: "fixed", left: rect.left+"px", top: rect.top+"px",
-        width: rect.width+"px", pointerEvents: "none", opacity: "0.8",
-        zIndex: "8999", background: "#111", borderRadius: "6px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.5)", margin: "0",
+        width: rect.width+"px", height: rect.height+"px",
+        pointerEvents: "none", opacity: "0.75", zIndex: "8999",
+        margin: "0", boxSizing: "border-box",
       });
-      document.body.appendChild(wdrag.ghost);
-      wdrag.widget.style.opacity = "0.15";
+      document.body.appendChild(tdrag.ghost);
+      tdrag.item.style.visibility = "hidden";
     }
-    wdrag.ghost.style.left = (e.clientX - wdrag.offX) + "px";
-    wdrag.ghost.style.top  = (e.clientY - wdrag.offY) + "px";
+    tdrag.ghost.style.left = (e.clientX - tdrag.offX) + "px";
+    tdrag.ghost.style.top  = (e.clientY - tdrag.offY) + "px";
 
-    const gcy = e.clientY - wdrag.offY + wdrag.h / 2;
+    const gcx = e.clientX - tdrag.offX + tdrag.w / 2;
+    const gcy = e.clientY - tdrag.offY + tdrag.h / 2;
     let over = null;
-    for (const t of widgetGrid.children) {
-      if (t === wdrag.widget) continue;
+    for (const t of topGrid.children) {
+      if (t === tdrag.item) continue;
       const r = t.getBoundingClientRect();
-      if (gcy >= r.top && gcy <= r.bottom) { over = t; break; }
+      if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
     }
-    if (!over) { wdrag.lastOver = null; return; }
-    if (over === wdrag.lastOver) return;
-    wdrag.lastOver = over;
-    const overNext = over.nextSibling, wNext = wdrag.widget.nextSibling;
-    if (wNext === over)              widgetGrid.insertBefore(over, wdrag.widget);
-    else if (overNext === wdrag.widget) widgetGrid.insertBefore(wdrag.widget, over);
+    if (!over) { tdrag.lastOver = null; return; }
+    if (over === tdrag.lastOver) return;
+    tdrag.lastOver = over;
+    const overNext = over.nextSibling, iNext = tdrag.item.nextSibling;
+    if (iNext === over)               topGrid.insertBefore(over, tdrag.item);
+    else if (overNext === tdrag.item) topGrid.insertBefore(tdrag.item, over);
     else {
-      widgetGrid.insertBefore(wdrag.widget, overNext || null);
-      widgetGrid.insertBefore(over, wNext || null);
+      topGrid.insertBefore(tdrag.item, overNext || null);
+      topGrid.insertBefore(over, iNext || null);
     }
   });
 
-  document.addEventListener("pointerup", e => {
-    if (!wdrag) return;
-    if (wdrag.active) {
-      wdrag.widget.style.opacity = "";
-      if (wdrag.ghost) wdrag.ghost.remove();
-      saveWidgetOrder();
+  document.addEventListener("pointerup", () => {
+    if (!tdrag) return;
+    if (tdrag.active) {
+      tdrag.item.style.visibility = "";
+      if (tdrag.ghost) tdrag.ghost.remove();
+      saveTopGridOrder();
+    } else {
+      const btn = tdrag.item.querySelector("button");
+      if (btn) btn.click();
     }
-    wdrag = null;
+    tdrag = null;
   });
 
-  document.addEventListener("pointercancel", e => {
-    if (!wdrag) return;
-    wdrag.widget.style.opacity = "";
-    if (wdrag.ghost) wdrag.ghost.remove();
-    wdrag = null;
+  document.addEventListener("pointercancel", () => {
+    if (!tdrag) return;
+    tdrag.item.style.visibility = "";
+    if (tdrag.ghost) tdrag.ghost.remove();
+    tdrag = null;
   });
 
-  // ── Widget order persistence ───────────────────────────────
-  function saveWidgetOrder() {
-    const order = [...widgetGrid.children].map(w => w.dataset.widget).filter(Boolean);
-    localStorage.setItem("_widgetOrder", JSON.stringify(order));
+  function saveTopGridOrder() {
+    const order = [...topGrid.children].map(w => w.dataset.item).filter(Boolean);
+    localStorage.setItem("_topGridOrder", JSON.stringify(order));
   }
-  function applyWidgetOrder() {
+  function applyTopGridOrder() {
     try {
-      const saved = JSON.parse(localStorage.getItem("_widgetOrder"));
+      const saved = JSON.parse(localStorage.getItem("_topGridOrder"));
       if (!Array.isArray(saved)) return;
       saved.forEach(id => {
-        const w = widgetGrid.querySelector(`.widget[data-widget="${id}"]`);
-        if (w) widgetGrid.appendChild(w);
+        const w = topGrid.querySelector(`.top-item[data-item="${id}"]`);
+        if (w) topGrid.appendChild(w);
       });
     } catch {}
   }
-  applyWidgetOrder();
+  applyTopGridOrder();
 </script>
 </body>
 </html>
+
 
 
 
