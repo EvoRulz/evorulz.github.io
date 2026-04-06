@@ -62,7 +62,7 @@
       transition: box-shadow 0.2s, background 0.2s;
     }
     .tracker-btn.active {
-      background: #555;
+      background: var(--btn-active-bg, #555);
       box-shadow: 0 0 16px 5px var(--btn-glow, rgba(150, 90, 255, 0.65));
     }
     /* Ghost clone shouldn't inherit transitions */
@@ -286,7 +286,12 @@
     }
     #settings-btn-preview {
       padding: 10px 16px; border-radius: 6px; border: none;
-      font-size: 15px; text-align: center; pointer-events: none; cursor: default;
+      font-size: 15px; text-align: center; cursor: pointer;
+      transition: box-shadow 0.2s, background 0.2s;
+    }
+    #settings-btn-preview.active {
+      background: var(--preview-active-bg, #555) !important;
+      box-shadow: 0 0 16px 5px var(--preview-glow, rgba(150, 90, 255, 0.65));
     }
     #settings-footer { display: flex; gap: 8px; margin-top: 4px; }
     #settings-save, #settings-cancel, #settings-reset, #settings-export, #settings-import-btn {
@@ -317,7 +322,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v64</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v65</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -356,6 +361,10 @@
     <div class="settings-row">
       <label>Glow colour</label>
       <input type="color" id="s-glow" oninput="settingsChange()">
+    </div>
+    <div class="settings-row">
+      <label>Active background</label>
+      <input type="color" id="s-activebg" oninput="settingsChange()">
     </div>
     <div class="settings-row">
       <label>Font</label>
@@ -1096,7 +1105,7 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
-  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif", glow: "#9659ff" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif", glow: "#9659ff", activeBg: "#555555" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -1104,10 +1113,11 @@ function appExport() {
   } catch {}
 
   function applyBtnStyle() {
-    buttonsEl.style.setProperty("--btn-bg",   btnStyle.bg);
-    buttonsEl.style.setProperty("--btn-fg",   btnStyle.fg);
-    buttonsEl.style.setProperty("--btn-font", btnStyle.font);
-    buttonsEl.style.setProperty("--btn-glow", btnStyle.glow);
+    buttonsEl.style.setProperty("--btn-bg",        btnStyle.bg);
+    buttonsEl.style.setProperty("--btn-fg",        btnStyle.fg);
+    buttonsEl.style.setProperty("--btn-font",      btnStyle.font);
+    buttonsEl.style.setProperty("--btn-glow",      btnStyle.glow);
+    buttonsEl.style.setProperty("--btn-active-bg", btnStyle.activeBg);
   }
   applyBtnStyle();
 
@@ -1115,10 +1125,11 @@ function appExport() {
   function settingsOpen() {
     _settingsJustOpened = true;
     _btnStyleSnapshot = Object.assign({}, btnStyle);
-    document.getElementById("s-bg").value   = btnStyle.bg;
-    document.getElementById("s-fg").value   = btnStyle.fg;
-    document.getElementById("s-font").value = btnStyle.font;
-    document.getElementById("s-glow").value = btnStyle.glow;
+    document.getElementById("s-bg").value       = btnStyle.bg;
+    document.getElementById("s-fg").value       = btnStyle.fg;
+    document.getElementById("s-font").value     = btnStyle.font;
+    document.getElementById("s-glow").value     = btnStyle.glow;
+    document.getElementById("s-activebg").value = btnStyle.activeBg;
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
   }
@@ -1153,10 +1164,11 @@ function appExport() {
         if (data["_btnStyle"]) {
           btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS, JSON.parse(data["_btnStyle"]));
           applyBtnStyle();
-          document.getElementById("s-bg").value   = btnStyle.bg;
-          document.getElementById("s-fg").value   = btnStyle.fg;
-          document.getElementById("s-font").value = btnStyle.font;
-          document.getElementById("s-glow").value = btnStyle.glow;
+          document.getElementById("s-bg").value       = btnStyle.bg;
+          document.getElementById("s-fg").value       = btnStyle.fg;
+          document.getElementById("s-font").value     = btnStyle.font;
+          document.getElementById("s-glow").value     = btnStyle.glow;
+          document.getElementById("s-activebg").value = btnStyle.activeBg;
           settingsUpdatePreview();
         }
         input.value = "";
@@ -1165,10 +1177,11 @@ function appExport() {
     reader.readAsText(file);
   }
   function settingsChange() {
-    btnStyle.bg   = document.getElementById("s-bg").value;
-    btnStyle.fg   = document.getElementById("s-fg").value;
-    btnStyle.font = document.getElementById("s-font").value;
-    btnStyle.glow = document.getElementById("s-glow").value;
+    btnStyle.bg       = document.getElementById("s-bg").value;
+    btnStyle.fg       = document.getElementById("s-fg").value;
+    btnStyle.font     = document.getElementById("s-font").value;
+    btnStyle.glow     = document.getElementById("s-glow").value;
+    btnStyle.activeBg = document.getElementById("s-activebg").value;
     applyBtnStyle();
     settingsUpdatePreview();
   }
@@ -1183,11 +1196,16 @@ function appExport() {
   }
   function settingsUpdatePreview() {
     const p = document.getElementById("settings-btn-preview");
-    p.style.background  = btnStyle.bg;
-    p.style.color       = btnStyle.fg;
-    p.style.fontFamily  = btnStyle.font;
-    p.textContent = document.getElementById("s-font").selectedOptions[0].text;
+    p.style.background = btnStyle.bg;
+    p.style.color      = btnStyle.fg;
+    p.style.fontFamily = btnStyle.font;
+    p.textContent      = document.getElementById("s-font").selectedOptions[0].text;
+    p.style.setProperty("--preview-glow",      btnStyle.glow);
+    p.style.setProperty("--preview-active-bg", btnStyle.activeBg);
   }
+  document.getElementById("settings-btn-preview").addEventListener("click", function() {
+    this.classList.toggle("active");
+  });
   let _settingsJustOpened = false;
     document.getElementById("settings-overlay").addEventListener("click", e => {
   if (_settingsJustOpened) { _settingsJustOpened = false; return; }
@@ -1379,6 +1397,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
