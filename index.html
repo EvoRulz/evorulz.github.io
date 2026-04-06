@@ -245,6 +245,10 @@
     }
     .top-item:active { cursor: grabbing; }
     .top-item[data-item="clear-all"] { background: #5a1a1a; color: #ff9999; }
+    .top-item[data-item="title"],
+    .top-item[data-item="version"],
+    .top-item[data-item="clock"],
+    .top-item[data-item="settings"] { background: transparent; padding: 4px 8px; }
     .top-item button, .top-item span, .top-item label {
       background: transparent;
       color: inherit;
@@ -308,7 +312,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v56</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v57</span></div>
   <div class="top-item" data-item="clock"><span id="live-clock" style="font-size:13px;color:#666;letter-spacing:0.02em"></span></div>
   <div class="top-item" data-item="settings">
     <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
@@ -1046,6 +1050,14 @@ function appExport() {
     buttonsEl.style.gridAutoRows = maxH + 'px';
   }
   equalizeButtonSizes();
+  function equalizeTopGrid() {
+    const items = [...topGrid.querySelectorAll('.top-item')];
+    if (!items.length) return;
+    topGrid.style.gridAutoRows = '';
+    const maxH = Math.max(...items.map(i => i.offsetHeight));
+    topGrid.style.gridAutoRows = maxH + 'px';
+  }
+  equalizeTopGrid();
 
   // ── Button style settings ──────────────────────────────────
   const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif" };
@@ -1288,6 +1300,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
