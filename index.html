@@ -308,7 +308,7 @@
 </div>
 
 <h1>Habit Tracker
-  <span style="font-size:14px;color:#888;font-weight:normal">v49</span>
+  <span style="font-size:14px;color:#888;font-weight:normal">v50</span>
   <span id="live-clock" style="font-size:13px;color:#666;font-weight:normal;margin-left:18px;letter-spacing:0.02em"></span>
 </h1>
 
@@ -316,6 +316,9 @@
   <button class="app-btn" onclick="appExport()">Export All</button>
   <button class="app-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
   <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
+  <button class="app-btn" onclick="exportLayout()">Export Layout</button>
+  <button class="app-btn" onclick="document.getElementById('layout-import-file').click()">Import Layout</button>
+  <input type="file" id="layout-import-file" accept=".json" style="display:none" onchange="importLayout(this)">
   <button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button>
   <button class="app-btn" onclick="openMyFiles()">My Files</button>
 </div>
@@ -817,12 +820,14 @@
   // ── App-level export / import / clear ─────────────────────
   const APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id+":");
 
-  function appExport() {
+function appExport() {
     const out={};
     for (let i=0;i<localStorage.length;i++) {
       const k=localStorage.key(i);
       if (APP_PREFIXES.some(p=>k.startsWith(p))) out[k]=localStorage.getItem(k);
     }
+    const order=localStorage.getItem("_buttonOrder");
+    if (order) out["_buttonOrder"]=order;
     const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
     const a=document.createElement("a");
     a.href=URL.createObjectURL(blob); a.download=`all-${exportDateStr(new Date())}.json`;
@@ -837,12 +842,51 @@
         for (const [key,val] of Object.entries(data)) {
           if (APP_PREFIXES.some(p=>key.startsWith(p))) { localStorage.setItem(key,val); count++; }
         }
+        if (data["_buttonOrder"]) { localStorage.setItem("_buttonOrder", data["_buttonOrder"]); applyButtonOrder(); }
         input.value="";
         Object.values(trackers).forEach(t=>{ if (t.reload) t.reload(); });
         alert(`Imported ${count} entries across all trackers.`);
       } catch { alert("Invalid backup file."); }
     };
     reader.readAsText(file);
+  }
+  function exportLayout() {
+    const order=localStorage.getItem("_buttonOrder");
+    const out={ "_buttonOrder": order || JSON.stringify(TRACKER_CONFIGS.map(c=>c.id)) };
+    const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=`layout-${exportDateStr(new Date())}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+  }
+  function importLayout(input) {
+    const file=input.files[0]; if (!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try {
+        const data=JSON.parse(e.target.result);
+        if (!data["_buttonOrder"]) { alert("No layout data found in file."); return; }
+        localStorage.setItem("_buttonOrder", data["_buttonOrder"]);
+        applyButtonOrder();
+        input.value="";
+        alert("Layout imported.");
+      } catch { alert("Invalid layout file."); }
+    };
+    reader.readAsText(file);
+  }
+  function applyButtonOrder() {
+    const order=loadButtonOrder();
+    // Remove all current children
+    while (buttonsEl.firstChild) buttonsEl.removeChild(buttonsEl.firstChild);
+    order.forEach(id => {
+      if (!id) {
+        const slot=document.createElement("div"); slot.className="empty-slot"; buttonsEl.appendChild(slot);
+      } else {
+        const config=TRACKER_CONFIGS.find(c=>c.id===id);
+        if (config) buttonsEl.appendChild(makeTrackerBtn(config));
+      }
+    });
+    padEmptySlots();
+    applyBtnStyle();
   }
   async function appClear() {
     const ok=await confirmClear("This will permanently delete <strong>all data across every tracker</strong>.");
@@ -1123,6 +1167,7 @@
 </script>
 </body>
 </html>
+
 
 
 
