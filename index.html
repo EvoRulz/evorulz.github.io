@@ -63,7 +63,7 @@
     }
     .tracker-btn.active {
       background: #555;
-      box-shadow: 0 0 16px 5px rgba(150, 90, 255, 0.65);
+      box-shadow: 0 0 16px 5px var(--btn-glow, rgba(150, 90, 255, 0.65));
     }
     /* Ghost clone shouldn't inherit transitions */
     .tracker-btn.drag-ghost {
@@ -312,7 +312,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v60</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v61</span></div>
   <div class="top-item" data-item="clock"><span id="live-clock" style="font-size:13px;color:#666;letter-spacing:0.02em"></span></div>
   <div class="top-item" data-item="settings">
     <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
@@ -346,6 +346,10 @@
     <div class="settings-row">
       <label>Text colour</label>
       <input type="color" id="s-fg" oninput="settingsChange()">
+    </div>
+    <div class="settings-row">
+      <label>Glow colour</label>
+      <input type="color" id="s-glow" oninput="settingsChange()">
     </div>
     <div class="settings-row">
       <label>Font</label>
@@ -1061,7 +1065,7 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
-  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif", glow: "#9659ff" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -1072,6 +1076,7 @@ function appExport() {
     buttonsEl.style.setProperty("--btn-bg",   btnStyle.bg);
     buttonsEl.style.setProperty("--btn-fg",   btnStyle.fg);
     buttonsEl.style.setProperty("--btn-font", btnStyle.font);
+    buttonsEl.style.setProperty("--btn-glow", btnStyle.glow);
   }
   applyBtnStyle();
 
@@ -1080,6 +1085,7 @@ function appExport() {
     document.getElementById("s-bg").value   = btnStyle.bg;
     document.getElementById("s-fg").value   = btnStyle.fg;
     document.getElementById("s-font").value = btnStyle.font;
+    document.getElementById("s-glow").value = btnStyle.glow;
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
   }
@@ -1090,6 +1096,7 @@ function appExport() {
     btnStyle.bg   = document.getElementById("s-bg").value;
     btnStyle.fg   = document.getElementById("s-fg").value;
     btnStyle.font = document.getElementById("s-font").value;
+    btnStyle.glow = document.getElementById("s-glow").value;
     localStorage.setItem("_btnStyle", JSON.stringify(btnStyle));
     applyBtnStyle();
     settingsUpdatePreview();
@@ -1301,6 +1308,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
