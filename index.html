@@ -247,7 +247,8 @@
     .top-item[data-item="clear-all"] { background: #5a1a1a; color: #ff9999; }
     .top-item[data-item="title"],
     .top-item[data-item="version"],
-    .top-item[data-item="clock"],
+    .top-item[data-item="date"],
+    .top-item[data-item="time"],
     .top-item[data-item="settings"] { background: transparent; padding: 4px 8px; }
     .top-item button, .top-item span, .top-item label {
       background: transparent;
@@ -312,8 +313,9 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v61</span></div>
-  <div class="top-item" data-item="clock"><span id="live-clock" style="font-size:13px;color:#666;letter-spacing:0.02em"></span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v62</span></div>
+  <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
+  <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
     <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
       <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
@@ -371,17 +373,36 @@
 <script>
   // ── Live clock ─────────────────────────────────────────────
   (function() {
-    const el = document.getElementById("live-clock");
+    const dateEl = document.getElementById("live-date");
+    const timeEl = document.getElementById("live-time");
+    let dateLong = true;  // true = dd/mm/yyyy, false = d/m/yy
+    let time24   = true;  // true = 24hr,        false = 12hr am/pm
+
     function tick() {
       const n  = new Date();
-      const dd = String(n.getDate()).padStart(2,"0");
-      const mm = String(n.getMonth()+1).padStart(2,"0");
-      const yy = n.getFullYear();
-      const hh = String(n.getHours()).padStart(2,"0");
+      const d  = n.getDate();
+      const mo = n.getMonth() + 1;
+      const y  = n.getFullYear();
+      if (dateLong) {
+        dateEl.textContent = `${String(d).padStart(2,"0")}/${String(mo).padStart(2,"0")}/${y}`;
+      } else {
+        dateEl.textContent = `${d}/${mo}/${String(y).slice(-2)}`;
+      }
       const mi = String(n.getMinutes()).padStart(2,"0");
       const ss = String(n.getSeconds()).padStart(2,"0");
-      el.textContent = `${dd}/${mm}/${yy}  ${hh}:${mi}:${ss}`;
+      if (time24) {
+        timeEl.textContent = `${String(n.getHours()).padStart(2,"0")}:${mi}:${ss}`;
+      } else {
+        const h   = n.getHours();
+        const ampm = h >= 12 ? "pm" : "am";
+        const h12  = h % 12 || 12;
+        timeEl.textContent = `${h12}:${mi}:${ss} ${ampm}`;
+      }
     }
+
+    dateEl.addEventListener("click", () => { dateLong = !dateLong; tick(); });
+    timeEl.addEventListener("click", () => { time24   = !time24;   tick(); });
+
     tick();
     setInterval(tick, 1000);
   })();
@@ -1308,6 +1329,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
