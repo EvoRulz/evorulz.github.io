@@ -322,7 +322,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v68</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v69</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -365,6 +365,10 @@
     <div class="settings-row">
       <label>Active background</label>
       <input type="color" id="s-activebg" oninput="settingsChange()">
+    </div>
+    <div class="settings-row">
+      <label>Tap highlight</label>
+      <input type="color" id="s-taphighlight" oninput="settingsChange()">
     </div>
     <div class="settings-row">
       <label>Font</label>
@@ -1138,7 +1142,7 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
-  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif", glow: "#9659ff", activeBg: "#555555" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif", glow: "#9659ff", activeBg: "#555555", tapHighlight: "#0000ff" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -1151,6 +1155,7 @@ function appExport() {
     buttonsEl.style.setProperty("--btn-font",      btnStyle.font);
     buttonsEl.style.setProperty("--btn-glow",      btnStyle.glow);
     buttonsEl.style.setProperty("--btn-active-bg", btnStyle.activeBg);
+    buttonsEl.querySelectorAll(".tracker-btn").forEach(b => b.style.webkitTapHighlightColor = btnStyle.tapHighlight);
   }
   applyBtnStyle();
 
@@ -1165,7 +1170,8 @@ function appExport() {
     document.getElementById("s-fg").value       = btnStyle.fg;
     document.getElementById("s-font").value     = btnStyle.font;
     document.getElementById("s-glow").value     = btnStyle.glow;
-    document.getElementById("s-activebg").value = btnStyle.activeBg;
+    document.getElementById("s-activebg").value     = btnStyle.activeBg;
+    document.getElementById("s-taphighlight").value = btnStyle.tapHighlight;
     document.getElementById("s-datefmt").value  = clk.dateFmt;
     document.getElementById("s-time24").value   = String(clk.time24);
     settingsUpdatePreview();
@@ -1234,7 +1240,8 @@ function appExport() {
     btnStyle.fg       = document.getElementById("s-fg").value;
     btnStyle.font     = document.getElementById("s-font").value;
     btnStyle.glow     = document.getElementById("s-glow").value;
-    btnStyle.activeBg = document.getElementById("s-activebg").value;
+    btnStyle.activeBg      = document.getElementById("s-activebg").value;
+    btnStyle.tapHighlight  = document.getElementById("s-taphighlight").value;
     applyBtnStyle();
     const df  = Number(document.getElementById("s-datefmt").value);
     const t24 = document.getElementById("s-time24").value === "true";
@@ -1458,6 +1465,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
