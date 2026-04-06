@@ -279,7 +279,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v53</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v54</span></div>
   <div class="top-item" data-item="clock"><span id="live-clock" style="font-size:13px;color:#666;letter-spacing:0.02em"></span></div>
   <div class="top-item" data-item="settings">
     <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
@@ -302,6 +302,35 @@
 </div>
 <div id="buttons"></div>
 <div id="sections"></div>
+<!-- Settings overlay -->
+<div id="settings-overlay">
+  <div id="settings-panel">
+    <h2>Button Style</h2>
+    <div class="settings-row">
+      <label>Background</label>
+      <input type="color" id="s-bg" oninput="settingsChange()">
+    </div>
+    <div class="settings-row">
+      <label>Text colour</label>
+      <input type="color" id="s-fg" oninput="settingsChange()">
+    </div>
+    <div class="settings-row">
+      <label>Font</label>
+      <select id="s-font" onchange="settingsChange()">
+        <option value="sans-serif">Sans-serif</option>
+        <option value="serif">Serif</option>
+        <option value="monospace">Monospace</option>
+        <option value="cursive">Cursive</option>
+        <option value="fantasy">Fantasy</option>
+      </select>
+    </div>
+    <button id="settings-btn-preview">Preview</button>
+    <div id="settings-footer">
+      <button id="settings-close" onclick="settingsClose()">Close</button>
+      <button id="settings-reset" onclick="settingsReset()">Reset</button>
+    </div>
+  </div>
+</div>
 <script>
   // ── Live clock ─────────────────────────────────────────────
   (function() {
@@ -1227,6 +1256,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
