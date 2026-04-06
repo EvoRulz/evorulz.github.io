@@ -15,7 +15,7 @@
     .color-settings-row { display:flex; flex-direction:column; gap:6px; }
     .color-settings-row > label { font-size:13px; color:#bbb; }
     .color-picker-row { display:flex; align-items:center; gap:8px; }
-    .alpha-slider { flex:1; height:8px; border-radius:4px; cursor:pointer; border:1px solid #555; outline:none; }
+    .alpha-slider { flex:1; height:var(--slider-h,8px); border-radius:var(--slider-r,4px); cursor:pointer; border:1px solid var(--slider-border-color,#555); outline:none; }
     .hex-copy-row { display:flex; align-items:center; gap:6px; }
     .hex-input { flex:1; background:#111; color:#fff; border:1px solid #555; border-radius:4px; padding:4px 8px; font-size:12px; font-family:monospace; outline:none; text-transform:uppercase; letter-spacing:0.04em; min-width:0; }
     .copy-btn { background:#2a2a2a; border:1px solid #555; border-radius:4px; color:#aaa; cursor:pointer; padding:4px 10px; font-size:12px; flex-shrink:0; }
@@ -366,7 +366,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v83</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v84</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -448,6 +448,38 @@
         <input type="text" class="hex-input" id="s-taphighlight-hex" maxlength="9" oninput="onHexInput('s-taphighlight')" spellcheck="false" autocomplete="off">
         <button class="copy-btn" onclick="copyHex('s-taphighlight',this)">Copy</button>
       </div>
+    </div>
+    <div class="color-settings-row">
+      <label>Slider border colour</label>
+      <div class="color-picker-row">
+        <input type="color" id="s-sliderborder" oninput="onColorPickerChange('s-sliderborder')">
+        <input type="range" class="alpha-slider" id="s-sliderborder-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderborder')">
+      </div>
+      <div class="hex-copy-row">
+        <input type="text" class="hex-input" id="s-sliderborder-hex" maxlength="9" oninput="onHexInput('s-sliderborder')" spellcheck="false" autocomplete="off">
+        <button class="copy-btn" onclick="copyHex('s-sliderborder',this)">Copy</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <label>Slider height</label>
+      <select id="s-sliderh" onchange="settingsChange()">
+        <option value="4">Thin (4px)</option>
+        <option value="6">Slim (6px)</option>
+        <option value="8" selected>Default (8px)</option>
+        <option value="10">Chunky (10px)</option>
+        <option value="14">Thick (14px)</option>
+        <option value="20">Chonk (20px)</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <label>Slider corners</label>
+      <select id="s-sliderr" onchange="settingsChange()">
+        <option value="0">Sharp</option>
+        <option value="2">Slight</option>
+        <option value="4" selected>Rounded</option>
+        <option value="8">More rounded</option>
+        <option value="99">Pill</option>
+      </select>
     </div>
     <div class="settings-row">
       <label>Font</label>
@@ -1229,7 +1261,7 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4 };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -1320,6 +1352,9 @@ function appExport() {
     buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
     document.documentElement.style.setProperty("--tap-highlight", hex8ToCss(btnStyle.tapHighlight));
+    document.documentElement.style.setProperty("--slider-border-color", hex8ToCss(btnStyle.sliderBorder));
+    document.documentElement.style.setProperty("--slider-h",            btnStyle.sliderH + "px");
+    document.documentElement.style.setProperty("--slider-r",            btnStyle.sliderR + "px");
   }
   applyBtnStyle();
 
@@ -1408,6 +1443,9 @@ function appExport() {
     btnStyle.glow         = getColorValue('s-glow');
     btnStyle.activeBg     = getColorValue('s-activebg');
     btnStyle.tapHighlight = getColorValue('s-taphighlight');
+    btnStyle.sliderBorder = getColorValue('s-sliderborder');
+    btnStyle.sliderH      = Number(document.getElementById("s-sliderh").value);
+    btnStyle.sliderR      = Number(document.getElementById("s-sliderr").value);
     applyBtnStyle();
     const df  = Number(document.getElementById("s-datefmt").value);
     const t24 = document.getElementById("s-time24").value === "true";
@@ -1424,6 +1462,12 @@ function appExport() {
     setColorValue('s-glow',         btnStyle.glow);
     setColorValue('s-activebg',     btnStyle.activeBg);
     setColorValue('s-taphighlight', btnStyle.tapHighlight);
+    setColorValue('s-sliderborder', btnStyle.sliderBorder);
+    document.getElementById("s-sliderh").value = btnStyle.sliderH;
+    document.getElementById("s-sliderr").value = btnStyle.sliderR;
+    setColorValue('s-sliderborder', btnStyle.sliderBorder);
+    document.getElementById("s-sliderh").value = btnStyle.sliderH;
+    document.getElementById("s-sliderr").value = btnStyle.sliderR;
     document.getElementById("s-font").value    = btnStyle.font;
     document.getElementById("s-datefmt").value = "0";
     document.getElementById("s-time24").value  = "true";
@@ -1634,6 +1678,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
