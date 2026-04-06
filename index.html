@@ -11,6 +11,15 @@
   <meta name="theme-color" content="#000000">
   <style>
     * { -webkit-tap-highlight-color: var(--tap-highlight, #0000ff); }
+    .color-settings-row { display:flex; flex-direction:column; gap:6px; }
+    .color-settings-row > label { font-size:13px; color:#bbb; }
+    .color-picker-row { display:flex; align-items:center; gap:8px; }
+    .alpha-slider { flex:1; height:8px; border-radius:4px; cursor:pointer; border:1px solid #555; outline:none; }
+    .hex-copy-row { display:flex; align-items:center; gap:6px; }
+    .hex-input { flex:1; background:#111; color:#fff; border:1px solid #555; border-radius:4px; padding:4px 8px; font-size:12px; font-family:monospace; outline:none; text-transform:uppercase; letter-spacing:0.04em; min-width:0; }
+    .copy-btn { background:#2a2a2a; border:1px solid #555; border-radius:4px; color:#aaa; cursor:pointer; padding:4px 10px; font-size:12px; flex-shrink:0; }
+    .copy-btn:hover { background:#3a3a3a; color:#fff; }
+    .copy-btn.copied { color:#99ff99; border-color:#99ff99; }
     body {
       margin: 0;
       padding: 20px;
@@ -323,7 +332,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v70</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v71</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -351,25 +360,60 @@
 <div id="settings-overlay">
   <div id="settings-panel">
     <h2>Button Style</h2>
-    <div class="settings-row">
+    <div class="color-settings-row">
       <label>Background</label>
-      <input type="color" id="s-bg" oninput="settingsChange()">
+      <div class="color-picker-row">
+        <input type="color" id="s-bg" oninput="onColorPickerChange('s-bg')">
+        <input type="range" class="alpha-slider" id="s-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-bg')">
+      </div>
+      <div class="hex-copy-row">
+        <input type="text" class="hex-input" id="s-bg-hex" maxlength="9" oninput="onHexInput('s-bg')" spellcheck="false" autocomplete="off">
+        <button class="copy-btn" onclick="copyHex('s-bg',this)">Copy</button>
+      </div>
     </div>
-    <div class="settings-row">
+    <div class="color-settings-row">
       <label>Text colour</label>
-      <input type="color" id="s-fg" oninput="settingsChange()">
+      <div class="color-picker-row">
+        <input type="color" id="s-fg" oninput="onColorPickerChange('s-fg')">
+        <input type="range" class="alpha-slider" id="s-fg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-fg')">
+      </div>
+      <div class="hex-copy-row">
+        <input type="text" class="hex-input" id="s-fg-hex" maxlength="9" oninput="onHexInput('s-fg')" spellcheck="false" autocomplete="off">
+        <button class="copy-btn" onclick="copyHex('s-fg',this)">Copy</button>
+      </div>
     </div>
-    <div class="settings-row">
+    <div class="color-settings-row">
       <label>Glow colour</label>
-      <input type="color" id="s-glow" oninput="settingsChange()">
+      <div class="color-picker-row">
+        <input type="color" id="s-glow" oninput="onColorPickerChange('s-glow')">
+        <input type="range" class="alpha-slider" id="s-glow-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-glow')">
+      </div>
+      <div class="hex-copy-row">
+        <input type="text" class="hex-input" id="s-glow-hex" maxlength="9" oninput="onHexInput('s-glow')" spellcheck="false" autocomplete="off">
+        <button class="copy-btn" onclick="copyHex('s-glow',this)">Copy</button>
+      </div>
     </div>
-    <div class="settings-row">
+    <div class="color-settings-row">
       <label>Active background</label>
-      <input type="color" id="s-activebg" oninput="settingsChange()">
+      <div class="color-picker-row">
+        <input type="color" id="s-activebg" oninput="onColorPickerChange('s-activebg')">
+        <input type="range" class="alpha-slider" id="s-activebg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-activebg')">
+      </div>
+      <div class="hex-copy-row">
+        <input type="text" class="hex-input" id="s-activebg-hex" maxlength="9" oninput="onHexInput('s-activebg')" spellcheck="false" autocomplete="off">
+        <button class="copy-btn" onclick="copyHex('s-activebg',this)">Copy</button>
+      </div>
     </div>
-    <div class="settings-row">
+    <div class="color-settings-row">
       <label>Tap highlight</label>
-      <input type="color" id="s-taphighlight" oninput="settingsChange()">
+      <div class="color-picker-row">
+        <input type="color" id="s-taphighlight" oninput="onColorPickerChange('s-taphighlight')">
+        <input type="range" class="alpha-slider" id="s-taphighlight-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-taphighlight')">
+      </div>
+      <div class="hex-copy-row">
+        <input type="text" class="hex-input" id="s-taphighlight-hex" maxlength="9" oninput="onHexInput('s-taphighlight')" spellcheck="false" autocomplete="off">
+        <button class="copy-btn" onclick="copyHex('s-taphighlight',this)">Copy</button>
+      </div>
     </div>
     <div class="settings-row">
       <label>Font</label>
@@ -1151,20 +1195,93 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
-  const BTN_STYLE_DEFAULTS = { bg: "#444444", fg: "#ffffff", font: "sans-serif", glow: "#9659ff", activeBg: "#555555", tapHighlight: "#0000ff" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
     if (saved) btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS, saved);
   } catch {}
-
+  function hex8ToComponents(hex) {
+    const h = hex.replace('#','');
+    const r = parseInt(h.slice(0,2),16)||0, g = parseInt(h.slice(2,4),16)||0, b = parseInt(h.slice(4,6),16)||0;
+    const a = h.length === 8 ? parseInt(h.slice(6,8),16) : 255;
+    return {r,g,b,a};
+  }
+  function componentsToHex8({r,g,b,a}) {
+    return '#'+[r,g,b,a].map(v=>Math.round(v).toString(16).padStart(2,'0').toUpperCase()).join('');
+  }
+  function hex8ToCss(hex) {
+    const {r,g,b,a} = hex8ToComponents(hex);
+    return `rgba(${r},${g},${b},${(a/255).toFixed(3)})`;
+  }
+  function getColorValue(id) {
+    const picker = document.getElementById(id);
+    const alpha  = document.getElementById(id+'-alpha');
+    if (!picker) return '#444444FF';
+    const h = picker.value.replace('#','').toUpperCase();
+    const a = alpha ? parseInt(alpha.value).toString(16).padStart(2,'0').toUpperCase() : 'FF';
+    return '#'+h+a;
+  }
+  function setColorValue(id, hex) {
+    const {r,g,b,a} = hex8ToComponents(hex);
+    const picker = document.getElementById(id);
+    const slider = document.getElementById(id+'-alpha');
+    const hexEl  = document.getElementById(id+'-hex');
+    if (picker) picker.value = '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+    if (slider) { slider.value = a; updateAlphaSliderBg(id); }
+    if (hexEl)  hexEl.value = componentsToHex8({r,g,b,a});
+  }
+  function updateAlphaSliderBg(id) {
+    const picker = document.getElementById(id);
+    const slider = document.getElementById(id+'-alpha');
+    if (!picker||!slider) return;
+    slider.style.background = `linear-gradient(to right, transparent, ${picker.value})`;
+  }
+  function onColorPickerChange(id) {
+    const picker = document.getElementById(id);
+    const slider = document.getElementById(id+'-alpha');
+    const hexEl  = document.getElementById(id+'-hex');
+    const h = picker.value.replace('#','').toUpperCase();
+    const a = slider ? parseInt(slider.value).toString(16).padStart(2,'0').toUpperCase() : 'FF';
+    if (hexEl) hexEl.value = '#'+h+a;
+    updateAlphaSliderBg(id);
+    settingsChange();
+  }
+  function onAlphaChange(id) {
+    const picker = document.getElementById(id);
+    const slider = document.getElementById(id+'-alpha');
+    const hexEl  = document.getElementById(id+'-hex');
+    const h = picker ? picker.value.replace('#','').toUpperCase() : '444444';
+    const a = parseInt(slider.value).toString(16).padStart(2,'0').toUpperCase();
+    if (hexEl) hexEl.value = '#'+h+a;
+    updateAlphaSliderBg(id);
+    settingsChange();
+  }
+  function onHexInput(id) {
+    const hexEl = document.getElementById(id+'-hex');
+    let val = hexEl.value.trim();
+    if (!val.startsWith('#')) val = '#'+val;
+    const h = val.replace('#','');
+    if ((h.length===6||h.length===8) && /^[0-9a-fA-F]+$/.test(h)) {
+      setColorValue(id, val);
+      settingsChange();
+    }
+  }
+  function copyHex(id, btn) {
+    const val = getColorValue(id);
+    navigator.clipboard.writeText(val).then(() => {
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1200);
+    }).catch(() => {});
+  }
   function applyBtnStyle() {
-    buttonsEl.style.setProperty("--btn-bg",        btnStyle.bg);
-    buttonsEl.style.setProperty("--btn-fg",        btnStyle.fg);
+    buttonsEl.style.setProperty("--btn-bg",        hex8ToCss(btnStyle.bg));
+    buttonsEl.style.setProperty("--btn-fg",        hex8ToCss(btnStyle.fg));
     buttonsEl.style.setProperty("--btn-font",      btnStyle.font);
-    buttonsEl.style.setProperty("--btn-glow",      btnStyle.glow);
-    buttonsEl.style.setProperty("--btn-active-bg", btnStyle.activeBg);
-    document.documentElement.style.setProperty("--tap-highlight", btnStyle.tapHighlight);
+    buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
+    buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
+    document.documentElement.style.setProperty("--tap-highlight", hex8ToCss(btnStyle.tapHighlight));
   }
   applyBtnStyle();
 
@@ -1175,12 +1292,14 @@ function appExport() {
     _btnStyleSnapshot = Object.assign({}, btnStyle);
     const clk = window._clockGet();
     _clockSnapshot = { dateFmt: clk.dateFmt, time24: clk.time24 };
-    document.getElementById("s-bg").value       = btnStyle.bg;
-    document.getElementById("s-fg").value       = btnStyle.fg;
-    document.getElementById("s-font").value     = btnStyle.font;
-    document.getElementById("s-glow").value     = btnStyle.glow;
-    document.getElementById("s-activebg").value     = btnStyle.activeBg;
-    document.getElementById("s-taphighlight").value = btnStyle.tapHighlight;
+    setColorValue('s-bg',           btnStyle.bg);
+    setColorValue('s-fg',           btnStyle.fg);
+    setColorValue('s-glow',         btnStyle.glow);
+    setColorValue('s-activebg',     btnStyle.activeBg);
+    setColorValue('s-taphighlight', btnStyle.tapHighlight);
+    document.getElementById("s-font").value    = btnStyle.font;
+    document.getElementById("s-datefmt").value = clk.dateFmt;
+    document.getElementById("s-time24").value  = String(clk.time24);
     document.getElementById("s-datefmt").value  = clk.dateFmt;
     document.getElementById("s-time24").value   = String(clk.time24);
     settingsUpdatePreview();
@@ -1245,12 +1364,12 @@ function appExport() {
     reader.readAsText(file);
   }
   function settingsChange() {
-    btnStyle.bg       = document.getElementById("s-bg").value;
-    btnStyle.fg       = document.getElementById("s-fg").value;
-    btnStyle.font     = document.getElementById("s-font").value;
-    btnStyle.glow     = document.getElementById("s-glow").value;
-    btnStyle.activeBg      = document.getElementById("s-activebg").value;
-    btnStyle.tapHighlight  = document.getElementById("s-taphighlight").value;
+    btnStyle.bg           = getColorValue('s-bg');
+    btnStyle.fg           = getColorValue('s-fg');
+    btnStyle.font         = document.getElementById("s-font").value;
+    btnStyle.glow         = getColorValue('s-glow');
+    btnStyle.activeBg     = getColorValue('s-activebg');
+    btnStyle.tapHighlight = getColorValue('s-taphighlight');
     applyBtnStyle();
     const df  = Number(document.getElementById("s-datefmt").value);
     const t24 = document.getElementById("s-time24").value === "true";
@@ -1262,8 +1381,11 @@ function appExport() {
     localStorage.removeItem("_btnStyle");
     localStorage.removeItem("_clockDateFmt");
     localStorage.removeItem("_clockTime24");
-    document.getElementById("s-bg").value      = btnStyle.bg;
-    document.getElementById("s-fg").value      = btnStyle.fg;
+    setColorValue('s-bg',           btnStyle.bg);
+    setColorValue('s-fg',           btnStyle.fg);
+    setColorValue('s-glow',         btnStyle.glow);
+    setColorValue('s-activebg',     btnStyle.activeBg);
+    setColorValue('s-taphighlight', btnStyle.tapHighlight);
     document.getElementById("s-font").value    = btnStyle.font;
     document.getElementById("s-datefmt").value = "0";
     document.getElementById("s-time24").value  = "true";
@@ -1273,8 +1395,8 @@ function appExport() {
   }
   function settingsUpdatePreview() {
     const p = document.getElementById("settings-btn-preview");
-    p.style.background = btnStyle.bg;
-    p.style.color      = btnStyle.fg;
+    p.style.background = hex8ToCss(btnStyle.bg);
+    p.style.color      = hex8ToCss(btnStyle.fg);
     p.style.fontFamily = btnStyle.font;
     p.textContent      = document.getElementById("s-font").selectedOptions[0].text;
     p.style.setProperty("--preview-glow",      btnStyle.glow);
@@ -1474,6 +1596,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
