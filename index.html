@@ -10,6 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
   <style>
+    * { -webkit-tap-highlight-color: var(--tap-highlight, #0000ff); }
     body {
       margin: 0;
       padding: 20px;
@@ -322,7 +323,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span style="font-size:22px;font-weight:bold;color:white">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v69</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v70</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -943,10 +944,8 @@ function appExport() {
       const k=localStorage.key(i);
       if (APP_PREFIXES.some(p=>k.startsWith(p))) out[k]=localStorage.getItem(k);
     }
-    const order=localStorage.getItem("_buttonOrder");
-    if (order) out["_buttonOrder"]=order;
-    const worder=localStorage.getItem("_widgetOrder");
-    if (worder) out["_widgetOrder"]=worder;
+    ["_buttonOrder","_widgetOrder","_topGridOrder","_btnStyle","_clockDateFmt","_clockTime24"]
+      .forEach(k=>{ const v=localStorage.getItem(k); if (v!=null) out[k]=v; });
     const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
     const a=document.createElement("a");
     a.href=URL.createObjectURL(blob); a.download=`all-${exportDateStr(new Date())}.json`;
@@ -961,8 +960,18 @@ function appExport() {
         for (const [key,val] of Object.entries(data)) {
           if (APP_PREFIXES.some(p=>key.startsWith(p))) { localStorage.setItem(key,val); count++; }
         }
-        if (data["_buttonOrder"]) { localStorage.setItem("_buttonOrder", data["_buttonOrder"]); applyButtonOrder(); }
-        if (data["_widgetOrder"]) { localStorage.setItem("_widgetOrder", data["_widgetOrder"]); applyWidgetOrder(); }
+        if (data["_buttonOrder"])  { localStorage.setItem("_buttonOrder",  data["_buttonOrder"]);  applyButtonOrder(); }
+        if (data["_widgetOrder"])  { localStorage.setItem("_widgetOrder",  data["_widgetOrder"]);  applyWidgetOrder(); }
+        if (data["_topGridOrder"]) { localStorage.setItem("_topGridOrder", data["_topGridOrder"]); applyTopGridOrder(); }
+        if (data["_btnStyle"])     { localStorage.setItem("_btnStyle",     data["_btnStyle"]);
+                                     try { btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS, JSON.parse(data["_btnStyle"])); applyBtnStyle(); } catch {} }
+        if (data["_clockDateFmt"] != null) { localStorage.setItem("_clockDateFmt", data["_clockDateFmt"]); }
+        if (data["_clockTime24"]  != null) { localStorage.setItem("_clockTime24",  data["_clockTime24"]);  }
+        if (data["_clockDateFmt"] != null || data["_clockTime24"] != null) {
+          const df  = Number(data["_clockDateFmt"] ?? localStorage.getItem("_clockDateFmt") ?? 0);
+          const t24 = (data["_clockTime24"] ?? localStorage.getItem("_clockTime24")) !== "false";
+          window._clockSet(df, t24);
+        }
         input.value="";
         Object.values(trackers).forEach(t=>{ if (t.reload) t.reload(); });
         alert(`Imported ${count} entries across all trackers.`);
@@ -1155,7 +1164,7 @@ function appExport() {
     buttonsEl.style.setProperty("--btn-font",      btnStyle.font);
     buttonsEl.style.setProperty("--btn-glow",      btnStyle.glow);
     buttonsEl.style.setProperty("--btn-active-bg", btnStyle.activeBg);
-    buttonsEl.querySelectorAll(".tracker-btn").forEach(b => b.style.webkitTapHighlightColor = btnStyle.tapHighlight);
+    document.documentElement.style.setProperty("--tap-highlight", btnStyle.tapHighlight);
   }
   applyBtnStyle();
 
@@ -1465,6 +1474,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
