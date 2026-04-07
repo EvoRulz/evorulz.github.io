@@ -372,7 +372,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v91</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v92</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -1076,7 +1076,7 @@ function appExport() {
       const k=localStorage.key(i);
       if (APP_PREFIXES.some(p=>k.startsWith(p))) out[k]=localStorage.getItem(k);
     }
-    ["_buttonOrder","_widgetOrder","_topGridOrder","_btnStyle","_clockDateFmt","_clockTime24"]
+    ["_buttonOrder","_widgetOrder","_topGridOrder","_btnStyle","_clockDateFmt","_clockTime24","_habitsVisible"]
       .forEach(k=>{ const v=localStorage.getItem(k); if (v!=null) out[k]=v; });
     const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
     const a=document.createElement("a");
@@ -1099,6 +1099,11 @@ function appExport() {
                                      try { btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS, JSON.parse(data["_btnStyle"])); applyBtnStyle(); } catch {} }
         if (data["_clockDateFmt"] != null) { localStorage.setItem("_clockDateFmt", data["_clockDateFmt"]); }
         if (data["_clockTime24"]  != null) { localStorage.setItem("_clockTime24",  data["_clockTime24"]);  }
+        if (data["_habitsVisible"] != null) {
+          habitsVisible = data["_habitsVisible"] !== "false" && data["_habitsVisible"] !== false;
+          buttonsEl.style.display = habitsVisible ? "" : "none";
+          document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
+        }
         if (data["_clockDateFmt"] != null || data["_clockTime24"] != null) {
           const df  = Number(data["_clockDateFmt"] ?? localStorage.getItem("_clockDateFmt") ?? 0);
           const t24 = (data["_clockTime24"] ?? localStorage.getItem("_clockTime24")) !== "false";
@@ -1113,7 +1118,7 @@ function appExport() {
   }
   function exportLayout() {
     const order=localStorage.getItem("_buttonOrder");
-    const out={ "_buttonOrder": order || JSON.stringify(TRACKER_CONFIGS.map(c=>c.id)), "_widgetOrder": localStorage.getItem("_widgetOrder")||"", "_topGridOrder": localStorage.getItem("_topGridOrder")||"" };
+    const out={ "_buttonOrder": order || JSON.stringify(TRACKER_CONFIGS.map(c=>c.id)), "_widgetOrder": localStorage.getItem("_widgetOrder")||"", "_topGridOrder": localStorage.getItem("_topGridOrder")||"", "_habitsVisible": localStorage.getItem("_habitsVisible")||"true" };
     const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
     const a=document.createElement("a");
     a.href=URL.createObjectURL(blob); a.download=`layout-${exportDateStr(new Date())}.json`;
@@ -1130,6 +1135,12 @@ function appExport() {
           applyButtonOrder();
         if (data["_widgetOrder"]) { localStorage.setItem("_widgetOrder", data["_widgetOrder"]); applyWidgetOrder(); }
         if (data["_topGridOrder"]) { localStorage.setItem("_topGridOrder", data["_topGridOrder"]); applyTopGridOrder(); }
+        if (data["_habitsVisible"] != null) {
+          habitsVisible = data["_habitsVisible"] !== "false" && data["_habitsVisible"] !== false;
+          buttonsEl.style.display = habitsVisible ? "" : "none";
+          document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
+          localStorage.setItem("_habitsVisible", habitsVisible);
+        }
         input.value="";
         alert("Layout imported.");
       } catch { alert("Invalid layout file."); }
@@ -1614,11 +1625,14 @@ function appExport() {
   });
 
   // ── Show / Hide Habits ─────────────────────────────────────
-  let habitsVisible = true;
+  let habitsVisible = localStorage.getItem("_habitsVisible") !== "false";
+  buttonsEl.style.display = habitsVisible ? "" : "none";
+  document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
   function toggleHabits() {
     habitsVisible = !habitsVisible;
     buttonsEl.style.display = habitsVisible ? "" : "none";
     document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
+    localStorage.setItem("_habitsVisible", habitsVisible);
   }
 
   // ── Top grid drag-to-reorder ───────────────────────────────
@@ -1804,5 +1818,6 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
