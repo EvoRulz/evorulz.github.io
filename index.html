@@ -1757,10 +1757,6 @@ function appExport() {
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
     setColorValue('s-checkbox-bg', btnStyle.checkboxBg);
     document.getElementById("s-font").value    = btnStyle.font;
-    document.getElementById("s-datefmt").value = clk.dateFmt;
-    document.getElementById("s-time24").value  = String(clk.time24);
-    document.getElementById("s-datefmt").value  = clk.dateFmt;
-    document.getElementById("s-time24").value   = String(clk.time24);
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
   }
@@ -1859,10 +1855,8 @@ function appExport() {
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     document.getElementById("s-font").value    = btnStyle.font;
-    document.getElementById("s-datefmt").value = "0";
-    document.getElementById("s-time24").value  = "true";
     applyBtnStyle();
-    window._clockSet(0, true);
+    window._clockSet([6, 1, 1, 1, 2, 1, 1, 0, 0]);
     settingsUpdatePreview();
   }
   function settingsUpdatePreview() {
@@ -2396,36 +2390,75 @@ function appExport() {
       renderPreviews();
     }
 
+    let activeCol = 0;
+    function setActiveCol(ci) {
+      activeCol = ci;
+      wrap.querySelectorAll('.tumb-col').forEach((c, i) => {
+        c.style.background = i === ci ? '#2a2a2a' : '';
+        c.style.borderRadius = i === ci ? '4px' : '';
+      });
+    }
+
     function setupDrag(win, ci) {
-      let startY = null, lastY = null, accum = 0;
-      const STEP = 28;
-      function step(dir) {
+      let startX = null, startY = null, lastY = null;
+      let accumY = 0, accumX = 0;
+      let axis = null; // 'x' or 'y', locked after threshold
+      const STEP_Y = 28, STEP_X = 40, AXIS_LOCK = 8;
+
+      function stepY(dir) {
         const cfg = getCfg().slice();
         cfg[ci] = (cfg[ci] + dir + COLS[ci].opts.length) % COLS[ci].opts.length;
         setCfg(cfg);
       }
+      function stepX(dir) {
+        const next = ci + dir;
+        if (next >= 0 && next < COLS.length) setActiveCol(next);
+      }
+
       win.addEventListener("pointerdown", e => {
         e.preventDefault();
+        e.stopPropagation();
         win.setPointerCapture(e.pointerId);
-        startY = e.clientY; lastY = e.clientY; accum = 0;
+        setActiveCol(ci);
+        startX = e.clientX; startY = e.clientY;
+        lastY = e.clientY;
+        accumY = 0; accumX = 0; axis = null;
       });
       win.addEventListener("pointermove", e => {
         if (startY === null) return;
+        const dx = e.clientX - startX;
         const dy = lastY - e.clientY;
-        accum += dy;
-        lastY = e.clientY;
-        while (accum >= STEP)  { accum -= STEP; step(1); }
-        while (accum <= -STEP) { accum += STEP; step(-1); }
+        // Lock axis after moving past threshold
+        if (!axis) {
+          if (Math.abs(e.clientX - startX) > AXIS_LOCK || Math.abs(e.clientY - startY) > AXIS_LOCK) {
+            axis = Math.abs(e.clientX - startX) > Math.abs(e.clientY - startY) ? 'x' : 'y';
+          }
+        }
+        if (axis === 'y') {
+          accumY += dy;
+          lastY = e.clientY;
+          while (accumY >= STEP_Y)  { accumY -= STEP_Y; stepY(1); }
+          while (accumY <= -STEP_Y) { accumY += STEP_Y; stepY(-1); }
+        } else if (axis === 'x') {
+          accumX = e.clientX - startX;
+          if (accumX > STEP_X)       { startX = e.clientX; accumX = 0; stepX(1); }
+          else if (accumX < -STEP_X) { startX = e.clientX; accumX = 0; stepX(-1); }
+        }
       });
       win.addEventListener("pointerup", e => {
-        if (startY !== null && Math.abs(e.clientY - startY) < 4) {
+        if (startY !== null && !axis) {
+          // Pure tap — spin based on top/bottom half
           const rect = win.getBoundingClientRect();
           const mid  = rect.top + rect.height / 2;
-          step(e.clientY < mid ? -1 : 1);
+          stepY(e.clientY < mid ? -1 : 1);
         }
-        startY = null; lastY = null; accum = 0;
+        startX = null; startY = null; lastY = null;
+        accumY = 0; accumX = 0; axis = null;
       });
-      win.addEventListener("pointercancel", () => { startY = null; lastY = null; accum = 0; });
+      win.addEventListener("pointercancel", () => {
+        startX = null; startY = null; lastY = null;
+        accumY = 0; accumX = 0; axis = null;
+      });
     }
 
     window._tumblerRefresh = () => { buildTumbler(); };
