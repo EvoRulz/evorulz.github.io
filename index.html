@@ -1701,6 +1701,10 @@ function formatCustomDate(date, format) {
   const daysShort = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   
   let result = format;
+  const h24 = date.getHours();
+  const h12 = h24 % 12 || 12;
+  const ampm = h24 >= 12 ? 'pm' : 'am';
+  const AMPM = h24 >= 12 ? 'PM' : 'AM';
   const tokens = {
     'DD':   days[date.getDay()],
     'D':    daysShort[date.getDay()],
