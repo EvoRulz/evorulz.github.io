@@ -550,7 +550,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v163</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v164</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2243,14 +2243,15 @@ function appExport() {
     document.getElementById("s-clock-time-size").value = btnStyle.clockTimeSize;
     document.getElementById("s-font").value    = btnStyle.font;
     // Populate App panel
-    document.getElementById("s-app-bg-type").value  = appStyle.bgType;
-    document.getElementById("s-app-grad-dir").value = appStyle.gradDir;
-    document.getElementById("s-app-pat-size").value = appStyle.patSize;
-    document.getElementById("s-app-img-size").value   = appStyle.imgSize;
-    document.getElementById("s-app-img-pos").value    = appStyle.imgPos;
-    document.getElementById("s-app-img-repeat").value = appStyle.imgRepeat;
-    document.getElementById("s-app-img-attach").value = appStyle.imgAttach;
-    document.getElementById("s-app-padding").value    = appStyle.padding;
+    const _s = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+    _s("s-app-bg-type",    appStyle.bgType);
+    _s("s-app-grad-dir",   appStyle.gradDir);
+    _s("s-app-pat-size",   appStyle.patSize);
+    _s("s-app-img-size",   appStyle.imgSize);
+    _s("s-app-img-pos",    appStyle.imgPos);
+    _s("s-app-img-repeat", appStyle.imgRepeat);
+    _s("s-app-img-attach", appStyle.imgAttach);
+    _s("s-app-padding",    appStyle.padding);
     setColorValue("s-app-pat-color",  appStyle.patColor);
     setColorValue("s-app-pat-bg",     appStyle.patBg);
     setColorValue("s-app-img-tint",   appStyle.imgTint);
@@ -3204,6 +3205,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
