@@ -409,7 +409,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v109</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v110</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -430,7 +430,7 @@
   <div class="top-item" data-item="clear-all"><button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button></div>
   <div class="top-item" data-item="my-files"><button class="app-btn" onclick="openMyFiles()">My Files</button></div>
   <div class="top-item" data-item="hide-habits"><button class="app-btn" id="hide-habits-btn" onclick="toggleHabits()">Hide Habits</button></div>
-  <div class="top-item" data-item="manage-habits" style="pointer-events:auto"><button class="app-btn" onclick="manageOpen()" style="pointer-events:auto">Manage Habits</button></div>
+  <div class="top-item" data-item="manage-habits"><button class="app-btn" onclick="manageOpen()">Manage Habits</button></div>
 </div>
 <div id="buttons"></div>
 <div id="sections"></div>
@@ -1721,7 +1721,6 @@ function appExport() {
   topGrid.addEventListener("pointerdown", e => {
     const item = e.target.closest(".top-item");
     if (!item) return;
-    if (item.dataset.item === "manage-habits" || item.dataset.item === "hide-habits") return;
     if (tdrag) return;
     e.preventDefault();
     const rect = item.getBoundingClientRect();
@@ -1896,7 +1895,11 @@ function appExport() {
   }
   applySettingsGroupOrder();
   // ── Manage Habits ──────────────────────────────────────────
+  let _manageOpenLast = 0;
   function manageOpen() {
+    const now = Date.now();
+    if (now - _manageOpenLast < 400) return;
+    _manageOpenLast = now;
     manageRenderList();
     document.getElementById("manage-overlay").classList.add("active");
   }
@@ -1990,6 +1993,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
