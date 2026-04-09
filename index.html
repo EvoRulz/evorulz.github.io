@@ -2339,27 +2339,55 @@ function appExport() {
       COLS.forEach((col, ci) => renderCol(ci));
     }
 
+    function liveVal(ci, optIdx, now) {
+      if (optIdx === 0) return "—";
+      const DOW_LONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      const dowL = DOW_LONG[now.getDay()];
+      const d   = now.getDate(),  mo = now.getMonth() + 1, y = now.getFullYear();
+      const h24 = now.getHours(), h12 = h24 % 12 || 12;
+      const mi  = String(now.getMinutes()).padStart(2,"0");
+      const se  = String(now.getSeconds()).padStart(2,"0");
+      const ms  = String(now.getMilliseconds()).padStart(3,"0");
+      const ampm = h24 >= 12 ? "pm" : "am";
+      if (ci === 0) return dowL.slice(0, optIdx) || "—";           // 1→F, 2→Fr, 3→Fri …
+      if (ci === 1) return optIdx === 1 ? String(d) : String(d).padStart(2,"0");
+      if (ci === 2) return optIdx === 1 ? String(mo) : String(mo).padStart(2,"0");
+      if (ci === 3) return optIdx === 1 ? String(y).slice(-2) : String(y);
+      if (ci === 4) {
+        if (optIdx === 1) return String(h12);
+        if (optIdx === 2) return String(h12).padStart(2,"0");
+        if (optIdx === 3) return String(h24);
+        if (optIdx === 4) return String(h24).padStart(2,"0");
+      }
+      if (ci === 5) return mi;
+      if (ci === 6) return se;
+      if (ci === 7) return ms;
+      if (ci === 8) return ampm;
+      return "—";
+    }
+
     function renderCol(ci) {
-      const cfg = getCfg();
-      const col = wrap.querySelector(`.tumb-col[data-ci="${ci}"]`);
+      const cfg  = getCfg();
+      const col  = wrap.querySelector(`.tumb-col[data-ci="${ci}"]`);
       if (!col) return;
-      const win = col.querySelector(".tumb-window");
+      const win  = col.querySelector(".tumb-window");
       win.innerHTML = "";
       const opts = COLS[ci].opts;
       const sel  = cfg[ci];
       const prev = (sel - 1 + opts.length) % opts.length;
       const next = (sel + 1) % opts.length;
+      const now  = new Date();
       const aUp = document.createElement("div");
       aUp.className = "tumb-arrow"; aUp.textContent = "▲";
       const elPrev = document.createElement("div");
       elPrev.className = "tumb-item tumb-adj";
-      elPrev.textContent = opts[prev] || "—";
+      elPrev.textContent = liveVal(ci, prev, now);
       const elSel = document.createElement("div");
       elSel.className = "tumb-item tumb-sel";
-      elSel.textContent = opts[sel] || "—";
+      elSel.textContent = liveVal(ci, sel, now);
       const elNext = document.createElement("div");
       elNext.className = "tumb-item tumb-adj";
-      elNext.textContent = opts[next] || "—";
+      elNext.textContent = liveVal(ci, next, now);
       const aDown = document.createElement("div");
       aDown.className = "tumb-arrow"; aDown.textContent = "▼";
       win.append(aUp, elPrev, elSel, elNext, aDown);
