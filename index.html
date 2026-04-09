@@ -550,7 +550,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v155</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v156</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2417,7 +2417,7 @@ function appExport() {
     const wrap = document.getElementById("clock-tumbler-wrap");
 
     function getCfg() { return window._clockGet().tumblerCfg; }
-    function setCfg(cfg) { window._clockSet(cfg); renderPreviews(); }
+    function setCfg(cfg) { window._clockSet(cfg); resetPreviewCycle(); renderPreviews(); }
 
     function renderPreviews() {
       const cfg = getCfg();
@@ -2518,23 +2518,131 @@ function appExport() {
       wrap.innerHTML = "";
       const previewRow = document.createElement("div");
       previewRow.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;";
+
+      // ── preview date button ──
       const previewDate = document.createElement("div");
       previewDate.className = "top-item";
-      previewDate.style.cssText = "background:var(--clock-bg,transparent);display:flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;";
+      previewDate.dataset.previewItem = "date";
+      previewDate.style.cssText = "background:var(--clock-bg,transparent);display:flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;";
       const previewDateSpan = document.createElement("span");
       previewDateSpan.id = "tumb-preview-date";
       previewDateSpan.style.cssText = "font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;line-height:1.3;text-align:center;pointer-events:none;";
       previewDate.appendChild(previewDateSpan);
+
+      // ── preview time button ──
       const previewTime = document.createElement("div");
       previewTime.className = "top-item";
-      previewTime.style.cssText = "background:var(--clock-bg,transparent);display:flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;";
+      previewTime.dataset.previewItem = "time";
+      previewTime.style.cssText = "background:var(--clock-bg,transparent);display:flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;";
       const previewTimeSpan = document.createElement("span");
       previewTimeSpan.id = "tumb-preview-time";
       previewTimeSpan.style.cssText = "font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;line-height:1.3;text-align:center;pointer-events:none;";
       previewTime.appendChild(previewTimeSpan);
+
       previewRow.appendChild(previewDate);
       previewRow.appendChild(previewTime);
       wrap.appendChild(previewRow);
+
+      // ── preview grid drag-to-reorder ──
+      const PREVIEW_DRAG_THRESHOLD = 6;
+      let pdrag = null;
+      previewRow.addEventListener("pointerdown", e => {
+        const item = e.target.closest(".top-item[data-preview-item]");
+        if (!item || pdrag) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const rect = item.getBoundingClientRect();
+        pdrag = {
+          item, startX: e.clientX, startY: e.clientY,
+          offX: e.clientX - rect.left, offY: e.clientY - rect.top,
+          w: rect.width, h: rect.height,
+          ghost: null, lastOver: null, active: false,
+        };
+      });
+      document.addEventListener("pointermove", eP => {
+        if (!pdrag) return;
+        if (!pdrag.active) {
+          if (Math.hypot(eP.clientX - pdrag.startX, eP.clientY - pdrag.startY) < PREVIEW_DRAG_THRESHOLD) return;
+          pdrag.active = true;
+          const rect = pdrag.item.getBoundingClientRect();
+          pdrag.ghost = pdrag.item.cloneNode(true);
+          Object.assign(pdrag.ghost.style, {
+            position:"fixed", left:rect.left+"px", top:rect.top+"px",
+            width:rect.width+"px", height:rect.height+"px",
+            pointerEvents:"none", opacity:"0.75", zIndex:"9002",
+            margin:"0", boxSizing:"border-box", cursor:"grabbing",
+          });
+          document.body.appendChild(pdrag.ghost);
+          pdrag.item.style.visibility = "hidden";
+        }
+        pdrag.ghost.style.left = (eP.clientX - pdrag.offX) + "px";
+        pdrag.ghost.style.top  = (eP.clientY - pdrag.offY) + "px";
+        const gcx = eP.clientX - pdrag.offX + pdrag.w / 2;
+        const gcy = eP.clientY - pdrag.offY + pdrag.h / 2;
+        let over = null;
+        for (const t of previewRow.children) {
+          if (t === pdrag.item) continue;
+          const r = t.getBoundingClientRect();
+          if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
+        }
+        if (!over) { pdrag.lastOver = null; return; }
+        if (over === pdrag.lastOver) return;
+        pdrag.lastOver = over;
+        const overNext = over.nextSibling, iNext = pdrag.item.nextSibling;
+        if (iNext === over)               previewRow.insertBefore(over, pdrag.item);
+        else if (overNext === pdrag.item) previewRow.insertBefore(pdrag.item, over);
+        else {
+          previewRow.insertBefore(pdrag.item, overNext || null);
+          previewRow.insertBefore(over, iNext || null);
+        }
+      });
+      document.addEventListener("pointerup", eP => {
+        if (!pdrag) return;
+        if (pdrag.active) {
+          pdrag.item.style.visibility = "";
+          if (pdrag.ghost) pdrag.ghost.remove();
+        } else {
+          // tap — run the same cycle as the live top-grid buttons
+          const which = pdrag.item.dataset.previewItem;
+          if (which === "time") {
+            const saved = window._clockGet().tumblerCfg;
+            if (_previewTimeCycleStep === 0) {
+              _previewTimeCycleStep = 1; pdrag = null; return;
+            }
+            const cfg = saved.slice();
+            const savedHour = saved[4];
+            const is12 = savedHour === 1 || savedHour === 2;
+            const isPadded = savedHour === 2 || savedHour === 4;
+            if (_previewTimeCycleStep === 1) {
+              if      (savedHour === 1) cfg[4] = 2;
+              else if (savedHour === 2) cfg[4] = 1;
+              else if (savedHour === 3) cfg[4] = 4;
+              else if (savedHour === 4) cfg[4] = 3;
+              cfg[7] = (cfg[4] === 1 || cfg[4] === 2) ? 1 : 0;
+              _previewTimeCycleStep = 2;
+            } else if (_previewTimeCycleStep === 2) {
+              if (is12) cfg[4] = isPadded ? 4 : 3;
+              else      cfg[4] = isPadded ? 2 : 1;
+              cfg[7] = (cfg[4] === 1 || cfg[4] === 2) ? 1 : 0;
+              _previewTimeCycleStep = 3;
+            } else if (_previewTimeCycleStep === 3) {
+              const cur = cfg[4];
+              if      (cur === 1) cfg[4] = 2;
+              else if (cur === 2) cfg[4] = 1;
+              else if (cur === 3) cfg[4] = 4;
+              else if (cur === 4) cfg[4] = 3;
+              cfg[7] = (cfg[4] === 1 || cfg[4] === 2) ? 1 : 0;
+              _previewTimeCycleStep = 0;
+            }
+            window._clockSet(cfg);
+          }
+          // date button tap: no cycle defined yet, extend here if needed
+        }
+        pdrag = null;
+      });
+      document.addEventListener("pointercancel", () => {
+        if (!pdrag) return;
+        pdrag.item.style.
       const grid = document.createElement("div");
       grid.className = "tumb-grid";
       COLS.forEach((col, ci) => {
@@ -2626,6 +2734,11 @@ function appExport() {
       });
     }
 
+    let _previewTimeCycleStep = 0;
+    function resetPreviewCycle() { _previewTimeCycleStep = 0; }
+    // Hook into setCfg so any tumbler change resets the preview cycle
+    const _origSetCfg = setCfg;
+
     function syncPreviewSizes() {
       const liveDateItem = document.getElementById("live-date")?.closest(".top-item");
       const liveTimeItem = document.getElementById("live-time")?.closest(".top-item");
@@ -2656,6 +2769,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
