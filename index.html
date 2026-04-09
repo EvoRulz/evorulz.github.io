@@ -550,9 +550,9 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v151</span></div>
-  <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
-  <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v152</span></div>
+  <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
+  <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
     <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
       <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
@@ -713,6 +713,67 @@ input[type="checkbox"]:hover {
       </div>
     </div>
     <div class="settings-group-content" id="sg-clock">
+      <div class="color-settings-row">
+        <label>Date colour</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-clock-date-color" oninput="onColorPickerChange('s-clock-date-color')">
+          <input type="range" class="alpha-slider" id="s-clock-date-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-clock-date-color')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-clock-date-color-hex" maxlength="9" oninput="onHexInput('s-clock-date-color')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-clock-date-color',this)">Copy</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <label>Date size</label>
+        <select id="s-clock-date-size" onchange="settingsChange()">
+          <option value="10">10px</option>
+          <option value="11">11px</option>
+          <option value="12">12px</option>
+          <option value="13">13px (default)</option>
+          <option value="14">14px</option>
+          <option value="16">16px</option>
+          <option value="18">18px</option>
+          <option value="20">20px</option>
+          <option value="24">24px</option>
+        </select>
+      </div>
+      <div class="color-settings-row">
+        <label>Time colour</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-clock-time-color" oninput="onColorPickerChange('s-clock-time-color')">
+          <input type="range" class="alpha-slider" id="s-clock-time-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-clock-time-color')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-clock-time-color-hex" maxlength="9" oninput="onHexInput('s-clock-time-color')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-clock-time-color',this)">Copy</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <label>Time size</label>
+        <select id="s-clock-time-size" onchange="settingsChange()">
+          <option value="10">10px</option>
+          <option value="11">11px</option>
+          <option value="12">12px</option>
+          <option value="13">13px (default)</option>
+          <option value="14">14px</option>
+          <option value="16">16px</option>
+          <option value="18">18px</option>
+          <option value="20">20px</option>
+          <option value="24">24px</option>
+        </select>
+      </div>
+      <div class="color-settings-row">
+        <label>Background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-clock-bg" oninput="onColorPickerChange('s-clock-bg')">
+          <input type="range" class="alpha-slider" id="s-clock-bg-alpha" min="0" max="255" value="0" oninput="onAlphaChange('s-clock-bg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-clock-bg-hex" maxlength="9" oninput="onHexInput('s-clock-bg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-clock-bg',this)">Copy</button>
+        </div>
+      </div>
       <div id="clock-tumbler-wrap"></div>
     </div>
       <div class="settings-group-content" id="sg-checkboxes">
@@ -1627,7 +1688,7 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -1725,6 +1786,11 @@ function appExport() {
     document.documentElement.style.setProperty("--checkbox-mark",        hex8ToCss(btnStyle.checkboxMark));
     document.documentElement.style.setProperty("--checkbox-border",      hex8ToCss(btnStyle.checkboxBorder));
     document.documentElement.style.setProperty("--checkbox-bg",          hex8ToCss(btnStyle.checkboxBg));
+    document.documentElement.style.setProperty("--clock-date-color",     hex8ToCss(btnStyle.clockDateColor));
+    document.documentElement.style.setProperty("--clock-time-color",     hex8ToCss(btnStyle.clockTimeColor));
+    document.documentElement.style.setProperty("--clock-date-size",      btnStyle.clockDateSize + "px");
+    document.documentElement.style.setProperty("--clock-time-size",      btnStyle.clockTimeSize + "px");
+    document.documentElement.style.setProperty("--clock-bg",             hex8ToCss(btnStyle.clockBg));
   }
   applyBtnStyle();
 
@@ -1759,6 +1825,11 @@ function appExport() {
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
     setColorValue('s-checkbox-bg', btnStyle.checkboxBg);
+    setColorValue('s-clock-date-color', btnStyle.clockDateColor);
+    setColorValue('s-clock-time-color', btnStyle.clockTimeColor);
+    setColorValue('s-clock-bg',         btnStyle.clockBg);
+    document.getElementById("s-clock-date-size").value = btnStyle.clockDateSize;
+    document.getElementById("s-clock-time-size").value = btnStyle.clockTimeSize;
     document.getElementById("s-font").value    = btnStyle.font;
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
@@ -1833,6 +1904,11 @@ function appExport() {
     btnStyle.checkboxMark    = getColorValue('s-checkbox-mark');
     btnStyle.checkboxBorder  = getColorValue('s-checkbox-border');
     btnStyle.checkboxBg      = getColorValue('s-checkbox-bg');
+    btnStyle.clockDateColor  = getColorValue('s-clock-date-color');
+    btnStyle.clockTimeColor  = getColorValue('s-clock-time-color');
+    btnStyle.clockBg         = getColorValue('s-clock-bg');
+    btnStyle.clockDateSize   = Number(document.getElementById("s-clock-date-size").value);
+    btnStyle.clockTimeSize   = Number(document.getElementById("s-clock-time-size").value);
     applyBtnStyle();
     settingsUpdatePreview();
   }
@@ -1858,6 +1934,11 @@ function appExport() {
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     document.getElementById("s-font").value    = btnStyle.font;
+    setColorValue('s-clock-date-color', btnStyle.clockDateColor);
+    setColorValue('s-clock-time-color', btnStyle.clockTimeColor);
+    setColorValue('s-clock-bg',         btnStyle.clockBg);
+    document.getElementById("s-clock-date-size").value = btnStyle.clockDateSize;
+    document.getElementById("s-clock-time-size").value = btnStyle.clockTimeSize;
     applyBtnStyle();
     window._clockSet([6, 1, 1, 1, 2, 1, 1, 0]);
     settingsUpdatePreview();
@@ -2303,7 +2384,8 @@ function appExport() {
 
     function renderPreviews() {
       const cfg = getCfg();
-      const preview = wrap.querySelector(".tumb-preview");
+      const previewDateEl = wrap.querySelector("#tumb-preview-date");
+      const previewTimeEl = wrap.querySelector("#tumb-preview-time");
       const now = new Date();
       const DOW_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
       const DOW_LONG  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -2337,7 +2419,8 @@ function appExport() {
       const timeBase = timeParts.filter(Boolean).join(":");
       const timeLine = [timeBase, amStr ? " "+amStr : ""].join("").trim();
       const fullStr = [dateLine, timeLine].filter(Boolean).join("\n");
-      preview.textContent = fullStr || "(nothing selected)";
+      if (previewDateEl) previewDateEl.innerHTML = dateLine ? dateLine.replace(/\s/g,"<br>") : "(date)";
+      if (previewTimeEl) previewTimeEl.textContent = timeLine || "(time)";
       COLS.forEach((col, ci) => renderCol(ci));
     }
 
@@ -2396,9 +2479,25 @@ function appExport() {
 
     function buildTumbler() {
       wrap.innerHTML = "";
-      const preview = document.createElement("div");
-      preview.className = "tumb-preview";
-      wrap.appendChild(preview);
+      const previewRow = document.createElement("div");
+      previewRow.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;";
+      const previewDate = document.createElement("div");
+      previewDate.className = "top-item";
+      previewDate.style.cssText = "background:var(--clock-bg,transparent);display:flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;";
+      const previewDateSpan = document.createElement("span");
+      previewDateSpan.id = "tumb-preview-date";
+      previewDateSpan.style.cssText = "font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;line-height:1.3;text-align:center;pointer-events:none;";
+      previewDate.appendChild(previewDateSpan);
+      const previewTime = document.createElement("div");
+      previewTime.className = "top-item";
+      previewTime.style.cssText = "background:var(--clock-bg,transparent);display:flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;";
+      const previewTimeSpan = document.createElement("span");
+      previewTimeSpan.id = "tumb-preview-time";
+      previewTimeSpan.style.cssText = "font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;line-height:1.3;text-align:center;pointer-events:none;";
+      previewTime.appendChild(previewTimeSpan);
+      previewRow.appendChild(previewDate);
+      previewRow.appendChild(previewTime);
+      wrap.appendChild(previewRow);
       const grid = document.createElement("div");
       grid.className = "tumb-grid";
       COLS.forEach((col, ci) => {
@@ -2498,6 +2597,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
