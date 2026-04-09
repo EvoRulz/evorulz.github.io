@@ -404,7 +404,7 @@ input[type="checkbox"] {
   height: 18px;
   border: 2px solid var(--checkbox-border, #555555FF);
   border-radius: 4px;
-  background: white;
+  background: var(--checkbox-bg, #111111FF);
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
   position: relative;
@@ -444,7 +444,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v121</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v122</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -657,6 +657,17 @@ input[type="checkbox"]:hover {
         <div class="hex-copy-row">
           <input type="text" class="hex-input" id="s-checkbox-border-hex" maxlength="9" oninput="onHexInput('s-checkbox-border')" spellcheck="false" autocomplete="off">
           <button class="copy-btn" onclick="copyHex('s-checkbox-border',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row">
+        <label>Box background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-checkbox-bg" oninput="onColorPickerChange('s-checkbox-bg')">
+          <input type="range" class="alpha-slider" id="s-checkbox-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-checkbox-bg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-checkbox-bg-hex" maxlength="9" oninput="onHexInput('s-checkbox-bg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-checkbox-bg',this)">Copy</button>
         </div>
       </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid #444">
@@ -1461,7 +1472,7 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -1558,6 +1569,7 @@ function appExport() {
     document.documentElement.style.setProperty("--checkbox-checked",     hex8ToCss(btnStyle.checkboxChecked));
     document.documentElement.style.setProperty("--checkbox-mark",        hex8ToCss(btnStyle.checkboxMark));
     document.documentElement.style.setProperty("--checkbox-border",      hex8ToCss(btnStyle.checkboxBorder));
+    document.documentElement.style.setProperty("--checkbox-bg",          hex8ToCss(btnStyle.checkboxBg));
   }
   applyBtnStyle();
 
@@ -1591,6 +1603,7 @@ function appExport() {
     setColorValue('s-checkbox-checked', btnStyle.checkboxChecked);
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
+    setColorValue('s-checkbox-bg', btnStyle.checkboxBg);
     document.getElementById("s-font").value    = btnStyle.font;
     document.getElementById("s-datefmt").value = clk.dateFmt;
     document.getElementById("s-time24").value  = String(clk.time24);
@@ -1670,6 +1683,7 @@ function appExport() {
     btnStyle.checkboxChecked = getColorValue('s-checkbox-checked');
     btnStyle.checkboxMark    = getColorValue('s-checkbox-mark');
     btnStyle.checkboxBorder  = getColorValue('s-checkbox-border');
+    btnStyle.checkboxBg      = getColorValue('s-checkbox-bg');
     applyBtnStyle();
     const df  = Number(document.getElementById("s-datefmt").value);
     const t24 = document.getElementById("s-time24").value === "true";
@@ -1690,6 +1704,7 @@ function appExport() {
     setColorValue('s-checkbox-checked', btnStyle.checkboxChecked);
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
+    setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     setColorValue('s-sliderborder', btnStyle.sliderBorder);
@@ -2135,6 +2150,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
