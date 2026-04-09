@@ -384,6 +384,7 @@
     .manage-delete-btn { padding: 6px 10px; background: #2a1a1a; color: #ff9999;
       border: none; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
     .manage-delete-btn:hover { background: #3a2020; }
+    .manage-habit-checkbox { cursor: pointer; width: 18px; height: 18px; }
     #manage-add-row { display: flex; gap: 8px; }
     #manage-new-name {
       flex: 1; background: #111; color: #fff; border: 1px solid #555;
@@ -412,7 +413,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v117</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v118</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -442,11 +443,16 @@
   <div id="manage-panel">
     <h2>Manage Habits</h2>
     <div id="manage-list"></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input type="checkbox" id="manage-select-all" onchange="manageToggleSelectAll()">
+      <label for="manage-select-all" style="font-size:13px;color:#bbb;margin:0">Select All</label>
+    </div>
     <div id="manage-add-row">
       <input id="manage-new-name" type="text" placeholder="New habit name…" autocomplete="off" spellcheck="false">
       <button id="manage-add-btn" onclick="manageAddHabit()">Add</button>
     </div>
     <div style="display:flex;gap:8px;margin-top:4px">
+      <button id="manage-delete-selected" style="background:#3a2020;color:#ff9999;padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:13px;display:none" onclick="manageBulkDelete()">Delete Selected</button>
       <button id="manage-close-btn" onclick="manageClose()">Done</button>
     </div>
   </div>
@@ -1914,11 +1920,13 @@ function appExport() {
       row.className = "manage-habit-row";
       const safeName = cfg.label.replace(/&/g,"&amp;").replace(/"/g,"&quot;");
       row.innerHTML = `
+        <input type="checkbox" class="manage-habit-checkbox" data-id="${cfg.id}" onchange="manageUpdateSelectAll()">
         <input class="manage-habit-name" type="text" value="${safeName}" data-id="${cfg.id}" autocomplete="off" spellcheck="false">
         <button class="manage-rename-btn" onclick="manageRename('${cfg.id}',this)">Rename</button>
         <button class="manage-delete-btn" onclick="manageDelete('${cfg.id}')">Delete</button>`;
       list.appendChild(row);
     });
+    document.getElementById("manage-select-all").checked = false;
   }
   function manageRename(id, btn) {
     const input = btn.closest(".manage-habit-row").querySelector(".manage-habit-name");
@@ -1940,6 +1948,47 @@ function appExport() {
     if (!cfg) return;
     const ok = await confirmClear(`This will permanently delete the habit <strong>${cfg.label}</strong> and all its data.`);
     if (!ok) return;
+    performHabitDelete(id);
+    applyButtonOrder();
+    manageRenderList();
+  }
+  function manageUpdateSelectAll() {
+    const allChecked = [...document.querySelectorAll('.manage-habit-checkbox')].every(c => c.checked);
+    const anyChecked = [...document.querySelectorAll('.manage-habit-checkbox')].some(c => c.checked);
+    document.getElementById("manage-select-all").checked = allChecked;
+    document.getElementById("manage-delete-selected").style.display = anyChecked ? "" : "none";
+  }
+  function manageToggleSelectAll() {
+    const isChecked = document.getElementById("manage-select-all").checked;
+    document.querySelectorAll('.manage-habit-checkbox').forEach(c => c.checked = isChecked);
+    document.getElementById("manage-delete-selected").style.display = isChecked ? "" : "none";
+  }
+  function manageBulkDelete() {
+    const selected = [...document.querySelectorAll('.manage-habit-checkbox:checked')];
+    if (!selected.length) return;
+    const selectedIds = selected.map(c => c.dataset.id);
+    const selectedNames = selectedIds.map(id => TRACKER_CONFIGS.find(c => c.id === id)?.label).filter(Boolean);
+    
+    // Check if any selected habits have data
+    const hasData = selectedIds.some(id => {
+      const prefix = id + ":";
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k.startsWith(prefix)) return true;
+      }
+      return false;
+    });
+    
+    const msg = `This will permanently delete ${selectedNames.length} habit${selectedNames.length === 1 ? '' : 's'}:<br><strong>${selectedNames.join(', ')}</strong>`;
+    confirmClear(msg).then(ok => {
+      if (!ok) return;
+      selectedIds.forEach(id => performHabitDelete(id));
+      document.getElementById("manage-select-all").checked = false;
+      document.getElementById("manage-delete-selected").style.display = "none";
+      manageRenderList();
+    });
+  }
+  function performHabitDelete(id) {
     // Wipe all localStorage entries for this habit
     const prefix = id + ":";
     const keys = [];
@@ -1957,8 +2006,6 @@ function appExport() {
     const idx = TRACKER_CONFIGS.findIndex(c => c.id === id);
     if (idx !== -1) TRACKER_CONFIGS.splice(idx, 1);
     saveRawConfigs();
-    applyButtonOrder();
-    manageRenderList();
   }
   function manageAddHabit() {
     const input = document.getElementById("manage-new-name");
@@ -1993,6 +2040,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
