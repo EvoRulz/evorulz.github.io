@@ -173,14 +173,14 @@
 
     table { border-collapse: collapse; width: 100%; }
     th, td {
-      border: 1px solid #333;
+      border: 1px solid var(--app-border-color, #333);
       padding: 6px;
       text-align: center;
       font-size: 12px;
     }
     th {
       position: sticky; top: 0;
-      background: #000; z-index: 1;
+      background: var(--app-thead-bg, #000); z-index: 1;
       cursor: pointer; user-select: none; white-space: nowrap;
     }
     th:hover { background: #1a1a1a; }
@@ -188,9 +188,9 @@
     th.sorted-desc::after { content: " ▼"; }
 
     .bar-container { width: 100%; height: 18px; background: #222; }
-    .bar        { height: 100%; background: #7030A0; transition: width 0.2s; }
-    .bar-total  { height: 100%; background: #8000ff; transition: width 0.2s; }
-    .bar-streak { height: 100%; background: #375623; transition: width 0.2s; }
+    .bar        { height: 100%; background: var(--bar-set-color,    #7030A0); transition: width 0.2s; }
+    .bar-total  { height: 100%; background: var(--bar-total-color,  #8000ff); transition: width 0.2s; }
+    .bar-streak { height: 100%; background: var(--bar-streak-color, #375623); transition: width 0.2s; }
 
     td.set-cell { padding: 0; }
 
@@ -550,7 +550,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v159</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v160</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -604,6 +604,7 @@ input[type="checkbox"]:hover {
       <div class="settings-group-item" data-group="sg-sliders">Sliders</div>
       <div class="settings-group-item" data-group="sg-clock">Clock</div>
       <div class="settings-group-item" data-group="sg-checkboxes">Checkboxes</div>
+      <div class="settings-group-item" data-group="sg-app">App</div>
       <div class="empty-slot"></div>
       <div class="empty-slot"></div>
       <div class="empty-slot"></div>
@@ -776,7 +777,166 @@ input[type="checkbox"]:hover {
         </div>
       </div>
       </div>
-    <div class="settings-group-content" id="sg-checkboxes">
+    <div class="settings-group-content" id="sg-app">
+      <!-- Background type selector -->
+      <div class="settings-row">
+        <label>Background type</label>
+        <select id="s-app-bg-type" onchange="appBgTypeChange()">
+          <option value="solid">Solid colour</option>
+          <option value="gradient2">2-stop gradient</option>
+          <option value="gradient3">3-stop gradient</option>
+          <option value="gradient4">4-stop gradient</option>
+          <option value="pattern-dots">Pattern: Dots</option>
+          <option value="pattern-grid">Pattern: Grid</option>
+          <option value="pattern-stripes">Pattern: Stripes</option>
+          <option value="pattern-diagonal">Pattern: Diagonal</option>
+          <option value="pattern-crosshatch">Pattern: Crosshatch</option>
+          <option value="image">Image</option>
+        </select>
+      </div>
+      <!-- Gradient direction (hidden for solid/pattern/image) -->
+      <div class="settings-row" id="s-app-grad-dir-row">
+        <label>Direction</label>
+        <select id="s-app-grad-dir" onchange="settingsAppChange()">
+          <option value="to bottom">Top → Bottom</option>
+          <option value="to right">Left → Right</option>
+          <option value="to bottom right">Diagonal ↘</option>
+          <option value="to bottom left">Diagonal ↙</option>
+          <option value="135deg">135°</option>
+          <option value="45deg">45°</option>
+        </select>
+      </div>
+      <!-- Solid / gradient colour stops -->
+      <div id="s-app-stops-wrap"></div>
+      <!-- Pattern colour -->
+      <div id="s-app-pattern-wrap" style="display:none">
+        <div class="color-settings-row">
+          <label>Pattern colour</label>
+          <div class="color-picker-row">
+            <input type="color" id="s-app-pat-color" oninput="onColorPickerChange('s-app-pat-color')">
+            <input type="range" class="alpha-slider" id="s-app-pat-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-pat-color')">
+          </div>
+          <div class="hex-copy-row">
+            <input type="text" class="hex-input" id="s-app-pat-color-hex" maxlength="9" oninput="onHexInput('s-app-pat-color')" spellcheck="false" autocomplete="off">
+            <button class="copy-btn" onclick="copyHex('s-app-pat-color',this)">Copy</button>
+          </div>
+        </div>
+        <div class="color-settings-row">
+          <label>Pattern background</label>
+          <div class="color-picker-row">
+            <input type="color" id="s-app-pat-bg" oninput="onColorPickerChange('s-app-pat-bg')">
+            <input type="range" class="alpha-slider" id="s-app-pat-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-pat-bg')">
+          </div>
+          <div class="hex-copy-row">
+            <input type="text" class="hex-input" id="s-app-pat-bg-hex" maxlength="9" oninput="onHexInput('s-app-pat-bg')" spellcheck="false" autocomplete="off">
+            <button class="copy-btn" onclick="copyHex('s-app-pat-bg',this)">Copy</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>Pattern size</label>
+          <select id="s-app-pat-size" onchange="settingsAppChange()">
+            <option value="4">Tiny (4px)</option>
+            <option value="8">Small (8px)</option>
+            <option value="16" selected>Medium (16px)</option>
+            <option value="32">Large (32px)</option>
+            <option value="64">X-Large (64px)</option>
+          </select>
+        </div>
+      </div>
+      <!-- Image upload -->
+      <div id="s-app-image-wrap" style="display:none;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="copy-btn" style="padding:6px 14px;font-size:13px;" onclick="document.getElementById('s-app-img-file').click()">Choose image…</button>
+          <button class="copy-btn" style="padding:6px 14px;font-size:13px;" onclick="appClearImage()">Clear image</button>
+          <input type="file" id="s-app-img-file" accept="image/*" style="display:none" onchange="appLoadImage(this)">
+        </div>
+        <div id="s-app-img-preview" style="width:100%;max-height:120px;overflow:hidden;border-radius:6px;border:1px solid #444;display:none;">
+          <img id="s-app-img-thumb" style="width:100%;object-fit:cover;display:block;" src="">
+        </div>
+        <div class="settings-row">
+          <label>Size</label>
+          <select id="s-app-img-size" onchange="settingsAppChange()">
+            <option value="cover">Cover</option>
+            <option value="contain">Contain</option>
+            <option value="auto">Actual size</option>
+            <option value="50%">50%</option>
+            <option value="200%">200%</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <label>Position</label>
+          <select id="s-app-img-pos" onchange="settingsAppChange()">
+            <option value="center">Center</option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <label>Repeat</label>
+          <select id="s-app-img-repeat" onchange="settingsAppChange()">
+            <option value="no-repeat">No repeat</option>
+            <option value="repeat">Tile</option>
+            <option value="repeat-x">Tile horizontal</option>
+            <option value="repeat-y">Tile vertical</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <label>Attachment</label>
+          <select id="s-app-img-attach" onchange="settingsAppChange()">
+            <option value="scroll">Scroll with page</option>
+            <option value="fixed">Fixed (parallax)</option>
+          </select>
+        </div>
+        <!-- overlay tint over image -->
+        <div class="color-settings-row">
+          <label>Overlay tint</label>
+          <div class="color-picker-row">
+            <input type="color" id="s-app-img-tint" oninput="onColorPickerChange('s-app-img-tint')">
+            <input type="range" class="alpha-slider" id="s-app-img-tint-alpha" min="0" max="255" value="0" oninput="onAlphaChange('s-app-img-tint')">
+          </div>
+          <div class="hex-copy-row">
+            <input type="text" class="hex-input" id="s-app-img-tint-hex" maxlength="9" oninput="onHexInput('s-app-img-tint')" spellcheck="false" autocomplete="off">
+            <button class="copy-btn" onclick="copyHex('s-app-img-tint',this)">Copy</button>
+          </div>
+        </div>
+      </div>
+      <!-- Text / UI colours -->
+      <div class="color-settings-row" style="margin-top:8px">
+        <label>Page text colour</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-text" oninput="onColorPickerChange('s-app-text')">
+          <input type="range" class="alpha-slider" id="s-app-text-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-text')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-text-hex" maxlength="9" oninput="onHexInput('s-app-text')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-text',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row">
+        <label>Table border colour</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-border" oninput="onColorPickerChange('s-app-border')">
+          <input type="range" class="alpha-slider" id="s-app-border-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-border')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-border-hex" maxlength="9" oninput="onHexInput('s-app-border')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-border',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row">
+        <label>Table header background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-thead" oninput="onColorPickerChange('s-app-thead')">
+          <input type="range" class="alpha-slider" id="s-app-thead-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-thead')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-thead-hex" maxlength="9" oninput="onHexInput('s-app-thead')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-thead',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row">
       <div class="color-settings-row">
         <label>Checked background</label>
         <div class="color-picker-row">
@@ -1747,6 +1907,196 @@ function appExport() {
   requestAnimationFrame(equalizeTopGrid);
 
   // ── Button style settings ──────────────────────────────────
+  // ── App style ──────────────────────────────────────────────
+  const APP_STYLE_DEFAULTS = {
+    bgType: "solid",
+    stops: ["#111111FF"],
+    gradDir: "to bottom",
+    patColor: "#FFFFFF33",
+    patBg: "#111111FF",
+    patSize: 16,
+    imgData: null,
+    imgSize: "cover",
+    imgPos: "center",
+    imgRepeat: "no-repeat",
+    imgAttach: "scroll",
+    imgTint: "#00000000",
+    textColor: "#FFFFFFFF",
+    borderColor: "#333333FF",
+    theadBg: "#000000FF",
+    barSet: "#7030A0FF",
+    barTotal: "#8000FFFF",
+    barStreak: "#375623FF",
+    padding: 20,
+  };
+  let appStyle = Object.assign({}, APP_STYLE_DEFAULTS);
+  try {
+    const saved = JSON.parse(localStorage.getItem("_appStyle"));
+    if (saved) appStyle = Object.assign({}, APP_STYLE_DEFAULTS, saved);
+  } catch {}
+
+  function buildAppBg() {
+    const t = appStyle.bgType;
+    if (t === "image") {
+      if (!appStyle.imgData) { document.body.style.background = "#111"; return; }
+      const tint = hex8ToCss(appStyle.imgTint);
+      document.body.style.backgroundImage  = `linear-gradient(${tint},${tint}), url(${appStyle.imgData})`;
+      document.body.style.backgroundSize   = `auto, ${appStyle.imgSize}`;
+      document.body.style.backgroundPosition = `center, ${appStyle.imgPos}`;
+      document.body.style.backgroundRepeat   = `no-repeat, ${appStyle.imgRepeat}`;
+      document.body.style.backgroundAttachment = `scroll, ${appStyle.imgAttach}`;
+      return;
+    }
+    document.body.style.backgroundImage = "";
+    document.body.style.backgroundSize = "";
+    document.body.style.backgroundPosition = "";
+    document.body.style.backgroundRepeat = "";
+    document.body.style.backgroundAttachment = "";
+    if (t === "solid") {
+      document.body.style.background = hex8ToCss(appStyle.stops[0]);
+      return;
+    }
+    if (t.startsWith("gradient")) {
+      const stops = appStyle.stops.map(s => hex8ToCss(s)).join(", ");
+      document.body.style.background = `linear-gradient(${appStyle.gradDir}, ${stops})`;
+      return;
+    }
+    // Patterns
+    const c  = hex8ToCss(appStyle.patColor);
+    const bg = hex8ToCss(appStyle.patBg);
+    const sz = appStyle.patSize;
+    const h  = sz / 2;
+    if (t === "pattern-dots") {
+      document.body.style.background = bg;
+      document.body.style.backgroundImage = `radial-gradient(circle, ${c} ${sz*0.15}px, transparent ${sz*0.15}px)`;
+      document.body.style.backgroundSize = `${sz}px ${sz}px`;
+    } else if (t === "pattern-grid") {
+      document.body.style.background = bg;
+      document.body.style.backgroundImage =
+        `linear-gradient(${c} 1px, transparent 1px), linear-gradient(90deg, ${c} 1px, transparent 1px)`;
+      document.body.style.backgroundSize = `${sz}px ${sz}px`;
+    } else if (t === "pattern-stripes") {
+      document.body.style.background =
+        `repeating-linear-gradient(0deg, ${c}, ${c} 1px, ${bg} 1px, ${bg} ${sz}px)`;
+    } else if (t === "pattern-diagonal") {
+      document.body.style.background =
+        `repeating-linear-gradient(45deg, ${c} 0, ${c} 1px, ${bg} 0, ${bg} ${h}px)`;
+    } else if (t === "pattern-crosshatch") {
+      document.body.style.background = bg;
+      document.body.style.backgroundImage =
+        `repeating-linear-gradient(45deg, ${c} 0, ${c} 1px, transparent 0, transparent 50%),` +
+        `repeating-linear-gradient(-45deg, ${c} 0, ${c} 1px, transparent 0, transparent 50%)`;
+      document.body.style.backgroundSize = `${sz}px ${sz}px`;
+    }
+  }
+
+  function applyAppStyle() {
+    buildAppBg();
+    document.body.style.color   = hex8ToCss(appStyle.textColor);
+    document.body.style.padding = appStyle.padding + "px";
+    document.documentElement.style.setProperty("--app-border-color", hex8ToCss(appStyle.borderColor));
+    document.documentElement.style.setProperty("--app-thead-bg",     hex8ToCss(appStyle.theadBg));
+    document.documentElement.style.setProperty("--bar-set-color",    hex8ToCss(appStyle.barSet));
+    document.documentElement.style.setProperty("--bar-total-color",  hex8ToCss(appStyle.barTotal));
+    document.documentElement.style.setProperty("--bar-streak-color", hex8ToCss(appStyle.barStreak));
+  }
+  applyAppStyle();
+
+  // Build/destroy the gradient stop colour pickers dynamically
+  function buildStopPickers() {
+    const wrap = document.getElementById("s-app-stops-wrap");
+    wrap.innerHTML = "";
+    const t = appStyle.bgType;
+    const numStops = t === "solid" ? 1 : t === "gradient2" ? 2 : t === "gradient3" ? 3 : t === "gradient4" ? 4 : 0;
+    if (numStops === 0) return;
+    // Ensure stops array is right length
+    while (appStyle.stops.length < numStops) appStyle.stops.push("#111111FF");
+    for (let i = 0; i < numStops; i++) {
+      const label = numStops === 1 ? "Background colour" : `Stop ${i+1}`;
+      const pid = `s-app-stop-${i}`;
+      const div = document.createElement("div");
+      div.className = "color-settings-row";
+      div.style.marginBottom = "4px";
+      div.innerHTML = `
+        <label>${label}</label>
+        <div class="color-picker-row">
+          <input type="color" id="${pid}" oninput="onColorPickerChange('${pid}')">
+          <input type="range" class="alpha-slider" id="${pid}-alpha" min="0" max="255" value="255" oninput="onAlphaChange('${pid}')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="${pid}-hex" maxlength="9" oninput="onHexInput('${pid}')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('${pid}',this)">Copy</button>
+        </div>`;
+      wrap.appendChild(div);
+      setColorValue(pid, appStyle.stops[i] || "#111111FF");
+      // Hook dynamic pickers into settingsChange via a shared handler
+      document.getElementById(pid).addEventListener("input", () => collectAppStops());
+      document.getElementById(pid+"-alpha").addEventListener("input", () => collectAppStops());
+    }
+  }
+  function collectAppStops() {
+    const t = appStyle.bgType;
+    const numStops = t === "solid" ? 1 : t === "gradient2" ? 2 : t === "gradient3" ? 3 : t === "gradient4" ? 4 : 0;
+    appStyle.stops = [];
+    for (let i = 0; i < numStops; i++) {
+      appStyle.stops.push(getColorValue(`s-app-stop-${i}`));
+    }
+    buildAppBg();
+  }
+
+  function appBgTypeChange() {
+    appStyle.bgType = document.getElementById("s-app-bg-type").value;
+    const isGrad    = appStyle.bgType.startsWith("gradient");
+    const isPat     = appStyle.bgType.startsWith("pattern");
+    const isImg     = appStyle.bgType === "image";
+    document.getElementById("s-app-grad-dir-row").style.display  = isGrad ? "" : "none";
+    document.getElementById("s-app-pattern-wrap").style.display  = isPat  ? "" : "none";
+    document.getElementById("s-app-image-wrap").style.display    = isImg  ? "flex" : "none";
+    buildStopPickers();
+    buildAppBg();
+  }
+  function settingsAppChange() {
+    appStyle.bgType   = document.getElementById("s-app-bg-type").value;
+    appStyle.gradDir  = document.getElementById("s-app-grad-dir").value;
+    appStyle.patColor = getColorValue("s-app-pat-color");
+    appStyle.patBg    = getColorValue("s-app-pat-bg");
+    appStyle.patSize  = Number(document.getElementById("s-app-pat-size").value);
+    appStyle.imgSize  = document.getElementById("s-app-img-size").value;
+    appStyle.imgPos   = document.getElementById("s-app-img-pos").value;
+    appStyle.imgRepeat   = document.getElementById("s-app-img-repeat").value;
+    appStyle.imgAttach   = document.getElementById("s-app-img-attach").value;
+    appStyle.imgTint     = getColorValue("s-app-img-tint");
+    appStyle.textColor   = getColorValue("s-app-text");
+    appStyle.borderColor = getColorValue("s-app-border");
+    appStyle.theadBg     = getColorValue("s-app-thead");
+    appStyle.barSet      = getColorValue("s-app-bar-set");
+    appStyle.barTotal    = getColorValue("s-app-bar-total");
+    appStyle.barStreak   = getColorValue("s-app-bar-streak");
+    appStyle.padding     = Number(document.getElementById("s-app-padding").value);
+    collectAppStops();
+    applyAppStyle();
+  }
+  function appLoadImage(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      appStyle.imgData = e.target.result;
+      const thumb = document.getElementById("s-app-img-thumb");
+      const prev  = document.getElementById("s-app-img-preview");
+      if (thumb) { thumb.src = appStyle.imgData; prev.style.display = ""; }
+      buildAppBg();
+      input.value = "";
+    };
+    reader.readAsDataURL(file);
+  }
+  function appClearImage() {
+    appStyle.imgData = null;
+    const thumb = document.getElementById("s-app-img-thumb");
+    const prev  = document.getElementById("s-app-img-preview");
+    if (thumb) { thumb.src = ""; prev.style.display = "none"; }
+    buildAppBg();
+  }
+
   const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
@@ -1854,6 +2204,7 @@ function appExport() {
   applyBtnStyle();
 
   let _btnStyleSnapshot = null;
+  let _appStyleSnapshot = null;
   let _clockSnapshot    = null;
   function toggleSettingsGroup(groupId) {
     document.querySelectorAll('.settings-group-content').forEach(el => {
@@ -1873,6 +2224,7 @@ function appExport() {
   function settingsOpen() {
     _settingsJustOpened = true;
     _btnStyleSnapshot = Object.assign({}, btnStyle);
+    _appStyleSnapshot = Object.assign({}, appStyle, { stops: appStyle.stops.slice() });
     const clk = window._clockGet();
     _clockSnapshot = { tumblerCfg: clk.tumblerCfg.slice() };
     setColorValue('s-bg',           btnStyle.bg);
@@ -1890,6 +2242,36 @@ function appExport() {
     document.getElementById("s-clock-date-size").value = btnStyle.clockDateSize;
     document.getElementById("s-clock-time-size").value = btnStyle.clockTimeSize;
     document.getElementById("s-font").value    = btnStyle.font;
+    // Populate App panel
+    document.getElementById("s-app-bg-type").value  = appStyle.bgType;
+    document.getElementById("s-app-grad-dir").value = appStyle.gradDir;
+    document.getElementById("s-app-pat-size").value = appStyle.patSize;
+    document.getElementById("s-app-img-size").value   = appStyle.imgSize;
+    document.getElementById("s-app-img-pos").value    = appStyle.imgPos;
+    document.getElementById("s-app-img-repeat").value = appStyle.imgRepeat;
+    document.getElementById("s-app-img-attach").value = appStyle.imgAttach;
+    document.getElementById("s-app-padding").value    = appStyle.padding;
+    setColorValue("s-app-pat-color",  appStyle.patColor);
+    setColorValue("s-app-pat-bg",     appStyle.patBg);
+    setColorValue("s-app-img-tint",   appStyle.imgTint);
+    setColorValue("s-app-text",       appStyle.textColor);
+    setColorValue("s-app-border",     appStyle.borderColor);
+    setColorValue("s-app-thead",      appStyle.theadBg);
+    setColorValue("s-app-bar-set",    appStyle.barSet);
+    setColorValue("s-app-bar-total",  appStyle.barTotal);
+    setColorValue("s-app-bar-streak", appStyle.barStreak);
+    const isGrad = appStyle.bgType.startsWith("gradient");
+    const isPat  = appStyle.bgType.startsWith("pattern");
+    const isImg  = appStyle.bgType === "image";
+    document.getElementById("s-app-grad-dir-row").style.display = isGrad ? "" : "none";
+    document.getElementById("s-app-pattern-wrap").style.display = isPat  ? "" : "none";
+    document.getElementById("s-app-image-wrap").style.display   = isImg  ? "flex" : "none";
+    if (appStyle.imgData) {
+      const thumb = document.getElementById("s-app-img-thumb");
+      const prev  = document.getElementById("s-app-img-preview");
+      if (thumb) { thumb.src = appStyle.imgData; prev.style.display = ""; }
+    }
+    buildStopPickers();
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
   }
@@ -1897,15 +2279,14 @@ function appExport() {
     document.getElementById("settings-overlay").classList.remove("active");
   }
   function settingsSave() {
-    localStorage.setItem("_btnStyle", JSON.stringify(btnStyle));
+    localStorage.setItem("_btnStyle",   JSON.stringify(btnStyle));
+    localStorage.setItem("_appStyle",   JSON.stringify(appStyle));
     localStorage.setItem("_clockTumbler", JSON.stringify(window._clockGet().tumblerCfg));
     settingsClose();
   }
   function settingsCancel() {
-    if (_btnStyleSnapshot) {
-      btnStyle = Object.assign({}, _btnStyleSnapshot);
-      applyBtnStyle();
-    }
+    if (_btnStyleSnapshot) { btnStyle = Object.assign({}, _btnStyleSnapshot); applyBtnStyle(); }
+    if (_appStyleSnapshot) { appStyle  = Object.assign({}, _appStyleSnapshot); applyAppStyle(); }
     if (_clockSnapshot) window._clockSet(_clockSnapshot.tumblerCfg);
     settingsClose();
   }
@@ -1972,8 +2353,10 @@ function appExport() {
     settingsUpdatePreview();
   }
   function settingsReset() {
-    btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
+    btnStyle  = Object.assign({}, BTN_STYLE_DEFAULTS);
+    appStyle  = Object.assign({}, APP_STYLE_DEFAULTS);
     localStorage.removeItem("_btnStyle");
+    localStorage.removeItem("_appStyle");
     localStorage.removeItem("_clockTumbler");
     window._clockSet([6, 1, 1, 1, 2, 1, 1, 0]);
     if (window._tumblerRefresh) window._tumblerRefresh();
@@ -2814,6 +3197,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
