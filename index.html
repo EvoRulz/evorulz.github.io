@@ -412,7 +412,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v116</span></div>
+  <div class="top-item" data-item="version"><span style="font-size:14px;color:#888">v117</span></div>
   <div class="top-item" data-item="date"><span id="live-date" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time"><span id="live-time" style="font-size:13px;color:#666;letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -1781,8 +1781,8 @@ function appExport() {
       saveTopGridOrder();
     } else {
       const btn = tdrag.item.querySelector("button");
-      // Only re-trigger button click if pointer didn't start on the button itself
-      if (btn && e.target !== btn) btn.click();
+      // Skip re-triggering for manage-habits since it already fires directly
+      if (btn && tdrag.item.dataset.item !== "manage-habits") btn.click();
     }
     tdrag = null;
   });
@@ -1993,6 +1993,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
