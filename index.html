@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v209</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v210</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2865,11 +2865,11 @@ function appExport() {
       overlay.addEventListener('pointerup', e => {
         if (ox === null) return;
         const dx = e.clientX - ox;
-        const dt = Math.max(Date.now() - ot, 1);
+        const startX = ox;
         ox = null; ot = null;
 
-        if (Math.abs(dx) < 40) {
-          // Tap — only act on the centre-facing card
+        // Tap — no meaningful drag
+        if (Math.abs(dx) < 60) {
           const els = [...stage.querySelectorAll('.cf-item')];
           const centreEl = els.find(el => parseInt(el.dataset.cfI) === Math.round(cfIdx));
           if (centreEl) {
@@ -2881,12 +2881,10 @@ function appExport() {
           return;
         }
 
+        // One step per swipe, full stop
         const n = cfItems().length;
-        // How many items to jump: 1 for a slow swipe, 2 for a fast flick
-        const speed = Math.abs(dx / dt);
-        const steps = speed > 2.5 ? 2 : 1;
         const dir = dx < 0 ? 1 : -1;
-        cfIdx = Math.max(0, Math.min(Math.round(cfIdx) + dir * steps, n - 1));
+        cfIdx = Math.max(0, Math.min(Math.round(cfIdx) + dir, n - 1));
         cfRender();
         cfLoadPickersForId(cfActiveId());
       });
@@ -3719,6 +3717,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
