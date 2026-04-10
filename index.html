@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v227</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v228</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2748,10 +2748,10 @@ function appExport() {
         const ANGLE_STEP = 4;           // additional angle per card further out
         const MAX_ANGLE  = 84;          // never go fully flat
         const ry  = -sign * Math.min(BASE_ANGLE + (abs - 1) * ANGLE_STEP, MAX_ANGLE);
-        const sc  = Math.max(0.5, 1 - abs * 0.08);
+        const sc  = Math.max(0.82, 1 - abs * 0.03);
         const op  = Math.max(0.25, 1 - abs * 0.12);
         const zi  = Math.max(1, 20 - abs * 2);
-        const tx  = cx + sign * (abs * STEP_TX) - iW * 0.5;
+        const tx  = cx - iW * 0.5 + sign * abs * STEP_TX;
         return { tx, ry, sc, op, zi };
       }
       function cfInterp(a, b, t) {
@@ -3709,6 +3709,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
