@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v228</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v229</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2743,10 +2743,12 @@ function appExport() {
         const abs  = Math.abs(d);
         if (d === 0) return { tx: cx, ry: 0.001, sc: 1, op: 1, zi: 20 };
         // Each successive card steps further out, folds a bit more, shrinks a bit more
-        const STEP_TX    = iW * 0.18;   // tight spine gap like a record rack
-        const BASE_ANGLE = 62;          // angle at d=1
-        const ANGLE_STEP = 4;           // additional angle per card further out
-        const MAX_ANGLE  = 84;          // never go fully flat
+        const STEP_TX    = iW * 0.18;
+        const BASE_ANGLE = 62;
+        const ANGLE_STEP = 4;
+        const MAX_ANGLE  = 84;
+        // ease: cards accelerate into centre like Apple's coverflow
+        const ease = abs <= 1 ? abs * abs : abs;
         const ry  = -sign * Math.min(BASE_ANGLE + (abs - 1) * ANGLE_STEP, MAX_ANGLE);
         const sc  = Math.max(0.82, 1 - abs * 0.03);
         const op  = Math.max(0.25, 1 - abs * 0.12);
@@ -2825,8 +2827,8 @@ function appExport() {
       function springTo(target) {
         if (animId) cancelAnimationFrame(animId);
         let vel = 0;
-        const stiffness = 0.28;
-        const damping = 0.72;
+        const stiffness = 0.18;
+        const damping = 0.78;
         function step() {
           const diff = target - displayIdx;
           vel = vel * damping + diff * stiffness;
@@ -3709,6 +3711,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
