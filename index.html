@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v202</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v203</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2777,6 +2777,7 @@ function appExport() {
         el.dataset.cfI = i;
         el.textContent = item.label;
         el.style.width = iW + 'px';
+        el.style.pointerEvents = 'none';
         el.onclick = () => { cfIdx = i; cfRender(); cfLoadPickersForId(cfActiveId()); };
         stage.appendChild(el);
       });
@@ -2786,6 +2787,8 @@ function appExport() {
       stage.addEventListener('pointerdown', e => {
         sx = e.clientX; sy = e.clientY; t0 = Date.now();
         if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+        stage.setPointerCapture(e.pointerId);
+        e.preventDefault();
         e.stopPropagation();
       });
       stage.addEventListener('pointermove', e => {
@@ -2798,7 +2801,20 @@ function appExport() {
         const absDx = Math.abs(dx);
         sx = null; sy = null; t0 = null;
 
-        if (absDx < 12) return;
+        if (absDx < 12) {
+          // Treat as a tap — find which item was under the pointer
+          const items = cfItems();
+          const els = [...stage.querySelectorAll('.cf-item')];
+          const tapped = els.find(el => {
+            const r = el.getBoundingClientRect();
+            return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+          });
+          if (tapped) {
+            const i = parseInt(tapped.dataset.cfI);
+            if (!isNaN(i)) { cfIdx = i; cfRender(); cfLoadPickersForId(cfActiveId()); }
+          }
+          return;
+        }
 
         const n = cfItems().length;
         let momentum = (dx / Math.max(dt, 1)) * -18;
@@ -3648,6 +3664,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
