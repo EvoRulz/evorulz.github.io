@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v257</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v258</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2652,18 +2652,21 @@ function appExport() {
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36 };
   try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
   function cfApplyTuning() {
-    cfTuning.stepTx        = Number(document.getElementById("cf-step-tx").value) / 100;
-    cfTuning.maxAngle      = Number(document.getElementById("cf-max-angle").value);
-    cfTuning.scaleFalloff  = Number(document.getElementById("cf-scale").value) / 100;
-    cfTuning.opacityFalloff= Number(document.getElementById("cf-opacity").value) / 100;
-    cfTuning.duration      = Number(document.getElementById("cf-duration").value);
-    cfTuning.cardW         = Number(document.getElementById("cf-card-w").value) / 100;
-    document.getElementById("cf-step-tx-val").textContent    = cfTuning.stepTx.toFixed(2).replace("0.","") + "%";
-    document.getElementById("cf-max-angle-val").textContent  = cfTuning.maxAngle + "°";
-    document.getElementById("cf-scale-val").textContent      = cfTuning.scaleFalloff.toFixed(2);
-    document.getElementById("cf-opacity-val").textContent    = cfTuning.opacityFalloff.toFixed(2);
-    document.getElementById("cf-duration-val").textContent   = cfTuning.duration;
-    document.getElementById("cf-card-w-val").textContent     = cfTuning.cardW.toFixed(2).replace("0.","") + "%";
+    const _get = id => document.getElementById(id);
+    if (!_get("cf-step-tx")) return;
+    cfTuning.stepTx        = Number(_get("cf-step-tx").value) / 100;
+    cfTuning.maxAngle      = Number(_get("cf-max-angle").value);
+    cfTuning.scaleFalloff  = Number(_get("cf-scale").value) / 100;
+    cfTuning.opacityFalloff= Number(_get("cf-opacity").value) / 100;
+    cfTuning.duration      = Number(_get("cf-duration").value);
+    cfTuning.cardW         = Number(_get("cf-card-w").value) / 100;
+    const _vt = id => { const el = _get(id); if (el) el.textContent = cfTuning[id.replace("cf-","").replace("-val","")]; };
+    if (_get("cf-step-tx-val"))    _get("cf-step-tx-val").textContent    = cfTuning.stepTx.toFixed(2).replace("0.","") + "%";
+    if (_get("cf-max-angle-val"))  _get("cf-max-angle-val").textContent  = cfTuning.maxAngle + "°";
+    if (_get("cf-scale-val"))      _get("cf-scale-val").textContent      = cfTuning.scaleFalloff.toFixed(2);
+    if (_get("cf-opacity-val"))    _get("cf-opacity-val").textContent    = cfTuning.opacityFalloff.toFixed(2);
+    if (_get("cf-duration-val"))   _get("cf-duration-val").textContent   = cfTuning.duration;
+    if (_get("cf-card-w-val"))     _get("cf-card-w-val").textContent     = cfTuning.cardW.toFixed(2).replace("0.","") + "%";
     localStorage.setItem("_cfTuning", JSON.stringify(cfTuning));
     if (window._cfBuild) window._cfBuild();
   }
@@ -3713,6 +3716,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
