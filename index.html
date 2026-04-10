@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v201</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v202</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2780,56 +2780,45 @@ function appExport() {
         el.onclick = () => { cfIdx = i; cfRender(); cfLoadPickersForId(cfActiveId()); };
         stage.appendChild(el);
       });
-      // Swipe handling — velocity-aware flick
+// Swipe handling — velocity-aware flick
       let sx = null, sy = null, t0 = null;
+      let animationId = null;
       stage.addEventListener('pointerdown', e => {
         sx = e.clientX; sy = e.clientY; t0 = Date.now();
+        if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
         e.stopPropagation();
       });
       stage.addEventListener('pointermove', e => {
         if (sx === null) return;
-        // live drag: shift items fractionally for feel
       });
       stage.addEventListener('pointerup', e => {
-  if (sx === null) return;
-  const dx = e.clientX - sx;
-  const dt = Date.now() - t0;
-  let velocity = (dx / dt) * 0.3; // px/ms, dampened for smoother feel
-  sx = null; sy = null; t0 = null;
-  
-  if (Math.abs(dx) < 12) return; // tap threshold
-  
-  const n = cfItems().length;
-  
-  // Momentum animation with exponential decay
-  let momentum = velocity;
-  const friction = 0.92; // decay rate per frame
-  let animationId = null;
-  
-  function animateWithMomentum() {
-    if (Math.abs(momentum) < 0.1) {
-      // Stop animation and snap to nearest index
-      cfRender();
-      cfLoadPickersForId(cfActiveId());
-      return;
-    }
-    
-    // Move by momentum amount (accumulated)
-    const itemDelta = momentum * 0.15; // adjust sensitivity
-    cfIdx += itemDelta;
-    
-    // Clamp to bounds
-    cfIdx = Math.max(0, Math.min(cfIdx, n - 1));
-    
-    // Apply friction
-    momentum *= friction;
-    
-    cfRender();
-    animationId = requestAnimationFrame(animateWithMomentum);
-  }
-  
-  animateWithMomentum();
-});
+        if (sx === null) return;
+        const dx = e.clientX - sx;
+        const dt = Date.now() - t0;
+        const absDx = Math.abs(dx);
+        sx = null; sy = null; t0 = null;
+
+        if (absDx < 12) return;
+
+        const n = cfItems().length;
+        let momentum = (dx / Math.max(dt, 1)) * -18;
+
+        function animateWithMomentum() {
+          if (Math.abs(momentum) < 0.08) {
+            cfIdx = Math.max(0, Math.min(Math.round(cfIdx), n - 1));
+            cfRender();
+            cfLoadPickersForId(cfActiveId());
+            animationId = null;
+            return;
+          }
+          cfIdx += momentum;
+          cfIdx = Math.max(0, Math.min(cfIdx, n - 1));
+          momentum *= 0.88;
+          cfRender();
+          animationId = requestAnimationFrame(animateWithMomentum);
+        }
+        animateWithMomentum();
+      });
       stage.addEventListener('pointercancel', () => { sx = null; });
       cfRender();
     }
@@ -3643,6 +3632,13 @@ function appExport() {
       }
     }
     window._tumblerRefresh = () => { buildTumbler(); requestAnimationFrame(syncPreviewSizes); };
+    // Re-sync sizes whenever the settings overlay becomes visible
+    const _settingsOverlayEl = document.getElementById("settings-overlay");
+    new MutationObserver(() => {
+      if (_settingsOverlayEl.classList.contains("active")) {
+        requestAnimationFrame(() => requestAnimationFrame(syncPreviewSizes));
+      }
+    }).observe(_settingsOverlayEl, { attributes: true, attributeFilter: ["class"] });
   (function(){const V_COLORS=["#00FFFF","#FF00FF","#FFFF00"];const el=document.getElementById("app-version");if(el){const n=parseInt(el.textContent.replace("v",""))||0;el.style.color=V_COLORS[n%V_COLORS.length];}})();
     buildTumbler();
     requestAnimationFrame(syncPreviewSizes);
@@ -3652,6 +3648,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
