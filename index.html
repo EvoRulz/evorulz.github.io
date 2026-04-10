@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v216</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v217</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2819,9 +2819,26 @@ function appExport() {
         e.preventDefault();
         const dx = e.clientX - dragStartX;
         const n = cfItems().length;
-        // Move cfIdx fluidly with finger, no snapping yet
-        cfIdx = Math.max(0, Math.min(dragStartIdx + (-dx / DRAG_PX_PER_ITEM), n - 1));
-        [...stage.querySelectorAll('.cf-item')].forEach(el => el.style.transition = 'none');
+        const prevIdx = cfIdx;
+        const newIdx = Math.max(0, Math.min(dragStartIdx + (-dx / DRAG_PX_PER_ITEM), n - 1));
+
+        // If the centre card is just starting to leave centre, give it a brief
+        // transition so it visibly tucks/folds into the stack
+        const wasCentre = Math.abs(prevIdx - Math.round(prevIdx)) < 0.05 && Math.round(prevIdx) === dragStartIdx;
+        const nowMoving = Math.abs(newIdx - dragStartIdx) > 0.05;
+
+        if (wasCentre && nowMoving) {
+          [...stage.querySelectorAll('.cf-item')].forEach(el => {
+            el.style.transition = 'transform 0.12s cubic-bezier(0.4,0,0.6,1), opacity 0.12s, box-shadow 0.1s, left 0.12s cubic-bezier(0.4,0,0.6,1)';
+          });
+          setTimeout(() => {
+            [...stage.querySelectorAll('.cf-item')].forEach(el => el.style.transition = 'none');
+          }, 130);
+        } else {
+          [...stage.querySelectorAll('.cf-item')].forEach(el => el.style.transition = 'none');
+        }
+
+        cfIdx = newIdx;
         cfRender();
       });
 
@@ -3713,6 +3730,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
