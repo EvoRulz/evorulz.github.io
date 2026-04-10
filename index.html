@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v205</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v206</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2884,20 +2884,13 @@ function appExport() {
         }
 
         const n = cfItems().length;
-        let momentum = (dx / dt) * -1;
-
-        function go() {
-          if (Math.abs(momentum) < 0.08) {
-            cfIdx = Math.max(0, Math.min(Math.round(cfIdx), n - 1));
-            cfRender(); cfLoadPickersForId(cfActiveId());
-            oAnimId = null; return;
-          }
-          cfIdx = Math.max(0, Math.min(cfIdx + momentum, n - 1));
-          momentum *= 0.88;
-          cfRender();
-          oAnimId = requestAnimationFrame(go);
-        }
-        go();
+        // How many items to jump: 1 for a slow swipe, 2 for a fast flick
+        const speed = Math.abs(dx / dt);
+        const steps = speed > 1.2 ? 2 : 1;
+        const dir = dx < 0 ? 1 : -1;
+        cfIdx = Math.max(0, Math.min(Math.round(cfIdx) + dir * steps, n - 1));
+        cfRender();
+        cfLoadPickersForId(cfActiveId());
       });
 
       overlay.addEventListener('pointercancel', () => { ox = null; ot = null; });
@@ -3728,6 +3721,7 @@ function appExport() {
 </script>
 </body>
 </html>
+
 
 
 
