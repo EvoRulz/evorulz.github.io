@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v235</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v237</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2685,27 +2685,12 @@ function appExport() {
     window._cfActiveId = cfActiveId;
 
     function cfLoadPickersForId(id) {
-  // Only load for habit buttons (top-grid buttons use global style)
-  if (typeof id === 'string' && id.startsWith('top-')) {
-    // Load global button style
-    setColorValue('s-bg',       btnStyle.bg);
-    setColorValue('s-fg',       btnStyle.fg);
-    setColorValue('s-glow',     btnStyle.glow);
-    setColorValue('s-activebg', btnStyle.activeBg);
-    document.getElementById("s-font").value = btnStyle.font;
-  } else {
-    // Load per-habit style
-    const s = _btnStyleFor(id);
-    setColorValue('s-bg',       s.bg);
-    setColorValue('s-fg',       s.fg);
-    setColorValue('s-glow',     s.glow);
-    setColorValue('s-activebg', s.activeBg);
-    document.getElementById("s-font").value = s.font;
-    // Sync global btnStyle so settingsChange() reads the right baseline
-    btnStyle.bg = s.bg; btnStyle.fg = s.fg; btnStyle.glow = s.glow;
-    btnStyle.activeBg = s.activeBg; btnStyle.font = s.font;
-  }
-  // Also update alpha sliders and hex fields to match
+  const s = _btnStyleFor(id);
+  setColorValue('s-bg',       s.bg);
+  setColorValue('s-fg',       s.fg);
+  setColorValue('s-glow',     s.glow);
+  setColorValue('s-activebg', s.activeBg);
+  document.getElementById("s-font").value = s.font;
   updateAlphaSliderBg('s-bg');
   updateAlphaSliderBg('s-fg');
   updateAlphaSliderBg('s-glow');
@@ -3711,6 +3696,8 @@ function appExport() {
 </script>
 </body>
 </html>
+
+
 
 
 
