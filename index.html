@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v327</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v328</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2410,22 +2410,6 @@ function appExport() {
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.fontFamily = s.font;
     });
-    // Per-button overrides for top-grid items
-    topGrid.querySelectorAll(".top-item[data-item]").forEach(item => {
-      const id = "top-" + item.dataset.item;
-      const s = _btnStyleFor(id);
-      const btn = item.querySelector("button");
-      if (btn) {
-        btn.style.setProperty("--btn-bg",        hex8ToCss(s.bg));
-        btn.style.setProperty("--btn-fg",        hex8ToCss(s.fg));
-        btn.style.setProperty("--btn-glow",      hex8ToCss(s.glow));
-        btn.style.setProperty("--btn-active-bg", hex8ToCss(s.activeBg));
-        btn.style.setProperty("--btn-font",      s.font);
-        btn.style.background = hex8ToCss(s.bg);
-        btn.style.color      = hex8ToCss(s.fg);
-        btn.style.fontFamily = s.font;
-      }
-    });
   }
   applyBtnStyle();
   let _appStyleSnapshot = null;
@@ -2602,25 +2586,11 @@ function appExport() {
   }
   function settingsChange() {
     if (!document.getElementById('s-bg')) return;
-    const _cfId = window._cfActiveId ? window._cfActiveId() : null;
-    // Only update per-button colours/font — never touch global btnStyle for these
-    if (_cfId) {
-      _btnStyles[_cfId] = {
-        bg:       getColorValue('s-bg'),
-        fg:       getColorValue('s-fg'),
-        glow:     getColorValue('s-glow'),
-        activeBg: getColorValue('s-activebg'),
-        font:     document.getElementById("s-font").value,
-      };
-      _saveBtnStyles();
-      // Reflect into btnStyle only so settingsUpdatePreview reads correct values
-      btnStyle.bg       = _btnStyles[_cfId].bg;
-      btnStyle.fg       = _btnStyles[_cfId].fg;
-      btnStyle.glow     = _btnStyles[_cfId].glow;
-      btnStyle.activeBg = _btnStyles[_cfId].activeBg;
-      btnStyle.font     = _btnStyles[_cfId].font;
-    }
-    // Non-per-button properties always update globally
+    btnStyle.bg             = getColorValue('s-bg');
+    btnStyle.fg             = getColorValue('s-fg');
+    btnStyle.font           = document.getElementById("s-font").value;
+    btnStyle.glow           = getColorValue('s-glow');
+    btnStyle.activeBg       = getColorValue('s-activebg');
     btnStyle.tapHighlight   = getColorValue('s-taphighlight');
     btnStyle.sliderBorder   = getColorValue('s-sliderborder');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
@@ -2634,6 +2604,12 @@ function appExport() {
     btnStyle.clockBg         = getColorValue('s-clock-bg');
     btnStyle.clockDateSize   = Number(document.getElementById("s-clock-date-size").value);
     btnStyle.clockTimeSize   = Number(document.getElementById("s-clock-time-size").value);
+    // Write per-button overrides for the focused coverflow button
+    const _cfId = window._cfActiveId ? window._cfActiveId() : null;
+    if (_cfId) {
+      _btnStyles[_cfId] = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font };
+      _saveBtnStyles();
+    }
     applyBtnStyle();
     if (window._cfRender) window._cfRender();
     settingsUpdatePreview();
@@ -2961,7 +2937,7 @@ function appExport() {
       });
     }
     window._cfBuild = cfBuild;
-    new ResizeObserver(() => { if (window._cfBuild) { const saved = cfIdx; window._cfBuild(); cfIdx = saved; cfRender(); } }).observe(document.getElementById('cf-stage'));
+    new ResizeObserver(() => { if (window._cfBuild) window._cfBuild(); }).observe(document.getElementById('cf-stage'));
 
     function cfPrev() { if (cfIdx > 0) { cfIdx--; cfRender(); cfLoadPickersForId(cfActiveId()); } }
     function cfNext() { const n = cfItems().length; if (cfIdx < n-1) { cfIdx++; cfRender(); cfLoadPickersForId(cfActiveId()); } }
@@ -3787,9 +3763,6 @@ function appExport() {
 </script>
 </body>
 </html>
-
-
-
 
 
 
