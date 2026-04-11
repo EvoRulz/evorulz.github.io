@@ -170,6 +170,45 @@
 
     .sentinel { height: 1px; }
 
+/* ── Settings cog & panel ── */
+#settings-cog {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #999;
+  cursor: pointer;
+}
+
+#settings-cog:hover {
+  background: #3a3a3a;
+  color: #fff;
+}
+
+#settings-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.78);
+  z-index: 9998;
+  align-items: center;
+  justify-content: center;
+}
+
+#settings-overlay.active {
+  display: flex;
+}
+
+#settings-panel {
+  background: #1c1c1c;
+  border: 1px solid #555;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  color: white;
+}
     /* ── Confirmation overlay ── */
     #confirm-overlay {
       display: none; position: fixed; inset: 0;
@@ -224,6 +263,9 @@
 </h1>
 
 <div id="app-controls" style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+  <button id="settings-cog" onclick="openSettings()" title="Settings">
+  ⚙️
+</button>
   <button class="app-btn" onclick="appExport()">Export All</button>
   <button class="app-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
   <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
@@ -275,6 +317,41 @@
   const TOTAL_BAR_MAX  = 100;
   const STREAK_BAR_MAX = 30;
   const NUM_SETS       = 10;
+
+  // ── Settings ─────────────────────────────
+
+function openSettings() {
+  document.getElementById("settings-overlay").classList.add("active");
+}
+
+function closeSettings(e) {
+  if (!e || e.target.id === "settings-overlay") {
+    document.getElementById("settings-overlay").classList.remove("active");
+  }
+}
+
+function applySettings() {
+  const btn = document.getElementById("btnColor").value;
+  const glow = document.getElementById("glowColor").value;
+
+  document.documentElement.style.setProperty('--btn-bg', btn);
+  document.documentElement.style.setProperty('--btn-glow', glow);
+
+  localStorage.setItem("btnColor", btn);
+  localStorage.setItem("glowColor", glow);
+}
+
+// load saved settings
+(function loadSettings() {
+  const btn = localStorage.getItem("btnColor");
+  const glow = localStorage.getItem("glowColor");
+
+  if (btn) document.documentElement.style.setProperty('--btn-bg', btn);
+  if (glow) document.documentElement.style.setProperty('--btn-glow', glow);
+
+  if (btn) document.getElementById("btnColor").value = btn;
+  if (glow) document.getElementById("glowColor").value = glow;
+})();
 
   // ── Status colour ──────────────────────────────────────────
   function applyStatusColor(el) {
@@ -962,5 +1039,22 @@
     drag = null;
   });
 </script>
+<div id="settings-overlay" onclick="closeSettings(event)">
+  <div id="settings-panel" onclick="event.stopPropagation()">
+    <h2>Settings</h2>
+
+    <div class="settings-row">
+      <label>Button Color</label>
+      <input type="color" id="btnColor" onchange="applySettings()">
+    </div>
+
+    <div class="settings-row">
+      <label>Glow Color</label>
+      <input type="color" id="glowColor" onchange="applySettings()">
+    </div>
+
+    <button onclick="closeSettings()">Close</button>
+  </div>
+</div>
 </body>
 </html>
