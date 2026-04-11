@@ -644,7 +644,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v326</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v327</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -708,7 +708,7 @@ input[type="checkbox"]:hover {
     <div class="settings-group-content" id="sg-buttons">
       <div id="coverflow-label" style="text-align:center;font-size:13px;color:#ccc;font-weight:600;margin-bottom:4px;"></div>
       <div id="coverflow-wrap" style="position:relative;width:100%;height:90px;perspective:600px;overflow:hidden;margin-bottom:4px;"></div>
-      <div id="cf-outer">
+      <div id="cf-outer" style="margin-left:-20px;margin-right:-20px;">
         <div id="cf-label"></div>
         <div id="cf-stage"></div>
       </div>
@@ -2410,6 +2410,22 @@ function appExport() {
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.fontFamily = s.font;
     });
+    // Per-button overrides for top-grid items
+    topGrid.querySelectorAll(".top-item[data-item]").forEach(item => {
+      const id = "top-" + item.dataset.item;
+      const s = _btnStyleFor(id);
+      const btn = item.querySelector("button");
+      if (btn) {
+        btn.style.setProperty("--btn-bg",        hex8ToCss(s.bg));
+        btn.style.setProperty("--btn-fg",        hex8ToCss(s.fg));
+        btn.style.setProperty("--btn-glow",      hex8ToCss(s.glow));
+        btn.style.setProperty("--btn-active-bg", hex8ToCss(s.activeBg));
+        btn.style.setProperty("--btn-font",      s.font);
+        btn.style.background = hex8ToCss(s.bg);
+        btn.style.color      = hex8ToCss(s.fg);
+        btn.style.fontFamily = s.font;
+      }
+    });
   }
   applyBtnStyle();
   let _appStyleSnapshot = null;
@@ -2428,6 +2444,16 @@ function appExport() {
     if (item) item.classList.toggle('sg-active', isOpen);
     const preview = document.getElementById('settings-btn-preview');
     if (preview) preview.style.display = (groupId === 'sg-buttons' && isOpen) ? '' : 'none';
+    if (groupId === 'sg-buttons' && isOpen) {
+      const stage = document.getElementById('cf-stage');
+      if (stage) stage.style.visibility = 'hidden';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (window._cfBuild) window._cfBuild();
+          if (stage) stage.style.visibility = '';
+        });
+      });
+    }
   }
   function settingsOpen() {
     try {
@@ -2485,6 +2511,7 @@ function appExport() {
     buildStopPickers();
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
+    cfSyncTuningUI();
     if (window._cfBuild) {
       window._cfBuild();
       const _cfId = window._cfActiveId ? window._cfActiveId() : null;
@@ -2575,11 +2602,25 @@ function appExport() {
   }
   function settingsChange() {
     if (!document.getElementById('s-bg')) return;
-    btnStyle.bg             = getColorValue('s-bg');
-    btnStyle.fg             = getColorValue('s-fg');
-    btnStyle.font           = document.getElementById("s-font").value;
-    btnStyle.glow           = getColorValue('s-glow');
-    btnStyle.activeBg       = getColorValue('s-activebg');
+    const _cfId = window._cfActiveId ? window._cfActiveId() : null;
+    // Only update per-button colours/font — never touch global btnStyle for these
+    if (_cfId) {
+      _btnStyles[_cfId] = {
+        bg:       getColorValue('s-bg'),
+        fg:       getColorValue('s-fg'),
+        glow:     getColorValue('s-glow'),
+        activeBg: getColorValue('s-activebg'),
+        font:     document.getElementById("s-font").value,
+      };
+      _saveBtnStyles();
+      // Reflect into btnStyle only so settingsUpdatePreview reads correct values
+      btnStyle.bg       = _btnStyles[_cfId].bg;
+      btnStyle.fg       = _btnStyles[_cfId].fg;
+      btnStyle.glow     = _btnStyles[_cfId].glow;
+      btnStyle.activeBg = _btnStyles[_cfId].activeBg;
+      btnStyle.font     = _btnStyles[_cfId].font;
+    }
+    // Non-per-button properties always update globally
     btnStyle.tapHighlight   = getColorValue('s-taphighlight');
     btnStyle.sliderBorder   = getColorValue('s-sliderborder');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
@@ -2593,12 +2634,6 @@ function appExport() {
     btnStyle.clockBg         = getColorValue('s-clock-bg');
     btnStyle.clockDateSize   = Number(document.getElementById("s-clock-date-size").value);
     btnStyle.clockTimeSize   = Number(document.getElementById("s-clock-time-size").value);
-    // Write per-button overrides for the focused coverflow button
-    const _cfId = window._cfActiveId ? window._cfActiveId() : null;
-    if (_cfId) {
-      _btnStyles[_cfId] = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font };
-      _saveBtnStyles();
-    }
     applyBtnStyle();
     if (window._cfRender) window._cfRender();
     settingsUpdatePreview();
@@ -2647,6 +2682,39 @@ function appExport() {
     p.style.setProperty("--preview-glow",      btnStyle.glow);
     p.style.setProperty("--preview-active-bg", btnStyle.activeBg);
   }
+  // ── Coverflow tuning params ────────────────────────────────
+  const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36 };
+  try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
+  function cfApplyTuning() {
+    const _get = id => document.getElementById(id);
+    if (!_get("cf-step-tx")) return;
+    cfTuning.stepTx        = Number(_get("cf-step-tx").value) / 100;
+    cfTuning.maxAngle      = Number(_get("cf-max-angle").value);
+    cfTuning.scaleFalloff  = Number(_get("cf-scale").value) / 100;
+    cfTuning.opacityFalloff= Number(_get("cf-opacity").value) / 100;
+    cfTuning.duration      = Number(_get("cf-duration").value);
+    cfTuning.cardW         = Number(_get("cf-card-w").value) / 100;
+    const _vt = id => { const el = _get(id); if (el) el.textContent = cfTuning[id.replace("cf-","").replace("-val","")]; };
+    if (_get("cf-step-tx-val"))    _get("cf-step-tx-val").textContent    = cfTuning.stepTx.toFixed(2).replace("0.","") + "%";
+    if (_get("cf-max-angle-val"))  _get("cf-max-angle-val").textContent  = cfTuning.maxAngle + "°";
+    if (_get("cf-scale-val"))      _get("cf-scale-val").textContent      = cfTuning.scaleFalloff.toFixed(2);
+    if (_get("cf-opacity-val"))    _get("cf-opacity-val").textContent    = cfTuning.opacityFalloff.toFixed(2);
+    if (_get("cf-duration-val"))   _get("cf-duration-val").textContent   = cfTuning.duration;
+    if (_get("cf-card-w-val"))     _get("cf-card-w-val").textContent     = cfTuning.cardW.toFixed(2).replace("0.","") + "%";
+    localStorage.setItem("_cfTuning", JSON.stringify(cfTuning));
+    if (window._cfBuild) window._cfBuild();
+  }
+  function cfSyncTuningUI() {
+    const _sv = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+    _sv("cf-step-tx",    Math.round(cfTuning.stepTx * 100));
+    _sv("cf-max-angle",  cfTuning.maxAngle);
+    _sv("cf-scale",      Math.round(cfTuning.scaleFalloff * 100));
+    _sv("cf-opacity",    Math.round(cfTuning.opacityFalloff * 100));
+    _sv("cf-duration",   cfTuning.duration);
+    _sv("cf-card-w",     Math.round(cfTuning.cardW * 100));
+    cfApplyTuning();
+  }
+
   // ── Coverflow button selector ──────────────────────────────
   (function() {
     let cfIdx = 0;
@@ -2710,27 +2778,24 @@ function appExport() {
   if (!stage) return;
   const items = cfItems();
   if (!items.length) { stage.innerHTML = ''; if (label) label.textContent = ''; return; }
-  // Snap to nearest integer when rendering
-  const snappedIdx = Math.round(cfIdx);
-  cfIdx = Math.max(0, Math.min(snappedIdx, items.length - 1));
       const els = [...stage.querySelectorAll('.cf-item')];
       if (els.length !== items.length) { cfBuild(); return; }
      const W  = stage.offsetWidth || 300;
-      const iW = Math.min(150, Math.max(70, Math.floor(W * 0.36)));
+      const iW = Math.min(150, Math.max(70, Math.floor(W * cfTuning.cardW)));
       const cx = W / 2;
-      const STEP_TX = iW * 0.38;
+      const STEP_TX = (W / 2) * cfTuning.stepTx * 0.38;
 
-      function cfKeyframe(d) {
+        function cfKeyframe(d) {
         const sign = d < 0 ? -1 : 1;
         const abs  = Math.abs(d);
-        const MAX_ANGLE = 78;
-        const ry  = -sign * Math.min(abs * 32, MAX_ANGLE);
-        const sc  = Math.max(0.60, 1 - abs * 0.08);
-        const op  = Math.max(0.00, 1 - abs * 0.18);
+        const MAX_ANGLE = cfTuning.maxAngle;
+        const ry  = -sign * Math.min((abs > 1 ? abs * 72 : abs * 42), MAX_ANGLE);
+        const sc  = Math.max(0.80, 1 - Math.min(abs, 1) * cfTuning.scaleFalloff * 0.5 - Math.max(0, abs - 1) * cfTuning.scaleFalloff * 0.1);
+        const op  = Math.max(0.15, 1 - abs * cfTuning.opacityFalloff) * (abs > 2.5 ? Math.max(0.4, 1 - (abs - 2.5) * 0.25) : 1);
         const zi  = Math.max(1, 20 - Math.floor(abs * 2));
-        const tx  = cx + sign * abs * STEP_TX - iW * 0.5;
+        const tx  = cx + sign * (1 - Math.exp(-abs * 0.9)) * (W * 0.46) - iW * 0.5;
         return { tx, ry, sc, op, zi };
-      }
+        }
 
       function cfInterp(a, b, t) {
         return {
@@ -2769,7 +2834,7 @@ function appExport() {
       if (!items.length) return;
       cfIdx = 0;
       const W  = stage.offsetWidth || 300;
-      const iW = Math.min(150, Math.max(70, Math.floor(W * 0.36)));
+      const iW = Math.min(150, Math.max(70, Math.floor(W * cfTuning.cardW)));
       items.forEach((item, i) => {
         const el = document.createElement('button');
         el.className   = 'cf-item';
@@ -2777,89 +2842,126 @@ function appExport() {
         el.textContent = item.label;
         el.style.width = iW + 'px';
         el.style.pointerEvents = 'none';
+        el.style.webkitTapHighlightColor = 'transparent';
         el.onclick = () => { cfIdx = i; cfRender(); cfLoadPickersForId(cfActiveId()); };
         stage.appendChild(el);
       });
 
       cfRender();
 
-      // Transparent capture overlay — sits on top of all cf-items so pointer
-      // events are never stolen by child buttons
-      const overlay = document.createElement('div');
-      Object.assign(overlay.style, {
-        position: 'absolute', inset: '0', zIndex: '100',
-        background: 'transparent', touchAction: 'none',
-      });
       stage.style.position = 'relative';
-      stage.appendChild(overlay);
+      stage.style.touchAction = 'none';
+      const tapZone = document.createElement('div');
+      Object.assign(tapZone.style, {
+        position: 'absolute', top: '0', height: '100%',
+        zIndex: '101', pointerEvents: 'none',
+        webkitTapHighlightColor: hex8ToCss(btnStyle.tapHighlight),
+        borderRadius: '6px',
+      });
+      stage.appendChild(tapZone);
+      function updateTapZone() {
+        const W = stage.offsetWidth || 300;
+        const iW = Math.min(150, Math.max(70, Math.floor(W * cfTuning.cardW)));
+        const cx = W / 2;
+        tapZone.style.width = iW + 'px';
+        tapZone.style.left = (cx - iW / 2) + 'px';
+      }
+      updateTapZone();
 
       let dragStartX = null;
       let dragStartIdx = null;
       let animId = null;
       let displayIdx = cfIdx;
+      let didDrag = false;
 
       function springTo(target) {
         if (animId) cancelAnimationFrame(animId);
-        let vel = 0;
-        const stiffness = 0.18;
-        const damping = 0.78;
-        function step() {
-          const diff = target - displayIdx;
-          vel = vel * damping + diff * stiffness;
-          displayIdx += vel;
+        const startIdx = displayIdx;
+        const startTime = performance.now();
+        const duration = cfTuning.duration;
+        function step(now) {
+          const t = Math.min((now - startTime) / duration, 1);
+          const ease = 1 - Math.pow(1 - t, 3);
+          displayIdx = startIdx + (target - startIdx) * ease;
           cfRenderAt(displayIdx);
-          if (Math.abs(diff) < 0.0008 && Math.abs(vel) < 0.0008) {
+          if (t < 1) {
+            animId = requestAnimationFrame(step);
+          } else {
             displayIdx = target;
             cfIdx = target;
             cfRenderAt(displayIdx);
             animId = null;
-            return;
+            updateTapZone();
           }
-          animId = requestAnimationFrame(step);
         }
         animId = requestAnimationFrame(step);
       }
 
-      overlay.addEventListener('pointerdown', e => {
+      stage.addEventListener('pointerdown', e => {
+        tapZone.style.pointerEvents = 'auto';
+        requestAnimationFrame(() => { tapZone.style.pointerEvents = 'none'; });
         dragStartX = e.clientX;
         dragStartIdx = displayIdx;
+        didDrag = false;
         if (animId) { cancelAnimationFrame(animId); animId = null; }
-        overlay.setPointerCapture(e.pointerId);
+        stage.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
 
-      overlay.addEventListener('pointermove', e => {
+      stage.addEventListener('pointermove', e => {
         if (dragStartX === null) return;
-        e.preventDefault();
         const dx = e.clientX - dragStartX;
+        if (Math.abs(dx) > 4) didDrag = true;
+        if (!didDrag) return;
+        e.preventDefault();
         const n = cfItems().length;
         displayIdx = Math.max(0, Math.min(dragStartIdx + (-dx / 80), n - 1));
         cfIdx = displayIdx;
         cfRenderAt(displayIdx);
       });
 
-      overlay.addEventListener('pointerup', e => {
+      stage.addEventListener('pointerup', e => {
         if (dragStartX === null) return;
-        const dx = e.clientX - dragStartX;
+        const wasDrag = didDrag;
         dragStartX = null;
+        didDrag = false;
         const n = cfItems().length;
         const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
         cfIdx = target;
         springTo(target);
+        if (!wasDrag) {
+          // find which card was tapped by proximity to tap x
+          const stageRect = stage.getBoundingClientRect();
+          const tapX = e.clientX - stageRect.left;
+          const cardEls = [...stage.querySelectorAll('.cf-item')];
+          let closest = target;
+          let closestDist = Infinity;
+          cardEls.forEach((el, i) => {
+            const r = el.getBoundingClientRect();
+            const cardCx = r.left - stageRect.left + r.width / 2;
+            const dist = Math.abs(tapX - cardCx);
+            if (dist < closestDist) { closestDist = dist; closest = i; }
+          });
+          cfIdx = closest;
+          displayIdx = closest;
+          springTo(closest);
+        }
         cfLoadPickersForId(cfActiveId());
         dragStartIdx = null;
       });
 
-      overlay.addEventListener('pointercancel', () => {
+      stage.addEventListener('pointercancel', () => {
         const n = cfItems().length;
         const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
         cfIdx = target;
         springTo(target);
         dragStartX = null;
+        didDrag = false;
         dragStartIdx = null;
       });
     }
     window._cfBuild = cfBuild;
+    new ResizeObserver(() => { if (window._cfBuild) { const saved = cfIdx; window._cfBuild(); cfIdx = saved; cfRender(); } }).observe(document.getElementById('cf-stage'));
 
     function cfPrev() { if (cfIdx > 0) { cfIdx--; cfRender(); cfLoadPickersForId(cfActiveId()); } }
     function cfNext() { const n = cfItems().length; if (cfIdx < n-1) { cfIdx++; cfRender(); cfLoadPickersForId(cfActiveId()); } }
@@ -3685,6 +3787,70 @@ function appExport() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
