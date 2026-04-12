@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v386</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v387</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2453,8 +2453,6 @@ function appExport() {
     const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font };
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
-      'top-hide-habits':   { bg: '#444444FF', fg: '#ffffffff' },
-      'top-show-habits':   { bg: '#444444FF', fg: '#ffffffff' },
       'top-date':          { bg: '#00000000', fg: '#666666FF' },
       'top-time':          { bg: '#00000000', fg: '#666666FF' },
     };
@@ -2490,7 +2488,7 @@ function appExport() {
       { id: 'top-import-layout', el: '.top-item[data-item="import-layout"]', prefix: '--import-layout' },
       { id: 'top-clear-all',     el: '.top-item[data-item="clear-all"]',     prefix: '--clear-all' },
       { id: 'top-my-files',      el: '.top-item[data-item="my-files"]',      prefix: '--my-files' },
-      { id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', el: '.top-item[data-item="hide-habits"]', prefix: '--hide-habits' },
+      { id: 'top-hide-habits',   el: '.top-item[data-item="hide-habits"]',   prefix: '--hide-habits' },
     ];
     topGridMap.forEach(({ id, el: sel, prefix }) => {
       const el = document.querySelector(sel);
@@ -2851,17 +2849,15 @@ function appExport() {
     { selector: '.app-btn', id: null, getAllWithClass: true, labels: ['Export All', 'Import All', 'Export Layout', 'Import Layout', 'Clear All', 'My Files', 'Hide/Show Habits', 'Manage Habits'] }
   ];  
   // Add Export All top-grid button
-
-  items.push({ id: 'top-hide-habits',    label: 'Hide Habits',    isTopGrid: true });
-  items.push({ id: 'top-show-habits',    label: 'Show Habits',    isTopGrid: true });
   items.push({ id: 'top-export-all',     label: 'Export All',     isTopGrid: true });
-  items.push({ id: 'top-import-all',     label: 'Import All',     isTopGrid: true });
-  items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
-  items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true });
-  items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
-  items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
-  items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
-  items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
+items.push({ id: 'top-import-all',     label: 'Import All',     isTopGrid: true });
+items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true });
+items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
+items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
+items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
+items.push({ id: 'top-hide-habits',    label: 'Hide Habits',    isTopGrid: true });
+items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
+items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
 
   // Add habit buttons
   [...buttonsEl.querySelectorAll('.tracker-btn[data-id]')].forEach(b => {
@@ -3240,7 +3236,6 @@ function appExport() {
     buttonsEl.style.display = habitsVisible ? "" : "none";
     document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
     localStorage.setItem("_habitsVisible", habitsVisible);
-    applyBtnStyle();
   }
 
   // ── Top grid drag-to-reorder ───────────────────────────────
