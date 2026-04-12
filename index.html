@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v385</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v386</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2453,6 +2453,8 @@ function appExport() {
     const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font };
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
+      'top-hide-habits':   { bg: '#444444FF', fg: '#ffffffff' },
+      'top-show-habits':   { bg: '#444444FF', fg: '#ffffffff' },
       'top-date':          { bg: '#00000000', fg: '#666666FF' },
       'top-time':          { bg: '#00000000', fg: '#666666FF' },
     };
@@ -2488,19 +2490,9 @@ function appExport() {
       { id: 'top-import-layout', el: '.top-item[data-item="import-layout"]', prefix: '--import-layout' },
       { id: 'top-clear-all',     el: '.top-item[data-item="clear-all"]',     prefix: '--clear-all' },
       { id: 'top-my-files',      el: '.top-item[data-item="my-files"]',      prefix: '--my-files' },
-      { id: 'top-hide-habits',   el: '.top-item[data-item="hide-habits"]',   prefix: '--hide-habits' },
+      { id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', el: '.top-item[data-item="hide-habits"]', prefix: '--hide-habits' },
     ];
     topGridMap.forEach(({ id, el: sel, prefix }) => {
-      if (id === 'top-hide-habits') {
-        const _hideKey = habitsVisible ? 'top-hide-habits' : 'top-hide-habits-hidden';
-        const el = document.querySelector(sel);
-        if (!el) return;
-        const _s = _btnStyleFor(_hideKey);
-        el.style.setProperty(prefix + '-bg',   hex8ToCss(_s.bg));
-        el.style.setProperty(prefix + '-fg',   hex8ToCss(_s.fg));
-        el.style.setProperty(prefix + '-font', _s.font);
-        return;
-      }
       const el = document.querySelector(sel);
       if (!el) return;
       const _s = _btnStyleFor(id);
@@ -2737,10 +2729,7 @@ function appExport() {
     const _cfId = window._cfActiveId ? window._cfActiveId() : null;
     // Only update per-button colours/font — never touch global btnStyle for these
     if (_cfId) {
-      const _writeKey = (_cfId === 'top-hide-habits' && window._hideHabitsEditingHidden)
-        ? 'top-hide-habits-hidden'
-        : _cfId;
-      _btnStyles[_writeKey] = {
+      _btnStyles[_cfId] = {
         bg:       getColorValue('s-bg'),
         fg:       getColorValue('s-fg'),
         glow:     getColorValue('s-glow'),
@@ -2854,10 +2843,6 @@ function appExport() {
   // ── Coverflow button selector ──────────────────────────────
   (function() {
     let cfIdx = 0;
-    let _hideHabitsEditingHidden = false;
-  window._hideHabitsEditingHidden = false;
-    window._hideHabitsEditingHidden = false;
-  window._hideHabitsEditingHidden = false;
     function cfItems() {
   const items = [];
   // Add top-grid buttons
@@ -2866,17 +2851,18 @@ function appExport() {
     { selector: '.app-btn', id: null, getAllWithClass: true, labels: ['Export All', 'Import All', 'Export Layout', 'Import Layout', 'Clear All', 'My Files', 'Hide/Show Habits', 'Manage Habits'] }
   ];  
   // Add Export All top-grid button
-  
+
   items.push({ id: 'top-hide-habits',    label: 'Hide Habits',    isTopGrid: true });
+  items.push({ id: 'top-show-habits',    label: 'Show Habits',    isTopGrid: true });
   items.push({ id: 'top-export-all',     label: 'Export All',     isTopGrid: true });
   items.push({ id: 'top-import-all',     label: 'Import All',     isTopGrid: true });
+  items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
   items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true });
   items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
-  items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
   items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
   items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
   items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
-  
+
   // Add habit buttons
   [...buttonsEl.querySelectorAll('.tracker-btn[data-id]')].forEach(b => {
     items.push({ id: b.dataset.id, label: b.textContent.trim(), isHabit: true });
@@ -2891,30 +2877,6 @@ function appExport() {
     window._cfActiveId = cfActiveId;
 
     function cfLoadPickersForId(id) {
-  if (id === 'top-hide-habits') {
-    if (!_btnStyles['top-hide-habits-hidden']) {
-      _btnStyles['top-hide-habits-hidden'] = Object.assign({}, _btnStyleFor('top-hide-habits'));
-    }
-    _hideHabitsEditingHidden = !_hideHabitsEditingHidden;
-    window._hideHabitsEditingHidden = _hideHabitsEditingHidden;
-    const editKey = _hideHabitsEditingHidden ? 'top-hide-habits-hidden' : 'top-hide-habits';
-    const s = _btnStyleFor(editKey);
-    setColorValue('s-bg',       s.bg);
-    setColorValue('s-fg',       s.fg);
-    setColorValue('s-glow',     s.glow);
-    setColorValue('s-activebg', s.activeBg);
-    document.getElementById("s-font").value = s.font;
-    updateAlphaSliderBg('s-bg');
-    updateAlphaSliderBg('s-fg');
-    updateAlphaSliderBg('s-glow');
-    updateAlphaSliderBg('s-activebg');
-    const label = document.getElementById('cf-label');
-    if (label) label.textContent = _hideHabitsEditingHidden ? 'Hide/Show Habits (hidden state)' : 'Hide/Show Habits (visible state)';
-    settingsUpdatePreview();
-    return;
-  }
-  _hideHabitsEditingHidden = false;
-  window._hideHabitsEditingHidden = false;
   const s = _btnStyleFor(id);
   setColorValue('s-bg',       s.bg);
   setColorValue('s-fg',       s.fg);
@@ -2974,11 +2936,7 @@ function appExport() {
         const d0 = Math.floor(d), d1 = Math.ceil(d);
         const t  = d - d0;
         const kf = t === 0 ? cfKeyframe(d0) : cfInterp(cfKeyframe(d0), cfKeyframe(d1), t);
-        const _itemId = items[i].id;
-        const _resolvedId = (_itemId === 'top-hide-habits')
-          ? (habitsVisible ? 'top-hide-habits' : 'top-hide-habits-hidden')
-          : _itemId;
-        const s  = _btnStyleFor(_resolvedId);
+        const s  = _btnStyleFor(items[i].id);
         const isClockItem = items[i].id === 'top-date' || items[i].id === 'top-time';
         if (isClockItem) {
           el.style.background = hex8ToCss(btnStyle.clockBg);
