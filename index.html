@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v372</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v373</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2453,7 +2453,6 @@ function appExport() {
     const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font };
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
-      'top-show-habits':   { bg: '#444444FF', fg: '#FFFFFFFF' },
       'top-date':          { bg: '#00000000', fg: '#666666FF' },
       'top-time':          { bg: '#00000000', fg: '#666666FF' },
     };
@@ -2856,7 +2855,7 @@ items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true 
 items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
 items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
 items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
-items.push({ id: 'top-hide-habits', label: 'Hide/Show Habits', isTopGrid: true });
+items.push({ id: 'top-hide-habits',    label: 'Hide Habits',    isTopGrid: true });
 items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
 items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
 
@@ -2996,7 +2995,7 @@ items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true 
       const items = cfItems();
       stage.innerHTML = '';
       if (!items.length) return;
-      cfIdx = Math.min(cfIdx, items.length - 1);
+      cfIdx = 0;
       const W  = stage.offsetWidth || 300;
       const iW = Math.min(150, Math.max(70, Math.floor(W * cfTuning.cardW)));
       items.forEach((item, i) => {
@@ -3110,6 +3109,7 @@ items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true 
           displayIdx = closest;
           springTo(closest);
         }
+        cfLoadPickersForId(cfActiveId());
         dragStartIdx = null;
       });
 
@@ -3230,25 +3230,11 @@ items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true 
   // ── Show / Hide Habits ─────────────────────────────────────
   let habitsVisible = localStorage.getItem("_habitsVisible") !== "false";
   buttonsEl.style.display = habitsVisible ? "" : "none";
-  const _hideBtn = document.getElementById("hide-habits-btn");
-  _hideBtn.textContent = habitsVisible ? "Hide Habits" : "Show Habits";
-  (function() {
-    const _topItem = _hideBtn.closest(".top-item");
-    const _s = _btnStyleFor("top-hide-habits");
-    _topItem.style.setProperty("--hide-habits-bg", hex8ToCss(_s.bg));
-    _topItem.style.setProperty("--hide-habits-fg", hex8ToCss(_s.fg));
-    _topItem.style.setProperty("--hide-habits-font", _s.font);
-  })();
+  document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
   function toggleHabits() {
     habitsVisible = !habitsVisible;
     buttonsEl.style.display = habitsVisible ? "" : "none";
-    const btn = document.getElementById("hide-habits-btn");
-    btn.textContent = habitsVisible ? "Hide Habits" : "Show Habits";
-    const topItem = btn.closest(".top-item");
-    const s = _btnStyleFor("top-hide-habits");
-    topItem.style.setProperty("--hide-habits-bg", hex8ToCss(s.bg));
-    topItem.style.setProperty("--hide-habits-fg", hex8ToCss(s.fg));
-    topItem.style.setProperty("--hide-habits-font", s.font);
+    document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
     localStorage.setItem("_habitsVisible", habitsVisible);
   }
 
@@ -3970,18 +3956,6 @@ items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
