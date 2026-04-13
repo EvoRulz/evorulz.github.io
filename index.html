@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v18</span>
+  <span id="app-version">v19</span>
 </div>
 
 <div class="section">
@@ -100,9 +100,7 @@
 </div>
 
 <div class="section">
-  <h2>Active card colours</h2>
-
-  <p style="font-size:11px;color:#555;margin-bottom:8px;letter-spacing:0.05em;text-transform:uppercase;">Regular cards</p>
+  <h2>Active card colour</h2>
   <div class="color-row">
     <label>Background</label>
     <div class="color-picker-row">
@@ -146,76 +144,7 @@
       <option value="fantasy">Fantasy</option>
     </select>
   </div>
-
-  <p style="font-size:11px;color:#555;margin-top:14px;margin-bottom:8px;letter-spacing:0.05em;text-transform:uppercase;">Toggle — "Hide Habits" (center)</p>
-  <div class="color-row">
-    <label>Background</label>
-    <div class="color-picker-row">
-      <input type="color" id="t-hide-bg" value="#3a1a1a" oninput="syncColors()">
-      <input type="range" class="alpha-slider" id="t-hide-bg-alpha" min="0" max="255" value="255" oninput="syncColors()">
-    </div>
-    <div class="hex-row">
-      <input type="text" class="hex-input" id="t-hide-bg-hex" maxlength="9" oninput="onHexInput('t-hide-bg')" value="#3A1A1AFF">
-      <button class="copy-btn" onclick="copyHex('t-hide-bg', this)">Copy</button>
-    </div>
-  </div>
-  <div class="color-row">
-    <label>Text</label>
-    <div class="color-picker-row">
-      <input type="color" id="t-hide-fg" value="#ff9999" oninput="syncColors()">
-      <input type="range" class="alpha-slider" id="t-hide-fg-alpha" min="0" max="255" value="255" oninput="syncColors()">
-    </div>
-    <div class="hex-row">
-      <input type="text" class="hex-input" id="t-hide-fg-hex" maxlength="9" oninput="onHexInput('t-hide-fg')" value="#FF9999FF">
-      <button class="copy-btn" onclick="copyHex('t-hide-fg', this)">Copy</button>
-    </div>
-  </div>
-  <div class="color-row">
-    <label>Glow</label>
-    <div class="color-picker-row">
-      <input type="color" id="t-hide-glow" value="#ff6464" oninput="syncColors()">
-      <input type="range" class="alpha-slider" id="t-hide-glow-alpha" min="0" max="255" value="255" oninput="syncColors()">
-    </div>
-    <div class="hex-row">
-      <input type="text" class="hex-input" id="t-hide-glow-hex" maxlength="9" oninput="onHexInput('t-hide-glow')" value="#FF6464FF">
-      <button class="copy-btn" onclick="copyHex('t-hide-glow', this)">Copy</button>
-    </div>
-  </div>
-
-  <p style="font-size:11px;color:#555;margin-top:14px;margin-bottom:8px;letter-spacing:0.05em;text-transform:uppercase;">Toggle — "Show Habits" (center)</p>
-  <div class="color-row">
-    <label>Background</label>
-    <div class="color-picker-row">
-      <input type="color" id="t-show-bg" value="#1a3a1a" oninput="syncColors()">
-      <input type="range" class="alpha-slider" id="t-show-bg-alpha" min="0" max="255" value="255" oninput="syncColors()">
-    </div>
-    <div class="hex-row">
-      <input type="text" class="hex-input" id="t-show-bg-hex" maxlength="9" oninput="onHexInput('t-show-bg')" value="#1A3A1AFF">
-      <button class="copy-btn" onclick="copyHex('t-show-bg', this)">Copy</button>
-    </div>
-  </div>
-  <div class="color-row">
-    <label>Text</label>
-    <div class="color-picker-row">
-      <input type="color" id="t-show-fg" value="#99ff99" oninput="syncColors()">
-      <input type="range" class="alpha-slider" id="t-show-fg-alpha" min="0" max="255" value="255" oninput="syncColors()">
-    </div>
-    <div class="hex-row">
-      <input type="text" class="hex-input" id="t-show-fg-hex" maxlength="9" oninput="onHexInput('t-show-fg')" value="#99FF99FF">
-      <button class="copy-btn" onclick="copyHex('t-show-fg', this)">Copy</button>
-    </div>
-  </div>
-  <div class="color-row">
-    <label>Glow</label>
-    <div class="color-picker-row">
-      <input type="color" id="t-show-glow" value="#64ff64" oninput="syncColors()">
-      <input type="range" class="alpha-slider" id="t-show-glow-alpha" min="0" max="255" value="255" oninput="syncColors()">
-    </div>
-    <div class="hex-row">
-      <input type="text" class="hex-input" id="t-show-glow-hex" maxlength="9" oninput="onHexInput('t-show-glow')" value="#64FF64FF">
-      <button class="copy-btn" onclick="copyHex('t-show-glow', this)">Copy</button>
-    </div>
-  </div>
+  <div id="active-card-hint" style="font-size:11px;color:#555;margin-top:8px;letter-spacing:0.05em;text-transform:uppercase;">Regular card</div>
 </div>
 
 <div class="section">
@@ -377,25 +306,36 @@
     updateDebug();
   }
   function syncColors() {
-    style.bg = getColorValue("s-bg");
-    style.fg = getColorValue("s-fg");
-    style.glow = getColorValue("s-glow");
-    style.font = document.getElementById("s-font").value;
-    style.tHideBg   = getColorValue("t-hide-bg");
-    style.tHideFg   = getColorValue("t-hide-fg");
-    style.tHideGlow = getColorValue("t-hide-glow");
-    style.tShowBg   = getColorValue("t-show-bg");
-    style.tShowFg   = getColorValue("t-show-fg");
-    style.tShowGlow = getColorValue("t-show-glow");
+    const displayItems = getDisplayItems();
+    const center = displayItems[Math.round(cfIdx)];
+    const isToggle = center && center.isToggle;
+    const hint = document.getElementById("active-card-hint");
+
+    if (isToggle) {
+      if (hint) hint.textContent = hideHabits ? "Toggle - Show Habits" : "Toggle - Hide Habits";
+      style.bg    = getColorValue("s-bg");
+      style.fg    = getColorValue("s-fg");
+      style.glow  = getColorValue("s-glow");
+      style.font  = document.getElementById("s-font").value;
+      if (hideHabits) {
+        style.tShowBg   = style.bg;
+        style.tShowFg   = style.fg;
+        style.tShowGlow = style.glow;
+      } else {
+        style.tHideBg   = style.bg;
+        style.tHideFg   = style.fg;
+        style.tHideGlow = style.glow;
+      }
+    } else {
+      if (hint) hint.textContent = "Regular card";
+      style.bg   = getColorValue("s-bg");
+      style.fg   = getColorValue("s-fg");
+      style.glow = getColorValue("s-glow");
+      style.font = document.getElementById("s-font").value;
+    }
     updateAlphaSliderBg("s-bg");
     updateAlphaSliderBg("s-fg");
     updateAlphaSliderBg("s-glow");
-    updateAlphaSliderBg("t-hide-bg");
-    updateAlphaSliderBg("t-hide-fg");
-    updateAlphaSliderBg("t-hide-glow");
-    updateAlphaSliderBg("t-show-bg");
-    updateAlphaSliderBg("t-show-fg");
-    updateAlphaSliderBg("t-show-glow");
     cfRender();
     updateDebug();
   }
@@ -573,6 +513,7 @@
           cfRenderAt(displayIdx);
           animId = null;
           updateDebug();
+          updateControlsForCenter();
         }
       }
       animId = requestAnimationFrame(step);
@@ -606,6 +547,7 @@
       cfIdx = closest;
       displayIdx = closest;
       springTo(closest);
+      updateControlsForCenter();
     }
 
     let touchStartX = null;
@@ -704,6 +646,27 @@
     updateDebug();
   }
 
+  function updateControlsForCenter() {
+    const displayItems = getDisplayItems();
+    const center = displayItems[Math.round(cfIdx)];
+    const isToggle = center && center.isToggle;
+    const hint = document.getElementById("active-card-hint");
+    let bg, fg, glow;
+    if (isToggle) {
+      if (hint) hint.textContent = hideHabits ? "Toggle - Show Habits" : "Toggle - Hide Habits";
+      bg   = hideHabits ? style.tShowBg   : style.tHideBg;
+      fg   = hideHabits ? style.tShowFg   : style.tHideFg;
+      glow = hideHabits ? style.tShowGlow : style.tHideGlow;
+    } else {
+      if (hint) hint.textContent = "Regular card";
+      bg   = style.bg;
+      fg   = style.fg;
+      glow = style.glow;
+    }
+    setColorValue("s-bg",   bg);
+    setColorValue("s-fg",   fg);
+    setColorValue("s-glow", glow);
+  }
   // ── Init ───────────────────────────────────────────────────
   updateAlphaSliderBg("s-bg");
   updateAlphaSliderBg("s-fg");
@@ -721,6 +684,7 @@
 </script>
 </body>
 </html>
+
 
 
 
