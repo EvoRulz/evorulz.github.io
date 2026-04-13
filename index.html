@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v4</span>
+  <span id="app-version">v5</span>
 </div>
 
 <div class="section">
@@ -465,7 +465,117 @@
       cfIdx = saved;
     }
 
+    let touchStartX   = null;
+    let touchStartIdx = null;
+    let touchDidDrag  = false;
+
+    stage.addEventListener("touchstart", e => {
+      touchStartX   = e.touches[0].clientX;
+      touchStartIdx = cfIdx;
+      touchDidDrag  = false;
+      displayIdx    = cfIdx;
+      if (animId) { cancelAnimationFrame(animId); animId = null; }
+      e.preventDefault();
+    }, { passive: false });
+
+    stage.addEventListener("touchmove", e => {
+      if (touchStartX === null) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 4) touchDidDrag = true;
+      if (!touchDidDrag) return;
+      e.preventDefault();
+      const n = items.length;
+      displayIdx = Math.max(0, Math.min(touchStartIdx + (-dx / 60), n - 1));
+      cfIdx = displayIdx;
+      cfRenderAt(displayIdx);
+    }, { passive: false });
+
+    stage.addEventListener("touchend", e => {
+      if (touchStartX === null) return;
+      const wasDrag = touchDidDrag;
+      touchStartX   = null;
+      touchDidDrag  = false;
+      const n      = items.length;
+      const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
+      cfIdx = target;
+      springTo(target);
+      if (!wasDrag) {
+        const stageRect = stage.getBoundingClientRect();
+        const tapX      = e.changedTouches[0].clientX - stageRect.left;
+        const cardEls   = [...stage.querySelectorAll(".cf-item")];
+        let closest = target, closestDist = Infinity;
+        cardEls.forEach((el, i) => {
+          const r      = el.getBoundingClientRect();
+          const cardCx = r.left - stageRect.left + r.width / 2;
+          const dist   = Math.abs(tapX - cardCx);
+          if (dist < closestDist) { closestDist = dist; closest = i; }
+        });
+        cfIdx      = closest;
+        displayIdx = closest;
+        springTo(closest);
+      }
+      touchStartIdx = null;
+    }, { passive: false });
+
     stage.addEventListener("pointerdown", e => {
+      if (e.pointerType === "touch") return;
+      dragStartX   = e.clientX;
+      dragStartIdx = cfIdx;
+      didDrag      = false;
+      if (animId) { cancelAnimationFrame(animId); animId = null; }
+      stage.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+
+    stage.addEventListener("pointermove", e => {
+      if (e.pointerType === "touch") return;
+      if (dragStartX === null) return;
+      const dx = e.clientX - dragStartX;
+      if (Math.abs(dx) > 4) didDrag = true;
+      if (!didDrag) return;
+      e.preventDefault();
+      const n = items.length;
+      displayIdx = Math.max(0, Math.min(dragStartIdx + (-dx / 60), n - 1));
+      cfIdx = displayIdx;
+      cfRenderAt(displayIdx);
+    });
+
+    stage.addEventListener("pointerup", e => {
+      if (e.pointerType === "touch") return;
+      if (dragStartX === null) return;
+      const wasDrag = didDrag;
+      dragStartX    = null;
+      didDrag       = false;
+      const n      = items.length;
+      const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
+      cfIdx = target;
+      springTo(target);
+      if (!wasDrag) {
+        const stageRect = stage.getBoundingClientRect();
+        const tapX      = e.clientX - stageRect.left;
+        const cardEls   = [...stage.querySelectorAll(".cf-item")];
+        let closest = target, closestDist = Infinity;
+        cardEls.forEach((el, i) => {
+          const r      = el.getBoundingClientRect();
+          const cardCx = r.left - stageRect.left + r.width / 2;
+          const dist   = Math.abs(tapX - cardCx);
+          if (dist < closestDist) { closestDist = dist; closest = i; }
+        });
+        cfIdx      = closest;
+        displayIdx = closest;
+        springTo(closest);
+      }
+      dragStartIdx = null;
+    });
+
+    stage.addEventListener("pointercancel", e => {
+      if (e.pointerType === "touch") return;
+      const n      = items.length;
+      const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
+      cfIdx = target;
+      springTo(target);
+      dragStartX = null; didDrag = false; dragStartIdx = null;
+    });
       dragStartX   = e.clientX;
       dragStartIdx = cfIdx;
       didDrag      = false;
@@ -538,5 +648,6 @@
 </script>
 </body>
 </html>
+
 
 
