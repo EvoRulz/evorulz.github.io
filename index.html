@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v8</span>
+  <span id="app-version">v9</span>
 </div>
 
 <div class="section">
@@ -526,7 +526,6 @@ let hideHabits = false;
       const n = displayItems.length;
       const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
       cfIdx = target;
-      springTo(target);
       if (!wasDrag) {
         const stageRect = stage.getBoundingClientRect();
         const tapX      = e.changedTouches[0].clientX - stageRect.left;
@@ -549,6 +548,7 @@ let hideHabits = false;
         touchStartIdx = null;
         return;
       }
+      springTo(target);
       touchStartIdx = null;
     }, { passive: false });
 
@@ -584,7 +584,6 @@ let hideHabits = false;
       const n = displayItems.length;
       const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
       cfIdx = target;
-      springTo(target);
       if (!wasDrag) {
         const stageRect = stage.getBoundingClientRect();
         const tapX      = e.clientX - stageRect.left;
@@ -608,6 +607,7 @@ let hideHabits = false;
         dragStartIdx = null;
         return;
       }
+      springTo(target);
       dragStartIdx = null;
     });
 
@@ -636,4 +636,5 @@ let hideHabits = false;
 </script>
 </body>
 </html>
+
 
