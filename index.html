@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v16</span>
+  <span id="app-version">v17</span>
 </div>
 
 <div class="section">
@@ -446,6 +446,10 @@
   function cfBuild() {
     const existingStage = document.getElementById("cf-stage");
     if (!existingStage) return;
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
+    const stage = existingStage.cloneNode(false);
+    existingStage.parentNode.replaceChild(stage, existingStage);
+    displayIdx = cfIdx;
     stage.innerHTML = "";
     if (!items.length) return;
     const W = stage.offsetWidth || 300;
@@ -461,11 +465,6 @@
       stage.appendChild(el);
     });
 
-    if (animId) { cancelAnimationFrame(animId); animId = null; }
-    const oldStage = document.getElementById("cf-stage");
-    const stage = oldStage.cloneNode(false);
-    oldStage.parentNode.replaceChild(stage, oldStage);
-    displayIdx = cfIdx;
     let dragStartX = null;
     let dragStartIdx = null;
     let didDrag = false;
@@ -512,7 +511,6 @@
         if (dist < closestDist) { closestDist = dist; closest = i; }
       });
       if (displayItems[closest] && displayItems[closest].isToggle) {
-        console.log("TOGGLE TAPPED, hideHabits was:", hideHabits);
         hideHabits = !hideHabits;
         const togglePos = hideHabits ? 0 : Math.floor(items.length / 2);
         cfIdx = togglePos;
@@ -620,8 +618,6 @@
     updateDebug();
   }
 
-  new ResizeObserver(() => cfBuild()).observe(document.getElementById("cf-stage"));
-
   // ── Init ───────────────────────────────────────────────────
   updateAlphaSliderBg("s-bg");
   updateAlphaSliderBg("s-fg");
@@ -633,6 +629,7 @@
 </script>
 </body>
 </html>
+
 
 
 
