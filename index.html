@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v21</span>
+  <span id="app-version">v22</span>
 </div>
 
 <div class="section">
@@ -651,10 +651,11 @@
   renderItemsList();
   cfBuild();
   updateDebug();
-  (function(){const V_COLORS=["#00FFFF","#FF00FF","#FFFF00"];const el=document.getElementById("app-version");if(el){const n=parseInt(el.textContent.replace("v",""))||0;el.style.color=V_COLORS[n%V_COLORS.length];}})();
+  (function(){const V_COLORS=["#00FFFF","#FF00FF","#FFFF00"];const el=document.getElementById("app-version");if(el){const n=parseInt(el.textContent.replace("v",""))||0;el.style.color=V_COLORS[n%V_COLORS.length];el.style.setProperty("color",V_COLORS[n%V_COLORS.length],"important");}})();
 </script>
 </body>
 </html>
+
 
 
 
