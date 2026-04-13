@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v9</span>
+  <span id="app-version">v10</span>
 </div>
 
 <div class="section">
@@ -456,7 +456,6 @@ let hideHabits = false;
       stage.appendChild(el);
     });
 
-    // Drag / tap handling
     let dragStartX = null;
     let dragStartIdx = null;
     let displayIdx = cfIdx;
@@ -493,6 +492,27 @@ let hideHabits = false;
       cfIdx = saved;
     }
 
+    function handleTap(tapClientX) {
+      const stageRect = stage.getBoundingClientRect();
+      const tapX = tapClientX - stageRect.left;
+      const cardEls = [...stage.querySelectorAll(".cf-item")];
+      let closest = 0, closestDist = Infinity;
+      cardEls.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const cardCx = r.left - stageRect.left + r.width / 2;
+        const dist = Math.abs(tapX - cardCx);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
+      });
+      if (displayItems[closest] && displayItems[closest].isToggle) {
+        hideHabits = !hideHabits;
+        cfBuild();
+        return;
+      }
+      cfIdx = closest;
+      displayIdx = closest;
+      springTo(closest);
+    }
+
     let touchStartX = null;
     let touchStartIdx = null;
     let touchDidDrag = false;
@@ -521,35 +541,17 @@ let hideHabits = false;
     stage.addEventListener("touchend", e => {
       if (touchStartX === null) return;
       const wasDrag = touchDidDrag;
+      const endX = e.changedTouches[0].clientX;
       touchStartX = null;
       touchDidDrag = false;
       const n = displayItems.length;
       const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
       cfIdx = target;
       if (!wasDrag) {
-        const stageRect = stage.getBoundingClientRect();
-        const tapX      = e.changedTouches[0].clientX - stageRect.left;
-        const cardEls   = [...stage.querySelectorAll(".cf-item")];
-        let closest = target, closestDist = Infinity;
-        cardEls.forEach((el, i) => {
-          const r      = el.getBoundingClientRect();
-          const cardCx = r.left - stageRect.left + r.width / 2;
-          const dist   = Math.abs(tapX - cardCx);
-          if (dist < closestDist) { closestDist = dist; closest = i; }
-        });
-        if (displayItems[closest] && displayItems[closest].isToggle) {
-          hideHabits = !hideHabits;
-          cfBuild();
-          return;
-        }
-        cfIdx      = closest;
-        displayIdx = closest;
-        springTo(closest);
-        touchStartIdx = null;
+        handleTap(endX);
         return;
       }
       springTo(target);
-      touchStartIdx = null;
     }, { passive: false });
 
     stage.addEventListener("pointerdown", e => {
@@ -579,32 +581,14 @@ let hideHabits = false;
       if (e.pointerType === "touch") return;
       if (dragStartX === null) return;
       const wasDrag = didDrag;
+      const upX = e.clientX;
       dragStartX = null;
       didDrag = false;
       const n = displayItems.length;
       const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
       cfIdx = target;
       if (!wasDrag) {
-        const stageRect = stage.getBoundingClientRect();
-        const tapX      = e.clientX - stageRect.left;
-        const cardEls   = [...stage.querySelectorAll(".cf-item")];
-        let closest = target, closestDist = Infinity;
-        cardEls.forEach((el, i) => {
-          const r      = el.getBoundingClientRect();
-          const cardCx = r.left - stageRect.left + r.width / 2;
-          const dist   = Math.abs(tapX - cardCx);
-          if (dist < closestDist) { closestDist = dist; closest = i; }
-        });
-        if (displayItems[closest] && displayItems[closest].isToggle) {
-          hideHabits = !hideHabits;
-          cfBuild();
-          dragStartIdx = null;
-          return;
-        }
-        cfIdx      = closest;
-        displayIdx = closest;
-        springTo(closest);
-        dragStartIdx = null;
+        handleTap(upX);
         return;
       }
       springTo(target);
@@ -636,5 +620,3 @@ let hideHabits = false;
 </script>
 </body>
 </html>
-
-
