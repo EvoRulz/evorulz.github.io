@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v22</span>
+  <span id="app-version">v23</span>
 </div>
 
 <div class="section">
@@ -379,7 +379,7 @@
       "active index: " + cfIdx + " / " + (items.length - 1) +
       "\nactive label: " + (items[cfIdx]?.label || "-") +
       "\ntuning: " + JSON.stringify(tuning, null, 2) +
-      "\nstyle: " + JSON.stringify(style, null, 2);
+      "\nitemStyles: " + JSON.stringify(itemStyles, null, 2);
   }
 
   // ── Toggle button injection ────────────────────────────────
@@ -642,19 +642,15 @@
   updateAlphaSliderBg("s-bg");
   updateAlphaSliderBg("s-fg");
   updateAlphaSliderBg("s-glow");
-  updateAlphaSliderBg("t-hide-bg");
-  updateAlphaSliderBg("t-hide-fg");
-  updateAlphaSliderBg("t-hide-glow");
-  updateAlphaSliderBg("t-show-bg");
-  updateAlphaSliderBg("t-show-fg");
-  updateAlphaSliderBg("t-show-glow");
   renderItemsList();
   cfBuild();
+  updateControlsForCenter();
   updateDebug();
   (function(){const V_COLORS=["#00FFFF","#FF00FF","#FFFF00"];const el=document.getElementById("app-version");if(el){const n=parseInt(el.textContent.replace("v",""))||0;el.style.color=V_COLORS[n%V_COLORS.length];el.style.setProperty("color",V_COLORS[n%V_COLORS.length],"important");}})();
 </script>
 </body>
 </html>
+
 
 
 
