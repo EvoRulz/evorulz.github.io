@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v19</span>
+  <span id="app-version">v20</span>
 </div>
 
 <div class="section">
@@ -216,9 +216,18 @@
   ];
 
   const tuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36 };
-  const style = { bg: "#444444FF", fg: "#FFFFFFFF", glow: "#9659FFFF", font: "sans-serif",
-    tHideBg: "#3A1A1AFF", tHideFg: "#FF9999FF", tHideGlow: "#FF6464FF",
-    tShowBg: "#1A3A1AFF", tShowFg: "#99FF99FF", tShowGlow: "#64FF64FF" };
+  const style = {
+    regular: { bg: "#444444FF", fg: "#FFFFFFFF", glow: "#9659FFFF" },
+    toggleHide: { bg: "#3A1A1AFF", fg: "#FF9999FF", glow: "#FF6464FF" },
+    toggleShow: { bg: "#1A3A1AFF", fg: "#99FF99FF", glow: "#64FF64FF" },
+    font: "sans-serif"
+  };
+  function getActiveStyle() {
+    const displayItems = getDisplayItems();
+    const center = displayItems[Math.round(cfIdx)];
+    if (center && center.isToggle) return hideHabits ? style.toggleShow : style.toggleHide;
+    return style.regular;
+  }
 
   let cfIdx = 0;
   let animId = null;
@@ -306,33 +315,11 @@
     updateDebug();
   }
   function syncColors() {
-    const displayItems = getDisplayItems();
-    const center = displayItems[Math.round(cfIdx)];
-    const isToggle = center && center.isToggle;
-    const hint = document.getElementById("active-card-hint");
-
-    if (isToggle) {
-      if (hint) hint.textContent = hideHabits ? "Toggle - Show Habits" : "Toggle - Hide Habits";
-      style.bg    = getColorValue("s-bg");
-      style.fg    = getColorValue("s-fg");
-      style.glow  = getColorValue("s-glow");
-      style.font  = document.getElementById("s-font").value;
-      if (hideHabits) {
-        style.tShowBg   = style.bg;
-        style.tShowFg   = style.fg;
-        style.tShowGlow = style.glow;
-      } else {
-        style.tHideBg   = style.bg;
-        style.tHideFg   = style.fg;
-        style.tHideGlow = style.glow;
-      }
-    } else {
-      if (hint) hint.textContent = "Regular card";
-      style.bg   = getColorValue("s-bg");
-      style.fg   = getColorValue("s-fg");
-      style.glow = getColorValue("s-glow");
-      style.font = document.getElementById("s-font").value;
-    }
+    const active = getActiveStyle();
+    active.bg   = getColorValue("s-bg");
+    active.fg   = getColorValue("s-fg");
+    active.glow = getColorValue("s-glow");
+    style.font  = document.getElementById("s-font").value;
     updateAlphaSliderBg("s-bg");
     updateAlphaSliderBg("s-fg");
     updateAlphaSliderBg("s-glow");
@@ -442,29 +429,22 @@
       const d0 = Math.floor(d), d1 = Math.ceil(d);
       const t = d - d0;
       const kf = t === 0 ? cfKeyframe(d0) : cfInterp(cfKeyframe(d0), cfKeyframe(d1), t);
+      const isCenter = Math.abs(d) < 0.5;
+      let cardStyle;
       if (item && item.isToggle) {
-        el.style.background = Math.abs(d) < 0.5
-          ? (hideHabits ? hex8ToCss(style.tShowBg) : hex8ToCss(style.tHideBg))
-          : "#1c1c2e";
-        el.style.color = Math.abs(d) < 0.5
-          ? (hideHabits ? hex8ToCss(style.tShowFg) : hex8ToCss(style.tHideFg))
-          : "#888888";
-        el.style.fontFamily = style.font;
+        cardStyle = hideHabits ? style.toggleShow : style.toggleHide;
       } else {
-        el.style.background = hex8ToCss(style.bg);
-        el.style.color = hex8ToCss(style.fg);
-        el.style.fontFamily = style.font;
+        cardStyle = style.regular;
       }
-      el.style.left = kf.tx + "px";
-      el.style.transform = `translateY(-50%) rotateY(${kf.ry}deg) scale(${kf.sc})`;
-      el.style.opacity = kf.op;
-      el.style.zIndex = kf.zi;
-      el.style.width = iW + "px";
-      el.style.boxShadow = Math.abs(d) < 0.5
-        ? (item && item.isToggle
-            ? `0 0 22px 6px ${hideHabits ? hex8ToCss(style.tShowGlow) : hex8ToCss(style.tHideGlow)}`
-            : `0 0 22px 6px ${hex8ToCss(style.glow)}`)
-        : "none";
+      el.style.background  = isCenter ? hex8ToCss(cardStyle.bg)  : "#1c1c2e";
+      el.style.color       = isCenter ? hex8ToCss(cardStyle.fg)  : "#888888";
+      el.style.fontFamily  = style.font;
+      el.style.left        = kf.tx + "px";
+      el.style.transform   = `translateY(-50%) rotateY(${kf.ry}deg) scale(${kf.sc})`;
+      el.style.opacity     = kf.op;
+      el.style.zIndex      = kf.zi;
+      el.style.width       = iW + "px";
+      el.style.boxShadow   = isCenter ? `0 0 22px 6px ${hex8ToCss(cardStyle.glow)}` : "none";
     });
     if (label) label.textContent = items[cfIdx]?.label || "";
   }
@@ -647,25 +627,18 @@
   }
 
   function updateControlsForCenter() {
+    const active = getActiveStyle();
+    const hint = document.getElementById("active-card-hint");
     const displayItems = getDisplayItems();
     const center = displayItems[Math.round(cfIdx)];
-    const isToggle = center && center.isToggle;
-    const hint = document.getElementById("active-card-hint");
-    let bg, fg, glow;
-    if (isToggle) {
-      if (hint) hint.textContent = hideHabits ? "Toggle - Show Habits" : "Toggle - Hide Habits";
-      bg   = hideHabits ? style.tShowBg   : style.tHideBg;
-      fg   = hideHabits ? style.tShowFg   : style.tHideFg;
-      glow = hideHabits ? style.tShowGlow : style.tHideGlow;
+    if (center && center.isToggle) {
+      hint.textContent = hideHabits ? "Toggle - Show Habits" : "Toggle - Hide Habits";
     } else {
-      if (hint) hint.textContent = "Regular card";
-      bg   = style.bg;
-      fg   = style.fg;
-      glow = style.glow;
+      hint.textContent = "Regular card";
     }
-    setColorValue("s-bg",   bg);
-    setColorValue("s-fg",   fg);
-    setColorValue("s-glow", glow);
+    setColorValue("s-bg",   active.bg);
+    setColorValue("s-fg",   active.fg);
+    setColorValue("s-glow", active.glow);
   }
   // ── Init ───────────────────────────────────────────────────
   updateAlphaSliderBg("s-bg");
@@ -684,6 +657,7 @@
 </script>
 </body>
 </html>
+
 
 
 
