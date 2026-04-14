@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v24</span>
+  <span id="app-version">v25</span>
 </div>
 
 <div class="section">
@@ -624,7 +624,8 @@
     updateDebug();
   }
   function updateControlsForCenter() {
-    const item = getCenteredItem();
+    const displayItems = getDisplayItems();
+    const item = displayItems[Math.round(cfIdx)] || null;
     const cs = getStyleForItem(item);
     const hint = document.getElementById("active-card-hint");
     if (item && item.isToggle) {
@@ -649,6 +650,7 @@
 </script>
 </body>
 </html>
+
 
 
 
