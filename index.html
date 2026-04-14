@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v25</span>
+  <span id="app-version">v26</span>
 </div>
 
 <div class="section">
@@ -520,6 +520,7 @@
         const togglePos = hideHabits ? 0 : Math.floor(items.length / 2);
         cfIdx = togglePos;
         cfBuild();
+        updateControlsForCenter();
         return;
       }
       cfIdx = closest;
@@ -650,6 +651,7 @@
 </script>
 </body>
 </html>
+
 
 
 
