@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v357</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v358</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2072,6 +2072,7 @@ function appExport() {
   equalizeButtonSizes();
   new ResizeObserver(equalizeButtonSizes).observe(buttonsEl);
   function equalizeTopGrid() {
+    const topGrid = document.getElementById("top-grid");
     const items = [...topGrid.querySelectorAll('.top-item')];
     if (!items.length) return;
     topGrid.style.gridAutoRows = '';
@@ -2356,6 +2357,7 @@ function appExport() {
     buildAppBg();
   }
 
+  let habitsVisible = localStorage.getItem("_habitsVisible") !== "false";
   const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
@@ -3247,7 +3249,6 @@ items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true 
   });
 
   // ── Show / Hide Habits ─────────────────────────────────────
-  let habitsVisible = localStorage.getItem("_habitsVisible") !== "false";
   buttonsEl.style.display = habitsVisible ? "" : "none";
   document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
   function toggleHabits() {
@@ -3975,6 +3976,7 @@ items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true 
 </script>
 </body>
 </html>
+
 
 
 
