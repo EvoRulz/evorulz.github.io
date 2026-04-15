@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v368</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v369</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -3025,12 +3025,10 @@ items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
         el.onclick = () => {
           cfIdx = i;
           if (items[i].id === 'top-hide-habits') {
-            window._cfHideInProgress = true;
-            cfIdx = 0;
-            cfRender();
-            window._cfHideInProgress = false;
             toggleHabits();
+            window._cfHideInProgress = true;
             cfBuild();
+            window._cfHideInProgress = false;
           } else {
             cfRender();
             cfLoadPickersForId(cfActiveId());
@@ -3065,6 +3063,7 @@ items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
       let animId = null;
       let displayIdx = cfIdx;
       let didDrag = false;
+      let pointerCaptured = false;
 
       function springTo(target) {
         if (animId) cancelAnimationFrame(animId);
@@ -3090,6 +3089,7 @@ items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
       }
 
       stage.addEventListener('pointerdown', e => {
+        if (pointerCaptured) return;
         tapZone.style.pointerEvents = 'auto';
         requestAnimationFrame(() => { tapZone.style.pointerEvents = 'none'; });
         dragStartX = e.clientX;
@@ -3097,6 +3097,7 @@ items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
         didDrag = false;
         if (animId) { cancelAnimationFrame(animId); animId = null; }
         stage.setPointerCapture(e.pointerId);
+        pointerCaptured = true;
         e.preventDefault();
       });
 
@@ -3148,6 +3149,7 @@ items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
           cfLoadPickersForId(cfActiveId());
         }
         dragStartIdx = null;
+        pointerCaptured = false;
       });
 
       stage.addEventListener('pointercancel', () => {
@@ -3158,6 +3160,7 @@ items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
         dragStartX = null;
         didDrag = false;
         dragStartIdx = null;
+        pointerCaptured = false;
       });
     }
     window._cfBuild = cfBuild;
@@ -3994,6 +3997,7 @@ items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
 </script>
 </body>
 </html>
+
 
 
 
