@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v455</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v452</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2862,9 +2862,13 @@ items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true 
 items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
 items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
 items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
-items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: habitsVisible ? 'Hide Habits' : 'Show Habits', isTopGrid: true });
+items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
   items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
   items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
+
+  if (!habitsVisible) {
+    return [{ id: 'top-show-habits', label: 'Show Habits', isTopGrid: true }];
+  }
 
   if (window._cfHideInProgress) {
     return [{ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true }];
@@ -3007,8 +3011,8 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
       const items = window._cfItems();
       stage.innerHTML = '';
       if (!items.length) return;
-      const hideIdx = items.findIndex(it => it.id === 'top-hide-habits' || it.id === 'top-show-habits');
-      cfIdx = hideIdx >= 0 ? hideIdx : 0;
+      const hideIdx = items.findIndex(it => it.id === 'top-hide-habits');
+      cfIdx = !habitsVisible ? (hideIdx >= 0 ? hideIdx : 0) : (hideIdx >= 0 ? hideIdx : 0);
       const W  = stage.offsetWidth || 300;
       const iW = Math.min(150, Math.max(70, Math.floor(W * cfTuning.cardW)));
       items.forEach((item, i) => {
@@ -3021,14 +3025,11 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
         el.style.webkitTapHighlightColor = 'transparent';
         el.onclick = () => {
           cfIdx = i;
-          if (items[i].id === 'top-hide-habits' || items[i].id === 'top-show-habits') {
-            const savedIdx = cfIdx;
+          if (items[i].id === 'top-hide-habits') {
             toggleHabits();
             window._cfHideInProgress = true;
             cfBuild();
             window._cfHideInProgress = false;
-            cfIdx = savedIdx;
-            cfRender();
           } else {
             cfRender();
             cfLoadPickersForId(cfActiveId());
@@ -3973,9 +3974,6 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
 </script>
 </body>
 </html>
-
-
-
 
 
 
