@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v443</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v372</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2500,7 +2500,7 @@ function appExport() {
     // Hide habits button: style depends on current visibility state
     const _habEl = document.querySelector('.top-item[data-item="hide-habits"]');
     if (_habEl) {
-      const _hs = _btnStyleFor('top-hide-habits');
+      const _hs = _btnStyleFor(habitsVisible ? 'top-hide-habits' : 'top-show-habits');
       _habEl.style.setProperty('--hide-habits-bg',   hex8ToCss(_hs.bg));
       _habEl.style.setProperty('--hide-habits-fg',   hex8ToCss(_hs.fg));
       _habEl.style.setProperty('--hide-habits-font', _hs.font);
@@ -2862,7 +2862,7 @@ items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true 
 items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
 items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
 items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
-items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
+items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: habitsVisible ? 'Hide Habits' : 'Show Habits', isTopGrid: true });
   items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
   items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
 
