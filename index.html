@@ -90,7 +90,7 @@
 </head>
 <body>
   <div style="text-align:right;font-size:13px;margin-bottom:16px;">
-  <span id="app-version">v27</span>
+  <span id="app-version">v28</span>
 </div>
 
 <div class="section">
@@ -143,6 +143,17 @@
       <option value="cursive">Cursive</option>
       <option value="fantasy">Fantasy</option>
     </select>
+  </div>
+  <div class="color-row">
+    <label>Tap highlight</label>
+    <div class="color-picker-row">
+      <input type="color" id="s-tap" value="#ffffff" oninput="syncColors()">
+      <input type="range" class="alpha-slider" id="s-tap-alpha" min="0" max="255" value="64" oninput="syncColors()">
+    </div>
+    <div class="hex-row">
+      <input type="text" class="hex-input" id="s-tap-hex" maxlength="9" oninput="onHexInput('s-tap')" value="#FFFFFF40">
+      <button class="copy-btn" onclick="copyHex('s-tap', this)">Copy</button>
+    </div>
   </div>
   <div id="active-card-hint" style="font-size:11px;color:#555;margin-top:8px;letter-spacing:0.05em;text-transform:uppercase;">Regular card</div>
 </div>
@@ -206,13 +217,13 @@
 <script>
   // ── State ──────────────────────────────────────────────────
   let items = [
-    { id: "export-all",    label: "Export All" },
-    { id: "import-all",    label: "Import All" },
-    { id: "clear-all",     label: "Clear All" },
-    { id: "my-files",      label: "My Files" },
-    { id: "pushups",       label: "Pushups" },
-    { id: "teeth",         label: "Teeth" },
-    { id: "appdev",        label: "App Dev" },
+    { id: "export-all",    label: "Export All",  tap: "#FFFFFF40" },
+    { id: "import-all",    label: "Import All",  tap: "#FFFFFF40" },
+    { id: "clear-all",     label: "Clear All",   tap: "#FFFFFF40" },
+    { id: "my-files",      label: "My Files",    tap: "#FFFFFF40" },
+    { id: "pushups",       label: "Pushups",     tap: "#FFFFFF40" },
+    { id: "teeth",         label: "Teeth",       tap: "#FFFFFF40" },
+    { id: "appdev",        label: "App Dev",     tap: "#FFFFFF40" },
   ];
 
   const tuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36 };
@@ -222,9 +233,9 @@
   const toggleShowStyle = { bg: "#1A3A1AFF", fg: "#99FF99FF", glow: "#64FF64FF" };
 
   function getStyleForItem(item) {
-    if (!item) return { bg: "#444444FF", fg: "#FFFFFFFF", glow: "#9659FFFF" };
+    if (!item) return { bg: "#444444FF", fg: "#FFFFFFFF", glow: "#9659FFFF", tap: "#FFFFFF40" };
     if (item.isToggle) return hideHabits ? toggleShowStyle : toggleHideStyle;
-    if (!itemStyles[item.id]) itemStyles[item.id] = { bg: "#444444FF", fg: "#FFFFFFFF", glow: "#9659FFFF" };
+    if (!itemStyles[item.id]) itemStyles[item.id] = { bg: "#444444FF", fg: "#FFFFFFFF", glow: "#9659FFFF", tap: item.tap || "#FFFFFF40" };
     return itemStyles[item.id];
   }
 
@@ -324,6 +335,7 @@
     cs.bg   = getColorValue("s-bg");
     cs.fg   = getColorValue("s-fg");
     cs.glow = getColorValue("s-glow");
+    cs.tap  = getColorValue("s-tap");
     globalFont.value = document.getElementById("s-font").value;
     updateAlphaSliderBg("s-bg");
     updateAlphaSliderBg("s-fg");
@@ -444,6 +456,7 @@
       el.style.zIndex      = kf.zi;
       el.style.width       = iW + "px";
       el.style.boxShadow   = isCenter ? `0 0 22px 6px ${hex8ToCss(cs.glow)}` : "none";
+      el.style.transition  = `transform 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s, background 0.12s, box-shadow 0.35s`;
     });
   }
 
@@ -466,6 +479,12 @@
       el.textContent = item.label;
       el.style.width = iW + "px";
       el.style.pointerEvents = "auto";
+      el.addEventListener("pointerdown", () => {
+        const cs = getStyleForItem(item);
+        el.style.background = hex8ToCss(cs.tap || "#FFFFFF40");
+      });
+      el.addEventListener("pointerup",     () => { const cs = getStyleForItem(item); el.style.background = hex8ToCss(cs.bg); });
+      el.addEventListener("pointercancel", () => { const cs = getStyleForItem(item); el.style.background = hex8ToCss(cs.bg); });
       stage.appendChild(el);
     });
 
@@ -637,12 +656,14 @@
     setColorValue("s-bg",   cs.bg);
     setColorValue("s-fg",   cs.fg);
     setColorValue("s-glow", cs.glow);
+    setColorValue("s-tap",  cs.tap || "#FFFFFF40");
     document.getElementById("s-font").value = globalFont.value;
   }
   // ── Init ───────────────────────────────────────────────────
   updateAlphaSliderBg("s-bg");
   updateAlphaSliderBg("s-fg");
   updateAlphaSliderBg("s-glow");
+  updateAlphaSliderBg("s-tap");
   renderItemsList();
   cfBuild();
   updateControlsForCenter();
@@ -651,6 +672,7 @@
 </script>
 </body>
 </html>
+
 
 
 
