@@ -661,7 +661,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v479</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v480</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2771,6 +2771,15 @@ function appExport() {
     btnStyle.clockBg         = getColorValue('s-clock-bg');
     btnStyle.clockDateSize   = Number(document.getElementById("s-clock-date-size").value);
     btnStyle.clockTimeSize   = Number(document.getElementById("s-clock-time-size").value);
+    // sync clock section pickers from per-button store if a cf item is active
+    if (_cfId) {
+      const _cs = _btnStyles[_cfId] || {};
+      if (_cs.clockDateColor !== undefined) { setColorValue('s-clock-date-color', _cs.clockDateColor); btnStyle.clockDateColor = _cs.clockDateColor; }
+      if (_cs.clockTimeColor !== undefined) { setColorValue('s-clock-time-color', _cs.clockTimeColor); btnStyle.clockTimeColor = _cs.clockTimeColor; }
+      if (_cs.clockBg        !== undefined) { setColorValue('s-clock-bg',         _cs.clockBg);        btnStyle.clockBg        = _cs.clockBg; }
+      if (_cs.clockDateSize  !== undefined) { document.getElementById("s-clock-date-size").value = _cs.clockDateSize; btnStyle.clockDateSize = _cs.clockDateSize; }
+      if (_cs.clockTimeSize  !== undefined) { document.getElementById("s-clock-time-size").value = _cs.clockTimeSize; btnStyle.clockTimeSize = _cs.clockTimeSize; }
+    }
     applyBtnStyle();
     if (window._cfRender) window._cfRender();
     if (window._tumblerRenderPreviews) window._tumblerRenderPreviews();
@@ -4027,6 +4036,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
 </script>
 </body>
 </html>
+
 
 
 
