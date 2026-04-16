@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v455</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v456</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2558,10 +2558,12 @@ function appExport() {
     _appStyleSnapshot  = Object.assign({}, appStyle, { stops: appStyle.stops.slice() });
     const clk = window._clockGet();
     _clockSnapshot = { tumblerCfg: clk.tumblerCfg.slice() };
-    setColorValue('s-bg',           btnStyle.bg);
-    setColorValue('s-fg',           btnStyle.fg);
-    setColorValue('s-glow',         btnStyle.glow);
-    setColorValue('s-activebg',     btnStyle.activeBg);
+    const _initId = window._cfActiveId ? window._cfActiveId() : null;
+    const _initS  = _initId ? _btnStyleFor(_initId) : btnStyle;
+    setColorValue('s-bg',           _initS.bg);
+    setColorValue('s-fg',           _initS.fg);
+    setColorValue('s-glow',         _initS.glow);
+    setColorValue('s-activebg',     _initS.activeBg);
     setColorValue('s-taphighlight', btnStyle.tapHighlight);
     setColorValue('s-checkbox-checked', btnStyle.checkboxChecked);
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
@@ -3041,7 +3043,7 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
       });
 
       cfRender();
-
+      cfLoadPickersForId(cfActiveId());
       stage.style.touchAction = 'none';
 
       if (_cfAnimId) { cancelAnimationFrame(_cfAnimId); _cfAnimId = null; }
@@ -3976,6 +3978,7 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
 </script>
 </body>
 </html>
+
 
 
 
