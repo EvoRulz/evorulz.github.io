@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
   <style>
-    * { -webkit-tap-highlight-color: var(--tap-highlight, #0000ff); scrollbar-width: none; -ms-overflow-style: none; }
+    * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
     *::-webkit-scrollbar { display: none; width: 0; height: 0; }
     .color-settings-row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
     .color-settings-row > label { font-size:13px; color:#bbb; width:100%; }
@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v473</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v474</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -3173,6 +3173,12 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
     const btn = e.target.closest(".tracker-btn[data-id]");
     if (!btn) return;
     if (drag) return;
+    const _th = btn.style.getPropertyValue("--tap-highlight") || getComputedStyle(btn).getPropertyValue("--tap-highlight");
+    const _origBg = btn.style.getPropertyValue("--btn-bg");
+    if (_th) btn.style.setProperty("--btn-bg", _th.trim());
+    const _clearTap = () => { btn.style.setProperty("--btn-bg", _origBg); btn.removeEventListener("pointerup", _clearTap); btn.removeEventListener("pointercancel", _clearTap); };
+    btn.addEventListener("pointerup", _clearTap);
+    btn.addEventListener("pointercancel", _clearTap);
     e.preventDefault();
     const rect = btn.getBoundingClientRect();
     drag = {
@@ -3985,6 +3991,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
 </script>
 </body>
 </html>
+
 
 
 
