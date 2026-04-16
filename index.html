@@ -661,7 +661,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v480</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v481</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2750,8 +2750,13 @@ function appExport() {
         fg:       getColorValue('s-fg'),
         glow:     getColorValue('s-glow'),
         activeBg: getColorValue('s-activebg'),
-        tap:      getColorValue('s-tap'),
-        font:     document.getElementById("s-font").value,
+        tap:           getColorValue('s-tap'),
+        font:          document.getElementById("s-font").value,
+        clockDateColor: getColorValue('s-clock-date-color'),
+        clockTimeColor: getColorValue('s-clock-time-color'),
+        clockBg:        getColorValue('s-clock-bg'),
+        clockDateSize:  Number(document.getElementById("s-clock-date-size").value),
+        clockTimeSize:  Number(document.getElementById("s-clock-time-size").value),
       };
       _saveBtnStyles();
       
@@ -4036,6 +4041,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
 </script>
 </body>
 </html>
+
 
 
 
