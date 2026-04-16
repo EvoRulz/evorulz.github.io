@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v452</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v453</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2947,7 +2947,6 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
         const d0 = Math.floor(d), d1 = Math.ceil(d);
         const t  = d - d0;
         const kf = t === 0 ? cfKeyframe(d0) : cfInterp(cfKeyframe(d0), cfKeyframe(d1), t);
-        const s  = _btnStyleFor(items[i].id);
         const isClockItem = items[i].id === 'top-date' || items[i].id === 'top-time';
         if (isClockItem) {
           el.style.background = hex8ToCss(btnStyle.clockBg);
@@ -2988,11 +2987,13 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
             ? (dateLine||"(date)").replace(/\s/g,"<br>")
             : (timeLine||"(time)");
         } else {
-          el.style.background = hex8ToCss(s.bg);
-          el.style.color      = hex8ToCss(s.fg);
-          el.style.fontSize   = '';
-          el.style.fontFamily = s.font;
-          el.textContent      = items[i].label;
+          const styleId = items[i].id === 'top-hide-habits' ? (habitsVisible ? 'top-hide-habits' : 'top-show-habits') : items[i].id;
+        const s2 = _btnStyleFor(styleId);
+        el.style.background = hex8ToCss(s2.bg);
+        el.style.color      = hex8ToCss(s2.fg);
+        el.style.fontSize   = '';
+        el.style.fontFamily = s2.font;
+        el.textContent      = items[i].label;
         }
         el.style.left      = kf.tx + 'px';
         el.style.transform = `translateY(-50%) rotateY(${kf.ry}deg) scale(${kf.sc})`;
@@ -3974,6 +3975,7 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
 </script>
 </body>
 </html>
+
 
 
 
