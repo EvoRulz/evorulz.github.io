@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v464</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v465</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2871,10 +2871,6 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
     return [{ id: 'top-show-habits', label: 'Show Habits', isTopGrid: true }];
   }
 
-  if (window._cfHideInProgress) {
-    return [{ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true }];
-  }
-
   items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
   // Add habit buttons
   [...buttonsEl.querySelectorAll('.tracker-btn[data-id]')].forEach(b => {
@@ -3030,11 +3026,8 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
         el.style.webkitTapHighlightColor = 'transparent';
         el.onclick = () => {
           cfIdx = i;
-          if (items[i].id === 'top-hide-habits') {
+          if (items[i].id === 'top-hide-habits' || items[i].id === 'top-show-habits') {
             toggleHabits();
-            window._cfHideInProgress = true;
-            cfBuild();
-            window._cfHideInProgress = false;
           } else {
             cfRender();
             cfLoadPickersForId(cfActiveId());
@@ -3986,6 +3979,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
 </script>
 </body>
 </html>
+
 
 
 
