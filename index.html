@@ -660,7 +660,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v460</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v461</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -2832,8 +2832,7 @@ function appExport() {
     if (_get("cf-duration-val"))   _get("cf-duration-val").textContent   = cfTuning.duration;
     if (_get("cf-card-w-val"))     _get("cf-card-w-val").textContent     = cfTuning.cardW.toFixed(2).replace("0.","") + "%";
     localStorage.setItem("_cfTuning", JSON.stringify(cfTuning));
-    if (window._cfBuild) window._cfBuild();
-  }
+    if (window._cfBuild) { window._cfBuild(); if (window._cfPostBuild) window._cfPostBuild(); }
   function cfSyncTuningUI() {
     const _sv = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
     _sv("cf-step-tx",    Math.round(cfTuning.stepTx * 100));
@@ -3134,6 +3133,10 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
     }
     window._cfBuild = cfBuild;
     new ResizeObserver(() => { if (window._cfBuild) { const saved = cfIdx; window._cfBuild(); cfIdx = saved; cfRender(); } }).observe(document.getElementById('cf-stage'));
+    window._cfPostBuild = function() {
+      const id = window._cfActiveId ? window._cfActiveId() : null;
+      if (id) cfLoadPickersForId(id);
+    };
 
     function cfPrev() { if (cfIdx > 0) { cfIdx--; cfRender(); cfLoadPickersForId(cfActiveId()); } }
     function cfNext() { const n = cfItems().length; if (cfIdx < n-1) { cfIdx++; cfRender(); cfLoadPickersForId(cfActiveId()); } }
@@ -3246,10 +3249,7 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
     document.getElementById("hide-habits-btn").textContent = habitsVisible ? "Hide Habits" : "Show Habits";
     localStorage.setItem("_habitsVisible", habitsVisible);
     applyBtnStyle();
-    if (window._cfBuild) window._cfBuild();
-    const activeId = window._cfActiveId ? window._cfActiveId() : null;
-    if (activeId && typeof cfLoadPickersForId !== 'undefined') cfLoadPickersForId(activeId);
-  }
+      }
   // ── Top grid drag-to-reorder ───────────────────────────────
   const topGrid = document.getElementById("top-grid");
   let tdrag = null;
@@ -3968,6 +3968,7 @@ items.push({ id: habitsVisible ? 'top-hide-habits' : 'top-show-habits', label: h
 </script>
 </body>
 </html>
+
 
 
 
