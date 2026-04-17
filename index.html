@@ -184,6 +184,9 @@
       background: var(--app-thead-bg, #000); z-index: 1;
       cursor: pointer; user-select: none; white-space: nowrap;
     }
+    td {
+      background: var(--app-cell-bg, #111);
+    }
     th:hover { background: #1a1a1a; }
     th.sorted-asc::after  { content: " ▲"; }
     th.sorted-desc::after { content: " ▼"; }
@@ -665,7 +668,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v511</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v512</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -1148,6 +1151,17 @@ input[type="checkbox"]:hover {
         <div class="hex-copy-row">
           <input type="text" class="hex-input" id="s-app-thead-hex" maxlength="9" oninput="onHexInput('s-app-thead')" spellcheck="false" autocomplete="off">
           <button class="copy-btn" onclick="copyHex('s-app-thead',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row">
+        <label>Table cell background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-cell-bg" oninput="onColorPickerChange('s-app-cell-bg')">
+          <input type="range" class="alpha-slider" id="s-app-cell-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-cell-bg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-cell-bg-hex" maxlength="9" oninput="onHexInput('s-app-cell-bg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-cell-bg',this)">Copy</button>
         </div>
       </div>
       </div>
@@ -2213,6 +2227,7 @@ function appExport() {
   const APP_STYLE_DEFAULTS = {
     bgType: "solid",
     stops: ["#111111FF"],
+    cellBg: "#111111FF",
     gradDir: "to bottom",
     patColor: "#FFFFFF33",
     patBg: "#111111FF",
@@ -2302,6 +2317,7 @@ function appExport() {
     document.body.style.padding = appStyle.padding + "px";
     document.documentElement.style.setProperty("--app-border-color", hex8ToCss(appStyle.borderColor));
     document.documentElement.style.setProperty("--app-thead-bg",     hex8ToCss(appStyle.theadBg));
+    document.documentElement.style.setProperty("--app-cell-bg",      hex8ToCss(appStyle.cellBg || "#111111FF"));
     document.documentElement.style.setProperty("--bar-set-color",    hex8ToCss(appStyle.barSet));
     document.documentElement.style.setProperty("--bar-total-color",  hex8ToCss(appStyle.barTotal));
     document.documentElement.style.setProperty("--bar-streak-color", hex8ToCss(appStyle.barStreak));
@@ -2375,6 +2391,7 @@ function appExport() {
     appStyle.textColor   = getColorValue("s-app-text");
     appStyle.borderColor = getColorValue("s-app-border");
     appStyle.theadBg     = getColorValue("s-app-thead");
+    appStyle.cellBg      = getColorValue("s-app-cell-bg");
     appStyle.barSet      = getColorValue("s-app-bar-set");
     appStyle.barTotal    = getColorValue("s-app-bar-total");
     appStyle.barStreak   = getColorValue("s-app-bar-streak");
@@ -2760,6 +2777,7 @@ function onHexInput(id) {
     setColorValue("s-app-text",       appStyle.textColor);
     setColorValue("s-app-border",     appStyle.borderColor);
     setColorValue("s-app-thead",      appStyle.theadBg);
+    setColorValue("s-app-cell-bg",    appStyle.cellBg || "#111111FF");
     setColorValue("s-app-bar-set",    appStyle.barSet);
     setColorValue("s-app-bar-total",  appStyle.barTotal);
     setColorValue("s-app-bar-streak", appStyle.barStreak);
@@ -4296,6 +4314,7 @@ fetch('./index.html').then(r=>r.text()).then(t=>{const el=document.getElementByI
 </script>
 </body>
 </html>
+
 
 
 
