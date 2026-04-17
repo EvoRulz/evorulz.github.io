@@ -107,7 +107,7 @@
     }
     .tracker-btn.active {
       background: var(--btn-active-bg, #555);
-      box-shadow: 0 0 16px 5px var(--btn-glow, rgba(150, 90, 255, 0.65));
+      box-shadow: 0 0 16px 5px var(--btn-active-glow, var(--btn-glow, rgba(150, 90, 255, 0.65)));
     }
     .is-dragging .tracker-btn { pointer-events: none; }
     /* Ghost clone shouldn't inherit transitions */
@@ -661,7 +661,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v502</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v503</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -757,6 +757,17 @@ input[type="checkbox"]:hover {
         <div class="hex-copy-row">
           <input type="text" class="hex-input" id="s-glow-hex" maxlength="9" oninput="onHexInput('s-glow')" spellcheck="false" autocomplete="off">
           <button class="copy-btn" onclick="copyHex('s-glow',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row">
+        <label>Active glow colour</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-activeglow" oninput="onColorPickerChange('s-activeglow')">
+          <input type="range" class="alpha-slider" id="s-activeglow-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-activeglow')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-activeglow-hex" maxlength="9" oninput="onHexInput('s-activeglow')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-activeglow',this)">Copy</button>
         </div>
       </div>
       <div class="color-settings-row">
@@ -2374,7 +2385,7 @@ function appExport() {
     buildAppBg();
   }
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -2526,6 +2537,7 @@ function onHexInput(id) {
     buttonsEl.style.setProperty("--btn-fg",        hex8ToCss(btnStyle.fg));
     buttonsEl.style.setProperty("--btn-font",      btnStyle.font);
     buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
+    buttonsEl.style.setProperty("--btn-active-glow", hex8ToCss(btnStyle.activeGlow || btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
@@ -2573,6 +2585,17 @@ function onHexInput(id) {
     if (_dateSpan) { _dateSpan.style.color = hex8ToCss(_btnStyleFor('top-date').fg); }
     if (_timeSpan) { _timeSpan.style.color = hex8ToCss(_btnStyleFor('top-time').fg); }
     const _versionColor = hex8ToCss(_btnStyleFor('top-version').fg);
+    const _versionItem = document.querySelector('.top-item[data-item="version"]');
+    if (_versionItem) {
+      _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg);
+      _versionItem.style.setProperty('--btn-glow', hex8ToCss(_btnStyleFor('top-version').glow));
+      const _vBtn = _versionItem.querySelector('div');
+      if (_vBtn) {
+        _vBtn.addEventListener('pointerdown', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); }, { once: true });
+        _vBtn.addEventListener('pointerup', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); }, { once: true });
+        _vBtn.addEventListener('pointercancel', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); }, { once: true });
+      }
+    }
     const _versionNumSpan = document.getElementById('app-version');
     const _versionStatsSpan = document.getElementById('app-stats');
     if (_versionNumSpan) _versionNumSpan.style.color = _versionColor;
@@ -2584,6 +2607,7 @@ function onHexInput(id) {
       btn.style.setProperty("--btn-bg",        hex8ToCss(s.bg));
       btn.style.setProperty("--btn-fg",        hex8ToCss(s.fg));
       btn.style.setProperty("--btn-glow",      hex8ToCss(s.glow));
+      btn.style.setProperty("--btn-active-glow", hex8ToCss(s.activeGlow || s.glow));
       btn.style.setProperty("--btn-active-bg", hex8ToCss(s.activeBg));
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.fontFamily = s.font;
@@ -2634,6 +2658,7 @@ function onHexInput(id) {
     setColorValue('s-bg',           _initS.bg);
     setColorValue('s-fg',           _initS.fg);
     setColorValue('s-glow',         _initS.glow);
+    setColorValue('s-activeglow',   _initS.activeGlow || _initS.glow);
     setColorValue('s-activebg',     _initS.activeBg);
     setColorValue('s-tap',          _initS.tap || btnStyle.tap);
     setColorValue('s-taphighlight', btnStyle.tapHighlight);
@@ -2816,7 +2841,8 @@ function onHexInput(id) {
         const dateColor = getColorValue('s-fg');
         _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
           bg: getColorValue('s-bg'), fg: dateColor,
-          glow: getColorValue('s-glow'), activeBg: getColorValue('s-activebg'),
+          glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
+          activeBg: getColorValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockDateSize: Number(document.getElementById("s-clock-date-size").value),
         });
@@ -2827,7 +2853,8 @@ function onHexInput(id) {
         const timeColor = getColorValue('s-fg');
         _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, {
           bg: getColorValue('s-bg'), fg: timeColor,
-          glow: getColorValue('s-glow'), activeBg: getColorValue('s-activebg'),
+          glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
+          activeBg: getColorValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockTimeSize: Number(document.getElementById("s-clock-time-size").value),
         });
@@ -2836,7 +2863,8 @@ function onHexInput(id) {
       } else {
         _btnStyles[_cfId] = {
           bg: getColorValue('s-bg'), fg: getColorValue('s-fg'),
-          glow: getColorValue('s-glow'), activeBg: getColorValue('s-activebg'),
+          glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
+          activeBg: getColorValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
         };
       }
@@ -2912,6 +2940,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-bg',              btnStyle.bg);
     setColorValue('s-fg',              btnStyle.fg);
     setColorValue('s-glow',            btnStyle.glow);
+    setColorValue('s-activeglow',      btnStyle.activeGlow);
     setColorValue('s-activebg',        btnStyle.activeBg);
     setColorValue('s-tap',             btnStyle.tap);
     setColorValue('s-taphighlight',    btnStyle.tapHighlight);
@@ -3029,6 +3058,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   setColorValue('s-bg',       s.bg);
   setColorValue('s-fg',       s.fg);
   setColorValue('s-glow',     s.glow);
+  setColorValue('s-activeglow', s.activeGlow || s.glow);
   setColorValue('s-activebg', s.activeBg);
   setColorValue('s-tap',      s.tap);
   document.getElementById("s-font").value = s.font;
@@ -4181,6 +4211,7 @@ fetch('./index.html').then(r=>r.text()).then(t=>{const el=document.getElementByI
 </script>
 </body>
 </html>
+
 
 
 
