@@ -661,7 +661,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v489</span></div>
+  <div class="top-item" data-item="version"><span id="app-version" style="font-size:14px;">v490</span></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -832,7 +832,7 @@ input[type="checkbox"]:hover {
         <label>Date colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-date-color" oninput="onColorPickerChange('s-clock-date-color')">
-          <input type="range" class="alpha-slider" id="s-clock-date-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-clock-date-color')">
+          <input type="range" class="alpha-slider" id="s-clock-date-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-clock-date-color')" data-clock-picker="true">
         </div>
         <div class="hex-copy-row">
           <input type="text" class="hex-input" id="s-clock-date-color-hex" maxlength="9" oninput="onHexInput('s-clock-date-color')" spellcheck="false" autocomplete="off">
@@ -2423,8 +2423,10 @@ function onAlphaChange(id) {
     const h = picker ? picker.value.replace('#','').toUpperCase() : '444444';
     const a = parseInt(slider.value).toString(16).padStart(2,'0').toUpperCase();
     if (hexEl) hexEl.value = '#'+h+a;
-  updateAlphaSliderBg(id);
-  settingsChange();
+    updateAlphaSliderBg(id);
+    const _cfId = window._cfActiveId ? window._cfActiveId() : null;
+    if ((id === 's-clock-date-color' && _cfId === 'top-date') || (id === 's-clock-time-color' && _cfId === 'top-time')) return;
+    settingsChange();
 }
 function onHexInput(id) {
     const hexEl = document.getElementById(id+'-hex');
@@ -4098,6 +4100,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
 </script>
 </body>
 </html>
+
 
 
 
