@@ -97,7 +97,7 @@
       color: var(--btn-fg, #fff);
       font-family: var(--btn-font, sans-serif);
       border: none;
-      border-radius: 6px;
+      border-radius: var(--btn-radius, 6px);
       cursor: pointer;
       font-size: 16px;
       user-select: none;
@@ -106,6 +106,7 @@
       transition: box-shadow 0.2s, background 0.2s;
   box-shadow: 0 0 16px 5px var(--btn-glow, rgba(150, 90, 255, 0.65));
     }
+    .top-item button { border-radius: var(--btn-radius, 6px) !important; }
     .tracker-btn.active {
       background: var(--btn-active-bg, #555);
       box-shadow: 0 0 16px 5px var(--btn-active-glow, var(--btn-glow, rgba(150, 90, 255, 0.65)));
@@ -668,7 +669,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v516</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v517</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -723,6 +724,7 @@ input[type="checkbox"]:hover {
       <div class="settings-group-item" data-group="sg-clock">Clock</div>
       <div class="settings-group-item" data-group="sg-checkboxes">Checkboxes</div>
       <div class="settings-group-item" data-group="sg-app">App</div>
+      <div class="settings-group-item" data-group="sg-coverflow" onclick="toggleSettingsGroup('sg-coverflow')">Coverflow</div>
       <div class="empty-slot"></div>
       <div class="empty-slot"></div>
       <div class="empty-slot"></div>
@@ -800,6 +802,18 @@ input[type="checkbox"]:hover {
         </div>
       </div>
       <div class="settings-row">
+        <label>Corner radius</label>
+        <select id="s-radius" onchange="settingsChange()">
+          <option value="0">Sharp (0px)</option>
+          <option value="4">Slight (4px)</option>
+          <option value="6" selected>Default (6px)</option>
+          <option value="10">Rounded (10px)</option>
+          <option value="16">Very rounded (16px)</option>
+          <option value="50">Pill (50%)</option>
+          <option value="999">Circle</option>
+        </select>
+      </div>
+        <div class="settings-row">
         <label>Font</label>
         <select id="s-font" onchange="settingsChange()">
           <option value="sans-serif">Sans-serif</option>
@@ -1165,7 +1179,44 @@ input[type="checkbox"]:hover {
         </div>
       </div>
       </div>
-    <button id="settings-btn-preview" style="display:none">Preview</button>
+    <div class="settings-group-content" id="sg-coverflow" style="display:none">
+      <div class="settings-row">
+        <label>Step spread <span id="cf-step-tx-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-step-tx" min="10" max="100" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row">
+        <label>Max angle <span id="cf-max-angle-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-max-angle" min="0" max="89" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row">
+        <label>Scale falloff <span id="cf-scale-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-scale" min="0" max="100" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row">
+        <label>Opacity falloff <span id="cf-opacity-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-opacity" min="0" max="100" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row">
+        <label>Animation speed <span id="cf-duration-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-duration" min="50" max="800" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row">
+        <label>Card width <span id="cf-card-w-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-card-w" min="10" max="80" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row">
+        <label>Corner radius</label>
+        <select id="cf-shape" onchange="cfApplyTuning()">
+          <option value="0">Sharp (0px)</option>
+          <option value="4">Slight (4px)</option>
+          <option value="6" selected>Default (6px)</option>
+          <option value="10">Rounded (10px)</option>
+          <option value="16">Very rounded (16px)</option>
+          <option value="50">Pill (50%)</option>
+        </select>
+      </div>
+    </div>
+<button id="settings-btn-preview" style="display:none">Preview</button>
     <div id="settings-footer">
       <button id="settings-save" onclick="settingsSave()">Save</button>
       <button id="settings-cancel" onclick="settingsCancel()">Cancel</button>
@@ -2428,7 +2479,7 @@ function appExport() {
     buildAppBg();
   }
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderH: 8, sliderR: 4, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -2619,6 +2670,7 @@ function onHexInput(id) {
     buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-glow", hex8ToCss(btnStyle.activeGlow || btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
+    document.documentElement.style.setProperty("--btn-radius",           (btnStyle.btnRadius ?? 6) + 'px');
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
     document.documentElement.style.setProperty("--slider-r",             btnStyle.sliderR + "px");
@@ -2659,7 +2711,7 @@ function onHexInput(id) {
       _cogEl.style.background   = hex8ToCss(_ss.bg);
       _cogEl.style.color        = hex8ToCss(_ss.fg);
       _cogEl.style.borderColor  = hex8ToCss(_ss.fg);
-      _cogEl.style.boxShadow    = '';
+      _cogEl.style.boxShadow    = `0 0 16px 5px ${hex8ToCss(_ss.glow)}`;
     }
     // Hide habits button: style depends on current visibility state
     const _habEl = document.querySelector('.top-item[data-item="hide-habits"]');
@@ -2728,7 +2780,7 @@ function onHexInput(id) {
     const item = document.querySelector(`#settings-groups-grid [data-group="${groupId}"]`);
     if (item) item.classList.toggle('sg-active', isOpen);
     const preview = document.getElementById('settings-btn-preview');
-    if (preview) preview.style.display = (groupId === 'sg-buttons' && isOpen) ? '' : 'none';
+    if (preview) preview.style.display = (groupId === 'sg-buttons' && isOpen) ? 'block' : 'none';
     if (groupId === 'sg-buttons' && isOpen) {
       const stage = document.getElementById('cf-stage');
       if (stage) stage.style.visibility = 'hidden';
@@ -2771,6 +2823,7 @@ function onHexInput(id) {
     document.getElementById("s-clock-date-size").value = _btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize;
     document.getElementById("s-clock-time-size").value = _btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize;
     document.getElementById("s-font").value    = btnStyle.font;
+    document.getElementById("s-radius").value  = String(btnStyle.btnRadius ?? 6);
     // Populate App panel
     const _s = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
     _s("s-app-bg-type",    appStyle.bgType);
@@ -2973,6 +3026,7 @@ function onHexInput(id) {
       _saveBtnStyles();
     }
     // Non-per-button properties always update globally
+    btnStyle.btnRadius      = Number(document.getElementById("s-radius").value);
     btnStyle.tap            = getColorValue('s-tap');
     btnStyle.glow           = getColorValue('s-glow');
     btnStyle.activeGlow     = getColorValue('s-activeglow');
@@ -3062,6 +3116,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     document.getElementById("s-font").value    = btnStyle.font;
+    document.getElementById("s-radius").value  = String(BTN_STYLE_DEFAULTS.btnRadius ?? 6);
     setColorValue('s-clock-date-color', _btnStyleFor('top-date').fg);
     setColorValue('s-clock-time-color', _btnStyleFor('top-time').fg);
     setColorValue('s-clock-date-bg',    _btnStyleFor('top-date').bg);
@@ -3077,20 +3132,27 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
   }
   function settingsUpdatePreview() {
     const p = document.getElementById("settings-btn-preview");
-    const bg       = getColorValue('s-bg');
-    const fg       = getColorValue('s-fg');
-    const glow     = getColorValue('s-glow');
-    const activeBg = getColorValue('s-activebg');
-    const font     = document.getElementById("s-font").value;
-    p.style.background = hex8ToCss(bg);
-    p.style.color      = hex8ToCss(fg);
-    p.style.fontFamily = font;
-    p.textContent      = document.getElementById("s-font").selectedOptions[0].text;
-    p.style.setProperty("--preview-glow",      hex8ToCss(glow));
-    p.style.setProperty("--preview-active-bg", hex8ToCss(activeBg));
+    if (!p) return;
+    const _cfId = window._cfActiveId ? window._cfActiveId() : null;
+    const s = _cfId ? _btnStyleFor(_cfId) : btnStyle;
+    p.style.background = hex8ToCss(s.bg);
+    p.style.color      = hex8ToCss(s.fg);
+    p.style.fontFamily = s.font;
+    const items = window._cfItems ? window._cfItems() : [];
+    const activeItem = items.find(it => it.id === _cfId);
+    p.textContent = activeItem ? activeItem.label : document.getElementById("s-font").selectedOptions[0].text;
+    p.style.setProperty("--preview-glow",      hex8ToCss(s.glow));
+    p.style.setProperty("--preview-active-bg", hex8ToCss(s.activeBg));
+    p.style.borderRadius = (btnStyle.btnRadius ?? 6) + 'px';
+    p.style.padding = '12px 20px';
+    p.style.border = 'none';
+    p.style.cursor = 'pointer';
+    p.style.fontSize = '16px';
+    p.style.width = '100%';
+    p.style.boxShadow = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
   }
   // ── Coverflow tuning params ────────────────────────────────
-  const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36 };
+  const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
   try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
   function cfApplyTuning() {
     const _get = id => document.getElementById(id);
@@ -3101,6 +3163,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     cfTuning.opacityFalloff= Number(_get("cf-opacity").value) / 100;
     cfTuning.duration      = Number(_get("cf-duration").value);
     cfTuning.cardW         = Number(_get("cf-card-w").value) / 100;
+    cfTuning.shape         = Number(_get("cf-shape").value);
     const _vt = id => { const el = _get(id); if (el) el.textContent = cfTuning[id.replace("cf-","").replace("-val","")]; };
     if (_get("cf-step-tx-val"))    _get("cf-step-tx-val").textContent    = cfTuning.stepTx.toFixed(2).replace("0.","") + "%";
     if (_get("cf-max-angle-val"))  _get("cf-max-angle-val").textContent  = cfTuning.maxAngle + "°";
@@ -3119,6 +3182,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     _sv("cf-opacity",    Math.round(cfTuning.opacityFalloff * 100));
     _sv("cf-duration",   cfTuning.duration);
     _sv("cf-card-w",     Math.round(cfTuning.cardW * 100));
+    _sv("cf-shape",      cfTuning.shape ?? 6);
     cfApplyTuning();
   }
 
@@ -3320,7 +3384,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
         el.style.opacity   = kf.op;
         el.style.zIndex    = kf.zi;
         const isCircle = items[i].id === 'top-settings';
-        el.style.borderRadius = isCircle ? '50%' : '6px';
+        el.style.borderRadius = isCircle ? '50%' : (cfTuning.shape ?? 6) + 'px';
         el.style.boxShadow = Math.abs(d) < 0.5 ? `0 0 22px 6px ${hex8ToCss(s.glow)}` : `0 0 10px 3px ${hex8ToCss(s.glow)}`;
       });
       if (label) label.textContent = items[cfIdx]?.label || '';
@@ -4341,6 +4405,7 @@ fetch('./index.html').then(r=>r.text()).then(t=>{const el=document.getElementByI
 </script>
 </body>
 </html>
+
 
 
 
