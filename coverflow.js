@@ -216,7 +216,6 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
           const _sglow = hex8ToCss(_ss.glow);
           const _sr = (_ss.btnRadius ?? btnStyle.btnRadius ?? 6);
           el.style.borderRadius = _sr + 'px';
-          const _sr = (_ss.btnRadius ?? btnStyle.btnRadius ?? 6);
           el.innerHTML = '<div style="width:34px;height:34px;border-radius:' + _sr + 'px;background:' + _scol + ';border:1px solid ' + _sfg + ';color:' + _sfg + ';display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 0 16px 5px ' + _sglow + ';"><svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:currentColor"><path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg></div>';
         } else {
           const styleId = items[i].id === 'top-hide-habits' ? (habitsVisible ? 'top-hide-habits' : 'top-show-habits') : items[i].id;
