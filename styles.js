@@ -557,6 +557,7 @@ document.documentElement.style.setProperty("--btn-radius", _activeRadius + 'px')
       btn.style.setProperty("--btn-active-bg", hex8ToCss(s.activeBg));
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.fontFamily = s.font;
+      btn.style.borderRadius = (s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
     });
   }
   applyBtnStyle(true);

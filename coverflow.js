@@ -85,6 +85,9 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   setColorValue('s-activebg', s.activeBg);
   setColorValue('s-tap',      s.tap);
   document.getElementById("s-font").value = s.font;
+  const _rVal = s.btnRadius ?? btnStyle.btnRadius ?? 6;
+  const _rEl = document.getElementById("s-radius"); if (_rEl) _rEl.value = String(_rVal);
+  const _rvEl = document.getElementById("s-radius-val"); if (_rvEl) _rvEl.textContent = _rVal + "px";
   updateAlphaSliderBg('s-bg');
   updateAlphaSliderBg('s-fg');
   updateAlphaSliderBg('s-glow');
@@ -235,7 +238,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
         el.style.transform = `translateY(-50%) rotateY(${kf.ry}deg) scale(${kf.sc})`;
         el.style.opacity   = kf.op;
         el.style.zIndex    = kf.zi;
-        el.style.borderRadius = (btnStyle.btnRadius ?? 6) + 'px';
+        el.style.borderRadius = (_btnStyleFor(items[i].id).btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
         if (items[i].id !== 'top-settings') el.style.boxShadow = Math.abs(d) < 0.5 ? `0 0 22px 6px ${hex8ToCss(s.glow)}` : `0 0 10px 3px ${hex8ToCss(s.glow)}`;
       });
       if (label) label.textContent = items[cfIdx]?.label || '';
