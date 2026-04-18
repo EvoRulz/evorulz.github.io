@@ -446,7 +446,7 @@ function onHexInput(id) {
     if (_s && typeof _s === "object") _btnStyles = _s;
   } catch {}
   function _btnStyleFor(id) {
-    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap };
+    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6 };
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
       'top-settings':      { bg: '#2a2a2aFF', fg: '#999999FF' },
@@ -467,9 +467,7 @@ function onHexInput(id) {
     buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-glow", hex8ToCss(btnStyle.activeGlow || btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
-    const _cfIdNow = window._cfActiveId ? window._cfActiveId() : null;
-const _activeRadius = (_cfIdNow && _btnStyles[_cfIdNow]?.btnRadius != null) ? _btnStyles[_cfIdNow].btnRadius : (btnStyle.btnRadius ?? 6);
-document.documentElement.style.setProperty("--btn-radius", _activeRadius + 'px');
+    document.documentElement.style.setProperty("--btn-radius", (btnStyle.btnRadius ?? 6) + 'px');
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
     document.documentElement.style.setProperty("--slider-r",             btnStyle.sliderR + "px");
