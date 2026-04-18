@@ -899,7 +899,8 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     }
     const _cdrIn = document.getElementById("s-clock-date-radius");
     const _ctrIn = document.getElementById("s-clock-time-radius");
-    if (_cdrIn && _cfId !== 'top-date') _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, { btnRadius: Number(_cdrIn.value) });
+    if (_cdrIn) _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, { btnRadius: Number(_cdrIn.value) });
+if (_ctrIn) _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, { btnRadius: Number(_ctrIn.value) });
     if (_ctrIn && _cfId !== 'top-time') _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, { btnRadius: Number(_ctrIn.value) });
     _saveBtnStyles();
     applyBtnStyle();
