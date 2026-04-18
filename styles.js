@@ -501,6 +501,8 @@ function onHexInput(id) {
       el.style.setProperty(prefix + '-fg',   hex8ToCss(_s.fg));
       el.style.setProperty(prefix + '-font', _s.font);
       el.style.setProperty(prefix + '-glow', hex8ToCss(_s.glow));
+      const _btn = el.querySelector('button');
+      if (_btn) _btn.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
     });
     const _cogEl = document.getElementById('settings-cog');
     if (_cogEl) {
