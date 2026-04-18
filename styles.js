@@ -530,6 +530,10 @@ function onHexInput(id) {
     const _timeTopItem = document.querySelector('.top-item[data-item="time"]');
     if (_dateTopItem) _dateTopItem.style.borderRadius = (_btnStyles['top-date']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
     if (_timeTopItem) _timeTopItem.style.borderRadius = (_btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+    const _pvDI2 = document.querySelector("[data-preview-item='date']");
+    const _pvTI2 = document.querySelector("[data-preview-item='time']");
+    if (_pvDI2) _pvDI2.style.borderRadius = (_btnStyles['top-date']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+    if (_pvTI2) _pvTI2.style.borderRadius = (_btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
     const _dateItemGlow = document.querySelector('.top-item[data-item="date"]');
     const _timeItemGlow = document.querySelector('.top-item[data-item="time"]');
     if (_dateItemGlow) _dateItemGlow.style.setProperty('--btn-glow', hex8ToCss(_btnStyleFor('top-date').glow || '#00000000'));
