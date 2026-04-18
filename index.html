@@ -669,7 +669,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v530</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v525</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -803,7 +803,7 @@ input[type="checkbox"]:hover {
       </div>
       <div class="settings-row">
         <label>Corner radius <span id="s-radius-val">6px</span></label>
-        <input type="range" class="alpha-slider" id="s-radius" min="0" max="50" value="6" oninput="document.getElementById('s-radius-val').textContent=this.value+'px';settingsChange();">
+        <input type="range" class="alpha-slider" id="s-radius" min="0" max="50" value="6" oninput="document.getElementById('s-radius-val').textContent=this.value+'px';settingsChange()">
       </div>
         <div class="settings-row">
         <label>Font</label>
@@ -2633,7 +2633,7 @@ function onHexInput(id) {
     if (_s && typeof _s === "object") _btnStyles = _s;
   } catch {}
   function _btnStyleFor(id) {
-    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6 };
+    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap };
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
       'top-settings':      { bg: '#2a2a2aFF', fg: '#999999FF' },
@@ -2655,32 +2655,6 @@ function onHexInput(id) {
     buttonsEl.style.setProperty("--btn-active-glow", hex8ToCss(btnStyle.activeGlow || btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
     document.documentElement.style.setProperty("--btn-radius",           (btnStyle.btnRadius ?? 6) + 'px');
-    buttonsEl.querySelectorAll(".tracker-btn[data-id]").forEach(btn => {
-      const _r = _btnStyles[btn.dataset.id]?.btnRadius;
-      if (_r !== undefined) btn.style.setProperty("--btn-radius", _r + "px");
-    });
-    // Per-button radius for top-grid items
-    const _topGridRadiusMap = [
-      { id: 'top-export-all',    sel: '.top-item[data-item="export-all"] button' },
-      { id: 'top-import-all',    sel: '.top-item[data-item="import-all"] button' },
-      { id: 'top-export-layout', sel: '.top-item[data-item="export-layout"] button' },
-      { id: 'top-import-layout', sel: '.top-item[data-item="import-layout"] button' },
-      { id: 'top-clear-all',     sel: '.top-item[data-item="clear-all"] button' },
-      { id: 'top-my-files',      sel: '.top-item[data-item="my-files"] button' },
-      { id: 'top-manage-habits', sel: '.top-item[data-item="manage-habits"] button' },
-      { id: 'top-hide-habits',   sel: '.top-item[data-item="hide-habits"] button' },
-    ];
-    _topGridRadiusMap.forEach(({ id, sel }) => {
-      const el = document.querySelector(sel);
-      if (!el) return;
-      const _r = _btnStyles[id]?.btnRadius;
-      el.style.borderRadius = (_r !== undefined ? _r : (btnStyle.btnRadius ?? 6)) + "px";
-    });
-    const _cogEl0 = document.getElementById('settings-cog');
-    if (_cogEl0) {
-      const _r = _btnStyles['top-settings']?.btnRadius;
-      _cogEl0.style.borderRadius = (_r !== undefined ? _r : (btnStyle.btnRadius ?? 6)) + "px";
-    }
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
     document.documentElement.style.setProperty("--slider-r",             btnStyle.sliderR + "px");
@@ -2714,8 +2688,6 @@ function onHexInput(id) {
       el.style.setProperty(prefix + '-fg',   hex8ToCss(_s.fg));
       el.style.setProperty(prefix + '-font', _s.font);
       el.style.setProperty(prefix + '-glow', hex8ToCss(_s.glow));
-      const _btnEl = el.querySelector('button');
-      if (_btnEl) _btnEl.style.borderRadius = (_s.btnRadius !== undefined ? _s.btnRadius : (btnStyle.btnRadius ?? 6)) + "px";
     });
     const _cogEl = document.getElementById('settings-cog');
     if (_cogEl) {
@@ -2724,7 +2696,6 @@ function onHexInput(id) {
       _cogEl.style.color        = hex8ToCss(_ss.fg);
       _cogEl.style.borderColor  = hex8ToCss(_ss.fg);
       _cogEl.style.boxShadow    = `0 0 16px 5px ${hex8ToCss(_ss.glow)}`;
-      _cogEl.style.borderRadius = (_ss.btnRadius !== undefined ? _ss.btnRadius : (btnStyle.btnRadius ?? 6)) + "px";
     }
     // Hide habits button: style depends on current visibility state
     const _habEl = document.querySelector('.top-item[data-item="hide-habits"]');
@@ -2771,7 +2742,6 @@ function onHexInput(id) {
       btn.style.setProperty("--btn-active-bg", hex8ToCss(s.activeBg));
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.fontFamily = s.font;
-      btn.style.borderRadius = (s.btnRadius !== undefined ? s.btnRadius : (btnStyle.btnRadius ?? 6)) + "px";
     });
   }
   applyBtnStyle(true);
@@ -3039,17 +3009,7 @@ function onHexInput(id) {
       _saveBtnStyles();
     }
     // Non-per-button properties always update globally
-    const _newRadius = Number(document.getElementById("s-radius").value);
-    if (_cfId) {
-      _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, { btnRadius: _newRadius });
-      _saveBtnStyles();
-    } else {
-      btnStyle.btnRadius = _newRadius;
-    }
-    if (_cfId) {
-      _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, { btnRadius: btnStyle.btnRadius });
-      _saveBtnStyles();
-    }
+    btnStyle.btnRadius      = Number(document.getElementById("s-radius").value);
     btnStyle.tap            = getColorValue('s-tap');
     btnStyle.glow           = getColorValue('s-glow');
     btnStyle.activeGlow     = getColorValue('s-activeglow');
@@ -3105,6 +3065,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
       updateAlphaSliderBg('s-clock-time-color');
       const _hexTimeEl = document.getElementById('s-clock-time-color-hex'); if (_hexTimeEl) _hexTimeEl.value = getColorValue('s-fg');
     }
+    _saveBtnStyles();
     applyBtnStyle();
     if (window._cfRender) window._cfRender();
     if (window._tumblerRenderPreviews) window._tumblerRenderPreviews();
@@ -3269,11 +3230,6 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   setColorValue('s-activebg', s.activeBg);
   setColorValue('s-tap',      s.tap);
   document.getElementById("s-font").value = s.font;
-  const _rEl = document.getElementById("s-radius");
-  const _rvEl = document.getElementById("s-radius-val");
-  const _loadedRadius = s.btnRadius !== undefined ? s.btnRadius : (btnStyle.btnRadius ?? 6);
-  if (_rEl) _rEl.value = _loadedRadius;
-  if (_rvEl) _rvEl.textContent = _loadedRadius + "px";
   updateAlphaSliderBg('s-bg');
   updateAlphaSliderBg('s-fg');
   updateAlphaSliderBg('s-glow');
@@ -4445,11 +4401,6 @@ fetch('./index.html').then(r=>r.text()).then(t=>{const el=document.getElementByI
 </script>
 </body>
 </html>
-
-
-
-
-
 
 
 
