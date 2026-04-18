@@ -424,7 +424,10 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
     }
     window._cfBuild = function() { cfBuild(); cfLoadPickersForId(cfActiveId()); };
     window._cfSetIdx = function(i) { cfIdx = i; };
-    new ResizeObserver(() => { if (window._cfBuild) { const saved = cfIdx; window._cfBuild(); cfIdx = saved; cfRender(); cfLoadPickersForId(cfActiveId()); } }).observe(document.getElementById('cf-stage'));
+    const _cfStageEl = document.getElementById('cf-stage');
+if (_cfStageEl) {
+  new ResizeObserver(() => { if (window._cfBuild) { const saved = cfIdx; window._cfBuild(); cfIdx = saved; cfRender(); cfLoadPickersForId(cfActiveId()); } }).observe(_cfStageEl);
+}
 
     function cfPrev() { if (cfIdx > 0) { cfIdx--; cfRender(); cfLoadPickersForId(cfActiveId()); } }
     function cfNext() { const n = cfItems().length; if (cfIdx < n-1) { cfIdx++; cfRender(); cfLoadPickersForId(cfActiveId()); } }
