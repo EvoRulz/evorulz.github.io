@@ -541,7 +541,7 @@ function onHexInput(id) {
     const _versionColor = hex8ToCss(_btnStyleFor('top-version').fg);
     const _versionItem = document.querySelector('.top-item[data-item="version"]');
     if (_versionItem) {
-      _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg);
+      _versionItem.style.borderRadius = (_btnStyles['top-version']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       _versionItem.style.setProperty('--btn-glow', hex8ToCss(_btnStyleFor('top-version').glow));
       const _vBtn = _versionItem.querySelector('div');
       if (_vBtn) {
