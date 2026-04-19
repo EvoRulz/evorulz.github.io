@@ -520,6 +520,8 @@ function onHexInput(id) {
       _habEl.style.setProperty('--hide-habits-fg',   hex8ToCss(_hs.fg));
       _habEl.style.setProperty('--hide-habits-font', _hs.font);
       _habEl.style.setProperty('--hide-habits-glow', hex8ToCss(_hs.glow || '#00000000'));
+      const _habBtn = _habEl.querySelector('button');
+      if (_habBtn) _habBtn.style.borderRadius = (_hs.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
     }
     // Date and time spans get direct inline styles
     const _dateSpan = document.querySelector('.top-item[data-item="date"] span');
