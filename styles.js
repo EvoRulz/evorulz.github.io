@@ -543,11 +543,12 @@ function onHexInput(id) {
     if (_versionItem) {
       _versionItem.style.borderRadius = (_btnStyles['top-version']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       _versionItem.style.setProperty('--btn-glow', hex8ToCss(_btnStyleFor('top-version').glow));
+      _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg);
       const _vBtn = _versionItem.querySelector('div');
       if (_vBtn) {
-        _vBtn.addEventListener('pointerdown', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); }, { once: true });
-        _vBtn.addEventListener('pointerup', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); }, { once: true });
-        _vBtn.addEventListener('pointercancel', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); }, { once: true });
+        _vBtn.addEventListener('pointerdown', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); });
+        _vBtn.addEventListener('pointerup', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); });
+        _vBtn.addEventListener('pointercancel', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); });
       }
     }
     const _versionNumSpan = document.getElementById('app-version');
