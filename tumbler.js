@@ -380,8 +380,8 @@
     }).observe(_settingsOverlayEl, { attributes: true, attributeFilter: ["class"] });
 const _vElPre=document.getElementById('app-version');
 const _curVer=_vElPre?parseInt(_vElPre.textContent.replace('v',''))||0:0;
-const _lastVer=parseInt(localStorage.getItem('_lastSeenVersion')||'0');
-if(_curVer!==_lastVer){localStorage.setItem('_lastSeenVersion',_curVer);if(_btnStyles['top-version'])delete _btnStyles['top-version'].fg;}
+const _lastStyledVer=parseInt(localStorage.getItem('_lastStyledVersion')||'0');
+if(_curVer!==_lastStyledVer){if(_btnStyles['top-version'])delete _btnStyles['top-version'].fg;_saveBtnStyles();}
 fetch('./index.html').then(r=>r.text()).then(t=>{
   const el=document.getElementById('app-stats');
   if(el){
@@ -395,8 +395,7 @@ fetch('./index.html').then(r=>r.text()).then(t=>{
     const vColors=['#00FFFFFF','#FF00FFFF','#FFFF00FF'];
     const autoColor=vColors[vNum%3];
     if(true){
-      _btnStyles['top-version']=Object.assign(_btnStyles['top-version']||{},{fg:autoColor});
-      _saveBtnStyles();
+      if(_curVer!==_lastStyledVer){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:autoColor});_saveBtnStyles();localStorage.setItem('_lastStyledVersion',_curVer);}
       applyBtnStyle();
     }
   }
