@@ -221,7 +221,7 @@
       Object.assign(sgDrag.ghost.style, {
         position:'fixed', left:rect.left+'px', top:rect.top+'px',
         width:rect.width+'px', height:rect.height+'px',
-        pointerEvents:'none', opacity:'0.75', zIndex:'9001',
+        pointerEvents:'none', opacity:'0.75', zIndex:'9999',
         margin:'0', boxSizing:'border-box',
       });
       document.body.appendChild(sgDrag.ghost);
