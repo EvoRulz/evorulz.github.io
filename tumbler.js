@@ -45,10 +45,6 @@
       const fullStr = [dateLine, timeLine].filter(Boolean).join("\n");
       if (previewDateEl) previewDateEl.innerHTML = dateLine ? dateLine.replace(/\s/g,"<br>") : "(date)";
       if (previewTimeEl) previewTimeEl.textContent = timeLine || "(time)";
-      const _pvDI = wrap.querySelector("[data-preview-item='date']");
-      const _pvTI = wrap.querySelector("[data-preview-item='time']");
-      if (_pvDI) _pvDI.style.borderRadius = (_btnStyles['top-date']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
-      if (_pvTI) _pvTI.style.borderRadius = (_btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       COLS.forEach((col, ci) => renderCol(ci));
     }
 
