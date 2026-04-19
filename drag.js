@@ -224,7 +224,7 @@
         pointerEvents:'none', opacity:'0.75', zIndex:'9999',
         margin:'0', boxSizing:'border-box',
       });
-      document.body.appendChild(sgDrag.ghost);
+      (document.getElementById('settings-overlay') || document.body).appendChild(sgDrag.ghost);
       sgDrag.item.style.visibility = 'hidden';
     }
     sgDrag.ghost.style.left = (e.clientX - sgDrag.offX) + 'px';
