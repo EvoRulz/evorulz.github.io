@@ -521,7 +521,9 @@ function onHexInput(id) {
       _habEl.style.setProperty('--hide-habits-font', _hs.font);
       _habEl.style.setProperty('--hide-habits-glow', hex8ToCss(_hs.glow || '#00000000'));
       const _habBtn = _habEl.querySelector('button');
-      if (_habBtn) _habBtn.style.borderRadius = (_hs.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+      const _habStyleId = !skipHabitsBtn && habitsVisible ? 'top-hide-habits' : 'top-show-habits';
+      const _habRadius = _btnStyles[_habStyleId]?.btnRadius ?? btnStyle.btnRadius ?? 6;
+      if (_habBtn) _habBtn.style.borderRadius = _habRadius + 'px';
     }
     // Date and time spans get direct inline styles
     const _dateSpan = document.querySelector('.top-item[data-item="date"] span');
