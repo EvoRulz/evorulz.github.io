@@ -107,7 +107,7 @@
   });
   padEmptySlots(); // fill any remaining slots up to TOTAL_SLOTS
 
-  let _eqFrame = null;
+  var _eqFrame = null;
   function equalizeButtonSizes() {
     if (_eqFrame) cancelAnimationFrame(_eqFrame);
     _eqFrame = requestAnimationFrame(() => {
