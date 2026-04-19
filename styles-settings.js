@@ -338,6 +338,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
         btnStyle.font = _s2.font;
       }
     }
+    if(window.fontPickerSync)fontPickerSync();
     } catch(e) { alert("settingsOpen error: " + e.message + "\n" + e.stack); }
   }
   function settingsClose() {
@@ -404,6 +405,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
           document.getElementById("s-glow").value     = btnStyle.glow;
           document.getElementById("s-activebg").value = btnStyle.activeBg;
           settingsUpdatePreview();
+          if(window.fontPickerSync)fontPickerSync();
         }
         if (data["_clockTumbler"] !== undefined) {
           try {
@@ -611,6 +613,7 @@ _btnStyles = {};
     applyBtnStyle();
     window._clockSet([6, 1, 1, 1, 2, 1, 1, 0]);
     settingsUpdatePreview();
+    if(window.fontPickerSync)fontPickerSync();
   }
   function settingsUpdatePreview() {
     const p = document.getElementById("settings-btn-preview");
