@@ -225,7 +225,7 @@
         margin:'0', boxSizing:'border-box',
       });
       (document.getElementById('settings-overlay') || document.body).appendChild(sgDrag.ghost);
-      sgDrag.item.style.visibility = 'hidden';
+      sgDrag.item.style.opacity = '0.3';
     }
     sgDrag.ghost.style.left = (e.clientX - sgDrag.offX) + 'px';
     sgDrag.ghost.style.top  = (e.clientY - sgDrag.offY) + 'px';
@@ -252,7 +252,7 @@
   document.addEventListener('pointerup', () => {
     if (!sgDrag) return;
     if (sgDrag.active) {
-      sgDrag.item.style.visibility = '';
+      sgDrag.item.style.opacity = '';
       if (sgDrag.ghost) sgDrag.ghost.remove();
       saveSettingsGroupOrder();
     } else {
@@ -263,7 +263,7 @@
 
   document.addEventListener('pointercancel', () => {
     if (!sgDrag) return;
-    sgDrag.item.style.visibility = '';
+    sgDrag.item.style.opacity = '';
     if (sgDrag.ghost) sgDrag.ghost.remove();
     sgDrag = null;
   });
