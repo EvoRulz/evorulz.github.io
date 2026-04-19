@@ -666,7 +666,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     buildStopPickers();
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
-    if (typeof cfSyncTuningUI !== 'undefined') cfSyncTuningUI();
+    if (typeof cfSyncTuningUI !== 'undefined') if (window.cfSyncTuningUI) window.cfSyncTuningUI();
     if (window._cfBuild) {
       window._cfBuild();
       const _cfId = window._cfActiveId ? window._cfActiveId() : null;
@@ -775,7 +775,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
           try {
             Object.assign(cfTuning, JSON.parse(data["_cfTuning"]));
             localStorage.setItem("_cfTuning", data["_cfTuning"]);
-            if (typeof cfSyncTuningUI !== 'undefined') cfSyncTuningUI();
+            if (typeof cfSyncTuningUI !== 'undefined') if (window.cfSyncTuningUI) window.cfSyncTuningUI();
           } catch {}
         }
         if (data["_settingsGroupOrder"]) {
