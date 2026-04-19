@@ -542,6 +542,8 @@ function onHexInput(id) {
     const _versionItem = document.querySelector('.top-item[data-item="version"]');
     if (_versionItem) {
       _versionItem.style.borderRadius = (_btnStyles['top-version']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+      const _vDiv = _versionItem.querySelector('div');
+      if (_vDiv) _vDiv.style.borderRadius = (_btnStyles['top-version']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       _versionItem.style.setProperty('--btn-glow', hex8ToCss(_btnStyleFor('top-version').glow));
       const _vBtn = _versionItem.querySelector('div');
       if (_vBtn) {
