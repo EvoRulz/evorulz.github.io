@@ -68,7 +68,7 @@ function _updateOrientBtn() {
 }
 function toggleOrientLock() {
   if (_orientLocked) {
-    window.location.href = 'orientlock://unlock';
+    const _ola = document.createElement('a'); _ola.href = 'orientlock://unlock'; document.body.appendChild(_ola); _ola.click(); document.body.removeChild(_ola);
     _orientLocked = false;
     _updateOrientBtn();
     if (window._cfRender) window._cfRender();
@@ -79,6 +79,6 @@ function toggleOrientLock() {
   _orientLocked = true;
   _updateOrientBtn();
   if (window._cfRender) window._cfRender();
-  window.location.href = 'orientlock://lock?type=' + target;
+  const _ola = document.createElement('a'); _ola.href = 'orientlock://lock?type=' + target; document.body.appendChild(_ola); _ola.click(); document.body.removeChild(_ola);
 }
 _updateOrientBtn();
