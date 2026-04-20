@@ -70,13 +70,32 @@ function toggleOrientLock() {
   if (_orientLocked) {
     try { screen.orientation.unlock(); } catch(e) {}
     _orientLocked = false;
+    _updateOrientBtn();
+    if (window._cfRender) window._cfRender();
   } else {
-    const t = (screen.orientation && screen.orientation.type) || '';
-    const target = t.includes('landscape') ? 'landscape' : 'portrait';
-    try { screen.orientation.lock(target).catch(function(){}); } catch(e) {}
-    _orientLocked = true;
+    const t = (screen.orientation && screen.orientation.type) || 'portrait-primary';
+    const target = t.startsWith('landscape') ? 'landscape-primary' : 'portrait-primary';
+    try {
+      var p = screen.orientation.lock(target);
+      if (p && typeof p.then === 'function') {
+        p.then(function() {
+          _orientLocked = true;
+          _updateOrientBtn();
+          if (window._cfRender) window._cfRender();
+        }).catch(function(e) {
+          console.log('Orientation lock failed:', e);
+          _orientLocked = false;
+          _updateOrientBtn();
+        });
+      } else {
+        _orientLocked = true;
+        _updateOrientBtn();
+        if (window._cfRender) window._cfRender();
+      }
+    } catch(e) {
+      console.log('Orientation lock error:', e);
+      _orientLocked = false;
+      _updateOrientBtn();
+    }
   }
-  _updateOrientBtn();
-  if (window._cfRender) window._cfRender();
 }
-_updateOrientBtn();
