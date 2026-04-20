@@ -66,7 +66,9 @@ function _updateOrientBtn() {
   btn.style.color = _orientLocked ? '#99ff99' : '';
   btn.style.borderColor = _orientLocked ? '#99ff99' : '';
 }
+document.addEventListener('DOMContentLoaded', _updateOrientBtn);
 async function toggleOrientLock() {
+  alert('toggle called');
   if (_orientLocked) {
     try {
       try { screen.orientation.unlock(); } catch(e) {}
