@@ -75,20 +75,12 @@ async function toggleOrientLock() {
     return;
   }
   const t = (screen.orientation && screen.orientation.type) || 'portrait-primary';
-  const target = t.startsWith('landscape') ? 'landscape-primary' : 'portrait-primary';
+  const target = t.startsWith('landscape') ? 'landscape' : 'portrait';
   try {
     await screen.orientation.lock(target);
     _orientLocked = true;
   } catch(e) {
-    try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen().catch(() => {});
-      }
-      await screen.orientation.lock(target);
-      _orientLocked = true;
-    } catch(e2) {
-      _orientLocked = false;
-    }
+    _orientLocked = false;
   }
   _updateOrientBtn();
   if (window._cfRender) window._cfRender();
