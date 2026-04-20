@@ -80,7 +80,6 @@ function toggleOrientLock() {
   _orientLocked = true;
   _updateOrientBtn();
   if (window._cfRender) window._cfRender();
-  (document.fullscreenElement ? Promise.resolve() : document.documentElement.requestFullscreen().catch(() => {}))
-    .then(() => screen.orientation.lock(target).catch(() => {}));
+  try { screen.orientation.lock(target).catch(() => {}); } catch(e) {}
 }
 _updateOrientBtn();
