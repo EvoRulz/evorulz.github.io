@@ -46,6 +46,7 @@
     aUp.className = 'tumb-arrow';
     aUp.textContent = '▲';
     aUp.style.cursor = 'pointer';
+    aUp.style.pointerEvents = 'auto';
     var win = document.createElement('div');
     win.className = 'tumb-window';
     win.style.height = '80px';
@@ -64,6 +65,7 @@
     aDown.className = 'tumb-arrow';
     aDown.textContent = '▼';
     aDown.style.cursor = 'pointer';
+    aDown.style.pointerEvents = 'auto';
     wrap.appendChild(aUp);
     wrap.appendChild(win);
     wrap.appendChild(aDown);
