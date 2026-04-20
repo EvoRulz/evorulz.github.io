@@ -80,13 +80,19 @@ async function toggleOrientLock() {
   }
   const t = (screen.orientation && screen.orientation.type) || 'portrait-primary';
   const target = t.startsWith('landscape') ? 'landscape' : 'portrait';
-  try {
-    await screen.orientation.lock(target);
-    _orientLocked = true;
-  } catch(e) {
-    alert('Lock failed: ' + e.name + ' - ' + e.message);
-    _orientLocked = false;
-  }
+  setTimeout(async () => {
+    try {
+      await screen.orientation.lock(target);
+      _orientLocked = true;
+      _updateOrientBtn();
+      if (window._cfRender) window._cfRender();
+    } catch(e) {
+      alert('Lock failed: ' + e.name + ' - ' + e.message);
+      _orientLocked = false;
+      _updateOrientBtn();
+    }
+  }, 200);
+  return;
   _updateOrientBtn();
   if (window._cfRender) window._cfRender();
 }
