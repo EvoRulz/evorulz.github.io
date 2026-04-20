@@ -21,11 +21,33 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 public class LauncherActivity
         extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    public class OrientationBridge {
+        @JavascriptInterface
+        public void lock(String orientation) {
+            if (orientation.equals("portrait")) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else if (orientation.equals("landscape")) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        WebView wv = findViewById(com.google.androidbrowserhelper.trusted.R.id.webview);
+        if (wv != null) wv.addJavascriptInterface(new OrientationBridge(), "AndroidOrientation");
     }
 
     @Override
