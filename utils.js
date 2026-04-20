@@ -82,6 +82,9 @@ async function toggleOrientLock() {
   const target = t.startsWith('landscape') ? 'landscape' : 'portrait';
   setTimeout(async () => {
     try {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
       await screen.orientation.lock(target);
       _orientLocked = true;
       _updateOrientBtn();
