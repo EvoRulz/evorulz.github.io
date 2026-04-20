@@ -33,6 +33,19 @@ public class LauncherActivity
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
         // Intercept myfiles:// URLs and launch Samsung My Files natively
+        if (data != null && "orientlock".equals(data.getScheme())) {
+            if ("lock".equals(data.getHost())) {
+                String type = data.getQueryParameter("type");
+                if ("landscape".equals(type)) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                } else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
+            } else if ("unlock".equals(data.getHost())) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            }
+            return;
+        }
         if (data != null && "myfiles".equals(data.getScheme())) {
             if ("downloads".equals(data.getHost())) {
                 try {

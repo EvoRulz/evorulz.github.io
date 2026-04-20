@@ -68,7 +68,7 @@ function _updateOrientBtn() {
 }
 function toggleOrientLock() {
   if (_orientLocked) {
-    try { screen.orientation.unlock(); } catch(e) {}
+    window.location.href = 'orientlock://unlock';
     _orientLocked = false;
     _updateOrientBtn();
     if (window._cfRender) window._cfRender();
@@ -76,14 +76,9 @@ function toggleOrientLock() {
   }
   const t = (screen.orientation && screen.orientation.type) || 'portrait-primary';
   const target = t.startsWith('landscape') ? 'landscape' : 'portrait';
-  screen.orientation.lock(target).then(() => {
-    _orientLocked = true;
-    _updateOrientBtn();
-    if (window._cfRender) window._cfRender();
-  }).catch(() => {
-    _orientLocked = false;
-    _updateOrientBtn();
-    if (window._cfRender) window._cfRender();
-  });
+  _orientLocked = true;
+  _updateOrientBtn();
+  if (window._cfRender) window._cfRender();
+  window.location.href = 'orientlock://lock?type=' + target;
 }
 _updateOrientBtn();
