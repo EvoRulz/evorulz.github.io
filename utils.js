@@ -82,6 +82,7 @@ async function toggleOrientLock() {
     await screen.orientation.lock(target);
     _orientLocked = true;
   } catch(e) {
+    alert('Lock failed: ' + e.name + ' - ' + e.message);
     _orientLocked = false;
   }
   _updateOrientBtn();
