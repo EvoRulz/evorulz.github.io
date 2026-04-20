@@ -68,7 +68,10 @@ function _updateOrientBtn() {
 }
 async function toggleOrientLock() {
   if (_orientLocked) {
-    try { screen.orientation.unlock(); } catch(e) {}
+    try {
+      if (window.launcherActivity) window.launcherActivity.setOrientationLock("sensor");
+      else screen.orientation.unlock();
+    } catch(e) {}
     _orientLocked = false;
     _updateOrientBtn();
     if (window._cfRender) window._cfRender();
@@ -77,7 +80,8 @@ async function toggleOrientLock() {
   const t = (screen.orientation && screen.orientation.type) || 'portrait-primary';
   const target = t.startsWith('landscape') ? 'landscape' : 'portrait';
   try {
-    await screen.orientation.lock(target);
+    if (window.launcherActivity) window.launcherActivity.setOrientationLock(target);
+    else await screen.orientation.lock(target);
     _orientLocked = true;
   } catch(e) {
     _orientLocked = false;

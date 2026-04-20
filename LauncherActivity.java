@@ -26,7 +26,24 @@ public class LauncherActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        addJavascriptInterface(this, "launcherActivity");
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+    }
+
+    private int savedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR;
+
+    @android.webkit.JavascriptInterface
+    public void setOrientationLock(String orientation) {
+        if ("portrait".equals(orientation)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            savedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        } else if ("landscape".equals(orientation)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            savedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            savedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR;
+        }
     }
 
     @Override
