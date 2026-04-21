@@ -44,7 +44,7 @@
     settingsBtn.textContent = 'Open Settings';
     settingsBtn.style.cssText = 'padding:7px 16px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
     settingsBtn.onclick = () => {
-      window.location.href = 'intent:#Intent;action=android.settings.APP_NOTIFICATION_SETTINGS;S.android.provider.Settings.EXTRA_APP_PACKAGE=io.github.evorulz.twa;end';
+      window.location.href = 'intent:#Intent;action=android.settings.APPLICATION_DETAILS_SETTINGS;d=package:io.github.evorulz.twa;end';
     };
     const testBtn = document.createElement('button');
     testBtn.textContent = 'Send Test';
