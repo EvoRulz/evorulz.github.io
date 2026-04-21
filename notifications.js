@@ -43,6 +43,33 @@
     }
   }
   window.notifyTest = function() {
+    if (Notification.permission === 'denied') {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:99999;display:flex;align-items:center;justify-content:center;';
+      const box = document.createElement('div');
+      box.style.cssText = 'background:#1c1c1c;border:1px solid #555;border-radius:10px;padding:24px 28px;max-width:380px;width:90%;display:flex;flex-direction:column;gap:12px;';
+      const p = document.createElement('p');
+      p.style.cssText = 'margin:0;font-size:13px;color:#ccc;line-height:1.6;';
+      p.textContent = 'Notifications are blocked. Open settings to enable them.';
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;';
+      const settingsBtn = document.createElement('button');
+      settingsBtn.textContent = 'Open Settings';
+      settingsBtn.style.cssText = 'padding:7px 16px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
+      settingsBtn.onclick = () => {
+        window.location.href = 'intent:#Intent;action=android.settings.APP_NOTIFICATION_SETTINGS;S.android.provider.Settings.EXTRA_APP_PACKAGE=io.github.evorulz.twa;end';
+      };
+      const okBtn = document.createElement('button');
+      okBtn.textContent = 'Cancel';
+      okBtn.style.cssText = 'padding:7px 16px;background:#333;color:#ccc;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
+      okBtn.onclick = () => document.body.removeChild(overlay);
+      row.append(settingsBtn, okBtn);
+      box.append(p, row);
+      overlay.appendChild(box);
+      overlay.addEventListener('click', e => { if (e.target === overlay) document.body.removeChild(overlay); });
+      document.body.appendChild(overlay);
+      return;
+    }
     navigator.serviceWorker.ready.then(reg => {
       reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
     }).catch(err => { console.error('notifyTest failed:', err); });
