@@ -58,11 +58,12 @@
       testBtn.disabled = true;
       try {
         const reg = await navigator.serviceWorker.ready;
+        p.textContent = 'SW state: ' + (reg.active ? reg.active.state : 'no active SW') + ' | controller: ' + (navigator.serviceWorker.controller ? 'yes' : 'no');
         reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
-        testBtn.textContent = 'Sent';
-        setTimeout(() => { if (document.body.contains(overlay)) document.body.removeChild(overlay); }, 1000);
+        testBtn.textContent = 'Called';
+        testBtn.disabled = false;
       } catch(e) {
-        p.textContent = 'SW error: ' + e.message;
+        p.textContent = 'Error: ' + e.message;
         testBtn.textContent = 'Failed';
         testBtn.disabled = false;
       }
