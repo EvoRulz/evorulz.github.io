@@ -318,7 +318,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
           } else if (items[i].id === 'top-hide-habits' || items[i].id === 'top-show-habits') {
             toggleHabits();
           } else if (items[i].id === 'top-orient-lock' || items[i].id === 'top-orient-lock-locked') {
-            toggleOrientLockNoFullscreen().then(() => { cfRender(); cfLoadPickersForId(cfActiveId()); });
+            cfRender(); cfLoadPickersForId(cfActiveId());
           } else {
             cfRender();
             cfLoadPickersForId(cfActiveId());
@@ -438,7 +438,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
             toggleHabits();
             cfLoadPickersForId(cfActiveId());
           } else if (tappedItem && (tappedItem.id === 'top-orient-lock' || tappedItem.id === 'top-orient-lock-locked')) {
-            toggleOrientLockNoFullscreen().then(() => { springTo(closest); cfLoadPickersForId(cfActiveId()); });
+            springTo(closest); cfLoadPickersForId(cfActiveId());
           } else {
             springTo(closest);
             cfLoadPickersForId(cfActiveId());
