@@ -32,11 +32,11 @@ public class LauncherActivity
 
     public class SettingsBridge {
         @JavascriptInterface
-            public void openAppSettings() {
-                Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                intent.setData(Uri.parse("package:io.github.evorulz.twa"));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+        public void openAppSettings() {
+            Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            i.setData(Uri.parse("package:io.github.evorulz.twa"));
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         }
     }
 
@@ -79,6 +79,16 @@ public class LauncherActivity
     @Override
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
+        if (data != null && "appsettings".equals(data.getScheme())) {
+    Intent settingsIntent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                settingsIntent.setData(Uri.parse("package:io.github.evorulz.twa"));
+                settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(settingsIntent);
+    intent.setData(Uri.parse("package:io.github.evorulz.twa"));
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
+    return;
+}
         // Intercept myfiles:// URLs and launch Samsung My Files natively
         if (data != null && "myfiles".equals(data.getScheme())) {
             if ("downloads".equals(data.getHost())) {

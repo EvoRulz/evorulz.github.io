@@ -47,7 +47,7 @@
       if (window.AndroidSettings) {
         window.AndroidSettings.openAppSettings();
       } else {
-        window.location.href = 'app-settings:';
+        window.location.href = 'appsettings://open';
       }
     };
     const testBtn = document.createElement('button');
