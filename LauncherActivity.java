@@ -84,11 +84,8 @@ public class LauncherActivity
                 settingsIntent.setData(Uri.parse("package:io.github.evorulz.twa"));
                 settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(settingsIntent);
-    intent.setData(Uri.parse("package:io.github.evorulz.twa"));
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    startActivity(intent);
     return;
-}
+    }
         // Intercept myfiles:// URLs and launch Samsung My Files natively
         if (data != null && "myfiles".equals(data.getScheme())) {
             if ("downloads".equals(data.getHost())) {
