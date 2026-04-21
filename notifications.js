@@ -18,11 +18,13 @@
     if (isPushupsDone()) return;
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
-    new Notification('Habit Tracker', {
-      body: 'Pushups not done yet today.',
-      icon: './icon-192.png',
-      tag: 'pushups-reminder',
-    });
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification('Habit Tracker', { body: 'Pushups not done yet today.', icon: './icon-192.png', tag: 'pushups-reminder' });
+      });
+    } else {
+      new Notification('Habit Tracker', { body: 'Pushups not done yet today.', icon: './icon-192.png', tag: 'pushups-reminder' });
+    }
   }
   function schedule() {
     notify();
@@ -40,7 +42,23 @@
       alert('Notifications are blocked. Enable them in browser settings.');
     }
   }
-  window.notifyTest = notifyTest;
+  window.notifyTest = function() {
+    if (!('Notification' in window)) { alert('Notifications not supported.'); return; }
+    if (Notification.permission !== 'granted') {
+      Notification.requestPermission().then(p => {
+        if (p === 'granted') window.notifyTest();
+        else alert('Notifications blocked. Enable in app settings.');
+      });
+      return;
+    }
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
+      });
+    } else {
+      new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
+    }
+  };
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') {
     schedule();
