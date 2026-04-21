@@ -240,7 +240,11 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
           const _unlockPath = '<path fill-rule="evenodd" d="M14.5 1A4.5 4.5 0 0 0 10 5.5V9H3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1.5V5.5a3 3 0 1 1 6 0v2.75a.75.75 0 0 0 1.5 0V5.5A4.5 4.5 0 0 0 14.5 1z" clip-rule="evenodd"/>';
           const _iconColor = _locked ? '#99ff99' : _ofg;
           el.style.borderRadius = _or + 'px';
-          el.innerHTML = '<div style="width:34px;height:34px;border-radius:' + _or + 'px;background:' + _obg + ';border:1px solid ' + _iconColor + ';color:' + _iconColor + ';display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 0 16px 5px ' + _oglow + ';"><svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:currentColor">' + (_locked ? _lockPath : _unlockPath) + '</svg></div>';
+          el.style.background = _obg;
+          el.style.color = _iconColor;
+          el.style.borderColor = _iconColor;
+          el.style.boxShadow = '0 0 16px 5px ' + _oglow;
+          el.innerHTML = '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:currentColor">' + (_locked ? _lockPath : _unlockPath) + '</svg>';
         } else {
           const styleId = items[i].id === 'top-hide-habits' ? (habitsVisible ? 'top-hide-habits' : 'top-show-habits') : items[i].id;
         const s2 = _btnStyleFor(styleId);
