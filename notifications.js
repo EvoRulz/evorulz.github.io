@@ -28,6 +28,19 @@
     notify();
     setInterval(notify, 60 * 60 * 1000);
   }
+  function notifyTest() {
+    if (!('Notification' in window)) { alert('Notifications not supported.'); return; }
+    if (Notification.permission === 'granted') {
+      new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(p => {
+        if (p === 'granted') new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
+      });
+    } else {
+      alert('Notifications are blocked. Enable them in browser settings.');
+    }
+  }
+  window.notifyTest = notifyTest;
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') {
     schedule();

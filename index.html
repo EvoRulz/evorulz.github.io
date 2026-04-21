@@ -752,7 +752,7 @@ input[type="checkbox"]:hover {
       <div class="settings-group-item" data-group="sg-clock">Clock</div>
       <div class="settings-group-item" data-group="sg-checkboxes">Checkboxes</div>
       <div class="settings-group-item" data-group="sg-app">App</div>
-      <div class="empty-slot"></div>
+      <div class="settings-group-item" data-group="sg-notifications">Notifications</div>
       <div class="empty-slot"></div>
       <div class="empty-slot"></div>
       <div class="empty-slot"></div>
@@ -1252,6 +1252,12 @@ input[type="checkbox"]:hover {
         </div>
       </div>
       </div>
+      <div class="settings-group-content" id="sg-notifications">
+      <div class="settings-row">
+        <label>Test notification</label>
+        <button onclick="notifyTest()" style="padding:6px 14px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Send test</button>
+      </div>
+    </div>
     <div class="settings-group-content" id="sg-coverflow" style="display:none">
       <div class="settings-row">
         <label>Step spread <span id="cf-step-tx-val"></span></label>
