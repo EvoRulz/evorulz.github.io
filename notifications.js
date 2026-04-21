@@ -44,11 +44,11 @@
     settingsBtn.textContent = 'Open Settings';
     settingsBtn.style.cssText = 'padding:7px 16px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
     settingsBtn.onclick = () => {
-      const _a = document.createElement('a');
-      _a.href = 'intent:#Intent;action=android.settings.APPLICATION_DETAILS_SETTINGS;data=package:io.github.evorulz.twa;launchFlags=0x10000000;end';
-      document.body.appendChild(_a);
-      _a.click();
-      document.body.removeChild(_a);
+      if (window.AndroidSettings) {
+        window.AndroidSettings.openAppSettings();
+      } else {
+        window.location.href = 'app-settings:';
+      }
     };
     const testBtn = document.createElement('button');
     testBtn.textContent = 'Send Test';

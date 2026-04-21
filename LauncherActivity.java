@@ -30,6 +30,16 @@ public class LauncherActivity
         super.onCreate(savedInstanceState);
     }
 
+    public class SettingsBridge {
+        @JavascriptInterface
+            public void openAppSettings() {
+                Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.setData(Uri.parse("package:io.github.evorulz.twa"));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+        }
+    }
+
     public class OrientationBridge {
         @JavascriptInterface
         public void lock(String orientation) {
@@ -48,7 +58,10 @@ public class LauncherActivity
         super.onStart();
         android.view.View root = getWindow().getDecorView().getRootView();
         WebView wv = findWebView(root);
-        if (wv != null) wv.addJavascriptInterface(new OrientationBridge(), "AndroidOrientation");
+        if (wv != null) {
+            wv.addJavascriptInterface(new OrientationBridge(), "AndroidOrientation");
+            wv.addJavascriptInterface(new SettingsBridge(), "AndroidSettings");
+        }
     }
 
     private WebView findWebView(android.view.View v) {
