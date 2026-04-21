@@ -65,7 +65,7 @@
         const reg = await navigator.serviceWorker.ready;
         p.textContent = 'SW: ' + (reg.active ? reg.active.state : 'none') + ' | ctrl: ' + (navigator.serviceWorker.controller ? 'yes' : 'no');
         try {
-          await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
+          await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test', vibrate: [200], requireInteraction: false });
           testBtn.textContent = 'Sent';
         } catch(e2) {
           new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });

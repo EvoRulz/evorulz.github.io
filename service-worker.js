@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v649";
+const CACHE = "habit-tracker-v650";
 
 const ASSETS = [
   "./",
@@ -20,6 +20,10 @@ const ASSETS = [
   "./font.js",
   "./notifications.js"
 ];
+
+self.addEventListener("notificationclick", e => {
+  e.notification.close();
+});
 
 self.addEventListener("install", e => {
   e.waitUntil(
@@ -58,6 +62,7 @@ self.addEventListener("fetch", e => {
     })
   );
 });
+
 
 
 
