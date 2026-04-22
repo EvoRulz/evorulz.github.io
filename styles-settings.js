@@ -188,6 +188,8 @@ function onHexInput(id) {
     appStyle.barSet      = getColorValue("s-app-bar-set");
     appStyle.barTotal    = getColorValue("s-app-bar-total");
     appStyle.barStreak   = getColorValue("s-app-bar-streak");
+    appStyle.tableBg     = getColorValue("s-app-table-bg");
+    appStyle.tableText   = getColorValue("s-app-table-text");
     appStyle.padding     = Number(document.getElementById("s-app-padding").value);
     collectAppStops();
     applyAppStyle();
@@ -312,6 +314,8 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     setColorValue("s-app-bar-set",    appStyle.barSet);
     setColorValue("s-app-bar-total",  appStyle.barTotal);
     setColorValue("s-app-bar-streak", appStyle.barStreak);
+    setColorValue("s-app-table-bg",    appStyle.tableBg || "#111111FF");
+    setColorValue("s-app-table-text",  appStyle.tableText || "#FFFFFFFF");
     const isGrad = appStyle.bgType.startsWith("gradient");
     const isPat  = appStyle.bgType.startsWith("pattern");
     const isImg  = appStyle.bgType === "image";
