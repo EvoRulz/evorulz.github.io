@@ -46,11 +46,7 @@
     const testBtn = document.createElement('button');
     testBtn.textContent = 'Send Test';
     testBtn.style.cssText = 'padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
-    testBtn.onclick = () => {
-      window.location.href = 'habitnotify://pushups-not-done';
-      testBtn.textContent = 'Sent';
-      setTimeout(() => document.body.removeChild(overlay), 800);
-    };
+    testBtn.onclick = async () => {
       testBtn.textContent = 'Sending...';
       testBtn.disabled = true;
       try {
