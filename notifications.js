@@ -65,10 +65,10 @@ window.notifSendTest = async function() {
       } else {
         const _na2 = document.createElement('a'); _na2.href = 'habitnotify://pushups-not-done'; _na2.click();
       }
-      await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test', vibrate: [200], requireInteraction: false });
+      await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test-' + Date.now(), vibrate: [200], requireInteraction: false });
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     } catch(e2) {
-      new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test' });
+      new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test-' + Date.now() });
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     }
   } catch(e) {
