@@ -17,7 +17,7 @@
     if (isPushupsDone()) return;
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
-    window.location.href = 'habitnotify://pushups-not-done';
+    const _f = document.createElement('iframe'); _f.style.display='none'; _f.src='habitnotify://pushups-not-done'; document.body.appendChild(_f); setTimeout(()=>_f.remove(),500);
 }
   function schedule() {
     notify();
@@ -46,7 +46,11 @@
     const testBtn = document.createElement('button');
     testBtn.textContent = 'Send Test';
     testBtn.style.cssText = 'padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
-    testBtn.onclick = async () => {
+    testBtn.onclick = () => {
+      const _f = document.createElement('iframe'); _f.style.display='none'; _f.src='habitnotify://pushups-not-done'; document.body.appendChild(_f); setTimeout(()=>_f.remove(),500);
+      testBtn.textContent = 'Sent';
+      setTimeout(() => document.body.removeChild(overlay), 800);
+    };
       testBtn.textContent = 'Sending...';
       testBtn.disabled = true;
       try {
@@ -61,7 +65,7 @@
           if (window.AndroidSettings && window.AndroidSettings.showNotification) {
             window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
           } else {
-            window.location.href = 'habitnotify://pushups-not-done';
+            const _f = document.createElement('iframe'); _f.style.display='none'; _f.src='habitnotify://pushups-not-done'; document.body.appendChild(_f); setTimeout(()=>_f.remove(),500);
           }
           await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', tag: 'test', vibrate: [200], requireInteraction: false });
           testBtn.textContent = 'Sent';
