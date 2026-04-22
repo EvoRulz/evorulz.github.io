@@ -242,6 +242,7 @@ function onHexInput(id) {
     if (item) item.classList.toggle('sg-active', isOpen);
     if (groupId === 'sg-notifications' && isOpen) {
       if (window.notifRefreshPermission) window.notifRefreshPermission();
+      if (window.notifLoadScheduleUI) window.notifLoadScheduleUI();
     }
     if (groupId === 'sg-buttons' && isOpen) {
       const stage = document.getElementById('cf-stage');
