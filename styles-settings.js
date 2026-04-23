@@ -240,10 +240,6 @@ function onHexInput(id) {
 }
     const item = document.querySelector(`#settings-groups-grid [data-group="${groupId}"]`);
     if (item) item.classList.toggle('sg-active', isOpen);
-    if (groupId === 'sg-notifications' && isOpen) {
-      if (window.notifRefreshPermission) window.notifRefreshPermission();
-      if (window.notifLoadScheduleUI) window.notifLoadScheduleUI();
-    }
     if (groupId === 'sg-buttons' && isOpen) {
       const stage = document.getElementById('cf-stage');
       if (stage) stage.style.visibility = 'hidden';

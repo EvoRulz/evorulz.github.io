@@ -130,21 +130,6 @@
                 <data android:scheme="myfiles" />
             </intent-filter>
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="appsettings" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="habitnotify" />
-            </intent-filter>
-
-
         </activity>
 
         <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" />
@@ -164,8 +149,8 @@
 
         <service
             android:name=".DelegationService"
-            android:enabled="true"
-            android:exported="true">
+            android:enabled="@bool/enableNotification"
+            android:exported="@bool/enableNotification">
 
             <meta-data
                 android:name="android.support.customtabs.trusted.SMALL_ICON"

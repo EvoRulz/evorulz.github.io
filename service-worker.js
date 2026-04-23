@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v663";
+const CACHE = "habit-tracker-v629";
 
 const ASSETS = [
   "./",
@@ -17,13 +17,8 @@ const ASSETS = [
   "./manage.js",
   "./tumbler.js",
   "./bootstrap.js",
-  "./font.js",
-  "./notifications.js"
+  "./font.js"
 ];
-
-self.addEventListener("notificationclick", e => {
-  e.notification.close();
-});
 
 self.addEventListener("install", e => {
   e.waitUntil(
@@ -62,48 +57,6 @@ self.addEventListener("fetch", e => {
     })
   );
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

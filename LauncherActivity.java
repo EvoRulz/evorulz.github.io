@@ -22,49 +22,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import androidx.core.app.NotificationCompat;
 import android.webkit.WebView;
 public class LauncherActivity
         extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        Uri data = intent != null ? intent.getData() : null;
-        if (data != null && "appsettings".equals(data.getScheme())) {
-            Intent settingsIntent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            settingsIntent.setData(Uri.parse("package:io.github.evorulz.twa"));
-            settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(settingsIntent);
-        }
-    }
-
-    public class SettingsBridge {
-        @JavascriptInterface
-        public void openAppSettings() {
-            Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            i.setData(Uri.parse("package:io.github.evorulz.twa"));
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-        }
-        @JavascriptInterface
-        public void showNotification(String title, String body) {
-            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel ch = new NotificationChannel("habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
-                nm.createNotificationChannel(ch);
-            }
-            Notification n = new NotificationCompat.Builder(LauncherActivity.this, "habit_reminders")
-                .setSmallIcon(R.drawable.ic_notification_icon)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setAutoCancel(true)
-                .build();
-            nm.notify(1001, n);
-        }
     }
 
     public class OrientationBridge {
@@ -85,10 +48,7 @@ public class LauncherActivity
         super.onStart();
         android.view.View root = getWindow().getDecorView().getRootView();
         WebView wv = findWebView(root);
-        if (wv != null) {
-            wv.addJavascriptInterface(new OrientationBridge(), "AndroidOrientation");
-            wv.addJavascriptInterface(new SettingsBridge(), "AndroidSettings");
-        }
+        if (wv != null) wv.addJavascriptInterface(new OrientationBridge(), "AndroidOrientation");
     }
 
     private WebView findWebView(android.view.View v) {
@@ -106,29 +66,6 @@ public class LauncherActivity
     @Override
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
-        if (data != null && "appsettings".equals(data.getScheme())) {
-    Intent settingsIntent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                settingsIntent.setData(Uri.parse("package:io.github.evorulz.twa"));
-                settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(settingsIntent);
-    return;
-    }
-
-    if (data != null && "habitnotify".equals(data.getScheme())) {
-            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel ch = new NotificationChannel("habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
-                nm.createNotificationChannel(ch);
-            }
-            Notification n = new NotificationCompat.Builder(this, "habit_reminders")
-                .setSmallIcon(R.drawable.ic_notification_icon)
-                .setContentTitle("Habit Tracker")
-                .setContentText("Pushups not done yet today.")
-                .setAutoCancel(true)
-                .build();
-            nm.notify((int) System.currentTimeMillis(), n);
-            return;
-        }
         // Intercept myfiles:// URLs and launch Samsung My Files natively
         if (data != null && "myfiles".equals(data.getScheme())) {
             if ("downloads".equals(data.getHost())) {
