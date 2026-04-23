@@ -62,9 +62,8 @@ public class LauncherActivity
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true)
-                .setContentIntent(android.app.PendingIntent.getActivity(LauncherActivity.this, 0, new Intent(LauncherActivity.this, LauncherActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP), android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE))
                 .build();
-            nm.notify((int) System.currentTimeMillis(), n);
+            nm.notify(1001, n);
         }
     }
 
@@ -126,7 +125,6 @@ public class LauncherActivity
                 .setContentTitle("Habit Tracker")
                 .setContentText("Pushups not done yet today.")
                 .setAutoCancel(true)
-                .setContentIntent(android.app.PendingIntent.getActivity(this, 0, new Intent(this, LauncherActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP), android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE))
                 .build();
             nm.notify((int) System.currentTimeMillis(), n);
             return;
@@ -161,9 +159,7 @@ public class LauncherActivity
             }
             return;
         }
-        if (data != null) {
-    super.onNewIntent(intent);
-}
+        super.onNewIntent(intent);
     }
 
     @Override

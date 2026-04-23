@@ -258,22 +258,6 @@ function onHexInput(id) {
   function settingsOpen() {
     try {
     _settingsJustOpened = true;
-    // Debounce all top-grid buttons to prevent accidental clicks on open
-    document.querySelectorAll('.top-item button, .app-btn').forEach(btn => {
-      btn.dataset.debounced = 'false';
-      if (!btn.dataset.debounceListener) {
-        btn.addEventListener('click', (e) => {
-          if (btn.dataset.debounced === 'true') {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-            return;
-          }
-          btn.dataset.debounced = 'true';
-          setTimeout(() => { btn.dataset.debounced = 'false'; }, 500);
-        }, true);
-        btn.dataset.debounceListener = 'true';
-      }
-    });
     _btnStyleSnapshot  = Object.assign({}, btnStyle);
     _btnStylesSnapshot = JSON.parse(JSON.stringify(_btnStyles));
     _appStyleSnapshot  = Object.assign({}, appStyle, { stops: appStyle.stops.slice() });

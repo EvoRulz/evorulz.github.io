@@ -42,18 +42,13 @@
     if (h < 7 || h >= 23) return;
     if (window.AndroidSettings && window.AndroidSettings.showNotification) {
       window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
-    } else if ('Notification' in window && Notification.permission === 'granted') {
-      navigator.serviceWorker.ready.then(r => r.showNotification('Habit Tracker', { body: 'Pushups not done yet today.', icon: './icon-192.png' })).catch(() => {});
+    } else {
+      const _na = document.createElement('a'); _na.href = 'habitnotify://pushups-not-done'; _na.click();
     }
   }
 
   let _notifInterval = null;
   function schedule() {
-    if (_notifInterval) clearInterval(_notifInterval);
-    scheduleNextNotification();
-  }
-
-  function scheduleNextNotification() {
     if (_notifInterval) clearInterval(_notifInterval);
     notify();
     _notifInterval = setInterval(() => {
@@ -66,17 +61,13 @@
     schedule();
   };
 
-  // Delay initial schedule to avoid triggering on app load
-  setTimeout(() => {
-    if (!('Notification' in window)) return;
-    if (Notification.permission === 'granted') {
-      scheduleNextNotification();
-    } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission().then(p => { if (p === 'granted') scheduleNextNotification(); });
-    }
-  }, 10000);
-
-  
+  window.notifyTest = function() { if (window.notifSendTest) window.notifSendTest(); };
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    schedule();
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(p => { if (p === 'granted') schedule(); });
+  }
 })();
 
 window.notifOpenSettings = function() {
@@ -127,12 +118,6 @@ window.notifSendTest = async function() {
   if (statusEl) statusEl.textContent = 'Sending...';
   if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
   try {
-    if (window.AndroidSettings && window.AndroidSettings.showNotification) {
-      window.AndroidSettings.showNotification('Habit Tracker', 'Test notification.');
-      if (statusEl) statusEl.textContent = 'Sent via Android bridge.';
-      if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
-      return;
-    }
     if (Notification.permission !== 'granted') {
       const result = await Notification.requestPermission();
       window.notifRefreshPermission();
@@ -145,6 +130,15 @@ window.notifSendTest = async function() {
     const reg = await navigator.serviceWorker.ready;
     if (statusEl) statusEl.textContent = 'SW: ' + (reg.active ? reg.active.state : 'none') + ' | ctrl: ' + (navigator.serviceWorker.controller ? 'yes' : 'no');
     try {
+      if (window.AndroidSettings && window.AndroidSettings.showNotification) {
+        window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
+      } else {
+        if (window.AndroidSettings && window.AndroidSettings.showNotification) {
+        window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
+      } else {
+        const _na2 = document.createElement('a'); _na2.href = 'habitnotify://pushups-not-done'; _na2.click();
+      }
+      }
       await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     } catch(e2) {

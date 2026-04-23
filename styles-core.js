@@ -76,8 +76,6 @@
     bgType: "solid",
     stops: ["#111111FF"],
     cellBg: "#111111FF",
-    tableBg: "#111111FF",
-    tableText: "#FFFFFFFF",
     gradDir: "to bottom",
     patColor: "#FFFFFF33",
     patBg: "#111111FF",
@@ -168,8 +166,6 @@
     document.documentElement.style.setProperty("--app-border-color", hex8ToCss(appStyle.borderColor));
     document.documentElement.style.setProperty("--app-thead-bg",     hex8ToCss(appStyle.theadBg));
     document.documentElement.style.setProperty("--app-cell-bg",      hex8ToCss(appStyle.cellBg || "#111111FF"));
-    document.documentElement.style.setProperty("--app-table-bg",      hex8ToCss(appStyle.tableBg || "#111111FF"));
-    document.documentElement.style.setProperty("--app-table-text",    hex8ToCss(appStyle.tableText || "#FFFFFFFF"));
     document.documentElement.style.setProperty("--bar-set-color",    hex8ToCss(appStyle.barSet));
     document.documentElement.style.setProperty("--bar-total-color",  hex8ToCss(appStyle.barTotal));
     document.documentElement.style.setProperty("--bar-streak-color", hex8ToCss(appStyle.barStreak));
