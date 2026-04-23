@@ -161,7 +161,9 @@ public class LauncherActivity
             }
             return;
         }
-        super.onNewIntent(intent);
+        if (data != null) {
+    super.onNewIntent(intent);
+}
     }
 
     @Override
