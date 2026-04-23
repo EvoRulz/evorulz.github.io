@@ -170,7 +170,7 @@ function onHexInput(id) {
     buildStopPickers();
     buildAppBg();
   }
-  function settingsAppChange() {
+  func{
     appStyle.bgType   = document.getElementById("s-app-bg-type").value;
     appStyle.gradDir  = document.getElementById("s-app-grad-dir").value;
     appStyle.patColor = getColorValue("s-app-pat-color");
@@ -355,7 +355,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   async function settingsSave() {
     localStorage.setItem("_btnStyle",   JSON.stringify(btnStyle));
     localStorage.setItem("_btnStyles",  JSON.stringify(_btnStyles));
-    settingsAppChange();
     try {
       const saveStyle = Object.assign({}, appStyle, { imgData: null });
       localStorage.setItem("_appStyle", JSON.stringify(saveStyle));
