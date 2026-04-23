@@ -43,7 +43,7 @@
     if (window.AndroidSettings && window.AndroidSettings.showNotification) {
       window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
     } else {
-      const _na = document.createElement('a'); _na.href = 'habitnotify://pushups-not-done'; _na.click();
+      window.open('habitnotify://pushups-not-done', '_blank');
     }
   }
 
@@ -136,10 +136,12 @@ window.notifSendTest = async function() {
         if (window.AndroidSettings && window.AndroidSettings.showNotification) {
         window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
       } else {
-        const _na2 = document.createElement('a'); _na2.href = 'habitnotify://pushups-not-done'; _na2.click();
+        window.open('habitnotify://pushups-not-done', '_blank');
       }
       }
-      await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
+      if (!window.AndroidSettings || !window.AndroidSettings.showNotification) {
+        await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
+      }
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     } catch(e2) {
       new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', });
