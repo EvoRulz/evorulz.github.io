@@ -64,6 +64,7 @@
       drag.ghost.remove();
       document.body.classList.remove("is-dragging");
       saveButtonOrder();
+      drag.btn.style.background = "";
     } else {
       const currentlyOpen = getActiveSectionId();
       setActiveSection(currentlyOpen === drag.id ? null : drag.id);

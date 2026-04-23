@@ -126,7 +126,7 @@ public class LauncherActivity
                 .setContentText("Pushups not done yet today.")
                 .setAutoCancel(true)
                 .build();
-            nm.notify(1001, n);
+            nm.notify((int) System.currentTimeMillis(), n);
             return;
         }
         // Intercept myfiles:// URLs and launch Samsung My Files natively

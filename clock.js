@@ -176,7 +176,7 @@ dateEl.closest(".top-item").addEventListener("click", () => {
   })();
 
   // ── My Files ───────────────────────────────────────────────
-  function openMyFiles() { window.location.href = "myfiles://downloads"; }
+  function openMyFiles() { const a = document.createElement('a'); a.href = 'myfiles://downloads'; a.click(); }
 
   // ── Service Worker ─────────────────────────────────────────
   if ('serviceWorker' in navigator && !location.hostname.includes('claudeusercontent.com')) {
