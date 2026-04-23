@@ -50,17 +50,11 @@
   }
 
   function scheduleNextNotification() {
-    const now = new Date();
-    const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0, 0);
-    const msUntilNextHour = nextHour - now;
-    
     if (_notifInterval) clearInterval(_notifInterval);
-    _notifInterval = setTimeout(() => {
+    notify();
+    _notifInterval = setInterval(() => {
       notify();
-      _notifInterval = setInterval(() => {
-        notify();
-      }, getIntervalMs());
-    }, msUntilNextHour);
+    }, getIntervalMs());
   }
 
   window._notifReschedule = function() {
