@@ -127,6 +127,12 @@ window.notifSendTest = async function() {
   if (statusEl) statusEl.textContent = 'Sending...';
   if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
   try {
+    if (window.AndroidSettings && window.AndroidSettings.showNotification) {
+      window.AndroidSettings.showNotification('Habit Tracker', 'Test notification.');
+      if (statusEl) statusEl.textContent = 'Sent via Android bridge.';
+      if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
+      return;
+    }
     if (Notification.permission !== 'granted') {
       const result = await Notification.requestPermission();
       window.notifRefreshPermission();
@@ -139,11 +145,7 @@ window.notifSendTest = async function() {
     const reg = await navigator.serviceWorker.ready;
     if (statusEl) statusEl.textContent = 'SW: ' + (reg.active ? reg.active.state : 'none') + ' | ctrl: ' + (navigator.serviceWorker.controller ? 'yes' : 'no');
     try {
-      if (window.AndroidSettings && window.AndroidSettings.showNotification) {
-        window.AndroidSettings.showNotification('Habit Tracker', 'Test notification.');
-      } else {
-        await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
-      }
+      await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     } catch(e2) {
       new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', });
