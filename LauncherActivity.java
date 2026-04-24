@@ -198,11 +198,11 @@ public class LauncherActivity
     }
 
     if (data != null && "habitnotify".equals(data.getScheme()) && "myfiles".equals(data.getHost())) {
-            Intent myFilesIntent = getPackageManager().getLaunchIntentForPackage("com.sec.android.app.myfiles");
-            if (myFilesIntent != null) {
-                myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                try { startActivity(myFilesIntent); } catch (Exception ignored) {}
-            }
+            Intent myFilesIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            myFilesIntent.setPackage("com.sec.android.app.myfiles");
+            myFilesIntent.setData(android.net.Uri.parse("myfiles://downloads"));
+            myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try { startActivity(myFilesIntent); } catch (Exception ignored) {}
         }
 
     if (data != null && "myfiles".equals(data.getScheme())) {
@@ -254,11 +254,11 @@ public class LauncherActivity
             return;
 
         } else if ("myfiles".equals(host)) {
-            Intent myFilesIntent = getPackageManager().getLaunchIntentForPackage("com.sec.android.app.myfiles");
-            if (myFilesIntent != null) {
-                myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                try { startActivity(myFilesIntent); } catch (Exception ignored) {}
-            }
+            Intent myFilesIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            myFilesIntent.setPackage("com.sec.android.app.myfiles");
+            myFilesIntent.setData(android.net.Uri.parse("myfiles://downloads"));
+            myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try { startActivity(myFilesIntent); } catch (Exception ignored) {}
             return;
         } else if ("alarmsettings".equals(host)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
