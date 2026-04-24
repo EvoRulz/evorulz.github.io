@@ -132,8 +132,9 @@ window.notifLoadScheduleUI = function() {
 window.notifSendTest = async function() {
   const statusEl = document.getElementById('notif-status-msg');
   const btn = document.getElementById('notif-send-test-btn');
-  if (statusEl) statusEl.textContent = 'Sending...';
-  if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+  if (statusEl) statusEl.textContent = 'Sending in 5s...';
+  if (btn) { btn.textContent = 'Sending in 5s...'; btn.disabled = true; }
+  await new Promise(r => setTimeout(r, 5000));
   try {
     if (Notification.permission !== 'granted') {
       const result = await Notification.requestPermission();
@@ -147,15 +148,14 @@ window.notifSendTest = async function() {
     const reg = await navigator.serviceWorker.ready;
     if (statusEl) statusEl.textContent = 'SW: ' + (reg.active ? reg.active.state : 'none') + ' | ctrl: ' + (navigator.serviceWorker.controller ? 'yes' : 'no');
     try {
-      if (window.AndroidSettings && window.AndroidSettings.showNotification) {
-        window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
-      } else {
-        const _na2 = document.createElement('a'); _na2.href = 'habitnotify://pushups-not-done'; _na2.click();
-      }
       await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     } catch(e2) {
-      new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', });
+      if (window.AndroidSettings && window.AndroidSettings.showNotification) {
+        window.AndroidSettings.showNotification('Habit Tracker', 'Test notification.');
+      } else {
+        new Notification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png' });
+      }
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     }
   } catch(e) {
