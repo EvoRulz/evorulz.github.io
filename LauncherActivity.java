@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 package io.github.evorulz.twa;
+import android.app.AlarmManager;
 import android.app.DownloadManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -49,6 +51,16 @@ public class LauncherActivity
             i.setData(Uri.parse("package:io.github.evorulz.twa"));
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
+        }
+        @JavascriptInterface
+        public void scheduleRepeatingNotification(long intervalMs) {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent i = new Intent(LauncherActivity.this, NotificationReceiver.class);
+            PendingIntent pi = PendingIntent.getBroadcast(LauncherActivity.this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            am.cancel(pi);
+            if (intervalMs > 0) {
+                am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, intervalMs, pi);
+            }
         }
         @JavascriptInterface
         public void showNotification(String title, String body) {

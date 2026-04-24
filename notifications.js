@@ -112,6 +112,16 @@ window.notifSaveSchedule = function() {
   };
   localStorage.setItem('_notifSettings', JSON.stringify(s));
   if (window._notifReschedule) window._notifReschedule();
+  const intervalMs = (
+    (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
+    (s.days    || 0) * 24 * 60 * 60 * 1000 +
+    (s.hours   || 0) * 60 * 60 * 1000 +
+    (s.minutes || 0) * 60 * 1000 +
+    (s.seconds || 0) * 1000
+  ) || 60 * 60 * 1000;
+  if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
+    window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
+  }
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; setTimeout(() => btn.textContent = orig, 1200); }
 };
