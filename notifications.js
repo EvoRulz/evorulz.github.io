@@ -41,17 +41,23 @@
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
     try {
-    const reg = await navigator.serviceWorker.ready;
-    await reg.showNotification('Habit Tracker', {
-      body: 'Pushups not done yet today.',
-      icon: './icon-192.png',
-      vibrate: [200],
-      requireInteraction: false,
-      tag: 'habit-reminder'
-    });
-  } catch(e) {
-    window.location.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Pushups not done yet today.');
-  }
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification('Habit Tracker', {
+        body: 'Pushups not done yet today.',
+        icon: './icon-192.png',
+        vibrate: [200],
+        requireInteraction: false,
+        tag: 'habit-reminder'
+      });
+    } catch(e) {
+      try {
+        const a = document.createElement('a');
+        a.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Pushups not done yet today.');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch(e2) {}
+    }
   }
 
   let _notifInterval = null;
@@ -72,7 +78,6 @@
     schedule();
   };
 
-  // Delay initial schedule to avoid triggering on app load
   setTimeout(() => {
     if (!('Notification' in window)) return;
     if (Notification.permission === 'granted') {
@@ -82,7 +87,6 @@
     }
   }, 10000);
 
-  
 })();
 
 window.notifOpenSettings = function() {
@@ -183,7 +187,13 @@ window.notifSendTest = async function() {
       await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     } catch(e2) {
-      window.location.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Test notification.');
+      try {
+        const a = document.createElement('a');
+        a.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Test notification.');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch(e3) {}
       if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
     }
   } catch(e) {
