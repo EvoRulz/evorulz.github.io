@@ -47,6 +47,16 @@ public class LauncherActivity
 
     public class SettingsBridge {
         @JavascriptInterface
+        public String getPermissionStatus() {
+            boolean notif = true;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                notif = checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            }
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            boolean alarm = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || am.canScheduleExactAlarms();
+            return "{\"notifications\":" + notif + ",\"exactAlarm\":" + alarm + "}";
+        }
+        @JavascriptInterface
         public void openAlarmSettings() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Intent i = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
@@ -76,7 +86,11 @@ public class LauncherActivity
             if (intervalMs > 0) {
                 LauncherActivity.this.getSharedPreferences("notif", Context.MODE_PRIVATE)
                     .edit().putLong("intervalMs", intervalMs).apply();
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+                } else {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+                }
             }
         }
         @JavascriptInterface

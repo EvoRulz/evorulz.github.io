@@ -1,6 +1,7 @@
 package io.github.evorulz.twa;
 
 import android.app.AlarmManager;
+import android.os.Build;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -33,7 +34,11 @@ public class NotificationReceiver extends BroadcastReceiver {
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent i = new Intent(context, NotificationReceiver.class);
             PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+            } else {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+            }
         }
     }
 }

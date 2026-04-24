@@ -103,7 +103,21 @@ window.notifOpenAlarmSettings = function() {
 
 window.notifRefreshPermission = function() {
   const el = document.getElementById('notif-permission-status');
-  if (el && 'Notification' in window) el.textContent = Notification.permission;
+  if (!el) return;
+  const webPerm = ('Notification' in window) ? Notification.permission : 'unavailable';
+  if (window.AndroidSettings && window.AndroidSettings.getPermissionStatus) {
+    try {
+      const s = JSON.parse(window.AndroidSettings.getPermissionStatus());
+      el.innerHTML =
+        'Web: <span style="color:' + (webPerm === 'granted' ? '#99ff99' : '#ff9999') + '">' + webPerm + '</span>' +
+        ' &nbsp; Notifications: <span style="color:' + (s.notifications ? '#99ff99' : '#ff9999') + '">' + (s.notifications ? 'granted' : 'denied') + '</span>' +
+        ' &nbsp; Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>';
+    } catch {
+      el.textContent = webPerm;
+    }
+  } else {
+    el.textContent = webPerm;
+  }
 };
 
 window.notifSaveSchedule = function() {
