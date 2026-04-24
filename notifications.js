@@ -36,11 +36,24 @@
     return false;
   }
 
-  function notify() {
+  async function notify() {
     if (isPushupsDone()) return;
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
-    const _na = document.createElement('a'); _na.href = 'habitnotify://pushups-not-done'; _na.click();
+    try {
+    const reg = await navigator.serviceWorker.ready;
+    await reg.showNotification('Habit Tracker', {
+      body: 'Pushups not done yet today.',
+      icon: './icon-192.png',
+      vibrate: [200],
+      requireInteraction: false,
+      tag: 'habit-reminder'
+    });
+  } catch(e) {
+    if (window.AndroidSettings && window.AndroidSettings.showNotification) {
+      window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
+    }
+  }
   }
 
   let _notifInterval = null;

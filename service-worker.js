@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v675";
+const CACHE = "habit-tracker-v676";
 
 const ASSETS = [
   "./",
@@ -23,6 +23,26 @@ const ASSETS = [
 
 self.addEventListener("notificationclick", e => {
   e.notification.close();
+  e.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
+      for (const c of list) {
+        if (c.url && "focus" in c) return c.focus();
+      }
+      if (clients.openWindow) return clients.openWindow("./");
+    })
+  );
+});
+
+self.addEventListener("push", e => {
+  const data = e.data ? e.data.json() : { title: "Habit Tracker", body: "Reminder" };
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "./icon-192.png",
+      vibrate: [200],
+      tag: "habit-reminder"
+    })
+  );
 });
 
 self.addEventListener("install", e => {
@@ -62,6 +82,7 @@ self.addEventListener("fetch", e => {
     })
   );
 });
+
 
 
 
