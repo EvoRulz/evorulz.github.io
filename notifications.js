@@ -105,18 +105,19 @@ window.notifRefreshPermission = function() {
   const el = document.getElementById('notif-permission-status');
   if (!el) return;
   const webPerm = ('Notification' in window) ? Notification.permission : 'unavailable';
+  const webColor = webPerm === 'granted' ? '#99ff99' : '#ff9999';
   if (window.AndroidSettings && window.AndroidSettings.getPermissionStatus) {
     try {
       const s = JSON.parse(window.AndroidSettings.getPermissionStatus());
       el.innerHTML =
-        'Web: <span style="color:' + (webPerm === 'granted' ? '#99ff99' : '#ff9999') + '">' + webPerm + '</span>' +
-        ' &nbsp; Notifications: <span style="color:' + (s.notifications ? '#99ff99' : '#ff9999') + '">' + (s.notifications ? 'granted' : 'denied') + '</span>' +
-        ' &nbsp; Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>';
+        'Web: <span style="color:' + webColor + '">' + webPerm + '</span>' +
+        '<br>Notifications: <span style="color:' + (s.notifications ? '#99ff99' : '#ff9999') + '">' + (s.notifications ? 'granted' : 'denied') + '</span>' +
+        '<br>Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>';
     } catch {
-      el.textContent = webPerm;
+      el.innerHTML = 'Web: <span style="color:' + webColor + '">' + webPerm + '</span>';
     }
   } else {
-    el.textContent = webPerm;
+    el.innerHTML = 'Web: <span style="color:' + webColor + '">' + webPerm + '</span>';
   }
 };
 

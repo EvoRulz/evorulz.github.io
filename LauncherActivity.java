@@ -125,6 +125,21 @@ public class LauncherActivity
 
     @Override
     protected void onStart() {
+        long savedInterval = getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getLong("intervalMs", 0);
+        if (savedInterval > 0) {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent i = new Intent(this, NotificationReceiver.class);
+            PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+            if (pi == null) {
+                PendingIntent newPi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + savedInterval, newPi);
+                } else {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + savedInterval, newPi);
+                }
+            }
+        }
         super.onStart();
         android.view.View root = getWindow().getDecorView().getRootView();
         WebView wv = findWebView(root);

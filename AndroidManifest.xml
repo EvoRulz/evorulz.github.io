@@ -182,6 +182,11 @@
 
         <activity android:name="com.google.androidbrowserhelper.trusted.NotificationPermissionRequestActivity" />
         <receiver android:name=".NotificationReceiver" android:exported="true" />
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 </manifest>
