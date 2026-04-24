@@ -25,13 +25,16 @@ public class NotificationReceiver extends BroadcastReceiver {
             cal.get(java.util.Calendar.YEAR),
             cal.get(java.util.Calendar.MONTH) + 1,
             cal.get(java.util.Calendar.DAY_OF_MONTH));
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+        PendingIntent launchPi = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Notification n = new NotificationCompat.Builder(context, "habit_reminders")
             .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle("Habit Tracker")
             .setContentText("Pushups not done yet today.")
+            .setContentIntent(launchPi)
             .setAutoCancel(true)
             .build();
-        nm.notify(1002, n);
+        nm.notify((int) System.currentTimeMillis(), n);
 
         long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
             .getLong("intervalMs", 0);

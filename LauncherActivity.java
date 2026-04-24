@@ -119,13 +119,16 @@ public class LauncherActivity
                 NotificationChannel ch = new NotificationChannel("habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
                 nm.createNotificationChannel(ch);
             }
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+            PendingIntent launchPi = PendingIntent.getActivity(LauncherActivity.this, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             Notification n = new NotificationCompat.Builder(LauncherActivity.this, "habit_reminders")
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(title)
                 .setContentText(body)
+                .setContentIntent(launchPi)
                 .setAutoCancel(true)
                 .build();
-            nm.notify(1001, n);
+            nm.notify((int) System.currentTimeMillis(), n);
         }
     }
 
@@ -241,10 +244,13 @@ public class LauncherActivity
                 NotificationChannel ch = new NotificationChannel("habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
                 nm.createNotificationChannel(ch);
             }
+            Intent launchIntent2 = getPackageManager().getLaunchIntentForPackage(getPackageName());
+            PendingIntent launchPi2 = PendingIntent.getActivity(this, 1, launchIntent2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             Notification n = new NotificationCompat.Builder(this, "habit_reminders")
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(title)
                 .setContentText(body)
+                .setContentIntent(launchPi2)
                 .setAutoCancel(true)
                 .build();
             nm.notify((int) System.currentTimeMillis(), n);
