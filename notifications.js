@@ -168,36 +168,15 @@ window.notifMarkDone = function(dateKey, done) {
 window.notifSendTest = async function() {
   const statusEl = document.getElementById('notif-status-msg');
   const btn = document.getElementById('notif-send-test-btn');
-  if (statusEl) statusEl.textContent = 'Sending in 5s...';
-  if (btn) { btn.textContent = 'Sending in 5s...'; btn.disabled = true; }
-  await new Promise(r => setTimeout(r, 5000));
+  if (statusEl) statusEl.textContent = '';
+  if (btn) { btn.textContent = 'Sent'; btn.disabled = true; setTimeout(() => { btn.textContent = 'Send Test'; btn.disabled = false; }, 1500); }
   try {
-    if (Notification.permission !== 'granted') {
-      const result = await Notification.requestPermission();
-      window.notifRefreshPermission();
-      if (result !== 'granted') {
-        if (statusEl) statusEl.textContent = 'No permission.';
-        if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
-        return;
-      }
-    }
-    const reg = await navigator.serviceWorker.ready;
-    if (statusEl) statusEl.textContent = 'SW: ' + (reg.active ? reg.active.state : 'none') + ' | ctrl: ' + (navigator.serviceWorker.controller ? 'yes' : 'no');
-    try {
-      await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], requireInteraction: false });
-      if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
-    } catch(e2) {
-      try {
-        const a = document.createElement('a');
-        a.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Test notification.');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } catch(e3) {}
-      if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
-    }
+    const a = document.createElement('a');
+    a.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Test notification.');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   } catch(e) {
     if (statusEl) statusEl.textContent = 'Error: ' + e.message;
-    if (btn) { btn.textContent = 'Send Test'; btn.disabled = false; }
   }
 };
