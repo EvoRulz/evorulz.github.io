@@ -40,15 +40,16 @@
     if (isPushupsDone()) return;
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
-    if (window.AndroidSettings && window.AndroidSettings.showNotification) {
-        window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
-    } else {
-        const _na = document.createElement('a'); _na.href = 'habitnotify://pushups-not-done'; _na.click();
-    }
+    const _na = document.createElement('a'); _na.href = 'habitnotify://pushups-not-done'; _na.click();
   }
 
   let _notifInterval = null;
   function schedule() {
+    if (_notifInterval) clearInterval(_notifInterval);
+    scheduleNextNotification();
+  }
+
+  function scheduleNextNotification() {
     if (_notifInterval) clearInterval(_notifInterval);
     notify();
     _notifInterval = setInterval(() => {
@@ -61,13 +62,17 @@
     schedule();
   };
 
-  window.notifyTest = function() { if (window.notifSendTest) window.notifSendTest(); };
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'granted') {
-    schedule();
-  } else if (Notification.permission !== 'denied') {
-    Notification.requestPermission().then(p => { if (p === 'granted') schedule(); });
-  }
+  // Delay initial schedule to avoid triggering on app load
+  setTimeout(() => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'granted') {
+      scheduleNextNotification();
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(p => { if (p === 'granted') scheduleNextNotification(); });
+    }
+  }, 10000);
+
+  
 })();
 
 window.notifOpenSettings = function() {
