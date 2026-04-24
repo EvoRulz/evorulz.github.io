@@ -40,7 +40,11 @@
     if (isPushupsDone()) return;
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
-    const _na = document.createElement('a'); _na.href = 'habitnotify://pushups-not-done'; _na.click();
+    if (window.AndroidSettings && window.AndroidSettings.showNotification) {
+        window.AndroidSettings.showNotification('Habit Tracker', 'Pushups not done yet today.');
+    } else {
+        const _na = document.createElement('a'); _na.href = 'habitnotify://pushups-not-done'; _na.click();
+    }
   }
 
   let _notifInterval = null;
