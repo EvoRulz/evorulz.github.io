@@ -258,6 +258,7 @@
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
     document.documentElement.style.setProperty("--slider-r",             btnStyle.sliderR + "%");
+    document.documentElement.style.setProperty("--slider-spread",        (btnStyle.sliderSpread ?? 4) + "px");
     document.documentElement.style.setProperty("--slider-handle-h",      (btnStyle.sliderHandleH ?? 16) + "px");
     document.documentElement.style.setProperty("--slider-handle-r",      (btnStyle.sliderHandleR ?? 3) + "%");
     document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));

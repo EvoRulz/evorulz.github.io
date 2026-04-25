@@ -531,6 +531,7 @@ else {
     btnStyle.sliderHandle   = getColorValue('s-sliderhandle');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
     btnStyle.sliderR        = Number(document.getElementById("s-sliderr").value);
+    btnStyle.sliderSpread   = Number(document.getElementById("s-sliderspread").value);
     btnStyle.sliderHandleH  = Number(document.getElementById("s-sliderhandleh").value);
     btnStyle.sliderHandleR  = Number(document.getElementById("s-sliderhandler").value);
     btnStyle.checkboxChecked = getColorValue('s-checkbox-checked');
@@ -626,6 +627,8 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     const _shrv = document.getElementById("s-sliderhandler-val"); if (_shrv) _shrv.textContent = (btnStyle.sliderHandleR ?? 3) + "%";
     const _shhEl = document.getElementById("s-sliderhandleh"); if (_shhEl) _shhEl.value = btnStyle.sliderHandleH ?? 16;
     const _shrEl = document.getElementById("s-sliderhandler"); if (_shrEl) _shrEl.value = btnStyle.sliderHandleR ?? 3;
+    const _sspv = document.getElementById("s-sliderspread-val"); if (_sspv) _sspv.textContent = (btnStyle.sliderSpread ?? 4) + "px";
+    const _sspEl = document.getElementById("s-sliderspread"); if (_sspEl) _sspEl.value = btnStyle.sliderSpread ?? 4;
     document.getElementById("s-font").value    = btnStyle.font;
     document.getElementById("s-radius").value  = String(BTN_STYLE_DEFAULTS.btnRadius ?? 6);
 const _rvDef = document.getElementById("s-radius-val"); if (_rvDef) _rvDef.textContent = (BTN_STYLE_DEFAULTS.btnRadius ?? 6) + "px";
