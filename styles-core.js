@@ -193,9 +193,15 @@
   }
   function updateSliderFill(slider) {
     const pct = ((slider.value - slider.min) / ((slider.max || 255) - (slider.min || 0))) * 100;
-    const fill = hex8ToCss(btnStyle.sliderFill || '#9659FFFF');
-    const track = hex8ToCss(btnStyle.sliderTrack || '#333333FF');
     const adjPct = `calc(${pct / 100} * (100% - var(--slider-handle-w)) + var(--slider-handle-w) / 2)`;
+    const track = hex8ToCss(btnStyle.sliderTrack || '#333333FF');
+    let fill;
+    if (slider.id && slider.id.endsWith('-alpha')) {
+      const picker = document.getElementById(slider.id.slice(0, -6));
+      fill = picker ? picker.value : hex8ToCss(btnStyle.sliderFill || '#9659FFFF');
+    } else {
+      fill = hex8ToCss(btnStyle.sliderFill || '#9659FFFF');
+    }
     slider.style.background = `linear-gradient(to right, ${fill} ${adjPct}, ${track} ${adjPct})`;
   }
   function hex8ToCss(hex) {
