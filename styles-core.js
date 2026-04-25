@@ -230,7 +230,9 @@
     const slider = document.getElementById(id+'-alpha');
     if (!picker||!slider) return;
     const pct = ((slider.value - (slider.min||0)) / ((slider.max||255) - (slider.min||0))) * 100;
-    slider.style.background = `linear-gradient(to right, ${picker.value} ${pct}%, transparent ${pct}%), linear-gradient(to right, transparent, ${picker.value})`;
+    const adjPct = `calc(${pct / 100} * (100% - var(--slider-handle-w)) + var(--slider-handle-w) / 2)`;
+    const track = hex8ToCss(btnStyle.sliderTrack || '#333333FF');
+    slider.style.background = `linear-gradient(to right, ${picker.value} ${adjPct}, ${track} ${adjPct})`;
     // Update swatch overlay to show color+alpha
     const overlay = document.getElementById(id+'-swatch-overlay');
     if (overlay) {
@@ -282,10 +284,7 @@
     document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));
     document.documentElement.style.setProperty("--slider-track-bg",      hex8ToCss(btnStyle.sliderTrack  || '#333333FF'));
     document.documentElement.style.setProperty("--slider-handle-color",  hex8ToCss(btnStyle.sliderHandle || '#FFFFFFFF'));
-    document.querySelectorAll('.alpha-slider').forEach(s => {
-      if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
-      else updateSliderFill(s);
-    });
+    document.querySelectorAll('.alpha-slider').forEach(s => updateSliderFill(s));
     document.documentElement.style.setProperty("--checkbox-checked",     hex8ToCss(btnStyle.checkboxChecked));
     document.documentElement.style.setProperty("--checkbox-mark",        hex8ToCss(btnStyle.checkboxMark));
     document.documentElement.style.setProperty("--checkbox-border",      hex8ToCss(btnStyle.checkboxBorder));
