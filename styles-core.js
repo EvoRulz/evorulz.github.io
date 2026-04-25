@@ -256,8 +256,8 @@
     buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
     document.documentElement.style.setProperty("--btn-radius", (btnStyle.btnRadius ?? 6) + 'px');
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
-    document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
-    document.documentElement.style.setProperty("--slider-r",             btnStyle.sliderR + "px");
+    document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "%");
+    document.documentElement.style.setProperty("--slider-r",             btnStyle.sliderR + "%");
     document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));
     document.documentElement.style.setProperty("--slider-track-bg",      hex8ToCss(btnStyle.sliderTrack  || '#333333FF'));
     document.documentElement.style.setProperty("--slider-handle-color",  hex8ToCss(btnStyle.sliderHandle || '#FFFFFFFF'));

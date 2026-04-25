@@ -618,8 +618,8 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-sliderhandle',    btnStyle.sliderHandle || '#FFFFFFFF');
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
-    const _shv = document.getElementById("s-sliderh-val"); if (_shv) _shv.textContent = btnStyle.sliderH + "px";
-    const _srv = document.getElementById("s-sliderr-val"); if (_srv) _srv.textContent = btnStyle.sliderR + "px";
+    const _shv = document.getElementById("s-sliderh-val"); if (_shv) _shv.textContent = btnStyle.sliderH + "%";
+    const _srv = document.getElementById("s-sliderr-val"); if (_srv) _srv.textContent = btnStyle.sliderR + "%";
     document.getElementById("s-font").value    = btnStyle.font;
     document.getElementById("s-radius").value  = String(BTN_STYLE_DEFAULTS.btnRadius ?? 6);
 const _rvDef = document.getElementById("s-radius-val"); if (_rvDef) _rvDef.textContent = (BTN_STYLE_DEFAULTS.btnRadius ?? 6) + "px";
