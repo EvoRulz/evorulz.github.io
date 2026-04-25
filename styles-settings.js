@@ -526,6 +526,9 @@ else {
     btnStyle.activeGlow     = getColorValue('s-activeglow');
     btnStyle.tapHighlight   = getColorValue('s-taphighlight');
     btnStyle.sliderBorder   = getColorValue('s-sliderborder');
+    btnStyle.sliderFill     = getColorValue('s-sliderfill');
+    btnStyle.sliderTrack    = getColorValue('s-slidertrack');
+    btnStyle.sliderHandle   = getColorValue('s-sliderhandle');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
     btnStyle.sliderR        = Number(document.getElementById("s-sliderr").value);
     btnStyle.checkboxChecked = getColorValue('s-checkbox-checked');
@@ -583,6 +586,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     if (window._cfRender) window._cfRender();
     if (window._tumblerRenderPreviews) window._tumblerRenderPreviews();
     settingsUpdatePreview();
+    document.querySelectorAll('.alpha-slider:not([id$="-alpha"])').forEach(s => updateSliderFill(s));
   }
   function settingsReset() {
     btnStyle  = Object.assign({}, BTN_STYLE_DEFAULTS);
@@ -608,9 +612,14 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
-    setColorValue('s-sliderborder', btnStyle.sliderBorder);
+    setColorValue('s-sliderborder',    btnStyle.sliderBorder);
+    setColorValue('s-sliderfill',      btnStyle.sliderFill   || '#9659FFFF');
+    setColorValue('s-slidertrack',     btnStyle.sliderTrack  || '#333333FF');
+    setColorValue('s-sliderhandle',    btnStyle.sliderHandle || '#FFFFFFFF');
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
+    const _shv = document.getElementById("s-sliderh-val"); if (_shv) _shv.textContent = btnStyle.sliderH + "px";
+    const _srv = document.getElementById("s-sliderr-val"); if (_srv) _srv.textContent = btnStyle.sliderR + "px";
     document.getElementById("s-font").value    = btnStyle.font;
     document.getElementById("s-radius").value  = String(BTN_STYLE_DEFAULTS.btnRadius ?? 6);
 const _rvDef = document.getElementById("s-radius-val"); if (_rvDef) _rvDef.textContent = (BTN_STYLE_DEFAULTS.btnRadius ?? 6) + "px";

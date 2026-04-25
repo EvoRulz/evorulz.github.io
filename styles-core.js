@@ -191,6 +191,12 @@
   function componentsToHex8({r,g,b,a}) {
     return '#'+[r,g,b,a].map(v=>Math.round(v).toString(16).padStart(2,'0').toUpperCase()).join('');
   }
+  function updateSliderFill(slider) {
+    const pct = ((slider.value - slider.min) / ((slider.max || 255) - (slider.min || 0))) * 100;
+    const fill = hex8ToCss(btnStyle.sliderFill || '#9659FFFF');
+    const track = hex8ToCss(btnStyle.sliderTrack || '#333333FF');
+    slider.style.background = `linear-gradient(to right, ${fill} ${pct}%, ${track} ${pct}%)`;
+  }
   function hex8ToCss(hex) {
     const {r,g,b,a} = hex8ToComponents(hex);
     return `rgba(${r},${g},${b},${(a/255).toFixed(3)})`;
@@ -252,6 +258,10 @@
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
     document.documentElement.style.setProperty("--slider-r",             btnStyle.sliderR + "px");
+    document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));
+    document.documentElement.style.setProperty("--slider-track-bg",      hex8ToCss(btnStyle.sliderTrack  || '#333333FF'));
+    document.documentElement.style.setProperty("--slider-handle-color",  hex8ToCss(btnStyle.sliderHandle || '#FFFFFFFF'));
+    document.querySelectorAll('.alpha-slider').forEach(s => updateSliderFill(s));
     document.documentElement.style.setProperty("--checkbox-checked",     hex8ToCss(btnStyle.checkboxChecked));
     document.documentElement.style.setProperty("--checkbox-mark",        hex8ToCss(btnStyle.checkboxMark));
     document.documentElement.style.setProperty("--checkbox-border",      hex8ToCss(btnStyle.checkboxBorder));
