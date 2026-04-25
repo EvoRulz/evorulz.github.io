@@ -68,6 +68,7 @@
 
   function scheduleNextNotification() {
     if (_notifInterval) clearInterval(_notifInterval);
+    if (localStorage.getItem('_notifEnabled') !== 'true') return;
     _notifInterval = setInterval(() => {
       notify();
     }, getIntervalMs());
@@ -80,6 +81,9 @@
 
   setTimeout(() => {
     if (!('Notification' in window)) return;
+    const _offUntil = parseInt(localStorage.getItem('_notifOffUntil') || '0');
+    if (_offUntil && Date.now() >= _offUntil) { localStorage.setItem('_notifEnabled', 'true'); localStorage.removeItem('_notifOffUntil'); }
+    if (localStorage.getItem('_notifEnabled') !== 'true') return;
     if (Notification.permission === 'granted') {
       scheduleNextNotification();
     } else if (Notification.permission !== 'denied') {
@@ -157,6 +161,94 @@ window.notifLoadScheduleUI = function() {
     set('notif-seconds',     s.seconds);
     set('notif-target-reps', s.targetReps);
   } catch {}
+  _notifUpdateToggleUI();
+  _notifTickCountdown();
+};
+
+function _notifUpdateToggleUI() {
+  const enabled = localStorage.getItem('_notifEnabled') === 'true';
+  const wrap  = document.getElementById('notif-toggle-wrap');
+  const knob  = document.getElementById('notif-toggle-knob');
+  const offWrap = document.getElementById('notif-off-wrap');
+  if (wrap)  { wrap.style.background = enabled ? '#1a5a1a' : '#333'; }
+  if (knob)  { knob.style.left = enabled ? '27px' : '3px'; knob.style.background = enabled ? '#99ff99' : '#666'; }
+  if (offWrap) { offWrap.style.display = enabled ? 'none' : 'flex'; }
+}
+
+function _notifTickCountdown() {
+  const el = document.getElementById('notif-countdown-display');
+  if (!el) return;
+  const enabled = localStorage.getItem('_notifEnabled') === 'true';
+  if (enabled) { el.textContent = ''; return; }
+  const until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
+  if (!until) { el.textContent = 'Off indefinitely'; return; }
+  const remaining = until - Date.now();
+  if (remaining <= 0) {
+    localStorage.setItem('_notifEnabled', 'true');
+    localStorage.removeItem('_notifOffUntil');
+    _notifUpdateToggleUI();
+    if (window._notifReschedule) window._notifReschedule();
+    el.textContent = '';
+    return;
+  }
+  const totalSec = Math.floor(remaining / 1000);
+  const s = totalSec % 60;
+  const totalMin = Math.floor(totalSec / 60);
+  const m = totalMin % 60;
+  const totalHr = Math.floor(totalMin / 60);
+  const h = totalHr % 24;
+  const d = Math.floor(totalHr / 24);
+  const parts = [];
+  if (d) parts.push(d + 'd');
+  if (h) parts.push(h + 'h');
+  if (m) parts.push(m + 'm');
+  parts.push(s + 's');
+  el.textContent = 'Enables in: ' + parts.join(' ');
+}
+
+setInterval(() => {
+  const until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
+  if (until && Date.now() >= until && localStorage.getItem('_notifEnabled') !== 'true') {
+    localStorage.setItem('_notifEnabled', 'true');
+    localStorage.removeItem('_notifOffUntil');
+    _notifUpdateToggleUI();
+    if (window._notifReschedule) window._notifReschedule();
+  }
+  _notifTickCountdown();
+}, 1000);
+
+window.notifToggle = function() {
+  const enabled = localStorage.getItem('_notifEnabled') === 'true';
+  if (enabled) {
+    localStorage.setItem('_notifEnabled', 'false');
+    localStorage.removeItem('_notifOffUntil');
+    if (window._notifReschedule) window._notifReschedule();
+  } else {
+    localStorage.setItem('_notifEnabled', 'true');
+    localStorage.removeItem('_notifOffUntil');
+    if (window._notifReschedule) window._notifReschedule();
+  }
+  _notifUpdateToggleUI();
+  _notifTickCountdown();
+};
+
+window.notifSetOffTimer = function() {
+  const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  const ms = (
+    g('notif-off-years') * 365 * 24 * 60 * 60 * 1000 +
+    g('notif-off-days')  * 24 * 60 * 60 * 1000 +
+    g('notif-off-hours') * 60 * 60 * 1000 +
+    g('notif-off-mins')  * 60 * 1000 +
+    g('notif-off-secs')  * 1000
+  );
+  if (!ms) { window.notifSetOffForever(); return; }
+  localStorage.setItem('_notifOffUntil', String(Date.now() + ms));
+  _notifTickCountdown();
+};
+
+window.notifSetOffForever = function() {
+  localStorage.removeItem('_notifOffUntil');
+  _notifTickCountdown();
 };
 
 window.notifMarkDone = function(dateKey, done) {

@@ -692,7 +692,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v698</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v699</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -1253,6 +1253,42 @@ input[type="checkbox"]:hover {
       </div>
       </div>
       <div class="settings-group-content" id="sg-notifications">
+        <div class="settings-row" style="justify-content:space-between;gap:12px;">
+        <label style="font-size:13px;color:#bbb;">Notifications enabled</label>
+        <div id="notif-toggle-wrap" onclick="notifToggle()" style="width:48px;height:26px;border-radius:13px;background:#333;border:1px solid #555;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;touch-action:manipulation;">
+          <div id="notif-toggle-knob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#666;transition:left 0.2s,background 0.2s;pointer-events:none;"></div>
+        </div>
+      </div>
+      <div id="notif-off-wrap" style="display:flex;flex-direction:column;gap:8px;padding:10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;">
+        <div style="font-size:12px;color:#888;">Auto-enable after (all zero = indefinite)</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Years</label>
+            <input id="notif-off-years" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Days</label>
+            <input id="notif-off-days" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Hours</label>
+            <input id="notif-off-hours" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Mins</label>
+            <input id="notif-off-mins" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Secs</label>
+            <input id="notif-off-secs" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+        </div>
+        <div id="notif-countdown-display" style="font-size:12px;color:#aaa;min-height:16px;">Off indefinitely</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="notifSetOffTimer()" style="padding:6px 14px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Set timer</button>
+          <button onclick="notifSetOffForever()" style="padding:6px 14px;background:#2a1a1a;color:#ff9999;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Indefinite</button>
+        </div>
+      </div>
       <div class="settings-row" style="flex-wrap:wrap;gap:6px;">
         <label>Permissions</label>
         <span id="notif-permission-status" style="font-size:12px;color:#aaa;flex:1;min-width:0;">—</span>
@@ -1354,6 +1390,7 @@ input[type="checkbox"]:hover {
 <script src="notifications.js"></script>
 </body>
 </html>
+
 
 
 
