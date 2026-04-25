@@ -282,7 +282,10 @@
     document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));
     document.documentElement.style.setProperty("--slider-track-bg",      hex8ToCss(btnStyle.sliderTrack  || '#333333FF'));
     document.documentElement.style.setProperty("--slider-handle-color",  hex8ToCss(btnStyle.sliderHandle || '#FFFFFFFF'));
-    document.querySelectorAll('.alpha-slider').forEach(s => updateSliderFill(s));
+    document.querySelectorAll('.alpha-slider').forEach(s => {
+      if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
+      else updateSliderFill(s);
+    });
     document.documentElement.style.setProperty("--checkbox-checked",     hex8ToCss(btnStyle.checkboxChecked));
     document.documentElement.style.setProperty("--checkbox-mark",        hex8ToCss(btnStyle.checkboxMark));
     document.documentElement.style.setProperty("--checkbox-border",      hex8ToCss(btnStyle.checkboxBorder));
