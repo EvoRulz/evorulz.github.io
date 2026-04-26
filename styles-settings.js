@@ -234,6 +234,7 @@ function onHexInput(id) {
     });
     const c = document.getElementById(groupId);
     const isOpen = c.classList.toggle('open');
+    if (isOpen) history.pushState({panel:'sg'}, '');
     if (groupId === 'sg-clock' && isOpen) {
   setColorValue('s-clock-date-color', _btnStyles['top-date']?.fg || btnStyle.clockDateColor);
   updateAlphaSliderBg('s-clock-date-color');
@@ -380,6 +381,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
       }
     }
     if(window.fontPickerSync)fontPickerSync();
+    history.pushState({panel:'settings'}, '');
     } catch(e) { alert("settingsOpen error: " + e.message + "\n" + e.stack); }
   }
   function settingsClose() {
@@ -934,20 +936,12 @@ makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 
 window.addEventListener('load', function() {
-  var _backReady = false;
-  function _initBack() {
-    if (_backReady) return;
-    _backReady = true;
-    history.pushState({ panel: 'nav' }, '');
-  }
-  document.addEventListener('touchstart', _initBack, { once: true, passive: true });
-  document.addEventListener('click', _initBack, { once: true });
-
+  document.addEventListener('touchstart', function() {
+    history.pushState({panel:'base'}, '');
+  }, { once: true, passive: true });
   window.addEventListener('popstate', function() {
-    setTimeout(function() { history.pushState({ panel: 'nav' }, ''); }, 0);
     if (document.getElementById('manage-overlay').classList.contains('active')) {
-      manageClose();
-      return;
+      manageClose(); return;
     }
     if (document.getElementById('settings-overlay').classList.contains('active')) {
       var openGroup = null;
@@ -964,12 +958,10 @@ window.addEventListener('load', function() {
       return;
     }
     if (typeof getActiveSectionId === 'function' && getActiveSectionId()) {
-      setActiveSection(null);
-      return;
+      setActiveSection(null); return;
     }
     if (typeof habitsVisible !== 'undefined' && habitsVisible) {
-      toggleHabits();
-      return;
+      toggleHabits(); return;
     }
   });
 });

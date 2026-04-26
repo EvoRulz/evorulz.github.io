@@ -2,6 +2,7 @@
   function manageOpen() {
     manageRenderList();
     document.getElementById("manage-overlay").classList.add("active");
+    history.pushState({panel:'manage'}, '');
   }
   function manageClose() {
     document.getElementById("manage-overlay").classList.remove("active");

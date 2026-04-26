@@ -33,6 +33,7 @@
 
     // Open target and glow its button
     sectionEls[targetId].style.display = "block";
+    history.pushState({panel:'section'}, '');
     const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${targetId}"]`);
     if (btn) btn.classList.add("active");
 

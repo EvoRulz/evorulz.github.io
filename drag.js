@@ -89,6 +89,7 @@
   applyBtnStyle();
   function toggleHabits() {
     habitsVisible = !habitsVisible;
+    if (habitsVisible) history.pushState({panel:'base'}, '');
     if (!habitsVisible) setActiveSection(null);
     buttonsEl.style.display = habitsVisible ? "" : "none";
     if (habitsVisible) { buttonsEl.style.gridAutoRows = ''; equalizeButtonSizes(); }
