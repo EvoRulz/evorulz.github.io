@@ -937,12 +937,26 @@ window.addEventListener('load', function() {
   history.pushState({ panel: 'nav' }, '');
   window.addEventListener('popstate', function() {
     history.pushState({ panel: 'nav' }, '');
+    if (document.getElementById('manage-overlay').classList.contains('active')) {
+      manageClose();
+      return;
+    }
     if (document.getElementById('settings-overlay').classList.contains('active')) {
-      settingsCancel();
-    } else if (typeof getActiveSectionId === 'function' && getActiveSectionId()) {
+      const openGroup = document.querySelector('.settings-group-content.open');
+      if (openGroup) {
+        toggleSettingsGroup(openGroup.id);
+      } else {
+        settingsCancel();
+      }
+      return;
+    }
+    if (typeof getActiveSectionId === 'function' && getActiveSectionId()) {
       setActiveSection(null);
-    } else if (typeof habitsVisible !== 'undefined' && habitsVisible) {
+      return;
+    }
+    if (typeof habitsVisible !== 'undefined' && habitsVisible) {
       toggleHabits();
+      return;
     }
   });
 });
