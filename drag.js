@@ -208,6 +208,7 @@
   sgGrid.addEventListener('pointerdown', e => {
     const item = e.target.closest('.settings-group-item');
     if (!item || sgDrag) return;
+    if (window._interactEnabled === false) return;
     e.preventDefault();
     const rect = item.getBoundingClientRect();
     sgDrag = {
