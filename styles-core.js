@@ -1,4 +1,7 @@
 // ── IndexedDB image store ──────────────────────────────────
+if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(() => {});
+  }
   const ImgDB = (() => {
     let db = null;
     function open() {
@@ -101,9 +104,17 @@
     const saved = JSON.parse(localStorage.getItem("_appStyle"));
     if (saved) appStyle = Object.assign({}, APP_STYLE_DEFAULTS, saved);
   } catch {}
-  ImgDB.get("bgImage").then(img => {
-    if (img) { appStyle.imgData = img; applyAppStyle(); }
-  }).catch(() => {});
+  (async function loadBgImage() {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        const img = await ImgDB.get("bgImage");
+        if (img) { appStyle.imgData = img; applyAppStyle(); }
+        return;
+      } catch (e) {
+        if (attempt < 3) await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+      }
+    }
+  })();
 
   function buildAppBg() {
     const t = appStyle.bgType;
