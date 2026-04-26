@@ -941,9 +941,8 @@ window.addEventListener('load', function() {
   }, { once: true, passive: true });
   window.addEventListener('popstate', function() {
     if (document.getElementById('manage-overlay').classList.contains('active')) {
-      manageClose(); return;
-    }
-    if (document.getElementById('settings-overlay').classList.contains('active')) {
+      manageClose();
+    } else if (document.getElementById('settings-overlay').classList.contains('active')) {
       var openGroup = null;
       document.querySelectorAll('.settings-group-content').forEach(function(el) {
         if (el.classList.contains('open')) openGroup = el;
@@ -955,13 +954,10 @@ window.addEventListener('load', function() {
       } else {
         settingsCancel();
       }
-      return;
-    }
-    if (typeof getActiveSectionId === 'function' && getActiveSectionId()) {
-      setActiveSection(null); return;
-    }
-    if (typeof habitsVisible !== 'undefined' && habitsVisible) {
-      toggleHabits(); return;
+    } else if (typeof getActiveSectionId === 'function' && getActiveSectionId()) {
+      setActiveSection(null);
+    } else if (typeof habitsVisible !== 'undefined' && habitsVisible) {
+      toggleHabits();
     }
     history.pushState({panel:'base'}, '');
   });
