@@ -864,6 +864,7 @@ _btnStyles = {};
       const item = e.target.closest('[' + itemAttr + ']');
       if (!item || rDrag) return;
       e.preventDefault();
+      grid.setPointerCapture(e.pointerId);
       const rect = item.getBoundingClientRect();
       rDrag = {
         item, startX: e.clientX, startY: e.clientY,
