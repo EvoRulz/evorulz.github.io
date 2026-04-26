@@ -771,6 +771,7 @@ _btnStyles = {};
       if (e.target.closest('input, select, button, textarea')) return;
       const item = e.target.closest('[data-slider-row]');
       if (!item || srDrag) return;
+      e.preventDefault();
       if (!item) return;
       e.preventDefault();
       e.stopPropagation();
