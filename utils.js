@@ -112,3 +112,16 @@ async function toggleOrientLock() {
   _updateOrientBtn();
   if (window._cfRender) window._cfRender();
 }
+window._dragEnabled = true;
+  window._interactEnabled = true;
+  function ctrlToggleDrag() {
+    window._dragEnabled = !window._dragEnabled;
+    const t = document.getElementById('drag-toggle');
+    if (t) t.classList.toggle('on', window._dragEnabled);
+  }
+  function ctrlToggleInteract() {
+    window._interactEnabled = !window._interactEnabled;
+    const t = document.getElementById('interact-toggle');
+    if (t) t.classList.toggle('on', window._interactEnabled);
+    document.body.classList.toggle('interact-locked', !window._interactEnabled);
+  }

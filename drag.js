@@ -6,6 +6,7 @@
     const btn = e.target.closest(".tracker-btn[data-id]");
     if (!btn) return;
     if (drag) return;
+    if (window._dragEnabled === false) return;
     e.preventDefault();
     const rect = btn.getBoundingClientRect();
     drag = {
@@ -66,8 +67,10 @@
       saveButtonOrder();
       drag.btn.style.background = "";
     } else {
-      const currentlyOpen = getActiveSectionId();
-      setActiveSection(currentlyOpen === drag.id ? null : drag.id);
+      if (window._interactEnabled !== false) {
+        const currentlyOpen = getActiveSectionId();
+        setActiveSection(currentlyOpen === drag.id ? null : drag.id);
+      }
     }
     drag = null;
   });
@@ -112,6 +115,7 @@
     const item = e.target.closest(".top-item");
     if (!item) return;
     if (tdrag) return;
+    if (window._dragEnabled === false) return;
     e.preventDefault();
     const rect = item.getBoundingClientRect();
     tdrag = {
@@ -203,6 +207,7 @@
   sgGrid.addEventListener('pointerdown', e => {
     const item = e.target.closest('.settings-group-item');
     if (!item || sgDrag) return;
+    if (window._dragEnabled === false) return;
     e.preventDefault();
     const rect = item.getBoundingClientRect();
     sgDrag = {
