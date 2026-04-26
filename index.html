@@ -32,6 +32,9 @@
     .slider-row-handle { display:none; }
     [data-slider-row] { touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none; }
     [data-slider-row]:active { cursor:grabbing; }
+    [data-btn-row] { touch-action:none; user-select:none; -webkit-user-select:none; }
+    [data-btn-row] > label { cursor:grab; }
+    [data-btn-row] > label:active { cursor:grabbing; }
     #settings-groups-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
     .settings-group-item { padding:8px 10px; background:#2a2a2a; border:1px solid #444; border-radius:6px; color:#aaa; cursor:grab; font-size:13px; text-align:center; touch-action:none; user-select:none; -webkit-user-select:none; box-sizing:border-box; }
     .settings-group-item:active { cursor:grabbing; }
@@ -700,7 +703,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v724</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v725</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -770,7 +773,7 @@ input[type="checkbox"]:hover {
       <div id="cf-outer" style="margin-left:-20px;margin-right:-20px;">
         <div id="cf-stage"></div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-btn-row="bg">
         <label>Background colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-bg" oninput="onColorPickerChange('s-bg')">
@@ -781,7 +784,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-bg',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-btn-row="fg">
         <label>Text colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-fg" oninput="onColorPickerChange('s-fg')">
@@ -792,7 +795,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-fg',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-btn-row="glow">
         <label>Glow colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-glow" oninput="onColorPickerChange('s-glow')">
@@ -803,7 +806,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-glow',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-btn-row="activeglow">
         <label>Active glow colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-activeglow" oninput="onColorPickerChange('s-activeglow')">
@@ -814,7 +817,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-activeglow',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-btn-row="activebg">
         <label>Active background</label>
         <div class="color-picker-row">
           <input type="color" id="s-activebg" oninput="onColorPickerChange('s-activebg')">
@@ -825,7 +828,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-activebg',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-btn-row="tap">
         <label>Tap colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-tap" oninput="onColorPickerChange('s-tap')">
@@ -836,11 +839,11 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-tap',this)">Copy</button>
         </div>
       </div>
-      <div class="settings-row">
+      <div class="settings-row" data-btn-row="radius">
         <label>Corner radius <span id="s-radius-val">6px</span></label>
         <input type="range" class="alpha-slider" id="s-radius" min="0" max="50" value="6" oninput="document.getElementById('s-radius-val').textContent=this.value+'px';settingsChange()">
       </div>
-        <div class="settings-row">
+        <div class="settings-row" data-btn-row="font">
         <label>Font</label>
         <select id="s-font" onchange="settingsChange()" style="display:none">
           <option value="sans-serif">Sans-serif</option>

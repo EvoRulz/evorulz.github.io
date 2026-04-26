@@ -837,3 +837,94 @@ _btnStyles = {};
     });
     applySliderRowOrder();
   })();
+  function makeRowsDraggable(containerId, itemAttr, saveKey) {
+    const DRAG_THRESHOLD = 6;
+    let rDrag = null;
+    const grid = document.getElementById(containerId);
+    if (!grid) return;
+    function saveOrder() {
+      const order = [...grid.querySelectorAll('[' + itemAttr + ']')].map(el => el.getAttribute(itemAttr));
+      localStorage.setItem(saveKey, JSON.stringify(order));
+    }
+    function applyOrder() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(saveKey));
+        if (!Array.isArray(saved)) return;
+        saved.forEach(id => {
+          const item = grid.querySelector('[' + itemAttr + '="' + id + '"]');
+          if (item) grid.appendChild(item);
+        });
+        grid.querySelectorAll('[' + itemAttr + ']').forEach(item => {
+          if (!saved.includes(item.getAttribute(itemAttr))) grid.appendChild(item);
+        });
+      } catch {}
+    }
+    grid.addEventListener('pointerdown', e => {
+      if (e.target.closest('input, select, button, textarea')) return;
+      const item = e.target.closest('[' + itemAttr + ']');
+      if (!item || rDrag) return;
+      e.preventDefault();
+      const rect = item.getBoundingClientRect();
+      rDrag = {
+        item, startX: e.clientX, startY: e.clientY,
+        offX: e.clientX - rect.left, offY: e.clientY - rect.top,
+        w: rect.width, h: rect.height,
+        ghost: null, lastOver: null, active: false,
+      };
+    });
+    document.addEventListener('pointermove', e => {
+      if (!rDrag) return;
+      if (!rDrag.active) {
+        if (Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY) < DRAG_THRESHOLD) return;
+        rDrag.active = true;
+        const rect = rDrag.item.getBoundingClientRect();
+        rDrag.ghost = rDrag.item.cloneNode(true);
+        Object.assign(rDrag.ghost.style, {
+          position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
+          width: rect.width + 'px', height: rect.height + 'px',
+          pointerEvents: 'none', opacity: '0.75', zIndex: '9999',
+          margin: '0', boxSizing: 'border-box',
+        });
+        (document.getElementById('settings-overlay') || document.body).appendChild(rDrag.ghost);
+        rDrag.item.style.opacity = '0.3';
+      }
+      rDrag.ghost.style.left = (e.clientX - rDrag.offX) + 'px';
+      rDrag.ghost.style.top  = (e.clientY - rDrag.offY) + 'px';
+      const gcx = e.clientX - rDrag.offX + rDrag.w / 2;
+      const gcy = e.clientY - rDrag.offY + rDrag.h / 2;
+      let over = null;
+      for (const t of grid.querySelectorAll('[' + itemAttr + ']')) {
+        if (t === rDrag.item) continue;
+        const r = t.getBoundingClientRect();
+        if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
+      }
+      if (!over) { rDrag.lastOver = null; return; }
+      if (over === rDrag.lastOver) return;
+      rDrag.lastOver = over;
+      const overNext = over.nextSibling, iNext = rDrag.item.nextSibling;
+      if (iNext === over)                grid.insertBefore(over, rDrag.item);
+      else if (overNext === rDrag.item)  grid.insertBefore(rDrag.item, over);
+      else {
+        grid.insertBefore(rDrag.item, overNext || null);
+        grid.insertBefore(over, iNext || null);
+      }
+    });
+    document.addEventListener('pointerup', () => {
+      if (!rDrag) return;
+      if (rDrag.active) {
+        rDrag.item.style.opacity = '';
+        if (rDrag.ghost) rDrag.ghost.remove();
+        saveOrder();
+      }
+      rDrag = null;
+    });
+    document.addEventListener('pointercancel', () => {
+      if (!rDrag) return;
+      rDrag.item.style.opacity = '';
+      if (rDrag.ghost) rDrag.ghost.remove();
+      rDrag = null;
+    });
+    applyOrder();
+  }
+
+  makeRowsDraggable('sg-buttons', 'data-btn-row', '_btnRowOrder');
