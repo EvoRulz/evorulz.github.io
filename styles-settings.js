@@ -936,9 +936,7 @@ makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 
 window.addEventListener('load', function() {
-  document.addEventListener('touchstart', function() {
-    history.pushState({panel:'base'}, '');
-  }, { once: true, passive: true });
+  history.pushState({panel:'base'}, '');
   window.addEventListener('popstate', function() {
     if (document.getElementById('manage-overlay').classList.contains('active')) {
       manageClose();
@@ -959,6 +957,6 @@ window.addEventListener('load', function() {
     } else if (typeof habitsVisible !== 'undefined' && habitsVisible) {
       toggleHabits();
     }
-    history.pushState({panel:'base'}, '');
+    setTimeout(function() { history.pushState({panel:'base'}, ''); }, 0);
   });
 });
