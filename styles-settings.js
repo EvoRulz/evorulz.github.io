@@ -774,7 +774,6 @@ _btnStyles = {};
       if (e.target.closest('input, select, button, textarea')) return;
       const item = e.target.closest('[data-slider-row]');
       if (!item || srDrag) return;
-      if (window._dragEnabled === false) return;
       e.preventDefault();
       if (!item || srDrag) return;
       e.preventDefault();
@@ -791,6 +790,7 @@ _btnStyles = {};
       if (!srDrag) return;
       if (!srDrag.active) {
         if (Math.hypot(e.clientX - srDrag.startX, e.clientY - srDrag.startY) < DRAG_THRESHOLD) return;
+        if (window._dragEnabled === false) { srDrag = null; return; }
         srDrag.active = true;
         const rect = srDrag.item.getBoundingClientRect();
         srDrag.ghost = srDrag.item.cloneNode(true);
@@ -867,7 +867,6 @@ _btnStyles = {};
       if (e.target.closest('input, select, button, textarea')) return;
       const item = e.target.closest('[' + itemAttr + ']');
       if (!item || rDrag) return;
-      if (window._dragEnabled === false) return;
       e.preventDefault();
       grid.setPointerCapture(e.pointerId);
       const rect = item.getBoundingClientRect();
@@ -882,6 +881,7 @@ _btnStyles = {};
       if (!rDrag) return;
       if (!rDrag.active) {
         if (Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY) < DRAG_THRESHOLD) return;
+        if (window._dragEnabled === false) { rDrag = null; return; }
         rDrag.active = true;
         const rect = rDrag.item.getBoundingClientRect();
         rDrag.ghost = rDrag.item.cloneNode(true);

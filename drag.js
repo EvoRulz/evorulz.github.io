@@ -115,7 +115,6 @@
     const item = e.target.closest(".top-item");
     if (!item) return;
     if (tdrag) return;
-    if (window._dragEnabled === false) return;
     e.preventDefault();
     const rect = item.getBoundingClientRect();
     tdrag = {
@@ -130,6 +129,7 @@
     if (!tdrag) return;
     if (!tdrag.active) {
       if (Math.hypot(e.clientX - tdrag.startX, e.clientY - tdrag.startY) < DRAG_THRESHOLD) return;
+      if (window._dragEnabled === false) { tdrag = null; return; }
       tdrag.active = true;
       const rect = tdrag.item.getBoundingClientRect();
       tdrag.ghost = tdrag.item.cloneNode(true);
@@ -207,7 +207,6 @@
   sgGrid.addEventListener('pointerdown', e => {
     const item = e.target.closest('.settings-group-item');
     if (!item || sgDrag) return;
-    if (window._dragEnabled === false) return;
     e.preventDefault();
     const rect = item.getBoundingClientRect();
     sgDrag = {
@@ -222,6 +221,7 @@
     if (!sgDrag) return;
     if (!sgDrag.active) {
       if (Math.hypot(e.clientX - sgDrag.startX, e.clientY - sgDrag.startY) < DRAG_THRESHOLD) return;
+      if (window._dragEnabled === false) { sgDrag = null; return; }
       sgDrag.active = true;
       const rect = sgDrag.item.getBoundingClientRect();
       sgDrag.ghost = sgDrag.item.cloneNode(true);
