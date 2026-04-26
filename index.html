@@ -703,7 +703,7 @@ input[type="checkbox"]:hover {
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v725</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v726</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -986,8 +986,8 @@ input[type="checkbox"]:hover {
         </div>
       </div>
       <div class="settings-group-content" id="sg-clock">
-      <div id="clock-tumbler-wrap"></div>
-      <div class="color-settings-row">
+      <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
+      <div class="color-settings-row"data-clock-row="datecolor">
         <label>Date colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-date-color" oninput="onColorPickerChange('s-clock-date-color')">
@@ -998,7 +998,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-clock-date-color',this)">Copy</button>
         </div>
       </div>
-      <div class="settings-row">
+      <div class="settings-row" data-clock-row="datesize">
         <label>Date size</label>
         <select id="s-clock-date-size" onchange="settingsChange()">
           <option value="10">10px</option>
@@ -1012,7 +1012,7 @@ input[type="checkbox"]:hover {
           <option value="24">24px</option>
         </select>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-clock-row="timecolor">
         <label>Time colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-time-color" oninput="onColorPickerChange('s-clock-time-color')">
@@ -1023,7 +1023,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-clock-time-color',this)">Copy</button>
         </div>
       </div>
-      <div class="settings-row">
+      <div class="settings-row" data-clock-row="timesize">
         <label>Time size</label>
         <select id="s-clock-time-size" onchange="settingsChange()">
           <option value="10">10px</option>
@@ -1037,7 +1037,7 @@ input[type="checkbox"]:hover {
           <option value="24">24px</option>
         </select>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-clock-row="datebg">
         <label>Date background</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-date-bg" oninput="onColorPickerChange('s-clock-date-bg')">
@@ -1048,7 +1048,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-clock-date-bg',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-clock-row="timebg">
         <label>Time background</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-time-bg" oninput="onColorPickerChange('s-clock-time-bg')">
@@ -1059,7 +1059,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-clock-time-bg',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-clock-row="dateglow">
         <label>Date glow</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-date-glow" oninput="onColorPickerChange('s-clock-date-glow')">
@@ -1070,7 +1070,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-clock-date-glow',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-clock-row="timeglow">
         <label>Time glow</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-time-glow" oninput="onColorPickerChange('s-clock-time-glow')">
@@ -1081,17 +1081,17 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-clock-time-glow',this)">Copy</button>
         </div>
       </div>
-      <div class="settings-row">
+      <div class="settings-row" data-clock-row="dateradius">
         <label>Date corner radius <span id="s-clock-date-radius-val">6px</span></label>
         <input type="range" class="alpha-slider" id="s-clock-date-radius" min="0" max="50" value="6" oninput="document.getElementById('s-clock-date-radius-val').textContent=this.value+'px';settingsChange()">
       </div>
-      <div class="settings-row">
+      <div class="settings-row" data-clock-row="timeradius:">
         <label>Time corner radius <span id="s-clock-time-radius-val">6px</span></label>
         <input type="range" class="alpha-slider" id="s-clock-time-radius" min="0" max="50" value="6" oninput="document.getElementById('s-clock-time-radius-val').textContent=this.value+'px';settingsChange()">
       </div>
       </div>
     <div class="settings-group-content" id="sg-checkboxes">
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-checkbox-row="checked">
         <label>Checked background</label>
         <div class="color-picker-row">
           <input type="color" id="s-checkbox-checked" oninput="onColorPickerChange('s-checkbox-checked')">
@@ -1102,7 +1102,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-checkbox-checked',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-checkbox-row="mark">
         <label>Checkmark colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-checkbox-mark" oninput="onColorPickerChange('s-checkbox-mark')">
@@ -1113,7 +1113,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-checkbox-mark',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-checkbox-row="border">
         <label>Border colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-checkbox-border" oninput="onColorPickerChange('s-checkbox-border')">
@@ -1124,7 +1124,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-checkbox-border',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-checkbox-row="bg">
         <label>Box background</label>
         <div class="color-picker-row">
           <input type="color" id="s-checkbox-bg" oninput="onColorPickerChange('s-checkbox-bg')">
@@ -1135,7 +1135,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-checkbox-bg',this)">Copy</button>
         </div>
       </div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #444">
+      <div data-checkbox-row="demo" style="margin-top:12px;padding-top:12px;border-top:1px solid #444">
         <label style="font-size:13px;color:#bbb">Demo:</label>
         <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
           <input type="checkbox" id="settings-checkbox" checked style="width:20px;height:20px;cursor:pointer">
@@ -1269,7 +1269,7 @@ input[type="checkbox"]:hover {
         </div>
       </div>
       <!-- Text / UI colours -->
-      <div class="color-settings-row" style="margin-top:8px">
+      <div class="color-settings-row" data-app-row="text" style="margin-top:8px">
         <label>Page text colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-app-text" oninput="onColorPickerChange('s-app-text')">
@@ -1280,7 +1280,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-app-text',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-app-row="border">
         <label>Table border colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-app-border" oninput="onColorPickerChange('s-app-border')">
@@ -1291,7 +1291,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-app-border',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-app-row="thead">
         <label>Table header background</label>
         <div class="color-picker-row">
           <input type="color" id="s-app-thead" oninput="onColorPickerChange('s-app-thead')">
@@ -1302,7 +1302,7 @@ input[type="checkbox"]:hover {
           <button class="copy-btn" onclick="copyHex('s-app-thead',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row">
+      <div class="color-settings-row" data-app-row="cellbg">
         <label>Table cell background</label>
         <div class="color-picker-row">
           <input type="color" id="s-app-cell-bg" oninput="onColorPickerChange('s-app-cell-bg')">

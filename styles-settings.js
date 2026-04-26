@@ -927,4 +927,7 @@ _btnStyles = {};
     applyOrder();
   }
 
-  makeRowsDraggable('sg-buttons', 'data-btn-row', '_btnRowOrder');
+makeRowsDraggable('sg-buttons', 'data-btn-row', '_btnRowOrder');
+makeRowsDraggable('sg-app', 'data-app-row', '_appRowOrder');
+makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
+makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
