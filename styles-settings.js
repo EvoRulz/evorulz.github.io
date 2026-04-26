@@ -937,7 +937,9 @@ makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 
 window.addEventListener('load', function() {
   history.pushState({panel:'base'}, '');
+  var _goingForward = false;
   window.addEventListener('popstate', function() {
+    if (_goingForward) { _goingForward = false; return; }
     if (document.getElementById('manage-overlay').classList.contains('active')) {
       manageClose();
     } else if (document.getElementById('settings-overlay').classList.contains('active')) {
@@ -957,6 +959,7 @@ window.addEventListener('load', function() {
     } else if (typeof habitsVisible !== 'undefined' && habitsVisible) {
       toggleHabits();
     }
-    setTimeout(function() { history.pushState({panel:'base'}, ''); }, 0);
+    _goingForward = true;
+    history.go(1);
   });
 });
