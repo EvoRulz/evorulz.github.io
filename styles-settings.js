@@ -363,7 +363,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     buildStopPickers();
     settingsUpdatePreview();
     document.getElementById("settings-overlay").classList.add("active");
-    history.pushState({ panel: 'settings' }, '');
     if (typeof cfSyncTuningUI !== 'undefined') if (window.cfSyncTuningUI) window.cfSyncTuningUI();
     if (window._cfBuild) {
       window._cfBuild();
@@ -385,9 +384,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   }
   function settingsClose() {
     document.getElementById("settings-overlay").classList.remove("active");
-    if (!_settingsClosingFromUI && history.state && history.state.panel === 'settings') {
-      history.back();
-    }
   }
   async function settingsSave() {
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
@@ -937,11 +933,14 @@ makeRowsDraggable('sg-app', 'data-app-row', '_appRowOrder');
 makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 
-let _settingsClosingFromUI = false;
+history.pushState({ panel: 'nav' }, '');
 window.addEventListener('popstate', function() {
+  history.pushState({ panel: 'nav' }, '');
   if (document.getElementById('settings-overlay').classList.contains('active')) {
-    _settingsClosingFromUI = true;
     settingsCancel();
-    _settingsClosingFromUI = false;
+  } else if (getActiveSectionId()) {
+    setActiveSection(null);
+  } else if (habitsVisible) {
+    toggleHabits();
   }
 });
