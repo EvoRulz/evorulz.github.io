@@ -768,9 +768,9 @@ _btnStyles = {};
     const grid = document.getElementById('sg-sliders');
     if (!grid) return;
     grid.addEventListener('pointerdown', e => {
-      const handle = e.target.closest('.slider-row-handle');
-      if (!handle || srDrag) return;
-      const item = handle.closest('[data-slider-row]');
+      if (e.target.closest('input, select, button, textarea')) return;
+      const item = e.target.closest('[data-slider-row]');
+      if (!item || srDrag) return;
       if (!item) return;
       e.preventDefault();
       e.stopPropagation();
