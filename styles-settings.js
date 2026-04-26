@@ -933,14 +933,16 @@ makeRowsDraggable('sg-app', 'data-app-row', '_appRowOrder');
 makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 
-history.pushState({ panel: 'nav' }, '');
-window.addEventListener('popstate', function() {
+window.addEventListener('load', function() {
   history.pushState({ panel: 'nav' }, '');
-  if (document.getElementById('settings-overlay').classList.contains('active')) {
-    settingsCancel();
-  } else if (getActiveSectionId()) {
-    setActiveSection(null);
-  } else if (habitsVisible) {
-    toggleHabits();
-  }
+  window.addEventListener('popstate', function() {
+    history.pushState({ panel: 'nav' }, '');
+    if (document.getElementById('settings-overlay').classList.contains('active')) {
+      settingsCancel();
+    } else if (typeof getActiveSectionId === 'function' && getActiveSectionId()) {
+      setActiveSection(null);
+    } else if (typeof habitsVisible !== 'undefined' && habitsVisible) {
+      toggleHabits();
+    }
+  });
 });
