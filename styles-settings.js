@@ -381,6 +381,18 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
       }
     }
     if(window.fontPickerSync)fontPickerSync();
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.hex-input').forEach(hexEl => {
+        if (hexEl.value) return;
+        const id = hexEl.id.replace('-hex', '');
+        const picker = document.getElementById(id);
+        const slider = document.getElementById(id + '-alpha');
+        if (!picker) return;
+        const h = picker.value.replace('#', '').toUpperCase();
+        const a = slider ? parseInt(slider.value).toString(16).padStart(2,'0').toUpperCase() : 'FF';
+        hexEl.value = '#' + h + a;
+      });
+    });
     history.pushState({panel:'settings'}, '');
     } catch(e) { alert("settingsOpen error: " + e.message + "\n" + e.stack); }
   }
@@ -452,11 +464,12 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
           setColorValue('s-activeglow', btnStyle.activeGlow || btnStyle.glow);
           setColorValue('s-activebg', btnStyle.activeBg);
           setColorValue('s-tap',      btnStyle.tap);
-          setColorValue('s-sliderborder',  btnStyle.sliderBorder);
+          setColorValue('s-sliderborder', btnStyle.sliderBorder || '#555555FF');
           setColorValue('s-sliderfill',    btnStyle.sliderFill   || '#9659FFFF');
           setColorValue('s-slidertrack',   btnStyle.sliderTrack  || '#333333FF');
           setColorValue('s-sliderhandle',  btnStyle.sliderHandle || '#FFFFFFFF');
           setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
+          
           const _sv = (id, val) => { const el = document.getElementById(id); if (el) el.value = String(val); };
           _sv('s-sliderh',       btnStyle.sliderH);
           _sv('s-sliderr',       btnStyle.sliderR);
