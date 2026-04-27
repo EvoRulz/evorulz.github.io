@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v782";
+const CACHE = "habit-tracker-v783";
 
 const ASSETS = [
   "./",
