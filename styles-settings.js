@@ -792,6 +792,7 @@ _btnStyles = {};
     function srCancel() {
       clearTimeout(srHoldTimer); srHoldTimer = null; srReady = false;
       grid.style.touchAction = '';
+    const _so = document.getElementById('settings-overlay'); if (_so) _so.style.touchAction = '';
       if (srDrag) {
         srDrag.item.style.boxShadow = '';
         srDrag.item.style.opacity = '';
@@ -822,7 +823,8 @@ _btnStyles = {};
         if (srDrag) {
           srReady = true;
           srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-          grid.style.touchAction = 'none';
+        grid.style.touchAction = 'none';
+        const _so = document.getElementById('settings-overlay'); if (_so) _so.style.touchAction = 'none';
         }
       }, 500);
     });
@@ -880,6 +882,7 @@ _btnStyles = {};
       if (!srDrag) return;
       const wasActive = srDrag.active;
       grid.style.touchAction = '';
+      const _so2 = document.getElementById('settings-overlay'); if (_so2) _so2.style.touchAction = '';
       srCancel();
       if (wasActive) saveSliderRowOrder();
     };
