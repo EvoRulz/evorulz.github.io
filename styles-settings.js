@@ -812,12 +812,14 @@ _btnStyles = {};
         pointerId: e.pointerId,
       };
       srReady = false;
+      e.preventDefault();
+      grid.setPointerCapture(e.pointerId);
       srHoldTimer = setTimeout(() => {
         if (srDrag) {
           srReady = true;
           srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         }
-      }, 1000);
+      }, 500);
     });
 
     grid.addEventListener('pointermove', e => {
@@ -831,7 +833,6 @@ _btnStyles = {};
         if (moved < 4) return;
         srDrag.active = true;
         srDrag.item.style.boxShadow = '';
-        grid.setPointerCapture(srDrag.pointerId);
         const rect = srDrag.item.getBoundingClientRect();
         srDrag.offX = srDrag.startX - rect.left;
         srDrag.offY = srDrag.startY - rect.top;
