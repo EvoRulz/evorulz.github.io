@@ -783,51 +783,58 @@ _btnStyles = {};
     } catch {}
   }
   (function() {
-    const DRAG_THRESHOLD = 6;
     let srDrag = null;
+    let srHoldTimer = null;
+    let srReady = false;
     const grid = document.getElementById('sg-sliders');
     if (!grid) return;
-    var _srHoldTimer = null;
-    var _srPending = null;
+
+    function srCancel() {
+      clearTimeout(srHoldTimer); srHoldTimer = null; srReady = false;
+      if (srDrag) {
+        srDrag.item.style.boxShadow = '';
+        srDrag.item.style.opacity = '';
+        if (srDrag.ghost) { srDrag.ghost.remove(); srDrag.ghost = null; }
+      }
+      srDrag = null;
+    }
 
     grid.addEventListener('pointerdown', e => {
-      if (e.target.closest('input, select, button, textarea')) return;
+      if (e.target.closest('input, select, button, textarea, .alpha-slider, [class*="overlay"]')) return;
       const item = e.target.closest('[data-slider-row]');
       if (!item || srDrag) return;
       const rect = item.getBoundingClientRect();
-      _srPending = {
+      srDrag = {
         item, startX: e.clientX, startY: e.clientY,
         offX: e.clientX - rect.left, offY: e.clientY - rect.top,
         w: rect.width, h: rect.height,
         ghost: null, lastOver: null, active: false,
         pointerId: e.pointerId,
       };
-      _srHoldTimer = setTimeout(() => {
-        if (_srPending) {
-          srDrag = _srPending;
-          _srPending.item.classList.add('sr-drag-ready');
+      srReady = false;
+      srHoldTimer = setTimeout(() => {
+        if (srDrag) {
+          srReady = true;
+          srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         }
       }, 1000);
     });
+
     grid.addEventListener('pointermove', e => {
-      if (_srPending && !srDrag) {
-        const dx = e.clientX - _srPending.startX;
-        const dy = e.clientY - _srPending.startY;
-        if (Math.hypot(dx, dy) > 8) {
-          clearTimeout(_srHoldTimer);
-          _srHoldTimer = null;
-          _srPending = null;
-          return;
-        }
-      }
       if (!srDrag) return;
+      const moved = Math.hypot(e.clientX - srDrag.startX, e.clientY - srDrag.startY);
+      if (!srReady) {
+        if (moved > 10) srCancel();
+        return;
+      }
       if (!srDrag.active) {
-        if (Math.hypot(e.clientX - srDrag.startX, e.clientY - srDrag.startY) < DRAG_THRESHOLD) return;
-        if (window._dragEnabled === false) { srDrag = null; return; }
+        if (moved < 4) return;
         srDrag.active = true;
+        srDrag.item.style.boxShadow = '';
         grid.setPointerCapture(srDrag.pointerId);
-        e.preventDefault();
         const rect = srDrag.item.getBoundingClientRect();
+        srDrag.offX = srDrag.startX - rect.left;
+        srDrag.offY = srDrag.startY - rect.top;
         srDrag.ghost = srDrag.item.cloneNode(true);
         Object.assign(srDrag.ghost.style, {
           position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
@@ -838,6 +845,7 @@ _btnStyles = {};
         (document.getElementById('settings-overlay') || document.body).appendChild(srDrag.ghost);
         srDrag.item.style.opacity = '0.3';
       }
+      e.preventDefault();
       srDrag.ghost.style.left = (e.clientX - srDrag.offX) + 'px';
       srDrag.ghost.style.top  = (e.clientY - srDrag.offY) + 'px';
       const gcx = e.clientX - srDrag.offX + srDrag.w / 2;
@@ -859,29 +867,15 @@ _btnStyles = {};
         grid.insertBefore(over, iNext || null);
       }
     });
-    grid.addEventListener('pointerup', () => {
-      clearTimeout(_srHoldTimer);
-      _srHoldTimer = null;
-      if (_srPending) { _srPending.item.classList.remove('sr-drag-ready'); _srPending = null; }
+
+    const srUp = () => {
       if (!srDrag) return;
-      srDrag.item.classList.remove('sr-drag-ready');
-      if (srDrag.active) {
-        srDrag.item.style.opacity = '';
-        if (srDrag.ghost) srDrag.ghost.remove();
-        saveSliderRowOrder();
-      }
-      srDrag = null;
-    });
-    grid.addEventListener('pointercancel', () => {
-      clearTimeout(_srHoldTimer);
-      _srHoldTimer = null;
-      if (_srPending) { _srPending.item.classList.remove('sr-drag-ready'); _srPending = null; }
-      if (!srDrag) return;
-      srDrag.item.classList.remove('sr-drag-ready');
-      srDrag.item.style.opacity = '';
-      if (srDrag.ghost) srDrag.ghost.remove();
-      srDrag = null;
-    });
+      const wasActive = srDrag.active;
+      srCancel();
+      if (wasActive) saveSliderRowOrder();
+    };
+    grid.addEventListener('pointerup', srUp);
+    grid.addEventListener('pointercancel', srCancel);
     applySliderRowOrder();
   })();
   function makeRowsDraggable(containerId, itemAttr, saveKey) {
