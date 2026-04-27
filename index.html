@@ -29,7 +29,7 @@
     .copy-btn { background:#2a2a2a; border:1px solid #555; border-radius:4px; color:#aaa; cursor:pointer; padding:4px 10px; font-size:12px; flex-shrink:0; }
     .copy-btn:hover { background:#3a3a3a; color:#fff; }
     .copy-btn.copied { color:#99ff99; border-color:#99ff99; }
-    .slider-row-handle { display: inline-block; cursor: grab; padding: 0 4px; color: #555; font-size: 16px; user-select: none; -webkit-user-select: none; }
+    .slider-row-handle { display:none; }
     [data-slider-row] { cursor:grab; user-select:none; -webkit-user-select:none; }
     [data-slider-row]:active { cursor:grabbing; }
     [data-btn-row] { user-select:none; -webkit-user-select:none; }
@@ -1537,6 +1537,8 @@ var dragging = false;
     var handleW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-w'))||16;
     var ratio = (parseFloat(s.value)-min)/(max-min);
     var thumbCX = rect.left + ratio*(rect.width-handleW) + handleW/2;
+    var hitRadius = Math.max(handleW, 28);
+    if (Math.abs(e.clientX - thumbCX) > hitRadius) return;
     e.preventDefault();
     e.stopPropagation();
     dragging = true;
