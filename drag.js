@@ -18,21 +18,12 @@
   });
 
   buttonsEl.addEventListener("pointerup", e => {
-    if (window._dragEnabled === false) {
-      if (window._interactEnabled === false) return;
-      if (!drag) return;
-      const id = drag.id;
-      drag = null;
-      const currentlyOpen = getActiveSectionId();
-      setActiveSection(currentlyOpen === id ? null : id);
-      return;
-    }
-    if (!drag || drag.active) return;
-    if (window._interactEnabled === false) return;
-    const id = drag.id;
-    drag = null;
-    const currentlyOpen = getActiveSectionId();
-    setActiveSection(currentlyOpen === id ? null : id);
+  if (!drag || drag.active) return;
+  if (window._interactEnabled === false) return;
+  const id = drag.id;
+  drag = null;
+  const currentlyOpen = getActiveSectionId();
+  setActiveSection(currentlyOpen === id ? null : id);
   });
 
   document.addEventListener("pointermove", e => {
