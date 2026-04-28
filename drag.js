@@ -136,7 +136,7 @@
     if (!tdrag) return;
     if (!tdrag.active) {
       if (Math.hypot(e.clientX - tdrag.startX, e.clientY - tdrag.startY) < DRAG_THRESHOLD) return;
-      if (window._dragEnabled === false) { tdrag = null; return; }
+      if (window._dragEnabled === false) return;
       tdrag.active = true;
       const rect = tdrag.item.getBoundingClientRect();
       tdrag.ghost = tdrag.item.cloneNode(true);
