@@ -21,7 +21,7 @@
     if (!drag) return;
     if (!drag.active) {
       if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < DRAG_THRESHOLD) return;
-      if (window._dragEnabled === false) { drag = null; return; }
+      if (window._dragEnabled === false) return;
       drag.active = true;
       const rect = drag.btn.getBoundingClientRect();
       drag.ghost = drag.btn.cloneNode(true);
@@ -67,10 +67,8 @@
       saveButtonOrder();
       drag.btn.style.background = "";
     } else {
-      if (window._interactEnabled !== false) {
-        const currentlyOpen = getActiveSectionId();
-        setActiveSection(currentlyOpen === drag.id ? null : drag.id);
-      }
+      const currentlyOpen = getActiveSectionId();
+      setActiveSection(currentlyOpen === drag.id ? null : drag.id);
     }
     drag = null;
   });
