@@ -1,5 +1,4 @@
-<style>
-    * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
+* { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
     *::-webkit-scrollbar { display: none; width: 0; height: 0; }
     .color-settings-row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
     .color-settings-row > label { font-size:13px; color:#bbb; width:100%; }
@@ -723,7 +722,10 @@ input[type="checkbox"]:hover {
     body.interact-locked #orient-lock-btn { pointer-events: none; }
     body.interact-locked #live-date { pointer-events: none; }
     body.interact-locked #live-time { pointer-events: none; }
-    body.interact-locked .title-span { pointer-events: none; }
+    body.interact-locked .title-span { pointer-events: none !important; }
+    body.interact-locked .top-item[data-item="version"] { pointer-events: none; }
+    body.interact-locked .top-item[data-item="date"] { pointer-events: none; }
+    body.interact-locked .top-item[data-item="time"] { pointer-events: none; }
     body.interact-locked .alpha-slider { pointer-events: none; }
     body.interact-locked .tumb-window { pointer-events: none; }
     body.interact-locked .font-tumbler-wrap { pointer-events: none; }
@@ -736,4 +738,3 @@ input[type="checkbox"]:hover {
     body.interact-locked #settings-footer button { pointer-events: none; }
     body.interact-locked .cf-arrow { pointer-events: none; }
     body { padding-bottom: 68px !important; }
-  </style>

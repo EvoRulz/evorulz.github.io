@@ -6,7 +6,6 @@
     const btn = e.target.closest(".tracker-btn[data-id]");
     if (!btn) return;
     if (drag) return;
-    if (window._dragEnabled === false) return;
     e.preventDefault();
     const rect = btn.getBoundingClientRect();
     drag = {
@@ -22,6 +21,7 @@
     if (!drag) return;
     if (!drag.active) {
       if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < DRAG_THRESHOLD) return;
+      if (window._dragEnabled === false) { drag = null; return; }
       drag.active = true;
       const rect = drag.btn.getBoundingClientRect();
       drag.ghost = drag.btn.cloneNode(true);
