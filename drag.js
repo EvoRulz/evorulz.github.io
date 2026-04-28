@@ -6,7 +6,6 @@
     const btn = e.target.closest(".tracker-btn[data-id]");
     if (!btn) return;
     if (drag) return;
-    if (window._dragEnabled === false) return;
     e.preventDefault();
     const rect = btn.getBoundingClientRect();
     drag = {
@@ -16,6 +15,15 @@
       btnW: rect.width, btnH: rect.height,
       ghost: null, lastOver: null, active: false,
     };
+  });
+
+  buttonsEl.addEventListener("pointerup", e => {
+    if (!drag || drag.active) return;
+    if (window._interactEnabled === false) return;
+    const id = drag.id;
+    drag = null;
+    const currentlyOpen = getActiveSectionId();
+    setActiveSection(currentlyOpen === id ? null : id);
   });
 
   document.addEventListener("pointermove", e => {
