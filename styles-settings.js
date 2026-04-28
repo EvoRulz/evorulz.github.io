@@ -270,9 +270,9 @@ function onHexInput(id) {
             return;
           }
           btn.dataset.debounced = 'true';
-          setTimeout(() => { btn.dataset.debounced = 'false'; }, 500);
-        }, true);
-        btn.dataset.debounceListener = 'true';
+          setTimeout(() => { btn.dataset.debounced = 'false'; }, btn.id === 'hide-habits-btn' ? 2 : 500);
+    }, true);
+    btn.dataset.debounceListener = 'true';
       }
     });
     _btnStyleSnapshot  = Object.assign({}, btnStyle);
