@@ -713,7 +713,6 @@ input[type="checkbox"]:hover {
       pointer-events: none;
     }
     .ctrl-toggle.on .ctrl-knob { left: 23px; background: #99ff99; }
-    body.interact-locked .tracker-btn { pointer-events: none; }
     body.interact-locked .top-item > button,
     body.interact-locked .top-item > label { pointer-events: none; }
     body.interact-locked #sections { pointer-events: none; }
