@@ -78,7 +78,16 @@
       const _s = _btnStyleFor(config.id);
       btn.style.background = hex8ToCss(_s.tap || btnStyle.tap);
     });
-    btn.addEventListener('pointerup',     () => { const _s = _btnStyleFor(config.id); btn.style.background = hex8ToCss(_s.bg); });
+    btn.addEventListener('pointerup', () => {
+      const _s = _btnStyleFor(config.id);
+      btn.style.background = hex8ToCss(_s.bg);
+      if (window._dragEnabled === false && window._interactEnabled !== false) {
+        drag = null;
+        const id = config.id;
+        const currentlyOpen = getActiveSectionId();
+        setActiveSection(currentlyOpen === id ? null : id);
+      }
+    });
     btn.addEventListener('pointercancel', () => { const _s = _btnStyleFor(config.id); btn.style.background = hex8ToCss(_s.bg); });
     return btn;
   }
