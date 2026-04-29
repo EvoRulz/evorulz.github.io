@@ -122,6 +122,8 @@
       ghost: null, lastOver: null, active: false,
       pointerId: e.pointerId,
     };
+    const _so = document.getElementById('settings-overlay');
+    if (_so) _so.style.overflowY = 'hidden';
     item.setPointerCapture(e.pointerId);
   });
 
@@ -205,3 +207,97 @@
     } catch {}
   }
   applySettingsGroupOrder();
+
+  // ── Top-grid drag-to-reorder ─────────────────────────────
+  const topGrid = document.getElementById('top-grid');
+  let topDrag = null;
+
+  function applyTopGridOrder() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('_topGridOrder'));
+      if (!Array.isArray(saved)) return;
+      saved.forEach(id => {
+        if (!id) return;
+        const item = topGrid.querySelector(`.top-item[data-item="${id}"]`);
+        if (item) topGrid.appendChild(item);
+      });
+    } catch {}
+  }
+
+  function saveTopGridOrder() {
+    const order = [...topGrid.children].map(el => el.dataset.item || null).filter(Boolean);
+    localStorage.setItem('_topGridOrder', JSON.stringify(order));
+  }
+
+  applyTopGridOrder();
+
+  topGrid.addEventListener('pointerdown', e => {
+    const item = e.target.closest('.top-item[data-item]');
+    if (!item || topDrag) return;
+    if (window._dragEnabled === false) return;
+    const rect = item.getBoundingClientRect();
+    topDrag = {
+      item, startX: e.clientX, startY: e.clientY,
+      offX: e.clientX - rect.left, offY: e.clientY - rect.top,
+      w: rect.width, h: rect.height,
+      ghost: null, lastOver: null, active: false,
+    };
+  });
+
+  document.addEventListener('pointermove', e => {
+    if (!topDrag) return;
+    if (!topDrag.active) {
+      if (Math.hypot(e.clientX - topDrag.startX, e.clientY - topDrag.startY) < DRAG_THRESHOLD) return;
+      if (window._dragEnabled === false) { topDrag = null; return; }
+      topDrag.active = true;
+      e.preventDefault();
+      const rect = topDrag.item.getBoundingClientRect();
+      topDrag.ghost = topDrag.item.cloneNode(true);
+      topDrag.ghost.classList.add('drag-ghost');
+      Object.assign(topDrag.ghost.style, {
+        position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
+        width: rect.width + 'px', height: rect.height + 'px',
+        pointerEvents: 'none', opacity: '0.75', zIndex: '9001',
+        margin: '0', boxSizing: 'border-box',
+      });
+      document.body.appendChild(topDrag.ghost);
+      topDrag.item.style.visibility = 'hidden';
+    }
+    topDrag.ghost.style.left = (e.clientX - topDrag.offX) + 'px';
+    topDrag.ghost.style.top  = (e.clientY - topDrag.offY) + 'px';
+    const gcx = e.clientX - topDrag.offX + topDrag.w / 2;
+    const gcy = e.clientY - topDrag.offY + topDrag.h / 2;
+    let over = null;
+    for (const t of topGrid.children) {
+      if (t === topDrag.item) continue;
+      const r = t.getBoundingClientRect();
+      if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
+    }
+    if (!over) { topDrag.lastOver = null; return; }
+    if (over === topDrag.lastOver) return;
+    topDrag.lastOver = over;
+    const overNext = over.nextSibling, iNext = topDrag.item.nextSibling;
+    if (iNext === over)                 topGrid.insertBefore(over, topDrag.item);
+    else if (overNext === topDrag.item) topGrid.insertBefore(topDrag.item, over);
+    else {
+      topGrid.insertBefore(topDrag.item, overNext || null);
+      topGrid.insertBefore(over, iNext || null);
+    }
+  });
+
+  document.addEventListener('pointerup', () => {
+    if (!topDrag) return;
+    if (topDrag.active) {
+      topDrag.item.style.visibility = '';
+      if (topDrag.ghost) topDrag.ghost.remove();
+      saveTopGridOrder();
+    }
+    topDrag = null;
+  });
+
+  document.addEventListener('pointercancel', () => {
+    if (!topDrag) return;
+    topDrag.item.style.visibility = '';
+    if (topDrag.ghost) topDrag.ghost.remove();
+    topDrag = null;
+  });
