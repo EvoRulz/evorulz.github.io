@@ -20,9 +20,9 @@
   document.addEventListener("pointermove", e => {
     if (!drag) return;
     if (!drag.active) {
-      if (Math.hypot(e.clientX - sgDrag.startX, e.clientY - sgDrag.startY) < DRAG_THRESHOLD) return;
+      if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < DRAG_THRESHOLD) return;
       if (window._dragEnabled === false) return;
-      sgDrag.active = true;
+      drag.active = true;
       e.preventDefault();
       const rect = drag.btn.getBoundingClientRect();
       drag.ghost = drag.btn.cloneNode(true);
