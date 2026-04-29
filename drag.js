@@ -113,28 +113,25 @@
     const item = e.target.closest('.settings-group-item');
     if (!item || sgDrag) return;
     if (window._interactEnabled === false) return;
-    e.preventDefault();
     const rect = item.getBoundingClientRect();
     sgDrag = {
       item, startX: e.clientX, startY: e.clientY,
       offX: e.clientX - rect.left, offY: e.clientY - rect.top,
       w: rect.width, h: rect.height,
       ghost: null, lastOver: null, active: false,
-      pointerId: e.pointerId,
     };
-    const _so = document.getElementById('settings-overlay');
-    if (_so) _so.style.overflowY = 'hidden';
+    item.setPointerCapture(e.pointerId);
   });
 
-  document.addEventListener('pointermove', e => {
+  sgGrid.addEventListener('pointermove', e => {
     if (!sgDrag) return;
-    e.preventDefault();
     if (!sgDrag.active) {
       if (Math.hypot(e.clientX - sgDrag.startX, e.clientY - sgDrag.startY) < 14) return;
       sgDrag.active = true;
-      sgDrag.item.setPointerCapture(sgDrag.pointerId);
+      e.preventDefault();
       const _so = document.getElementById('settings-overlay');
       if (_so) _so.style.overflowY = 'hidden';
+      const rect = sgDrag.item.getBoundingClientRect();
       sgDrag.ghost = sgDrag.item.cloneNode(true);
       Object.assign(sgDrag.ghost.style, {
         position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
@@ -145,8 +142,12 @@
       (document.getElementById('settings-overlay') || document.body).appendChild(sgDrag.ghost);
       sgDrag.item.style.opacity = '0.3';
     }
-    sgDrag.ghost.style.left = (e.clientX - sgDrag.offX) + 'px';
-    sgDrag.ghost.style.top  = (e.clientY - sgDrag.offY) + 'px';
+    e.preventDefault();
+    e.stopPropagation();
+    if (sgDrag.ghost) {
+      sgDrag.ghost.style.left = (e.clientX - sgDrag.offX) + 'px';
+      sgDrag.ghost.style.top  = (e.clientY - sgDrag.offY) + 'px';
+    }
     const gcx = e.clientX - sgDrag.offX + sgDrag.w / 2;
     const gcy = e.clientY - sgDrag.offY + sgDrag.h / 2;
     let over = null;
@@ -167,8 +168,9 @@
     }
   }, { passive: false });
 
-  document.addEventListener('pointerup', e => {
+  sgGrid.addEventListener('pointerup', e => {
     if (!sgDrag) return;
+    e.stopPropagation();
     const _so = document.getElementById('settings-overlay');
     if (_so) _so.style.overflowY = '';
     if (sgDrag.active) {
@@ -181,7 +183,7 @@
     sgDrag = null;
   });
 
-  document.addEventListener('pointercancel', e => {
+  sgGrid.addEventListener('pointercancel', e => {
     if (!sgDrag) return;
     const _so = document.getElementById('settings-overlay');
     if (_so) _so.style.overflowY = '';
