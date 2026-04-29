@@ -83,6 +83,12 @@
       btn.style.background = hex8ToCss(_s.bg);
     });
     btn.addEventListener('pointercancel', () => { const _s = _btnStyleFor(config.id); btn.style.background = hex8ToCss(_s.bg); });
+    btn.addEventListener('click', () => {
+      if (window._habitDragOccurred) return;
+      if (window._interactEnabled === false) return;
+      const currentlyOpen = getActiveSectionId();
+      setActiveSection(currentlyOpen === config.id ? null : config.id);
+    });
     return btn;
   }
 

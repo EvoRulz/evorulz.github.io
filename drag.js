@@ -6,8 +6,6 @@
     const btn = e.target.closest(".tracker-btn[data-id]");
     if (!btn) return;
     if (drag) return;
-    e.preventDefault();
-    btn.setPointerCapture(e.pointerId);
     const rect = btn.getBoundingClientRect();
     drag = {
       id: btn.dataset.id, btn,
@@ -24,6 +22,7 @@
       if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < DRAG_THRESHOLD) return;
       if (window._dragEnabled === false) return;
       drag.active = true;
+      e.preventDefault();
       const rect = drag.btn.getBoundingClientRect();
       drag.ghost = drag.btn.cloneNode(true);
       drag.ghost.classList.add("drag-ghost");
@@ -67,11 +66,8 @@
       document.body.classList.remove("is-dragging");
       saveButtonOrder();
       drag.btn.style.background = "";
-    } else {
-      if (window._interactEnabled !== false) {
-        const currentlyOpen = getActiveSectionId();
-        setActiveSection(currentlyOpen === drag.id ? null : drag.id);
-      }
+      window._habitDragOccurred = true;
+      setTimeout(() => { window._habitDragOccurred = false; }, 300);
     }
     drag = null;
   });
