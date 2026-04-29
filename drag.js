@@ -218,6 +218,8 @@
       pointerId: e.pointerId,
     };
     sgGrid.setPointerCapture(e.pointerId);
+    const _soDown = document.getElementById('settings-overlay');
+    if (_soDown) _soDown.style.overflowY = 'hidden';
   });
 
   sgGrid.addEventListener('pointermove', e => {
@@ -262,6 +264,8 @@
   }, { passive: false });
 
   sgGrid.addEventListener('pointerup', () => {
+    const _soUp = document.getElementById('settings-overlay');
+    if (_soUp) _soUp.style.overflowY = '';
     if (!sgDrag) return;
     if (sgDrag.active) {
       sgDrag.item.style.opacity = '';
@@ -276,11 +280,11 @@
   });
 
   sgGrid.addEventListener('pointercancel', () => {
+    const _soCancel = document.getElementById('settings-overlay');
+    if (_soCancel) _soCancel.style.overflowY = '';
     if (!sgDrag) return;
     sgDrag.item.style.opacity = '';
     if (sgDrag.ghost) sgDrag.ghost.remove();
-    const _so4 = document.getElementById('settings-overlay');
-    if (_so4) _so4.style.overflowY = '';
     sgDrag = null;
   });
 

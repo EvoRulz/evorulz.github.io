@@ -25,7 +25,7 @@
     [data-checkbox-row] { user-select:none; -webkit-user-select:none; }
     [data-btn-row] > label { cursor:grab; }
     [data-btn-row] > label:active { cursor:grabbing; }
-    #settings-groups-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    #settings-groups-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; touch-action:none; }
     .settings-group-item { padding:8px 10px; background:#2a2a2a; border:1px solid #444; border-radius:6px; color:#aaa; cursor:grab; font-size:13px; text-align:center; user-select:none; -webkit-user-select:none; box-sizing:border-box; }
     .settings-group-item:active { cursor:grabbing; }
     .settings-group-item.sg-active { background:#333; color:#fff; border-color:#666; }
