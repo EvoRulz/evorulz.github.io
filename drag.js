@@ -7,6 +7,7 @@
     if (!btn) return;
     if (drag) return;
     e.preventDefault();
+    btn.setPointerCapture(e.pointerId);
     const rect = btn.getBoundingClientRect();
     drag = {
       id: btn.dataset.id, btn,
