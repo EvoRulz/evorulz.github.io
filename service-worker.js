@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v806";
+const CACHE = "habit-tracker-v807";
 
 const ASSETS = [
   "./",
@@ -19,7 +19,6 @@ const ASSETS = [
   "./tumbler.js",
   "./bootstrap.js",
   "./font.js",
-  "./notifications.js"
   "./notifications.js",
   "./slider-init.js",
   "./styles.css"
