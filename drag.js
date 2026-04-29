@@ -1,6 +1,6 @@
 /// ── Drag-to-reorder — HABIT BUTTONS ──────────────────────
   const DRAG_THRESHOLD = 6;
-  let drag = null;
+  var drag = null;
 
   buttonsEl.addEventListener("pointerdown", e => {
     const btn = e.target.closest(".tracker-btn[data-id]");
