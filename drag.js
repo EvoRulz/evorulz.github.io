@@ -175,7 +175,7 @@
     }
   }, { passive: false });
 
-  sgGrid.addEventListener('pointerup', e => {
+  document.addEventListener('pointerup', e => {
     if (!sgDrag) return;
     e.stopPropagation();
     const _so = document.getElementById('settings-overlay');
@@ -190,7 +190,7 @@
     sgDrag = null;
   });
 
-  sgGrid.addEventListener('pointercancel', e => {
+  document.addEventListener('pointercancel', e => {
     if (!sgDrag) return;
     const _so = document.getElementById('settings-overlay');
     if (_so) _so.style.overflowY = '';
