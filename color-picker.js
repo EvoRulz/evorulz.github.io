@@ -90,14 +90,15 @@
       `linear-gradient(to right,#808080,rgb(${hr},${hg},${hb}))`;
     popup.querySelector('#cp-bri').style.background =
       `linear-gradient(to right,#000,rgb(${cr},${cg},${cb}))`;
-    popup.querySelector('#cp-swatch').style.background =
-      `rgb(${pr},${pg},${pb})`;
+    const _sw = popup.querySelector('#cp-swatch');
+    if (_sw) _sw.style.background = `rgb(${pr},${pg},${pb})`;
   }
 
   function commitColor() {
     const [r,g,b] = hsbToRgb(H, S, B);
     const hex = rgbToHex(r,g,b);
-    if (popup) popup.querySelector('#cp-hex').value = hex;
+    const _hexEl = popup ? popup.querySelector('#cp-hex') : null;
+    if (_hexEl) _hexEl.value = hex;
     refreshTracks();
     if (!activeSwatch) return;
     const inp = activeSwatch.querySelector('input[type="color"]');
@@ -141,34 +142,12 @@
         `<input id="cp-sat" type="range" min="0" max="100" value="${S}" style="${ss}"></div>` +
       `<div><div style="${ls}">Brightness</div>` +
         `<input id="cp-bri" type="range" min="0" max="100" value="${B}" style="${ss}"></div>` +
-      `<div style="display:flex;gap:8px;align-items:center;">` +
-        `<div id="cp-swatch" style="width:28px;height:28px;border-radius:4px;` +
-          `border:1px solid ${br};flex-shrink:0;"></div>` +
-        `<input id="cp-hex" maxlength="7" spellcheck="false" autocomplete="off"` +
-          ` style="flex:1;background:#111;color:#fff;border:1px solid ${br};border-radius:4px;` +
-          `padding:4px 6px;font-size:12px;font-family:monospace;text-transform:uppercase;outline:none;">` +
-      `</div>`;
     document.body.appendChild(el);
 
     makeDragger(el.querySelector('#cp-hue'), v => { H = v; commitColor(); });
     makeDragger(el.querySelector('#cp-sat'), v => { S = v; commitColor(); });
     makeDragger(el.querySelector('#cp-bri'), v => { B = v; commitColor(); });
-
-    const hexIn = el.querySelector('#cp-hex');
-    function applyHex() {
-      let raw = hexIn.value.trim();
-      if (!raw.startsWith('#')) raw = '#' + raw;
-      if (/^#[0-9a-fA-F]{6}$/.test(raw)) {
-        [H,S,B] = rgbToHsb(...hexToRgb(raw));
-        el.querySelector('#cp-hue').value = H;
-        el.querySelector('#cp-sat').value = S;
-        el.querySelector('#cp-bri').value = B;
-        commitColor();
-      }
-    }
-    hexIn.addEventListener('change', applyHex);
-    hexIn.addEventListener('keydown', e => { if (e.key === 'Enter') applyHex(); });
-
+    
     let dg = null;
     el.addEventListener('pointerdown', e => {
       if (e.target.tagName === 'INPUT') return;
