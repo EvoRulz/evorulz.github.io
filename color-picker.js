@@ -222,7 +222,19 @@
 
   // ── Intercept all swatch pointerdowns ──────────────────────
   document.addEventListener('pointerdown', function (e) {
-    const sw = e.target.closest('.color-swatch-wrap');
+    let sw = e.target.closest('.color-swatch-wrap');
+    if (!sw) {
+      const row = e.target.closest('.color-picker-row');
+      if (row) {
+        const swInRow = row.querySelector('.color-swatch-wrap');
+        if (swInRow) {
+          const r = swInRow.getBoundingClientRect();
+          if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+            sw = swInRow;
+          }
+        }
+      }
+    }
     if (!sw) return;
     e.preventDefault(); e.stopPropagation();
     activeSwatch === sw ? close() : openFor(sw);
