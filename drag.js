@@ -213,15 +213,16 @@
       offX: e.clientX - rect.left, offY: e.clientY - rect.top,
       w: rect.width, h: rect.height,
       ghost: null, lastOver: null, active: false,
+      pointerId: e.pointerId,
     };
   });
 
-  document.addEventListener('pointermove', e => {
+  sgGrid.addEventListener('pointermove', e => {
     if (!sgDrag) return;
     if (!sgDrag.active) {
       if (Math.hypot(e.clientX - sgDrag.startX, e.clientY - sgDrag.startY) < DRAG_THRESHOLD) return;
-      if (window._dragEnabled === false) return;
       sgDrag.active = true;
+      sgGrid.setPointerCapture(sgDrag.pointerId);
       const rect = sgDrag.item.getBoundingClientRect();
       sgDrag.ghost = sgDrag.item.cloneNode(true);
       Object.assign(sgDrag.ghost.style, {
