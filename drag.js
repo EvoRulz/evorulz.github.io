@@ -222,6 +222,7 @@
     if (!sgDrag.active) {
       if (Math.hypot(e.clientX - sgDrag.startX, e.clientY - sgDrag.startY) < DRAG_THRESHOLD) return;
       sgDrag.active = true;
+      e.preventDefault();
       const rect = sgDrag.item.getBoundingClientRect();
       sgDrag.ghost = sgDrag.item.cloneNode(true);
       Object.assign(sgDrag.ghost.style, {
@@ -253,7 +254,7 @@
       sgGrid.insertBefore(sgDrag.item, overNext || null);
       sgGrid.insertBefore(over, iNext || null);
     }
-  });
+  }, { passive: false });
 
   document.addEventListener('pointerup', () => {
     if (!sgDrag) return;
