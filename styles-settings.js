@@ -230,6 +230,7 @@ function onHexInput(id) {
   let _undoPending = false;
   let _undoDebounceTimer = null;
   let _skipCancelSnapshot = false;
+  let _applyingSnapshot = false;
   function toggleSettingsGroup(groupId) {
     document.querySelectorAll('.settings-group-content').forEach(el => {
       if (el.id !== groupId) {
@@ -341,6 +342,7 @@ function onHexInput(id) {
     settingsUpdatePreview();
   }
   function _applyStyleSnapshot(snap) {
+    _applyingSnapshot = true;
     btnStyle   = Object.assign({}, snap.btnStyle);
     _btnStyles = JSON.parse(JSON.stringify(snap._btnStyles));
     appStyle   = Object.assign({}, snap.appStyle, { stops: snap.appStyle.stops.slice(), imgData: snap.appStyle.imgData });
@@ -350,6 +352,7 @@ function onHexInput(id) {
     if (document.getElementById('settings-overlay').classList.contains('active')) {
       _syncSettingsPanelUI();
     }
+    _applyingSnapshot = false;
   }
   function settingsUndo() {
     if (!_undoStack.length) return;
@@ -664,7 +667,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   }
   function settingsChange() {
     if (!document.getElementById('s-bg')) return;
-    if (!_undoPending) {
+    if (!_undoPending && !_applyingSnapshot) {
       _settingsHasChanges = true;
       _undoPending = true;
       _undoStack.push(_captureStyleSnapshot());
