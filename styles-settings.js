@@ -228,6 +228,7 @@ function onHexInput(id) {
   let _history = [];
   let _historyIndex = -1;
   let _undoPending = false;
+  let _preGestureSnapshot = null;
   let _undoDebounceTimer = null;
   let _skipCancelSnapshot = false;
   let _applyingSnapshot = false;
@@ -676,16 +677,14 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     if (!document.getElementById('s-bg')) return;
     if (!_applyingSnapshot) {
       _settingsHasChanges = true;
-      clearTimeout(_undoDebounceTimer);
-      _undoDebounceTimer = setTimeout(() => {
-        if (!_applyingSnapshot) {
-          _history = _history.slice(0, _historyIndex + 1);
-          _history.push(_captureStyleSnapshot());
-          if (_history.length > 51) _history.shift();
-          _historyIndex = _history.length - 1;
-          _updateUndoRedoBtns();
-        }
-      }, 400);
+      if (!_applyingSnapshot && _preGestureSnapshot) {
+        _history = _history.slice(0, _historyIndex + 1);
+        _history.push(_preGestureSnapshot);
+        if (_history.length > 51) _history.shift();
+        _historyIndex = _history.length - 1;
+        _preGestureSnapshot = null;
+        _updateUndoRedoBtns();
+      }
       _updateUndoRedoBtns();
     }
     const _cfId = window._cfActiveId ? window._cfActiveId() : null;
@@ -910,3 +909,17 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
+  (function() {
+  let _gestureActive = false;
+  document.addEventListener('pointerdown', function() {
+    if (_applyingSnapshot) return;
+    if (!document.getElementById('settings-overlay').classList.contains('active')) return;
+    if (!_gestureActive) {
+      _gestureActive = true;
+      _preGestureSnapshot = _captureStyleSnapshot();
+    }
+  }, true);
+  document.addEventListener('pointerup', function() { _gestureActive = false; });
+  document.addEventListener('pointercancel', function() { _gestureActive = false; });
+})();
