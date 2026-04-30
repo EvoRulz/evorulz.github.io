@@ -80,6 +80,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
+      pointer-events: auto;
     }
     .app-btn.btn-clear-all {
       background: #5a1a1a;
@@ -269,6 +270,7 @@
       color: #999; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s, color 0.2s; padding: 0; flex-shrink: 0;
+      pointer-events: auto;
     }
     #settings-cog:hover { background: #3a3a3a; color: #fff; }
     #settings-cog svg { width: 16px; height: 16px; fill: currentColor; }
@@ -279,6 +281,7 @@
       color: #999; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s, color 0.2s, border-color 0.2s; padding: 0; flex-shrink: 0;
+      pointer-events: auto;
     }
     #orient-lock-btn:hover { background: #3a3a3a; color: #fff; }
     #orient-lock-btn svg { width: 16px; height: 16px; fill: currentColor; }
