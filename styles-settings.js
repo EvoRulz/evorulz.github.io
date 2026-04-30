@@ -226,6 +226,7 @@ function onHexInput(id) {
   let _clockSnapshot    = null;
   let _settingsHasChanges = false;
   let _undoStack = [];
+  let _undoRedoActive = false;
   let _redoStack = [];
   let _undoPending = false;
   let _undoDebounceTimer = null;
@@ -356,25 +357,25 @@ function onHexInput(id) {
   }
   function settingsUndo() {
     if (!_undoStack.length) return;
+    _undoRedoActive = true;
     _redoStack.push(_captureStyleSnapshot());
     const snap = _undoStack.pop();
-    clearTimeout(_undoDebounceTimer);
-    _undoPending = true;
     _applyStyleSnapshot(snap);
     _settingsHasChanges = true;
     _updateUndoRedoBtns();
-    _undoDebounceTimer = setTimeout(() => { _undoPending = false; }, 200);
+    clearTimeout(_undoDebounceTimer);
+    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 1000);
   }
   function settingsRedo() {
     if (!_redoStack.length) return;
+    _undoRedoActive = true;
     _undoStack.push(_captureStyleSnapshot());
     const snap = _redoStack.pop();
-    clearTimeout(_undoDebounceTimer);
-    _undoPending = true;
     _applyStyleSnapshot(snap);
     _settingsHasChanges = true;
     _updateUndoRedoBtns();
-    _undoDebounceTimer = setTimeout(() => { _undoPending = false; }, 200);
+    clearTimeout(_undoDebounceTimer);
+    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 1000);
   }
   function settingsOpen() {
     try {
@@ -679,8 +680,8 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
       _undoPending = true;
       _undoStack.push(_captureStyleSnapshot());
       if (_undoStack.length > 50) _undoStack.shift();
-      _redoStack = [];
-      _updateSettingsBtns();
+      if (!_undoRedoActive) _redoStack = [];
+      _updateUndoRedoBtns();
     }
     clearTimeout(_undoDebounceTimer);
     _undoDebounceTimer = setTimeout(() => { _undoPending = false; }, 800);
