@@ -276,6 +276,7 @@ function onHexInput(id) {
       _btnStyles: JSON.parse(JSON.stringify(_btnStyles)),
       appStyle: Object.assign({}, appStyle, { stops: appStyle.stops.slice(), imgData: appStyle.imgData }),
       clock: window._clockGet().tumblerCfg.slice(),
+      cpSettings: (function(){ try { return JSON.parse(localStorage.getItem('_cpSettings')); } catch(e) { return null; } })(),
     };
   }
   function _updateUndoRedoBtns() { _updateSettingsBtns(); }
@@ -354,6 +355,11 @@ function onHexInput(id) {
     window._clockSet(snap.clock);
     applyBtnStyle();
     applyAppStyle();
+    if (snap.cpSettings !== undefined) {
+      if (snap.cpSettings) { localStorage.setItem('_cpSettings', JSON.stringify(snap.cpSettings)); } else { localStorage.removeItem('_cpSettings'); }
+      if (window._cpSyncUI) window._cpSyncUI();
+      if (window._cpRebuild) window._cpRebuild();
+    }
     if (document.getElementById('settings-overlay').classList.contains('active')) {
       _syncSettingsPanelUI();
     }
