@@ -148,20 +148,6 @@
     makeDragger(el.querySelector('#cp-sat'), v => { S = v; commitColor(); });
     makeDragger(el.querySelector('#cp-bri'), v => { B = v; commitColor(); });
 
-    let dg = null;
-    el.addEventListener('pointerdown', e => {
-      if (e.target.tagName === 'INPUT') return;
-      dg = { x: e.clientX - el.offsetLeft, y: e.clientY - el.offsetTop };
-      el.setPointerCapture(e.pointerId); e.stopPropagation();
-    });
-    el.addEventListener('pointermove', e => {
-      if (!dg) return;
-      el.style.left = (e.clientX - dg.x) + 'px';
-      el.style.top  = (e.clientY - dg.y) + 'px';
-      el.style.right = 'auto'; el.style.bottom = 'auto';
-    });
-    el.addEventListener('pointerup',     () => { dg = null; });
-    el.addEventListener('pointercancel', () => { dg = null; });
     return el;
   }
 
@@ -181,13 +167,21 @@
   }
 
   function openFor(swatch) {
+    const wasOpen = !!popup;
+    const savedLeft = popup ? popup.style.left : null;
+    const savedTop  = popup ? popup.style.top  : null;
     close();
     const inp = swatch.querySelector('input[type="color"]');
     if (!inp) return;
     [H,S,B] = rgbToHsb(...hexToRgb(inp.value));
     activeSwatch = swatch;
     popup = buildPopup();
-    position(swatch);
+    if (wasOpen && savedLeft && savedTop) {
+      popup.style.left = savedLeft;
+      popup.style.top  = savedTop;
+    } else {
+      position(swatch);
+    }
     const _hexInit = popup.querySelector('#cp-hex'); if (_hexInit) _hexInit.value = inp.value.replace('#','').toUpperCase();
     refreshTracks();
     setTimeout(() => document.addEventListener('pointerdown', tapOut), 80);
