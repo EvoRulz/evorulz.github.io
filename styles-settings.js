@@ -225,9 +225,8 @@ function onHexInput(id) {
   let _appStyleSnapshot = null;
   let _clockSnapshot    = null;
   let _settingsHasChanges = false;
-  let _undoStack = [];
-  let _undoRedoActive = false;
-  let _redoStack = [];
+  let _history = [];
+  let _historyIndex = -1;
   let _undoPending = false;
   let _undoDebounceTimer = null;
   let _skipCancelSnapshot = false;
@@ -277,16 +276,18 @@ function onHexInput(id) {
     };
   }
   function _updateUndoRedoBtns() { _updateSettingsBtns(); }
+  function _canUndo() { return _historyIndex > 0; }
+  function _canRedo() { return _historyIndex < _history.length - 1; }
   function _updateSettingsBtns() {
     const saveBtn   = document.getElementById('settings-save');
     const cancelBtn = document.getElementById('settings-cancel');
     const undoBtn   = document.getElementById('settings-undo');
     const redoBtn   = document.getElementById('settings-redo');
-    const anyActivity = _settingsHasChanges || _undoStack.length > 0 || _redoStack.length > 0;
+    const anyActivity = _settingsHasChanges || _history.length > 1;
     if (saveBtn)   { saveBtn.style.display = anyActivity ? '' : 'none'; saveBtn.disabled = !_settingsHasChanges; saveBtn.style.opacity = _settingsHasChanges ? '' : '0.35'; }
     if (cancelBtn) cancelBtn.textContent = _settingsHasChanges ? 'Cancel' : 'Close';
-    if (undoBtn)   { undoBtn.style.display = anyActivity ? '' : 'none'; undoBtn.disabled = _undoStack.length === 0; undoBtn.style.opacity = _undoStack.length > 0 ? '' : '0.35'; }
-    if (redoBtn)   { redoBtn.style.display = anyActivity ? '' : 'none'; redoBtn.disabled = _redoStack.length === 0; redoBtn.style.opacity = _redoStack.length > 0 ? '' : '0.35'; }
+    if (undoBtn)   { undoBtn.style.display = anyActivity ? '' : 'none'; undoBtn.disabled = !_canUndo(); undoBtn.style.opacity = _canUndo() ? '' : '0.35'; }
+    if (redoBtn)   { redoBtn.style.display = anyActivity ? '' : 'none'; redoBtn.disabled = !_canRedo(); redoBtn.style.opacity = _canRedo() ? '' : '0.35'; }
   }
   function _syncSettingsPanelUI() {
     if (window._cfBuild) window._cfBuild();
@@ -356,26 +357,24 @@ function onHexInput(id) {
     _applyingSnapshot = false;
   }
   function settingsUndo() {
-    if (!_undoStack.length) return;
-    _undoRedoActive = true;
-    _redoStack.push(_captureStyleSnapshot());
-    const snap = _undoStack.pop();
-    _applyStyleSnapshot(snap);
+    if (!_canUndo()) return;
+    _historyIndex--;
+    _applyingSnapshot = true;
+    _applyStyleSnapshot(_history[_historyIndex]);
+    _applyingSnapshot = false;
     _settingsHasChanges = true;
+    _undoPending = false;
     _updateUndoRedoBtns();
-    clearTimeout(_undoDebounceTimer);
-    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 400);
   }
   function settingsRedo() {
-    if (!_redoStack.length) return;
-    _undoRedoActive = true;
-    _undoStack.push(_captureStyleSnapshot());
-    const snap = _redoStack.pop();
-    _applyStyleSnapshot(snap);
+    if (!_canRedo()) return;
+    _historyIndex++;
+    _applyingSnapshot = true;
+    _applyStyleSnapshot(_history[_historyIndex]);
+    _applyingSnapshot = false;
     _settingsHasChanges = true;
+    _undoPending = false;
     _updateUndoRedoBtns();
-    clearTimeout(_undoDebounceTimer);
-    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 400);
   }
   function settingsOpen() {
     try {
@@ -405,7 +404,7 @@ function onHexInput(id) {
       _appStyleSnapshot  = Object.assign({}, appStyle, { stops: appStyle.stops.slice(), imgData: appStyle.imgData });
       const clk = window._clockGet();
       _clockSnapshot = { tumblerCfg: clk.tumblerCfg.slice() };
-      _undoStack = []; _redoStack = []; _updateSettingsBtns();
+      _history = [_captureStyleSnapshot()]; _historyIndex = 0; _updateSettingsBtns();
     }
     const _initId = window._cfActiveId ? window._cfActiveId() : null;
     const _initS  = _initId ? _btnStyleFor(_initId) : btnStyle;
@@ -675,16 +674,17 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   }
   function settingsChange() {
     if (!document.getElementById('s-bg')) return;
-    if (!_undoPending && !_applyingSnapshot && !_undoRedoActive) {
-      _settingsHasChanges = true;
+    if (!_undoPending && !_applyingSnapshot) {
       _undoPending = true;
-      _undoStack.push(_captureStyleSnapshot());
-      if (_undoStack.length > 50) _undoStack.shift();
-      _redoStack = [];
+      _history = _history.slice(0, _historyIndex + 1);
+      _history.push(_captureStyleSnapshot());
+      if (_history.length > 51) _history.shift();
+      _historyIndex = _history.length - 1;
+      _settingsHasChanges = true;
       _updateUndoRedoBtns();
     }
     clearTimeout(_undoDebounceTimer);
-    _undoDebounceTimer = setTimeout(() => { _undoPending = false; }, 300);
+    _undoDebounceTimer = setTimeout(() => { _undoPending = false; }, 400);
     const _cfId = window._cfActiveId ? window._cfActiveId() : null;
     if (_cfId) {
       if (_cfId === 'top-date') {
@@ -807,9 +807,10 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
   async function settingsReset() {
     const ok = await confirmClear("This will reset all styles to their <strong>factory defaults</strong>.");
     if (!ok) return;
-    _undoStack.push(_captureStyleSnapshot());
-    if (_undoStack.length > 50) _undoStack.shift();
-    _redoStack = [];
+    _history = _history.slice(0, _historyIndex + 1);
+    _history.push(_captureStyleSnapshot());
+    if (_history.length > 51) _history.shift();
+    _historyIndex = _history.length - 1;
     _updateUndoRedoBtns();
     btnStyle  = Object.assign({}, BTN_STYLE_DEFAULTS);
     appStyle  = Object.assign({}, APP_STYLE_DEFAULTS);
