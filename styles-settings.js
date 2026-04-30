@@ -364,7 +364,7 @@ function onHexInput(id) {
     _settingsHasChanges = true;
     _updateUndoRedoBtns();
     clearTimeout(_undoDebounceTimer);
-    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 50);
+    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 400);
   }
   function settingsRedo() {
     if (!_redoStack.length) return;
@@ -375,7 +375,7 @@ function onHexInput(id) {
     _settingsHasChanges = true;
     _updateUndoRedoBtns();
     clearTimeout(_undoDebounceTimer);
-    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 1000);
+    _undoDebounceTimer = setTimeout(() => { _undoRedoActive = false; _undoPending = false; }, 400);
   }
   function settingsOpen() {
     try {
@@ -675,12 +675,12 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   }
   function settingsChange() {
     if (!document.getElementById('s-bg')) return;
-    if (!_undoPending && !_applyingSnapshot) {
+    if (!_undoPending && !_applyingSnapshot && !_undoRedoActive) {
       _settingsHasChanges = true;
       _undoPending = true;
       _undoStack.push(_captureStyleSnapshot());
       if (_undoStack.length > 50) _undoStack.shift();
-      if (!_undoRedoActive && !_applyingSnapshot) _redoStack = [];
+      _redoStack = [];
       _updateUndoRedoBtns();
     }
     clearTimeout(_undoDebounceTimer);
