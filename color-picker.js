@@ -169,7 +169,13 @@
     const r = swatch.getBoundingClientRect();
     let l = r.left, t = r.bottom + 8;
     if (l + 228 > window.innerWidth  - 8) l = window.innerWidth  - 228 - 8;
-    if (t + 220 > window.innerHeight - 8) t = r.top - 220 - 8;
+    const _undoBtn = document.getElementById('settings-undo');
+    let _coversUndo = false;
+    if (_undoBtn) {
+      const _ur = _undoBtn.getBoundingClientRect();
+      if (t + 220 > _ur.top) _coversUndo = true;
+    }
+    if (t + 220 > window.innerHeight - 8 || _coversUndo) t = r.top - 220 - 8;
     popup.style.left = Math.max(8, l) + 'px';
     popup.style.top  = Math.max(8, t) + 'px';
   }
@@ -196,7 +202,7 @@
 
   function tapOut(e) {
     if (!popup) return;
-    if (!popup.contains(e.target) && !e.target.closest('.color-swatch-wrap')) close();
+    if (!popup.contains(e.target) && !e.target.closest('.color-swatch-wrap') && !e.target.closest('#settings-footer')) close();
   }
 
   // ── Intercept all swatch pointerdowns ──────────────────────
