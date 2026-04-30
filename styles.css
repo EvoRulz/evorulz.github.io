@@ -345,7 +345,7 @@
       margin: 0;
       pointer-events: none;
     }
-    .top-item[data-item="manage-habits"] button,    }
+    .top-item[data-item="manage-habits"] button,
     .top-item[data-item="settings"] button,
     .top-item[data-item="orient-lock"] button,
     .top-item[data-item="export-all"] button,
