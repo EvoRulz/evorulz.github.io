@@ -44,7 +44,8 @@
       if (_tga) _tga.value = slider ? slider.value : 255;
     }
     if (window._cpSaveFromUI) window._cpSaveFromUI();
-    if (['s-cp-bg', 's-cp-border', 's-cp-label'].includes(id) && window._cpRebuild) window._cpRebuild();
+    if (['s-cp-bg', 's-cp-border', 's-cp-label'].includes(id) && window._cpRebuild
+      && !window._cpActiveDrag) window._cpRebuild();
     settingsChange();
 }
 function onAlphaChange(id) {
@@ -92,7 +93,8 @@ function onAlphaChange(id) {
       if (_tga) _tga.value = slider.value;
     }
     if (window._cpSaveFromUI) window._cpSaveFromUI();
-    if (['s-cp-bg', 's-cp-border', 's-cp-label'].includes(id) && window._cpRebuild) window._cpRebuild();
+    if (['s-cp-bg', 's-cp-border', 's-cp-label'].includes(id) && window._cpRebuild
+      && !window._cpActiveDrag) window._cpRebuild();
     settingsChange();
 }
 function onHexInput(id) {

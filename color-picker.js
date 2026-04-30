@@ -122,11 +122,12 @@
     }
     overlay.addEventListener('pointerdown', e => {
       active = true; cachedRect = slider.getBoundingClientRect(); overlay.setPointerCapture(e.pointerId);
+      window._cpActiveDrag = true;
       update(e.clientX); e.preventDefault(); e.stopPropagation();
     });
     overlay.addEventListener('pointermove', e => { if (active) { update(e.clientX); e.preventDefault(); } });
-    overlay.addEventListener('pointerup',     () => { active = false; cachedRect = null; });
-    overlay.addEventListener('pointercancel', () => { active = false; cachedRect = null; });
+    overlay.addEventListener('pointerup',     () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
+    overlay.addEventListener('pointercancel', () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
   }
 
   function buildPopup() {
