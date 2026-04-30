@@ -359,22 +359,22 @@ function onHexInput(id) {
     _applyingSnapshot = false;
   }
   function settingsUndo() {
+    clearTimeout(_undoDebounceTimer);
     if (!_canUndo()) return;
     _historyIndex--;
     _applyingSnapshot = true;
     _applyStyleSnapshot(_history[_historyIndex]);
     _applyingSnapshot = false;
-    clearTimeout(_undoDebounceTimer);
     _settingsHasChanges = true;
     _updateUndoRedoBtns();
   }
   function settingsRedo() {
+    clearTimeout(_undoDebounceTimer);
     if (!_canRedo()) return;
     _historyIndex++;
     _applyingSnapshot = true;
     _applyStyleSnapshot(_history[_historyIndex]);
     _applyingSnapshot = false;
-    clearTimeout(_undoDebounceTimer);
     _settingsHasChanges = true;
     _updateUndoRedoBtns();
   }
@@ -678,8 +678,16 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     if (!document.getElementById('s-bg')) return;
     if (!_applyingSnapshot) {
       _settingsHasChanges = true;
-      _gestureHasChanges = true;
       _updateUndoRedoBtns();
+      clearTimeout(_undoDebounceTimer);
+      _undoDebounceTimer = setTimeout(() => {
+        if (_applyingSnapshot) return;
+        _history = _history.slice(0, _historyIndex + 1);
+        _history.push(_captureStyleSnapshot());
+        if (_history.length > 50) _history.shift();
+        _historyIndex = _history.length - 1;
+        _updateUndoRedoBtns();
+      }, 400);
     }
     const _cfId = window._cfActiveId ? window._cfActiveId() : null;
     if (_cfId) {
@@ -903,30 +911,3 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
-
-  (function() {
-  let _gestureActive = false;
-  document.addEventListener('pointerdown', function() {
-    if (_applyingSnapshot) return;
-    if (!document.getElementById('settings-overlay').classList.contains('active')) return;
-    if (!_gestureActive) {
-      _gestureActive = true;
-      _preGestureSnapshot = _captureStyleSnapshot();
-    }
-  }, true);
-  document.addEventListener('pointerup', function() {
-    if (_gestureActive && _gestureHasChanges && !_applyingSnapshot) {
-      _history = _history.slice(0, _historyIndex + 1);
-      _history.push(_captureStyleSnapshot());
-      if (_history.length > 52) _history.shift();
-      _historyIndex = _history.length - 1;
-      _updateUndoRedoBtns();
-    }
-    _gestureActive = false;
-    _gestureHasChanges = false;
-  }, true);
-  document.addEventListener('pointercancel', function() {
-    _gestureActive = false;
-    _gestureHasChanges = false;
-  }, true);
-})();
