@@ -489,7 +489,7 @@
       box-shadow: 0 0 16px 5px var(--preview-glow, rgba(150, 90, 255, 0.65));
     }
     #settings-footer { display: flex; gap: 8px; margin-top: 4px; }
-    #settings-save, #settings-cancel, #settings-reset, #settings-export, #settings-import-btn {
+    #settings-save, #settings-cancel, #settings-reset, #settings-revert, #settings-export, #settings-import-btn {
       padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;
     }
     #settings-save   { background: #1a3a1a; color: #99ff99; }
@@ -498,6 +498,8 @@
     #settings-cancel:hover { background: #444; }
     #settings-reset  { background: #2a1a1a; color: #ff9999; }
     #settings-reset:hover { background: #3a2020; }
+    #settings-revert { background: #2a2a1a; color: #ffdd99; }
+    #settings-revert:hover { background: #3a3a20; }
     #settings-export, #settings-import-btn { background: #1a2a3a; color: #99ccff; }
     #settings-export:hover, #settings-import-btn:hover { background: #2a3a4a; }
     #manage-overlay {
