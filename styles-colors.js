@@ -186,6 +186,17 @@ function onHexInput(id) {
       setColorValue(pid, appStyle.stops[i] || "#111111FF");
       document.getElementById(pid).addEventListener("input", () => collectAppStops());
       document.getElementById(pid+"-alpha").addEventListener("input", () => collectAppStops());
+      const _spPicker = document.getElementById(pid);
+      if (_spPicker && !_spPicker.closest('.color-swatch-wrap')) {
+        const _spWrap = document.createElement('div');
+        _spWrap.className = 'color-swatch-wrap';
+        _spPicker.parentNode.insertBefore(_spWrap, _spPicker);
+        _spWrap.appendChild(_spPicker);
+        const _spOv = document.createElement('div');
+        _spOv.className = 'color-swatch-overlay';
+        _spOv.id = pid + '-swatch-overlay';
+        _spWrap.appendChild(_spOv);
+      }
     }
   }
   function collectAppStops() {

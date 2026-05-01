@@ -94,12 +94,43 @@
     if (_sw) _sw.style.background = `rgb(${pr},${pg},${pb})`;
   }
 
+  function refreshAlphaTrack() {
+    if (!popup) return;
+    const alphaEl = popup.querySelector('#cp-alpha');
+    if (!alphaEl) return;
+    const [r,g,b] = hsbToRgb(H, S, B);
+    const pct = parseInt(alphaEl.value) / 255 * 100;
+    const adjPct = `calc(${pct/100} * (100% - var(--slider-handle-w,16px)) + var(--slider-handle-w,16px) / 2)`;
+    const a = (parseInt(alphaEl.value) / 255).toFixed(3);
+    alphaEl.style.background = `linear-gradient(to right, rgba(${r},${g},${b},${a}) ${adjPct}, rgba(80,80,80,1) ${adjPct})`;
+  }
+
+  function commitAlpha(v) {
+    if (!activeSwatch) return;
+    const inp = activeSwatch.querySelector('input[type="color"]');
+    if (!inp) return;
+    const realAlpha = document.getElementById(inp.id + '-alpha');
+    if (realAlpha) { realAlpha.value = v; realAlpha.dispatchEvent(new Event('input', {bubbles:true})); }
+    const [r,g,b] = hsbToRgb(H, S, B);
+    const hex = rgbToHex(r,g,b);
+    const aHex = Math.round(Number(v)).toString(16).padStart(2,'0').toUpperCase();
+    const _hexEl = popup ? popup.querySelector('#cp-hex') : null;
+    if (_hexEl) _hexEl.value = '#' + hex.replace('#','') + aHex;
+    refreshAlphaTrack();
+  }
+
   function commitColor() {
     const [r,g,b] = hsbToRgb(H, S, B);
     const hex = rgbToHex(r,g,b);
     const _hexEl = popup ? popup.querySelector('#cp-hex') : null;
-    if (_hexEl) _hexEl.value = hex;
+    if (_hexEl) {
+      const alphaEl = popup.querySelector('#cp-alpha');
+      const aVal = alphaEl ? parseInt(alphaEl.value) : 255;
+      const aHex = aVal.toString(16).padStart(2,'0').toUpperCase();
+      _hexEl.value = '#' + hex.replace('#','') + aHex;
+    }
     refreshTracks();
+    refreshAlphaTrack();
     if (!activeSwatch) return;
     const inp = activeSwatch.querySelector('input[type="color"]');
     if (inp) { inp.value = hex.toLowerCase(); inp.dispatchEvent(new Event('input', {bubbles:true})); }
@@ -149,14 +180,59 @@
       `<div><div style="${ls}">Saturation</div>` +
         `<input id="cp-sat" type="range" min="0" max="100" value="${S}" style="${ss}"></div>` +
       `<div><div style="${ls}">Brightness</div>` +
-        `<input id="cp-bri" type="range" min="0" max="100" value="${B}" style="${ss}"></div>`;
-    document.body.appendChild(el);
+        `<input id="cp-bri" type="range" min="0" max="100" value="${B}" style="${ss}"></div>` +
+    `<div><div style="${ls}">Alpha</div>` +
+      `<input id="cp-alpha" type="range" min="0" max="255" value="255" style="${ss}"></div>` +
+    `<div style="display:flex;gap:6px;align-items:center;margin-top:2px;">` +
+      `<input id="cp-hex" type="text" maxlength="9" ` +
+        `style="flex:1;min-width:0;background:#111;color:#fff;border:1px solid ${br};border-radius:4px;padding:4px 6px;font-size:12px;font-family:monospace;outline:none;text-transform:uppercase;letter-spacing:0.04em;" ` +
+        `spellcheck="false" autocomplete="off">` +
+      `<button id="cp-copy" style="background:#2a2a2a;border:1px solid ${br};border-radius:4px;color:#aaa;cursor:pointer;padding:4px 8px;font-size:12px;flex-shrink:0;">Copy</button>` +
+    `</div>`;
+  document.body.appendChild(el);
 
-    makeDragger(el.querySelector('#cp-hue'), v => { H = v; commitColor(); });
-    makeDragger(el.querySelector('#cp-sat'), v => { S = v; commitColor(); });
-    makeDragger(el.querySelector('#cp-bri'), v => { B = v; commitColor(); });
+  makeDragger(el.querySelector('#cp-hue'), v => { H = v; commitColor(); });
+  makeDragger(el.querySelector('#cp-sat'), v => { S = v; commitColor(); });
+  makeDragger(el.querySelector('#cp-bri'), v => { B = v; commitColor(); });
+  makeDragger(el.querySelector('#cp-alpha'), v => { commitAlpha(v); });
 
-    return el;
+  el.querySelector('#cp-hex').addEventListener('input', function() {
+    let val = this.value.replace(/[^0-9a-fA-F#]/g,'');
+    if (val && !val.startsWith('#')) val = '#' + val;
+    const h = val.replace('#','');
+    if ((h.length === 6 || h.length === 8) && /^[0-9a-fA-F]+$/.test(h)) {
+      const r2 = parseInt(h.slice(0,2),16), g2 = parseInt(h.slice(2,4),16), b2 = parseInt(h.slice(4,6),16);
+      [H,S,B] = rgbToHsb(r2,g2,b2);
+      if (activeSwatch) {
+        const inp = activeSwatch.querySelector('input[type="color"]');
+        if (inp) { inp.value = '#'+h.slice(0,6).toLowerCase(); inp.dispatchEvent(new Event('input',{bubbles:true})); }
+        if (h.length === 8) {
+          const aVal = parseInt(h.slice(6,8),16);
+          const realAlpha = document.getElementById(inp.id + '-alpha');
+          if (realAlpha) { realAlpha.value = aVal; realAlpha.dispatchEvent(new Event('input',{bubbles:true})); }
+          const alphaEl = popup.querySelector('#cp-alpha');
+          if (alphaEl) { alphaEl.value = aVal; refreshAlphaTrack(); }
+        }
+      }
+      refreshTracks();
+    }
+  });
+  el.querySelector('#cp-hex').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+  });
+
+  const _cpCopyBtn = el.querySelector('#cp-copy');
+  _cpCopyBtn.addEventListener('pointerdown', e => e.stopPropagation());
+  _cpCopyBtn.addEventListener('click', function() {
+    const hexEl = popup ? popup.querySelector('#cp-hex') : null;
+    if (!hexEl) return;
+    navigator.clipboard.writeText(hexEl.value).then(() => {
+      this.textContent = 'Copied'; this.style.color = '#99ff99';
+      setTimeout(() => { this.textContent = 'Copy'; this.style.color = '#aaa'; }, 1200);
+    }).catch(() => {});
+  });
+
+  return el;
   }
 
   function position(swatch) {
@@ -190,8 +266,21 @@
     } else {
       position(swatch);
     }
-    const _hexInit = popup.querySelector('#cp-hex'); if (_hexInit) _hexInit.value = inp.value.replace('#','').toUpperCase();
+    const _realAlpha = document.getElementById(inp.id + '-alpha');
+    const _popupAlpha = popup.querySelector('#cp-alpha');
+    if (_realAlpha && _popupAlpha) _popupAlpha.value = _realAlpha.value;
+    const _realHex = document.getElementById(inp.id + '-hex');
+    const _hexInit = popup.querySelector('#cp-hex');
+    if (_hexInit) {
+      if (_realHex && _realHex.value) {
+        _hexInit.value = _realHex.value;
+      } else {
+        const _aVal = _realAlpha ? parseInt(_realAlpha.value) : 255;
+        _hexInit.value = '#' + inp.value.replace('#','').toUpperCase() + _aVal.toString(16).padStart(2,'0').toUpperCase();
+      }
+    }
     refreshTracks();
+    refreshAlphaTrack();
     setTimeout(() => document.addEventListener('pointerdown', tapOut), 80);
   }
 
@@ -258,6 +347,13 @@
   if (hueEl) hueEl.value = H;
   if (satEl) satEl.value = S;
   if (briEl) briEl.value = B;
+  const _realAlpha = document.getElementById(inp.id + '-alpha');
+  const _alphaEl = popup.querySelector('#cp-alpha');
+  if (_realAlpha && _alphaEl) _alphaEl.value = _realAlpha.value;
+  const _realHex = document.getElementById(inp.id + '-hex');
+  const _hexEl2 = popup.querySelector('#cp-hex');
+  if (_realHex && _hexEl2) _hexEl2.value = _realHex.value;
   refreshTracks();
+  refreshAlphaTrack();
   };
 })();

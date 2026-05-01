@@ -16,6 +16,8 @@
     .copy-btn { background:#2a2a2a; border:1px solid #555; border-radius:4px; color:#aaa; cursor:pointer; padding:4px 10px; font-size:12px; flex-shrink:0; }
     .copy-btn:hover { background:#3a3a3a; color:#fff; }
     .copy-btn.copied { color:#99ff99; border-color:#99ff99; }
+    .color-settings-row .alpha-slider { display: none !important; }
+    .color-settings-row .hex-copy-row { display: none !important; }
     .slider-row-handle { display:none; }
     [data-slider-row] { cursor:grab; user-select:none; -webkit-user-select:none; }
     [data-slider-row]:active { cursor:grabbing; }
