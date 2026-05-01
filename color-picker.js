@@ -37,6 +37,7 @@
     const inp = activeSwatch.querySelector('input[type="color"]');
     if (!inp) return;
     if (typeof updateAlphaSliderBg === 'function') updateAlphaSliderBg(inp.id);
+    if (window._cpSaveFromUI) window._cpSaveFromUI();
     if (typeof settingsChange === 'function') settingsChange();
   }
   const _gd   = {};   // stored gradient per swatch: { [inputId]: stops[] | null }
