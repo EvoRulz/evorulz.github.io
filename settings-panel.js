@@ -300,6 +300,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
       window._cfBuild();
     }
     if(window.fontPickerSync)fontPickerSync();
+    if (window._cpSyncUI) window._cpSyncUI();
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);

@@ -184,6 +184,7 @@
     table { border-collapse: collapse; width: 100%; }
     th, td {
       border: 1px solid var(--app-border-color, #333);
+      border-image: var(--app-border-image, none);
       padding: 6px;
       text-align: center;
       font-size: 12px;

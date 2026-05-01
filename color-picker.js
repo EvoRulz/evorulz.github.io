@@ -386,9 +386,11 @@
 
   function buildPopup() {
     const v = cssVars(), c = cpCfg();
-    const bg  = (c.bg && (c.bg.startsWith('linear-gradient') || c.bg.startsWith('radial-gradient'))) ? c.bg : h8css(c.bg);
+    const bgIsGrad = c.bg && typeof c.bg === 'string' && (c.bg.startsWith('linear-gradient') || c.bg.startsWith('radial-gradient'));
+    const bg  = bgIsGrad ? c.bg : h8css(c.bg);
     const brIsGrad = c.border && typeof c.border === 'string' && (c.border.startsWith('linear-gradient') || c.border.startsWith('radial-gradient'));
     const br = brIsGrad ? c.border : h8css(c.border);
+    const bgLayer = brIsGrad ? (bgIsGrad ? bg : `linear-gradient(${bg}, ${bg})`) : bg;
     const lbl = h8css(c.label);
     const sb = h8css((typeof btnStyle !== 'undefined' && btnStyle.sliderBorder) || '#555555FF');
     injectThumbCSS(v);
@@ -396,7 +398,7 @@
     el.id = 'cp-popup';
     el.style.cssText =
       (brIsGrad
-        ? `position:fixed;z-index:99999;background:${bg} padding-box, ${br} border-box;border:1px solid transparent;border-radius:8px;`
+        ? `position:fixed;z-index:99999;background:${bgLayer} padding-box, ${br} border-box;border:1px solid transparent;border-radius:8px;`
         : `position:fixed;z-index:99999;background:${bg};border:1px solid ${br};border-radius:8px;`) +
       `padding:14px 16px;width:268px;box-shadow:0 4px 24px rgba(0,0,0,0.65);` +
       `display:flex;flex-direction:column;gap:10px;touch-action:none;` +
