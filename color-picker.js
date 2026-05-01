@@ -42,6 +42,7 @@
   const _gd   = {};   // stored gradient per swatch: { [inputId]: stops[] | null }
   let   _ga   = null; // active stops for open popup (null = solid)
   let   _gSel = 0;    // selected handle index
+  let   _gRenderTime = 0; // timestamp of last _gRender call
   let H = 0, S = 100, B = 100;
 
   const CP_DEFAULTS = { bg: '#1c1c1cFF', border: '#555555FF', label: '#bbbbbbFF' };
@@ -88,6 +89,7 @@
   }
   function _gRender() {
     if (!popup) return;
+    _gRenderTime = Date.now();
     const strip  = popup.querySelector('#cp-grad-strip');
     const hw     = popup.querySelector('#cp-grad-hw');
     const minBtn = popup.querySelector('#cp-grad-minus');
@@ -153,6 +155,7 @@
       }
       let _ghdrag = false, _ghdragMoved = false;
       h.addEventListener('pointerdown', e => {
+        if (Date.now() - _gRenderTime < 150) return;
         e.stopPropagation(); e.preventDefault();
         _gSel = i;
         hw.querySelectorAll('[data-gi]').forEach((hh, ii) => {
@@ -198,7 +201,8 @@
             _gLoadHandle(i);
             return;
           }
-          _gRender(); _gSave(); _cpRefreshSwatch();
+          _gRender();
+        if (_ghdragMoved) { _gSave(); _cpRefreshSwatch(); }
         }
       });
       h.addEventListener('pointercancel', () => { if (_ghdrag) { _ghdrag=false; _ghdragMoved=false; _gRender(); } });
@@ -244,7 +248,8 @@
         _gLoadHandle(_gSel);
       }
     }
-    _gRender(); _gSave(); _cpRefreshSwatch();
+    _gRender();
+        if (_ghdragMoved) { _gSave(); _cpRefreshSwatch(); }
   }
   function _gMinus() {
     if (!_ga) return;
@@ -259,7 +264,8 @@
       if (_ga[mids[0]].isPercent) { _ga = null; _gSel = 0; }
       else { _ga[mids[0]].isPercent = true; _gSel = 0; }
     }
-    _gRender(); _gSave(); _cpRefreshSwatch();
+    _gRender();
+        if (_ghdragMoved) { _gSave(); _cpRefreshSwatch(); }
   }
 
   function cssVars() {
