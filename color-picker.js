@@ -228,21 +228,21 @@
     styleTag.id = 'cp-thumb-style';
     styleTag.textContent = `
       #cp-popup input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance:none; width:${v.hW}; height:${v.hH};
-        border-radius:${v.hR}; background:${v.hColor};
-        border:1px solid ${v.hBorder}; cursor:pointer; box-sizing:border-box;
+        -webkit-appearance:none; width:var(--slider-handle-w,16px); height:var(--slider-handle-h,16px);
+        border-radius:var(--slider-handle-r,3%); background:var(--slider-handle-color,#fff);
+        border:1px solid var(--slider-handle-border,transparent); cursor:pointer; box-sizing:border-box;
       }
       #cp-popup input[type=range]::-moz-range-thumb {
-        width:${v.hW}; height:${v.hH}; border-radius:${v.hR};
-        background:${v.hColor}; border:1px solid ${v.hBorder};
+        width:var(--slider-handle-w,16px); height:var(--slider-handle-h,16px); border-radius:var(--slider-handle-r,3%);
+        background:var(--slider-handle-color,#fff); border:1px solid var(--slider-handle-border,transparent);
         cursor:pointer; box-sizing:border-box;
       }`;
     document.head.appendChild(styleTag);
   }
 
   function sliderCSS(v) {
-    return `width:${v.w};height:${v.height};border-radius:${v.spread}/${v.radius};` +
-           `border:1px solid ${v.border};outline:none;appearance:none;-webkit-appearance:none;` +
+    return `width:var(--slider-w,100%);height:var(--slider-h,8px);border-radius:var(--slider-spread,4px)/var(--slider-r,4%);` +
+           `border:1px solid var(--slider-border-color,#555);outline:none;appearance:none;-webkit-appearance:none;` +
            `cursor:pointer;touch-action:none;display:block;box-sizing:border-box;`;
   }
 
