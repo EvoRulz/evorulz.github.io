@@ -328,6 +328,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   }
   async function settingsSave() {
     _settingsHasChanges = false;
+    _updateSettingsBtns();
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderW        = Number(document.getElementById("s-sliderw").value);
     btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);

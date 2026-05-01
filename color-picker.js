@@ -637,7 +637,28 @@
     } else {
       setColorValue('s-cp-label', c.label);
     }
+    _applyLabelToSwatches();
   };
+  window._cpRebuild
+  function _applyLabelToSwatches() {
+    const c = cpCfg();
+    const grad = c.labelStops ? _gBuildCSS(c.labelStops) : null;
+    document.querySelectorAll('.color-swatch-label').forEach(function(el) {
+      if (grad) {
+        el.style.background = grad;
+        el.style.webkitBackgroundClip = 'text';
+        el.style.webkitTextFillColor = 'transparent';
+        el.style.backgroundClip = 'text';
+        el.style.color = 'transparent';
+      } else {
+        el.style.background = '';
+        el.style.webkitBackgroundClip = '';
+        el.style.webkitTextFillColor = '';
+        el.style.backgroundClip = '';
+        el.style.color = h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
+      }
+    });
+  }
   window._cpSaveFromUI = function () {
     if (typeof getColorValue !== 'function') return;
     localStorage.setItem('_cpSettings', JSON.stringify({
@@ -648,6 +669,7 @@
       borderStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-border') : null,
       labelStops:  window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-label')  : null,
     }));
+    _applyLabelToSwatches();
   };
   window._cpRebuild = function () {
     if (popup && activeSwatch) { const sw = activeSwatch; const savedSel = _gSel; close(); openFor(sw); _gSel = savedSel; _gRender(); }
