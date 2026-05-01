@@ -414,7 +414,8 @@
     const brIsGrad = c.border && typeof c.border === 'string' && (c.border.startsWith('linear-gradient') || c.border.startsWith('radial-gradient'));
     const br = brIsGrad ? c.border : h8css(c.border);
     const bgLayer = brIsGrad ? (bgIsGrad ? bg : `linear-gradient(${bg}, ${bg})`) : bg;
-    const lbl = h8css(c.label);
+    const _lblRaw = (c.labelStops && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
+    const lbl = _lblRaw || h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
     const sb = h8css((typeof btnStyle !== 'undefined' && btnStyle.sliderBorder) || '#555555FF');
     injectThumbCSS(v);
     const el = document.createElement('div');
@@ -626,16 +627,23 @@
     } else {
       setColorValue('s-cp-border', c.border);
     }
-    setColorValue('s-cp-label', c.label);
+    if (c.labelStops && window._cpSetGradientStops) {
+      window._cpSetGradientStops('s-cp-label', c.labelStops);
+      const _lbOv = document.getElementById('s-cp-label-swatch-overlay');
+      if (_lbOv) { const _g = window._cpGetGradient('s-cp-label'); if (_g) _lbOv.style.background = _g; }
+    } else {
+      setColorValue('s-cp-label', c.label);
+    }
   };
   window._cpSaveFromUI = function () {
     if (typeof getColorValue !== 'function') return;
     localStorage.setItem('_cpSettings', JSON.stringify({
       bg:          (typeof getStyleValue === 'function' ? getStyleValue('s-cp-bg') : getColorValue('s-cp-bg')),
       border:      (typeof getStyleValue === 'function' ? getStyleValue('s-cp-border') : getColorValue('s-cp-border')),
-      label:       getColorValue('s-cp-label'),
+      label:       (typeof getStyleValue === 'function' ? getStyleValue('s-cp-label') : getColorValue('s-cp-label')),
       bgStops:     window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-bg')     : null,
       borderStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-border') : null,
+      labelStops:  window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-label') : null,
     }));
   };
   window._cpRebuild = function () {
