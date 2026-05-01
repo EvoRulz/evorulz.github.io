@@ -94,9 +94,16 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   const _rVal = s.btnRadius ?? btnStyle.btnRadius ?? 6;
   const _rEl = document.getElementById("s-radius"); if (_rEl) _rEl.value = String(_rVal);
   const _rvEl = document.getElementById("s-radius-val"); if (_rvEl) _rvEl.textContent = _rVal + "px";
-  updateAlphaSliderBg('s-bg');
-  const _sbOv = document.getElementById('s-bg-swatch-overlay');
-  if (_sbOv && s.bg && (s.bg.startsWith('linear-gradient') || s.bg.startsWith('radial-gradient'))) _sbOv.style.background = s.bg;
+  {
+    const _sbOv = document.getElementById('s-bg-swatch-overlay');
+    const _builtGrad = window._cpGetGradient ? window._cpGetGradient('s-bg') : null;
+    const _directGrad = typeof s.bg === 'string' && (s.bg.startsWith('linear-gradient') || s.bg.startsWith('radial-gradient')) ? s.bg : null;
+    if (_sbOv && (_builtGrad || _directGrad)) {
+      _sbOv.style.background = _builtGrad || _directGrad;
+    } else {
+      updateAlphaSliderBg('s-bg');
+    }
+  }
   updateAlphaSliderBg('s-fg');
   updateAlphaSliderBg('s-glow');
   updateAlphaSliderBg('s-activebg');
