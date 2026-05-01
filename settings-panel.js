@@ -364,3 +364,18 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     _settingsHasChanges = false;
     _updateUndoRedoBtns();
   }
+  (function() {
+    function dbounce(fn) {
+      var t = null;
+      return function() {
+        if (t) return;
+        t = setTimeout(function() { t = null; }, 100);
+        fn.apply(this, arguments);
+      };
+    }
+    settingsSave   = dbounce(settingsSave);
+    settingsUndo   = dbounce(settingsUndo);
+    settingsRedo   = dbounce(settingsRedo);
+    settingsCancel = dbounce(settingsCancel);
+    settingsReset  = dbounce(settingsReset);
+  })();
