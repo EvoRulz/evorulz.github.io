@@ -256,6 +256,8 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     const _shhvEl2 = document.getElementById('s-sliderhandleh-val'); if (_shhvEl2) _shhvEl2.textContent = (btnStyle.sliderHandleH ?? 16) + 'px';
     const _shrEl2 = document.getElementById('s-sliderhandler'); if (_shrEl2) _shrEl2.value = String(btnStyle.sliderHandleR ?? 3);
     const _shrvEl2 = document.getElementById('s-sliderhandler-val'); if (_shrvEl2) _shrvEl2.textContent = (btnStyle.sliderHandleR ?? 3) + '%';
+    const _shheEl2 = document.getElementById('s-sliderhandlehole'); if (_shheEl2) _shheEl2.value = String(btnStyle.sliderHandleHole ?? 0);
+    const _shhevEl2 = document.getElementById('s-sliderhandlehole-val'); if (_shhevEl2) _shhevEl2.textContent = (btnStyle.sliderHandleHole ?? 0) + '%';
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
@@ -326,6 +328,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     _settingsHasChanges = false;
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderW        = Number(document.getElementById("s-sliderw").value);
+    btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     localStorage.setItem("_btnStyle",   JSON.stringify(btnStyle));
     localStorage.setItem("_btnStyles",  JSON.stringify(_btnStyles));
     try {
