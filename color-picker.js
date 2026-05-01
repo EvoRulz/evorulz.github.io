@@ -386,7 +386,7 @@
 
   function buildPopup() {
     const v = cssVars(), c = cpCfg();
-    const bg  = h8css(c.bg), br = h8css(c.border), lbl = h8css(c.label);
+    const bg  = (c.bg && (c.bg.startsWith('linear-gradient') || c.bg.startsWith('radial-gradient'))) ? c.bg : h8css(c.bg); const br = h8css(c.border), lbl = h8css(c.label);
     const sb = h8css((typeof btnStyle !== 'undefined' && btnStyle.sliderBorder) || '#555555FF');
     injectThumbCSS(v);
     const el = document.createElement('div');
@@ -589,7 +589,7 @@
   window._cpSaveFromUI = function () {
     if (typeof getColorValue !== 'function') return;
     localStorage.setItem('_cpSettings', JSON.stringify({
-      bg:     getColorValue('s-cp-bg'),
+      bg:     (typeof getStyleValue === 'function' ? getStyleValue('s-cp-bg') : getColorValue('s-cp-bg')),
       border: getColorValue('s-cp-border'),
       label:  getColorValue('s-cp-label'),
     }));
