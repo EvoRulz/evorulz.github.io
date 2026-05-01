@@ -88,7 +88,16 @@
     if (!strip || !hw) return;
     const solid = _gHex8();
     strip.style.background = _ga
-      ? 'linear-gradient(to right,' + _ga.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')'
+      ? 'linear-gradient(to right,' + _ga.map(s => {
+          if (s.isPercent) {
+            const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-w').trim()) || 16;
+            const stripEl = popup && popup.querySelector('#cp-grad-strip');
+            const stripW = stripEl ? stripEl.offsetWidth : 200;
+            const offsetPct = stripW > 0 ? (hw / 2 / stripW * 100) : 0;
+            return h8css(s.hex8) + ' ' + Math.max(0, s.pos * 100 - offsetPct).toFixed(2) + '%';
+          }
+          return h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%';
+        }).join(',') + ')'
       : h8css(solid);
     hw.innerHTML = '';
     const stops = _ga || [
