@@ -633,7 +633,7 @@
     }));
   };
   window._cpRebuild = function () {
-    if (popup && activeSwatch) { const sw = activeSwatch; close(); openFor(sw); }
+    if (popup && activeSwatch) { const sw = activeSwatch; const savedSel = _gSel; close(); openFor(sw); _gSel = savedSel; _gRender(); }
   };
   window._cpGetGradient      = id => { const s = _gd[id]; return s ? _gBuildCSS(s) : null; };
   window._cpGetGradientStops = id => { const s = _gd[id]; return s ? s.map(x => ({...x})) : null; };
