@@ -282,7 +282,7 @@
     const pct = parseInt(alphaEl.value) / 255 * 100;
     const adjPct = `calc(${pct/100} * (100% - var(--slider-handle-w,16px)) + var(--slider-handle-w,16px) / 2)`;
     const a = (parseInt(alphaEl.value) / 255).toFixed(3);
-    alphaEl.style.background = `linear-gradient(to right, rgba(${r},${g},${b},${a}) ${adjPct}, rgba(80,80,80,1) ${adjPct})`;
+    alphaEl.style.background = `linear-gradient(to right, rgba(${r},${g},${b},0), rgba(${r},${g},${b},1))`;
   }
 
   function commitAlpha(v) {
