@@ -103,7 +103,7 @@
       const _cv = cssVars();
       const _hw = _cv.hW || '16px';
       const _hh = _cv.hH || '16px';
-      const _bw = Math.max(1, Math.round(parseFloat(_hw) * 0.10)) + 'px';
+      const _bw = Math.max(1, Math.round(parseFloat(_hw) * 0.02)) + 'px';
       h.style.cssText = [
         'position:absolute','top:50%','transform:translate(-50%,-50%)',
         'width:' + _hw,'height:' + _hh,'border-radius:' + _cv.hR,'box-sizing:border-box',
