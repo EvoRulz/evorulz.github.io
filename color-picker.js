@@ -101,7 +101,11 @@
             const leftPct = centerPct - halfPct;
             const rightPct = centerPct + halfPct;
             const trueCenterPct = stripW > 0 ? (hw / 2 + s.pos * (stripW - hw)) / stripW * 100 : centerPct;
-            stops.push(h8css(_gInterp(prev ? prev.hex8 : next.hex8, next ? next.hex8 : prev.hex8, 0.5)) + ' ' + trueCenterPct.toFixed(2) + '%');
+            const _prevPos = prev ? prev.pos : 0;
+            const _nextPos = next ? next.pos : 1;
+            const _denom = _nextPos - _prevPos;
+            const _t = _denom > 0 ? (s.pos - _prevPos) / _denom : 0.5;
+            stops.push(h8css(_gInterp(prev ? prev.hex8 : next.hex8, next ? next.hex8 : prev.hex8, _t)) + ' ' + trueCenterPct.toFixed(2) + '%');
           });
           return 'linear-gradient(to right,' + stops.join(',') + ')';
         })()
