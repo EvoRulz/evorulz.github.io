@@ -255,6 +255,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     if (window._tumblerRenderPreviews) window._tumblerRenderPreviews();
     settingsUpdatePreview();
     document.querySelectorAll('.alpha-slider:not([id$="-alpha"])').forEach(s => updateSliderFill(s));
+    if (window._cpRebuild && !window._cpActiveDrag) window._cpRebuild();
   }
   async function settingsReset() {
     const ok = await confirmClear("This will reset all styles to their <strong>factory defaults</strong>.");

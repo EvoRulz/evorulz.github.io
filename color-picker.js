@@ -101,8 +101,8 @@
       h.dataset.gi = i;
       if (s.isPercent) h.dataset.isPercent = '1';
       const _cv = cssVars();
-      const _hw = Math.round(parseFloat(_cv.hW || '16') * 0.8) + 'px';
-      const _hh = Math.round(parseFloat(_cv.hH || '16') * 0.8) + 'px';
+      const _hw = Math.round(parseFloat(_cv.hW || '16') * 2) + 'px';
+      const _hh = Math.round(parseFloat(_cv.hH || '16') * 2) + 'px';
       const _bw = Math.max(1, Math.round(parseFloat(_hw) * 0.28)) + 'px';
       h.style.cssText = [
         'position:absolute','top:50%','transform:translate(-50%,-50%)',
@@ -370,7 +370,8 @@
     el.innerHTML =
   `<div style="display:flex;gap:10px;align-items:center;">` +
     `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
-    `<div style="position:relative;height:22px;flex:1;">` +
+    `<div style="position:relative;height:${v.height};flex:1;max-width:${v.w};">` +
+  `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
       `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:4px;border:1px solid ${sb};background:#333;"></div>` +
       `<div id="cp-grad-hw"    style="position:absolute;inset:0;overflow:visible;pointer-events:none;"></div>` +
     `</div>` +
