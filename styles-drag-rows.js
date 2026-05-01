@@ -259,3 +259,112 @@ window.addEventListener('load', function() {
     history.go(1);
   });
 });
+(function() {
+  let swDrag = null, swHoldTimer = null, swReady = false;
+  const swGrid = document.getElementById('sg-swatches');
+  if (!swGrid) return;
+
+  function swCancel() {
+    clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
+    swGrid.style.touchAction = '';
+    const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
+    if (swDrag) {
+      swDrag.item.style.boxShadow = '';
+      swDrag.item.style.opacity = '';
+      if (swDrag.ghost) { swDrag.ghost.remove(); swDrag.ghost = null; }
+    }
+    swDrag = null;
+  }
+
+  function saveSwatchOrder() {
+    const order = [...swGrid.querySelectorAll('[data-swatch-row]')].map(el => el.dataset.swatchRow);
+    localStorage.setItem('_swatchRowOrder', JSON.stringify(order));
+  }
+
+  function applySwatchOrder() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('_swatchRowOrder'));
+      if (!Array.isArray(saved)) return;
+      saved.forEach(id => {
+        const item = swGrid.querySelector(`[data-swatch-row="${id}"]`);
+        if (item) swGrid.appendChild(item);
+      });
+    } catch {}
+  }
+
+  swGrid.addEventListener('pointerdown', e => {
+    if (e.target.closest('input, select, button, textarea')) return;
+    const item = e.target.closest('[data-swatch-row]');
+    if (!item || swDrag) return;
+    const rect = item.getBoundingClientRect();
+    swDrag = {
+      item, startX: e.clientX, startY: e.clientY,
+      offX: e.clientX - rect.left, offY: e.clientY - rect.top,
+      w: rect.width, h: rect.height,
+      ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
+    };
+    swReady = false;
+    swHoldTimer = setTimeout(() => {
+      if (swDrag) {
+        swReady = true;
+        swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+        swGrid.style.touchAction = 'none';
+        const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
+      }
+    }, 500);
+  });
+
+  swGrid.addEventListener('pointermove', e => {
+    if (!swDrag) return;
+    const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
+    if (!swReady) { if (moved > 10) swCancel(); return; }
+    e.preventDefault();
+    if (!swDrag.active) {
+      if (moved < 4) return;
+      swDrag.active = true;
+      swDrag.item.style.boxShadow = '';
+      const rect = swDrag.item.getBoundingClientRect();
+      swDrag.offX = swDrag.startX - rect.left;
+      swDrag.offY = swDrag.startY - rect.top;
+      swDrag.ghost = swDrag.item.cloneNode(true);
+      Object.assign(swDrag.ghost.style, {
+        position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
+        width: rect.width + 'px', height: rect.height + 'px',
+        pointerEvents: 'none', opacity: '0.75', zIndex: '99999',
+        margin: '0', boxSizing: 'border-box',
+      });
+      (document.getElementById('settings-overlay') || document.body).appendChild(swDrag.ghost);
+      swDrag.item.style.opacity = '0.3';
+    }
+    swDrag.ghost.style.left = (e.clientX - swDrag.offX) + 'px';
+    swDrag.ghost.style.top  = (e.clientY - swDrag.offY) + 'px';
+    const gcx = e.clientX - swDrag.offX + swDrag.w / 2;
+    const gcy = e.clientY - swDrag.offY + swDrag.h / 2;
+    let over = null;
+    for (const t of swGrid.querySelectorAll('[data-swatch-row]')) {
+      if (t === swDrag.item) continue;
+      const r = t.getBoundingClientRect();
+      if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
+    }
+    if (!over) { swDrag.lastOver = null; return; }
+    if (over === swDrag.lastOver) return;
+    swDrag.lastOver = over;
+    const overNext = over.nextSibling, iNext = swDrag.item.nextSibling;
+    if (iNext === over)                swGrid.insertBefore(over, swDrag.item);
+    else if (overNext === swDrag.item) swGrid.insertBefore(swDrag.item, over);
+    else {
+      swGrid.insertBefore(swDrag.item, overNext || null);
+      swGrid.insertBefore(over, iNext || null);
+    }
+  }, { passive: false });
+
+  swGrid.addEventListener('pointerup', () => {
+    if (!swDrag) return;
+    const wasActive = swDrag.active;
+    swCancel();
+    if (wasActive) saveSwatchOrder();
+  });
+  swGrid.addEventListener('pointercancel', swCancel);
+
+  applySwatchOrder();
+})();

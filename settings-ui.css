@@ -481,3 +481,9 @@ input[type="checkbox"]:hover {
     body.interact-locked #settings-footer button { pointer-events: none; }
     body.interact-locked .cf-arrow { pointer-events: none; }
     body { padding-bottom: 68px !important; }
+    #sg-swatches.settings-group-content {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
