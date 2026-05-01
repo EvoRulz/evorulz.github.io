@@ -346,6 +346,7 @@
   function buildPopup() {
     const v = cssVars(), c = cpCfg();
     const bg  = h8css(c.bg), br = h8css(c.border), lbl = h8css(c.label);
+    const sb = h8css((typeof btnStyle !== 'undefined' && btnStyle.sliderBorder) || '#555555FF');
     injectThumbCSS(v);
     const el = document.createElement('div');
     el.id = 'cp-popup';
@@ -358,12 +359,12 @@
     const ls = `font-size:11px;color:${lbl};margin-bottom:2px;`;
     el.innerHTML =
   `<div style="display:flex;gap:4px;align-items:center;">` +
-    `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${br};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
+    `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
     `<div style="position:relative;height:22px;flex:1;">` +
-      `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:4px;border:1px solid ${br};background:#333;"></div>` +
+      `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:4px;border:1px solid ${sb};background:#333;"></div>` +
       `<div id="cp-grad-hw"    style="position:absolute;inset:0;overflow:visible;pointer-events:none;"></div>` +
     `</div>` +
-    `<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${br};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
+    `<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
   `</div>` +
   `<div><div style="${ls}">Hue</div>` +
     `<input id="cp-hue" type="range" min="0" max="360" value="${H}" style="${ss}"></div>` +
@@ -375,9 +376,9 @@
   `<input id="cp-alpha" type="range" min="0" max="255" value="255" style="${ss}"></div>` +
 `<div style="display:flex;gap:6px;align-items:center;margin-top:2px;">` +
   `<input id="cp-hex" type="text" maxlength="9" ` +
-    `style="flex:1;min-width:0;background:#111;color:#fff;border:1px solid ${br};border-radius:4px;padding:4px 6px;font-size:12px;font-family:monospace;outline:none;text-transform:uppercase;letter-spacing:0.04em;" ` +
+    `style="flex:1;min-width:0;background:#111;color:#fff;border:1px solid ${sb};border-radius:4px;padding:4px 6px;font-size:12px;font-family:monospace;outline:none;text-transform:uppercase;letter-spacing:0.04em;" ` +
     `spellcheck="false" autocomplete="off">` +
-  `<button id="cp-copy" style="background:#2a2a2a;border:1px solid ${br};border-radius:4px;color:#aaa;cursor:pointer;padding:4px 8px;font-size:12px;flex-shrink:0;">Copy</button>` +
+  `<button id="cp-copy" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;padding:4px 8px;font-size:12px;flex-shrink:0;">Copy</button>` +
 `</div>`;
   document.body.appendChild(el);
 
