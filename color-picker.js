@@ -106,7 +106,7 @@
       const _bw = Math.max(3, Math.round(parseFloat(_hw) * 0.28)) + 'px';
       h.style.cssText = [
         'position:absolute','top:50%','transform:translate(-50%,-50%)',
-        'width:' + _hw,'height:' + _hh,'border-radius:50%','box-sizing:border-box',
+        'width:' + _hw,'height:' + _hh,'border-radius:' + _cv.hR,'box-sizing:border-box',
         'pointer-events:auto','touch-action:none',
         'cursor:' + (isL||isR ? 'pointer' : 'grab'),
         'left:' + (s.pos*100) + '%',
