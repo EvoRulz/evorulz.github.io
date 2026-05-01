@@ -297,7 +297,9 @@
   }
 
   // ── Intercept all swatch pointerdowns ──────────────────────
-  document.addEventListener('pointerdown', function (e) {
+  let _swatchDownX = null, _swatchDownY = null, _swatchDownEl = null;
+
+  function _resolveSwatchEl(e) {
     let sw = e.target.closest('.color-swatch-wrap');
     if (!sw) {
       const row = e.target.closest('.color-picker-row');
@@ -311,9 +313,27 @@
         }
       }
     }
+    return sw;
+  }
+
+  document.addEventListener('pointerdown', function(e) {
+    const sw = _resolveSwatchEl(e);
     if (!sw) return;
     e.preventDefault(); e.stopPropagation();
+    _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw;
+  }, true);
+
+  document.addEventListener('pointerup', function(e) {
+    if (!_swatchDownEl) return;
+    const sw = _swatchDownEl;
+    const moved = Math.hypot(e.clientX - (_swatchDownX || 0), e.clientY - (_swatchDownY || 0));
+    _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null;
+    if (moved > 8) return;
     activeSwatch === sw ? close() : openFor(sw);
+  }, true);
+
+  document.addEventListener('pointercancel', function() {
+    _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null;
   }, true);
 
   // ── Public API ─────────────────────────────────────────────

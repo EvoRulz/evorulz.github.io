@@ -426,6 +426,13 @@ if (navigator.storage && navigator.storage.persist) {
     const overlay = document.createElement('div');
     overlay.className = 'color-swatch-overlay';
     overlay.id = id + '-swatch-overlay';
+    const labelEl = wrap.closest('.color-settings-row') && wrap.closest('.color-settings-row').querySelector(':scope > label');
+    if (labelEl) {
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'color-swatch-label';
+      labelSpan.textContent = labelEl.textContent.trim();
+      overlay.appendChild(labelSpan);
+    }
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
