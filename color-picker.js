@@ -101,8 +101,8 @@
       h.dataset.gi = i;
       if (s.isPercent) h.dataset.isPercent = '1';
       const _cv = cssVars();
-      const _hw = Math.round(parseFloat(_cv.hW || '16') * 0.6) + 'px';
-      const _hh = Math.round(parseFloat(_cv.hH || '16') * 0.6) + 'px';
+      const _hw = Math.round(parseFloat(_cv.hW || '16') * 0.8) + 'px';
+      const _hh = Math.round(parseFloat(_cv.hH || '16') * 0.8) + 'px';
       const _bw = Math.max(1, Math.round(parseFloat(_hw) * 0.28)) + 'px';
       h.style.cssText = [
         'position:absolute','top:50%','transform:translate(-50%,-50%)',
