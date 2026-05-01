@@ -191,11 +191,11 @@ else {
     btnStyle.glow           = getColorValue('s-glow');
     btnStyle.activeGlow     = getColorValue('s-activeglow');
     btnStyle.tapHighlight   = getColorValue('s-taphighlight');
-    btnStyle.sliderBorder   = getColorValue('s-sliderborder');
-    if (document.getElementById('s-sliderfill'))   btnStyle.sliderFill   = getColorValue('s-sliderfill');
-if (document.getElementById('s-slidertrack'))  btnStyle.sliderTrack  = getColorValue('s-slidertrack');
-if (document.getElementById('s-sliderhandle')) btnStyle.sliderHandle = getColorValue('s-sliderhandle');
-    if (document.getElementById('s-sliderhandleborder')) btnStyle.sliderHandleBorder = getColorValue('s-sliderhandleborder');
+    btnStyle.sliderBorder   = getStyleValue('s-sliderborder');
+    if (document.getElementById('s-sliderfill'))   btnStyle.sliderFill   = getStyleValue('s-sliderfill');
+    if (document.getElementById('s-slidertrack'))  btnStyle.sliderTrack  = getStyleValue('s-slidertrack');
+    if (document.getElementById('s-sliderhandle')) btnStyle.sliderHandle = getStyleValue('s-sliderhandle');
+    if (document.getElementById('s-sliderhandleborder')) btnStyle.sliderHandleBorder = getStyleValue('s-sliderhandleborder');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
     btnStyle.sliderR        = Number(document.getElementById("s-sliderr").value);
     btnStyle.sliderSpread   = Number(document.getElementById("s-sliderspread").value);

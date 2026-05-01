@@ -311,10 +311,10 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--slider-w",             (btnStyle.sliderW ?? 100) + "%");
     document.documentElement.style.setProperty("--slider-handle-r",      (btnStyle.sliderHandleR ?? 3) + "%");
     document.documentElement.style.setProperty("--slider-handle-hole",  (btnStyle.sliderHandleHole ?? 0));
-    document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));
-    document.documentElement.style.setProperty("--slider-track-bg",      hex8ToCss(btnStyle.sliderTrack  || '#333333FF'));
-    document.documentElement.style.setProperty("--slider-handle-color",  hex8ToCss(btnStyle.sliderHandle || '#FFFFFFFF'));
-    document.documentElement.style.setProperty("--slider-handle-border", hex8ToCss(btnStyle.sliderHandleBorder || '#00000000'));
+    document.documentElement.style.setProperty("--slider-fill-color",    _bgCss(btnStyle.sliderFill   || '#9659FFFF'));
+    document.documentElement.style.setProperty("--slider-track-bg",      _bgCss(btnStyle.sliderTrack  || '#333333FF'));
+    document.documentElement.style.setProperty("--slider-handle-color",  _bgCss(btnStyle.sliderHandle || '#FFFFFFFF'));
+    document.documentElement.style.setProperty("--slider-handle-border", _bgCss(btnStyle.sliderHandleBorder || '#00000000'));
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
