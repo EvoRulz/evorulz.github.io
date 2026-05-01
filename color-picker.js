@@ -133,10 +133,11 @@
         'z-index:' + (isSel ? 10 : isL||isR ? 5 : 2),
       ].join(';');
       if (s.isPercent) {
-        h.style.background = '#444';
-        h.style.border = '2px solid ' + (isSel ? '#fff' : '#888');
-        h.style.boxShadow = '0 0 0 1px #000' + (isSel ? ',0 0 0 3px rgba(255,255,255,0.4)' : '');
-        h.innerHTML = '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;color:#ccc;font-weight:bold;pointer-events:none;">%</span>';
+        const _holeGrad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-hole').trim()) || 0;
+        h.style.background = 'radial-gradient(circle, transparent calc(' + _holeGrad + ' * 1%), ' + _cv.hColor + ' calc(' + _holeGrad + ' * 1%))';
+        h.style.border = '1px solid ' + _cv.hBorder;
+        h.style.boxShadow = isSel ? '0 0 8px 4px rgba(255,255,255,0.85)' : '';
+        h.innerHTML = '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;font-weight:bold;pointer-events:none;mix-blend-mode:difference;color:#fff;">%</span>';
       } else {
         const _holeGrad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-hole').trim()) || 0;
         h.style.background = 'radial-gradient(circle, transparent calc(' + _holeGrad + ' * 1%), ' + _cv.hColor + ' calc(' + _holeGrad + ' * 1%))';
