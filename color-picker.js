@@ -119,7 +119,7 @@
         h.innerHTML = '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;color:#ccc;font-weight:bold;pointer-events:none;">%</span>';
       } else {
         const _holeGrad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-hole').trim()) || 0;
-        h.style.background = 'radial-gradient(circle, transparent calc(' + _holeGrad + ' * 1%), ' + h8css(s.hex8) + ' calc(' + _holeGrad + ' * 1%))';
+        h.style.background = 'radial-gradient(circle, transparent calc(' + _holeGrad + ' * 1%), ' + _cv.hColor + ' calc(' + _holeGrad + ' * 1%))';
         h.style.border = '1px solid ' + _cv.hBorder;
         h.style.boxShadow = isSel ? '0 0 8px 4px rgba(255,255,255,0.85)' : '';
       }
@@ -375,7 +375,6 @@
     `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
     `<div style="position:relative;height:${v.height};flex:1;max-width:${v.w};">` +
   `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
-      `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:4px;border:1px solid ${sb};background:#333;"></div>` +
       `<div id="cp-grad-hw"    style="position:absolute;inset:0;overflow:visible;pointer-events:none;"></div>` +
     `</div>` +
     `<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
