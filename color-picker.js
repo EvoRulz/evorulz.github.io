@@ -218,6 +218,7 @@
       hH:      g('--slider-handle-h')     || '16px',
       hR:      g('--slider-handle-r')     || '3%',
       hBorder: g('--slider-handle-border')|| 'transparent',
+      w:       g('--slider-w')            || '100%',
     };
   }
 
@@ -240,7 +241,7 @@
   }
 
   function sliderCSS(v) {
-    return `width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};` +
+    return `width:${v.w};height:${v.height};border-radius:${v.spread}/${v.radius};` +
            `border:1px solid ${v.border};outline:none;appearance:none;-webkit-appearance:none;` +
            `cursor:pointer;touch-action:none;display:block;box-sizing:border-box;`;
   }
