@@ -694,9 +694,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.display = '';
         el.style.maxWidth = '';
         var _oc = h8css(c.labelBorder);
-        el.style.textShadow = '';
-        el.style.webkitTextStroke = '2px '+_oc;
-        el.style.paintOrder = 'stroke fill';
+        el.style.textShadow = '-2px -2px 0 '+_oc+', 2px -2px 0 '+_oc+', -2px 2px 0 '+_oc+', 2px 2px 0 '+_oc+', -3px 0 0 '+_oc+', 3px 0 0 '+_oc+', 0 -3px 0 '+_oc+', 0 3px 0 '+_oc;
         el.style.webkitTextStroke = '';
         el.style.paintOrder = '';
       } else {
