@@ -683,7 +683,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     const grad = c.labelStops ? _gBuildCSS(c.labelStops) : null;
     const outlineColor = c.labelOutline ? h8css(c.labelOutline) : 'rgba(0,0,0,1)';
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
-      el.style.webkitTextStroke = '1px ' + outlineColor;
+      el.style.webkitTextStroke = '4px ' + outlineColor;
       el.style.paintOrder = 'stroke fill';
       if (grad) {
         el.style.display = 'inline-block';
