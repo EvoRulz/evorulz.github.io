@@ -706,11 +706,14 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         var _strokeColor;
         if (_hasLbGrad) {
           var _lbN = _lbGradStops.length;
-          _strokeColor = h8css(_lbN > 2 ? _lbGradStops[Math.floor(_lbN / 2)].hex8 : _gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbN - 1].hex8, 0.5));
+          var _lbC0 = h8css(_lbGradStops[0].hex8);
+          var _lbCM = h8css(_gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbN - 1].hex8, 0.5));
+          var _lbC1 = h8css(_lbGradStops[_lbN - 1].hex8);
+          el.style.textShadow = '-1px -1px 0 '+_lbC0+', 0px -1px 0 '+_lbCM+', 1px -1px 0 '+_lbC1+', 1px 0px 0 '+_lbC1+', 1px 1px 0 '+_lbC1+', 0px 1px 0 '+_lbCM+', -1px 1px 0 '+_lbC0+', -1px 0px 0 '+_lbC0;
         } else {
-          _strokeColor = h8css(c.labelBorder);
+          var _strokeColor = h8css(c.labelBorder);
+          el.style.textShadow = '-1px -1px 0 '+_strokeColor+', 0px -1px 0 '+_strokeColor+', 1px -1px 0 '+_strokeColor+', 1px 0px 0 '+_strokeColor+', 1px 1px 0 '+_strokeColor+', 0px 1px 0 '+_strokeColor+', -1px 1px 0 '+_strokeColor+', -1px 0px 0 '+_strokeColor;
         }
-        el.style.textShadow = '-1px -1px 0 '+_strokeColor+', 0px -1px 0 '+_strokeColor+', 1px -1px 0 '+_strokeColor+', 1px 0px 0 '+_strokeColor+', 1px 1px 0 '+_strokeColor+', 0px 1px 0 '+_strokeColor+', -1px 1px 0 '+_strokeColor+', -1px 0px 0 '+_strokeColor;
       } else {
         el.style.border = '';
         el.style.borderRadius = '';
