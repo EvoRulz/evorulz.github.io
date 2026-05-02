@@ -702,31 +702,15 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.maxWidth = '';
         el.style.webkitTextStroke = '';
         el.style.paintOrder = '';
+        el.style.filter = '';
+        var _strokeColor;
         if (_hasLbGrad) {
-          var _lbN  = _lbGradStops.length;
-          var _lbC0 = h8css(_lbGradStops[0].hex8);
-          var _lbC1 = h8css(_lbGradStops[_lbN - 1].hex8);
-          var _lbCM = _lbN > 2 ? h8css(_lbGradStops[Math.floor(_lbN / 2)].hex8) : h8css(_gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbN - 1].hex8, 0.5));
-          el.style.textShadow = '';
-          el.style.filter =
-            'drop-shadow(-1px -1px 0 ' + _lbC0 + ') ' +
-            'drop-shadow(0px -1px 0 ' + _lbCM + ') ' +
-            'drop-shadow(1px -1px 0 ' + _lbC1 + ') ' +
-            'drop-shadow(1px 0px 0 '  + _lbC1 + ') ' +
-            'drop-shadow(1px 1px 0 '  + _lbC1 + ') ' +
-            'drop-shadow(0px 1px 0 '  + _lbCM + ') ' +
-            'drop-shadow(-1px 1px 0 ' + _lbC0 + ') ' +
-            'drop-shadow(-1px 0px 0 ' + _lbC0 + ')';
+          var _lbN = _lbGradStops.length;
+          _strokeColor = h8css(_lbN > 2 ? _lbGradStops[Math.floor(_lbN / 2)].hex8 : _gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbN - 1].hex8, 0.5));
         } else {
-          var _oc = h8css(c.labelBorder);
-          if (grad) {
-            el.style.textShadow = '';
-            el.style.filter = 'drop-shadow(1px 0px 0px '+_oc+') drop-shadow(-1px 0px 0px '+_oc+') drop-shadow(0px 1px 0px '+_oc+') drop-shadow(0px -1px 0px '+_oc+')';
-          } else {
-            el.style.filter = '';
-            el.style.textShadow = '-1px -1px 0 '+_oc+', 1px -1px 0 '+_oc+', -1px 1px 0 '+_oc+', 1px 1px 0 '+_oc+', -2px 0 0 '+_oc+', 2px 0 0 '+_oc+', 0 -2px 0 '+_oc+', 0 2px 0 '+_oc;
-          }
+          _strokeColor = h8css(c.labelBorder);
         }
+        el.style.textShadow = '-1px -1px 0 '+_strokeColor+', 0px -1px 0 '+_strokeColor+', 1px -1px 0 '+_strokeColor+', 1px 0px 0 '+_strokeColor+', 1px 1px 0 '+_strokeColor+', 0px 1px 0 '+_strokeColor+', -1px 1px 0 '+_strokeColor+', -1px 0px 0 '+_strokeColor;
       } else {
         el.style.border = '';
         el.style.borderRadius = '';
