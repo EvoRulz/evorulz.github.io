@@ -680,10 +680,10 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   };
   function _applyLabelToSwatches() {
     const c = cpCfg();
-    const grad = c.labelStops ? _gBuildCSS(c.labelStops) : null;
+    const grad = c.labelStops ? _gBuildCSS(c.labelStops) : (c.label && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
     const outlineColor = c.labelOutline ? h8css(c.labelOutline) : 'rgba(0,0,0,1)';
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
-      el.style.webkitTextStroke = '4px ' + outlineColor;
+      el.style.webkitTextStroke = '1px ' + outlineColor;
       el.style.paintOrder = 'stroke fill';
       if (grad) {
         el.style.display = 'inline-block';
@@ -693,7 +693,11 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.webkitTextFillColor = 'transparent';
         el.style.color = 'transparent';
       } else {
-        el.style.color = h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
+        el.style.background = '';
+        el.style.webkitBackgroundClip = '';
+        el.style.backgroundClip = '';
+        el.style.webkitTextFillColor = '';
+        el.style.color = h8css(typeof c.label === 'string' && !c.label.startsWith('linear-gradient') && !c.label.startsWith('radial-gradient') ? c.label : '#bbbbbbFF');
       }
     });
   }
