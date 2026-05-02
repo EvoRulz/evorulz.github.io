@@ -46,7 +46,7 @@
   let   _gRenderTime = 0; // timestamp of last _gRender call
   let H = 0, S = 100, B = 100;
 
-  const CP_DEFAULTS = { bg: '#1c1c1cFF', border: '#555555FF', label: '#bbbbbbFF', text: '#FFFFFFFF', labelBorder: '#00000000' };
+  const CP_DEFAULTS = { bg: '#1c1c1cFF', border: '#555555FF', label: '#bbbbbbFF', text: '#FFFFFFFF', labelOutline: '#000000FF' }
   function cpCfg() {
     try { const s = JSON.parse(localStorage.getItem('_cpSettings')); if (s) return Object.assign({}, CP_DEFAULTS, s); } catch {}
     return Object.assign({}, CP_DEFAULTS);
@@ -652,6 +652,9 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     if (c.text) {
       setColorValue('s-cp-text', c.text);
     }
+    if (c.labelOutline) {
+      setColorValue('s-cp-label-outline', c.labelOutline);
+    }
     if (c.labelBorderStops && window._cpSetGradientStops) {
       window._cpSetGradientStops('s-cp-label-border', c.labelBorderStops);
       const _lbOv = document.getElementById('s-cp-label-border-swatch-overlay');
@@ -678,25 +681,10 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   function _applyLabelToSwatches() {
     const c = cpCfg();
     const grad = c.labelStops ? _gBuildCSS(c.labelStops) : null;
-    var _lbGradStops = c.labelBorderStops ? c.labelBorderStops.filter(function(s){ return !s.isPercent; }) : null;
-    var _hasLbGrad   = _lbGradStops && _lbGradStops.length >= 2;
-    var _lbAlpha     = (!_hasLbGrad && c.labelBorder) ? parseInt(c.labelBorder.slice(7,9) || 'ff', 16) : (_hasLbGrad ? 1 : 0);
-    var hasOutline   = _hasLbGrad || (c.labelBorder && _lbAlpha > 0);
-    var oc = hasOutline ? (_hasLbGrad ? h8css(_gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbGradStops.length-1].hex8, 0.5)) : h8css(c.labelBorder)) : '';
+    const outlineColor = c.labelOutline ? h8css(c.labelOutline) : 'rgba(0,0,0,1)';
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
-      el.style.cssText = '';
-      el.style.fontSize = '10px';
-      el.style.lineHeight = '1.2';
-      el.style.wordBreak = 'break-word';
-      el.style.maxWidth = '100%';
-      el.style.pointerEvents = 'none';
-      el.style.userSelect = 'none';
-      el.style.textAlign = 'center';
-      el.style.padding = '2px 4px';
-      if (hasOutline) {
-        el.style.webkitTextStroke = '2px ' + oc;
-        el.style.paintOrder = 'stroke fill';
-      }
+      el.style.webkitTextStroke = '1px ' + outlineColor;
+      el.style.paintOrder = 'stroke fill';
       if (grad) {
         el.style.display = 'inline-block';
         el.style.background = grad;
@@ -720,6 +708,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
       borderStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-border') : null,
       labelStops:  window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-label')  : null,
       textStops:   window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-text')   : null,
+      labelOutline: getColorValue('s-cp-label-outline'),
       labelBorder: (typeof getColorValue === 'function' ? getColorValue('s-cp-label-border') : null),
       labelBorderStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-label-border') : null,
     }));
