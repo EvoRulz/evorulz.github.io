@@ -689,15 +689,19 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.color = h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
       }
       if (c.labelBorder && c.labelBorder !== '#00000000') {
-        el.style.border = '1px solid ' + h8css(c.labelBorder);
-        el.style.borderRadius = '2px';
-        el.style.display = 'inline-block';
-        el.style.maxWidth = '90%';
+        el.style.border = '';
+        el.style.borderRadius = '';
+        el.style.display = '';
+        el.style.maxWidth = '';
+        el.style.webkitTextStroke = '1px ' + h8css(c.labelBorder);
+        el.style.paintOrder = 'stroke fill';
       } else {
         el.style.border = '';
         el.style.borderRadius = '';
         el.style.display = '';
         el.style.maxWidth = '';
+        el.style.webkitTextStroke = '';
+        el.style.paintOrder = '';
       }
     });
   }
