@@ -432,9 +432,9 @@
       `user-select:none;-webkit-user-select:none;`;
     const ss = sliderCSS(v);
     const ls = _txtGrad
-      ? `font-size:11px;background:${_txtGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;margin-bottom:2px;`
+      ? `font-size:11px;background:${_txtGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;margin-bottom:2px;`
       : _lblGrad
-      ? `font-size:11px;background:${_lblGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;margin-bottom:2px;`
+      ? `font-size:11px;background:${_lblGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;margin-bottom:2px;`
       : `font-size:11px;color:${txt};margin-bottom:2px;`;
     el.innerHTML =
   `<div style="display:flex;gap:calc(${v.hW} * 1.5);align-items:center;">` +
@@ -469,6 +469,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
       label.style.color = 'transparent';
       label.style.fontSize = '11px';
       label.style.marginBottom = '2px';
+      label.style.display = 'inline-block';
     } else {
       label.style.cssText = 'font-size:11px;color:' + (txt || 'rgba(255,255,255,1)') + ';margin-bottom:2px;';
     }
