@@ -682,35 +682,30 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     var _hasLbGrad   = _lbGradStops && _lbGradStops.length >= 2;
     var _lbAlpha     = (!_hasLbGrad && c.labelBorder) ? parseInt(c.labelBorder.slice(7,9) || 'ff', 16) : (_hasLbGrad ? 1 : 0);
     var hasOutline   = _hasLbGrad || (c.labelBorder && _lbAlpha > 0);
+    var oc = hasOutline ? (_hasLbGrad ? h8css(_gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbGradStops.length-1].hex8, 0.5)) : h8css(c.labelBorder)) : '';
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
-      el.style.background = '';
-      el.style.webkitBackgroundClip = '';
-      el.style.webkitTextFillColor = '';
-      el.style.backgroundClip = '';
-      el.style.color = '';
-      el.style.display = '';
-      el.style.webkitTextStroke = '';
-      el.style.paintOrder = '';
-      el.style.textShadow = '';
-      el.style.filter = '';
+      el.style.cssText = '';
+      el.style.fontSize = '10px';
+      el.style.lineHeight = '1.2';
+      el.style.wordBreak = 'break-word';
+      el.style.maxWidth = '100%';
+      el.style.pointerEvents = 'none';
+      el.style.userSelect = 'none';
+      el.style.textAlign = 'center';
+      el.style.padding = '2px 4px';
+      if (hasOutline) {
+        el.style.webkitTextStroke = '2px ' + oc;
+        el.style.paintOrder = 'stroke fill';
+      }
       if (grad) {
+        el.style.display = 'inline-block';
         el.style.background = grad;
         el.style.webkitBackgroundClip = 'text';
-        el.style.webkitTextFillColor = 'transparent';
         el.style.backgroundClip = 'text';
+        el.style.webkitTextFillColor = 'transparent';
         el.style.color = 'transparent';
-        el.style.display = 'inline-block';
       } else {
         el.style.color = h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
-      }
-      if (hasOutline) {
-        var oc;
-        if (_hasLbGrad) {
-          oc = h8css(_gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbGradStops.length - 1].hex8, 0.5));
-        } else {
-          oc = h8css(c.labelBorder);
-        }
-        el.style.textShadow = '1px 0 0 '+oc+',-1px 0 0 '+oc+',0 1px 0 '+oc+',0 -1px 0 '+oc+',1px 1px 0 '+oc+',-1px -1px 0 '+oc+',1px -1px 0 '+oc+',-1px 1px 0 '+oc;
       }
     });
   }
