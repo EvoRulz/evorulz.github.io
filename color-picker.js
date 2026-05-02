@@ -703,6 +703,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.maxWidth = '';
         el.style.webkitTextStroke = '';
         el.style.paintOrder = '';
+        el.style.textShadow = '';
         el.style.filter = '';
         var _strokeColor;
         if (_hasLbGrad) {
@@ -713,13 +714,13 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
           el.style.webkitTextStroke = '';
 el.style.paintOrder = '';
 el.style.textShadow = '';
-el.style.filter = 'drop-shadow(1px 0 0 '+_lbCM+') drop-shadow(-1px 0 0 '+_lbCM+') drop-shadow(0 1px 0 '+_lbCM+') drop-shadow(0 -1px 0 '+_lbCM+')';
+el.style.textShadow = '0 0 3px '+_lbCM+', 0 0 3px '+_lbCM+', 0 0 3px '+_lbCM;
         } else {
           var _strokeColor = h8css(c.labelBorder);
           el.style.webkitTextStroke = '';
 el.style.paintOrder = '';
 el.style.textShadow = '';
-el.style.filter = 'drop-shadow(1px 0 0 '+_strokeColor+') drop-shadow(-1px 0 0 '+_strokeColor+') drop-shadow(0 1px 0 '+_strokeColor+') drop-shadow(0 -1px 0 '+_strokeColor+')';
+el.style.textShadow = '0 0 3px '+_strokeColor+', 0 0 3px '+_strokeColor+', 0 0 3px '+_strokeColor;
         }
       } else {
         el.style.border = '';
