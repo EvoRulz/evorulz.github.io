@@ -709,10 +709,14 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
           var _lbC0 = h8css(_lbGradStops[0].hex8);
           var _lbCM = h8css(_gInterp(_lbGradStops[0].hex8, _lbGradStops[_lbN - 1].hex8, 0.5));
           var _lbC1 = h8css(_lbGradStops[_lbN - 1].hex8);
-          el.style.textShadow = '-1px -1px 0 '+_lbC0+', 0px -1px 0 '+_lbCM+', 1px -1px 0 '+_lbC1+', 1px 0px 0 '+_lbC1+', 1px 1px 0 '+_lbC1+', 0px 1px 0 '+_lbCM+', -1px 1px 0 '+_lbC0+', -1px 0px 0 '+_lbC0;
+          el.style.webkitTextStroke = '1.5px ' + _lbCM;
+el.style.paintOrder = 'stroke fill';
+el.style.textShadow = '';
         } else {
           var _strokeColor = h8css(c.labelBorder);
-          el.style.textShadow = '-1px -1px 0 '+_strokeColor+', 0px -1px 0 '+_strokeColor+', 1px -1px 0 '+_strokeColor+', 1px 0px 0 '+_strokeColor+', 1px 1px 0 '+_strokeColor+', 0px 1px 0 '+_strokeColor+', -1px 1px 0 '+_strokeColor+', -1px 0px 0 '+_strokeColor;
+          el.style.webkitTextStroke = '1.5px ' + _strokeColor;
+el.style.paintOrder = 'stroke fill';
+el.style.textShadow = '';
         }
       } else {
         el.style.border = '';
