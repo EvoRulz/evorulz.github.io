@@ -688,7 +688,8 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.backgroundClip = '';
         el.style.color = h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
       }
-      if (c.labelBorder && c.labelBorder !== '#00000000') {
+      var _lbAlpha = c.labelBorder ? parseInt(c.labelBorder.slice(7,9) || 'ff', 16) : 0;
+      if (c.labelBorder && _lbAlpha > 0) {
         el.style.border = '';
         el.style.borderRadius = '';
         el.style.display = '';
