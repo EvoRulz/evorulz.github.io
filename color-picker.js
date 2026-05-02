@@ -683,8 +683,9 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     const grad = c.labelStops ? _gBuildCSS(c.labelStops) : (c.label && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
     const outlineColor = c.labelOutline ? h8css(c.labelOutline) : 'rgba(0,0,0,1)';
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
-      el.style.webkitTextStroke = '1px ' + outlineColor;
-      el.style.paintOrder = 'stroke fill';
+      el.style.webkitTextStroke = '';
+      el.style.paintOrder = '';
+      el.style.textShadow = `-1px -1px 0 ${outlineColor}, 1px -1px 0 ${outlineColor}, -1px 1px 0 ${outlineColor}, 1px 1px 0 ${outlineColor}`;
       if (grad) {
         el.style.display = 'inline-block';
         el.style.background = grad;
