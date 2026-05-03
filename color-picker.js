@@ -656,11 +656,11 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
       setColorValue('s-cp-label-outline', c.labelOutline);
     }
     if (c.labelBorderStops && window._cpSetGradientStops) {
-      window._cpSetGradientStops('s-cp-label-border', c.labelBorderStops);
-      const _lbOv = document.getElementById('s-cp-label-border-swatch-overlay');
-      if (_lbOv) { const _g = window._cpGetGradient('s-cp-label-border'); if (_g) _lbOv.style.background = _g; }
+      window._cpSetGradientStops('s-cp-label-outline', c.labelBorderStops);
+      const _lbOv = document.getElementById('s-cp-label-outline-swatch-overlay');
+      if (_lbOv) { const _g = window._cpGetGradient('s-cp-label-outline'); if (_g) _lbOv.style.background = _g; }
     } else if (c.labelBorder) {
-      setColorValue('s-cp-label-border', c.labelBorder);
+      setColorValue('s-cp-label-outline', c.labelBorder);
     }
     if (c.labelStops && window._cpSetGradientStops) {
       window._cpSetGradientStops('s-cp-label', c.labelStops);
@@ -728,7 +728,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
       textStops:   window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-text')   : null,
       labelOutline: getColorValue('s-cp-label-outline'),
       labelBorder: (typeof getColorValue === 'function' ? getColorValue('s-cp-label-border') : null),
-      labelBorderStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-label-border') : null,
+      labelBorderStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-cp-label-outline') : null,
     }));
     _applyLabelToSwatches();
   };
