@@ -691,10 +691,10 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     }
     // ::before is now the FILL (z-index:1 in CSS, paints on top of the stroke on the main element)
     if (fillGrad) {
-      lbStyleTag.textContent = `.color-swatch-label::before { background: ${fillGrad}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; -webkit-text-stroke: 0; }`;
+      lbStyleTag.textContent = `.color-swatch-label::before { background: ${fillGrad}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; -webkit-text-stroke: 4px transparent; color: transparent; z-index: -1; }`;
     } else {
       const _fc = h8css(typeof c.label === 'string' && !c.label.startsWith('linear-gradient') && !c.label.startsWith('radial-gradient') ? c.label : '#bbbbbbFF');
-      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-fill-color: ${_fc}; background: none; color: ${_fc}; -webkit-text-stroke: 2px ${outlineColor}; paint-order: stroke fill; }`;
+      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-fill-color: ${_fc}; background: none; color: ${_fc}; -webkit-text-stroke: 4px transparent; z-index: -1; }`;
     }
     // Main element carries the STROKE only, fill transparent so ::before shows through
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
@@ -710,7 +710,8 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.webkitBackgroundClip = 'text';
         el.style.backgroundClip = 'text';
       } else {
-        el.style.webkitTextStroke = '0';
+        el.style.webkitTextStroke = '2px ' + outlineColor;
+      el.style.zIndex = '1';
         el.style.background = '';
         el.style.webkitBackgroundClip = '';
         el.style.backgroundClip = '';
