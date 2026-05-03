@@ -689,29 +689,31 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
       lbStyleTag.id = '_swatch-label-pseudo-style';
       document.head.appendChild(lbStyleTag);
     }
-    if (outlineGrad) {
-      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-stroke: 3px transparent; background: ${outlineGrad}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }`;
+    // ::before is now the FILL (z-index:1 in CSS, paints on top of the stroke on the main element)
+    if (fillGrad) {
+      lbStyleTag.textContent = `.color-swatch-label::before { background: ${fillGrad}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; -webkit-text-stroke: 0; }`;
     } else {
-      lbStyleTag.textContent = `.color-swatch-label { -webkit-text-stroke: 2px ${outlineColor}; paint-order: stroke fill; } .color-swatch-label::before { display: none; }`;
+      const _fc = h8css(typeof c.label === 'string' && !c.label.startsWith('linear-gradient') && !c.label.startsWith('radial-gradient') ? c.label : '#bbbbbbFF');
+      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-fill-color: ${_fc}; background: none; color: ${_fc}; -webkit-text-stroke: 0; }`;
     }
+    // Main element carries the STROKE only, fill transparent so ::before shows through
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
       el.dataset.text = el.textContent.trim();
       el.style.textShadow = '';
       el.style.paintOrder = 'stroke fill';
-      el.style.paintOrder = '';
-      if (fillGrad) {
-        el.style.display = 'inline-block';
-        el.style.background = fillGrad;
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.color = 'transparent';
+      el.style.display = 'inline-block';
+      if (outlineGrad) {
+        el.style.webkitTextStroke = '3px transparent';
+        el.style.background = outlineGrad;
         el.style.webkitBackgroundClip = 'text';
         el.style.backgroundClip = 'text';
-        el.style.webkitTextFillColor = 'transparent';
-        el.style.color = 'transparent';
       } else {
+        el.style.webkitTextStroke = '2px ' + outlineColor;
         el.style.background = '';
         el.style.webkitBackgroundClip = '';
         el.style.backgroundClip = '';
-        el.style.webkitTextFillColor = '';
-        el.style.color = h8css(typeof c.label === 'string' && !c.label.startsWith('linear-gradient') && !c.label.startsWith('radial-gradient') ? c.label : '#bbbbbbFF');
       }
     });
   }
