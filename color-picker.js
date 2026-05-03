@@ -680,15 +680,28 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   };
   function _applyLabelToSwatches() {
     const c = cpCfg();
-    const grad = c.labelStops ? _gBuildCSS(c.labelStops) : (c.label && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
+    const fillGrad = c.labelStops ? _gBuildCSS(c.labelStops) : (c.label && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
     const outlineColor = c.labelOutline ? h8css(c.labelOutline) : 'rgba(0,0,0,1)';
+    const outlineGrad = c.labelBorderStops ? _gBuildCSS(c.labelBorderStops) : null;
+    let lbStyleTag = document.getElementById('_swatch-label-pseudo-style');
+    if (!lbStyleTag) {
+      lbStyleTag = document.createElement('style');
+      lbStyleTag.id = '_swatch-label-pseudo-style';
+      document.head.appendChild(lbStyleTag);
+    }
+    if (outlineGrad) {
+      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-stroke: 3px transparent; background: ${outlineGrad}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }`;
+    } else {
+      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-stroke: 2px ${outlineColor}; background: none; -webkit-text-fill-color: transparent; color: transparent; }`;
+    }
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
+      el.dataset.text = el.textContent.trim();
       el.style.textShadow = '';
-      el.style.webkitTextStroke = `2px ${outlineColor}`;
-      el.style.paintOrder = 'stroke fill';
-      if (grad) {
+      el.style.webkitTextStroke = '';
+      el.style.paintOrder = '';
+      if (fillGrad) {
         el.style.display = 'inline-block';
-        el.style.background = grad;
+        el.style.background = fillGrad;
         el.style.webkitBackgroundClip = 'text';
         el.style.backgroundClip = 'text';
         el.style.webkitTextFillColor = 'transparent';
