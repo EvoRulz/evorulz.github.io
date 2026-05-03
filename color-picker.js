@@ -692,12 +692,12 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     if (outlineGrad) {
       lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-stroke: 3px transparent; background: ${outlineGrad}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }`;
     } else {
-      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-stroke: 2px ${outlineColor}; background: none; -webkit-text-fill-color: transparent; color: transparent; }`;
+      lbStyleTag.textContent = `.color-swatch-label { -webkit-text-stroke: 2px ${outlineColor}; paint-order: stroke fill; } .color-swatch-label::before { display: none; }`;
     }
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
       el.dataset.text = el.textContent.trim();
       el.style.textShadow = '';
-      el.style.webkitTextStroke = '';
+      el.style.paintOrder = 'stroke fill';
       el.style.paintOrder = '';
       if (fillGrad) {
         el.style.display = 'inline-block';
