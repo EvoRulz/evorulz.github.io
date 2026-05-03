@@ -694,7 +694,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
       lbStyleTag.textContent = `.color-swatch-label::before { background: ${fillGrad}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; -webkit-text-stroke: 0; }`;
     } else {
       const _fc = h8css(typeof c.label === 'string' && !c.label.startsWith('linear-gradient') && !c.label.startsWith('radial-gradient') ? c.label : '#bbbbbbFF');
-      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-fill-color: ${_fc}; background: none; color: ${_fc}; -webkit-text-stroke: 0; }`;
+      lbStyleTag.textContent = `.color-swatch-label::before { -webkit-text-fill-color: ${_fc}; background: none; color: ${_fc}; -webkit-text-stroke: 2px ${outlineColor}; paint-order: stroke fill; }`;
     }
     // Main element carries the STROKE only, fill transparent so ::before shows through
     document.querySelectorAll('.color-swatch-label').forEach(function(el) {
@@ -710,7 +710,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.webkitBackgroundClip = 'text';
         el.style.backgroundClip = 'text';
       } else {
-        el.style.webkitTextStroke = '2px ' + outlineColor;
+        el.style.webkitTextStroke = '0';
         el.style.background = '';
         el.style.webkitBackgroundClip = '';
         el.style.backgroundClip = '';
