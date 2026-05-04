@@ -304,11 +304,11 @@ window.addEventListener('load', function() {
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
     };
     swReady = false;
+    swGrid.style.touchAction = 'none';
     swHoldTimer = setTimeout(() => {
       if (swDrag) {
         swReady = true;
         swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-        swGrid.style.touchAction = 'none';
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
       }
     }, 500);
