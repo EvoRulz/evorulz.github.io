@@ -613,7 +613,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   document.addEventListener('pointerdown', function(e) {
     const sw = _resolveSwatchEl(e);
     if (!sw) return;
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
     _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw;
   }, true);
 
