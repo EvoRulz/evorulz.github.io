@@ -406,8 +406,8 @@ if (navigator.storage && navigator.storage.persist) {
       const _vNumSpan = document.getElementById('app-version');
       if (_vNumSpan) _vNumSpan.style.fontFamily = _btnStyleFor('top-version').font;
     if (_vBtn) {
-      _vBtn.addEventListener('pointerdown', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); });
-      _vBtn.addEventListener('pointerup', () => {
+      _vBtn.onpointerdown = () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
+      _vBtn.onpointerup = () => {
         _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
         const _statsEl = document.getElementById('app-stats');
         if (_statsEl && _statsEl.dataset.swOrig) {
@@ -422,8 +422,21 @@ if (navigator.storage && navigator.storage.persist) {
           if(_prev){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:_prev});localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}
           localStorage.removeItem('_versionUpdatePending');
         }
-      });
-      _vBtn.addEventListener('pointercancel', () => { _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); });
+        if (window._versionCheckState === 'synced') {
+          const _statsEl = document.getElementById('app-stats');
+          if (_statsEl && _statsEl.dataset.swOrig) {
+            _statsEl.innerHTML = _statsEl.dataset.swOrig;
+            _statsEl.style.color = _statsEl.dataset.swOrigColor || '';
+            _statsEl.style.opacity = '0.4';
+            delete _statsEl.dataset.swOrig;
+            delete _statsEl.dataset.swOrigColor;
+          }
+          window._versionCheckState = 'idle';
+        } else {
+          if (window._verifyDeployedVersion) window._verifyDeployedVersion();
+        }
+      };
+      _vBtn.onpointercancel = () => { _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
     }
     }
     const _versionNumSpan = document.getElementById('app-version');

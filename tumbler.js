@@ -448,6 +448,7 @@ window._verifyDeployedVersion = (function() {
     }
     const orig = statsEl.dataset.swOrig;
     const origColor = statsEl.dataset.swOrigColor;
+    window._versionCheckState = 'checking';
     statsEl.innerHTML = 'checking CDN...';
     statsEl.style.color = hex8ToCss(_btnStyleFor('top-version').fg);
     statsEl.style.opacity = '1';
@@ -457,6 +458,7 @@ window._verifyDeployedVersion = (function() {
         const m = t.match(/habit-tracker-v(\d+)/);
         const remoteVer = m ? parseInt(m[1]) : 0;
         if (remoteVer === localVer) {
+          window._versionCheckState = 'synced';
           statsEl.innerHTML = 'CDN synced v' + remoteVer;
           statsEl.style.color = '#99ff99';
           statsEl.style.opacity = '1';
