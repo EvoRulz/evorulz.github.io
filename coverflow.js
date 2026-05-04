@@ -1,4 +1,4 @@
-// @version 1229
+// @version 1230
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -498,4 +498,5 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 

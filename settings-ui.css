@@ -1,4 +1,4 @@
-/* @version 1229 */
+/* @version 1230 */
 
 /* ── Settings cog & panel ── */
     #settings-cog {
@@ -491,4 +491,5 @@ input[type="checkbox"]:hover {
   align-items: flex-start;
   gap: 12px;
 }
+
 

@@ -1,4 +1,4 @@
-// @version 1229
+// @version 1230
 
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
@@ -63,4 +63,5 @@ var dragging = false;
     s.classList.remove('handle-active');
   });
 });
+
 
