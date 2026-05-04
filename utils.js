@@ -1,4 +1,4 @@
- // @version 1235
+ // @version 1236
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -117,15 +117,13 @@ async function toggleOrientLock() {
 (function() {
   const saved = localStorage.getItem('_zoom');
   if (saved) {
-    document.documentElement.style.zoom = '';
     const scale = parseInt(saved) / 100;
-    if (scale !== 1) {
-      const wrapper = document.getElementById('zoom-wrapper');
-      if (wrapper) {
-        wrapper.style.transform = '';
-        wrapper.style.transformOrigin = '';
-        wrapper.style.zoom = String(scale);
-      }
+    const wrapper = document.getElementById('zoom-wrapper');
+    if (wrapper && scale !== 1) {
+      wrapper.style.transformOrigin = 'bottom center';
+      wrapper.style.transform = 'scale(' + scale + ')';
+      wrapper.style.width = (100 / scale) + '%';
+      wrapper.style.marginLeft = ((1 - 1/scale) * 50) + '%';
     }
     const sl = document.getElementById('zoom-slider');
     const lb = document.getElementById('zoom-label');
@@ -134,20 +132,38 @@ async function toggleOrientLock() {
   }
 })();
   function ctrlZoom(val) {
+    val = Math.abs(val - 100) <= 8 ? 100 : val;
+    const sl = document.getElementById('zoom-slider');
+    if (sl) sl.value = val;
     const scale = val / 100;
-    document.documentElement.style.zoom = '';
     const wrapper = document.getElementById('zoom-wrapper');
     const spacer = document.getElementById('zoom-spacer');
+    document.documentElement.style.zoom = '';
     if (wrapper) {
-      wrapper.style.transform = '';
-      wrapper.style.transformOrigin = '';
-      wrapper.style.zoom = scale === 1 ? '' : String(scale);
-      if (spacer) spacer.style.height = '0';
+      if (scale === 1) {
+        wrapper.style.transform = '';
+        wrapper.style.transformOrigin = '';
+        wrapper.style.width = '';
+        wrapper.style.marginLeft = '';
+        wrapper.style.zoom = '';
+        if (spacer) spacer.style.height = '0';
+      } else {
+        wrapper.style.zoom = '';
+        wrapper.style.transformOrigin = 'bottom center';
+        wrapper.style.transform = 'scale(' + scale + ')';
+        wrapper.style.width = (100 / scale) + '%';
+        wrapper.style.marginLeft = ((1 - 1/scale) * 50) + '%';
+        if (spacer) {
+          requestAnimationFrame(() => {
+            spacer.style.height = (wrapper.offsetHeight * (scale - 1)) + 'px';
+          });
+        }
+      }
     }
     const lb = document.getElementById('zoom-label');
     if (lb) lb.textContent = val + '%';
-    requestAnimationFrame(() => window.scrollTo(0, document.body.scrollHeight));
-  }
+    localStorage.setItem('_zoom', val);
+}
   window._dragEnabled = true;
   window._interactEnabled = true;
   function ctrlToggleDrag() {
@@ -171,6 +187,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
