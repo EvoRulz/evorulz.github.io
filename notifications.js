@@ -1,3 +1,5 @@
+// @version 1222
+
 (function() {
   function todayStr() {
     const d = new Date();

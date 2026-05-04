@@ -1,3 +1,5 @@
+// @version 1222
+
 // ── Clock tumbler ──────────────────────────────────────────
   (function() {
     const COLS = window._CLOCK_COLS;
@@ -435,6 +437,15 @@ if (localStorage.getItem('_swJustUpdated') === '1') {
 
 window._verifyDeployedVersion = (function() {
   let _pending = false;
+  const _verifyFiles = [
+    './index.html',
+    './service-worker.js',
+    './utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
+    './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
+    './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
+    './slider-init.js','./color-picker.js','./app-data.js','./clock.js',
+    './app.css','./settings-ui.css',
+  ];
   return function() {
     if (_pending) return;
     _pending = true;
@@ -446,36 +457,43 @@ window._verifyDeployedVersion = (function() {
       statsEl.dataset.swOrig = statsEl.innerHTML;
       statsEl.dataset.swOrigColor = statsEl.style.color;
     }
-    const orig = statsEl.dataset.swOrig;
-    const origColor = statsEl.dataset.swOrigColor;
     window._versionCheckState = 'checking';
     statsEl.innerHTML = 'checking CDN...';
     statsEl.style.color = hex8ToCss(_btnStyleFor('top-version').fg);
     statsEl.style.opacity = '1';
-    fetch('./service-worker.js?nocache=' + Date.now(), { cache: 'no-store' })
-      .then(r => r.text())
-      .then(t => {
-        const m = t.match(/habit-tracker-v(\d+)/);
-        const remoteVer = m ? parseInt(m[1]) : 0;
-        if (remoteVer === localVer) {
-          window._versionCheckState = 'synced';
-          statsEl.innerHTML = 'CDN synced v' + remoteVer;
-          statsEl.style.color = '#99ff99';
-          statsEl.style.opacity = '1';
-          _pending = false;
-        } else {
-          statsEl.innerHTML = 'CDN: v' + remoteVer + '<br>local: v' + localVer;
-          statsEl.style.color = '#ffaa00';
-          statsEl.style.opacity = '1';
-          _pending = false;
-          setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 5000);
+    const nc = Date.now();
+    Promise.all(
+      _verifyFiles.map(f => fetch(f + '?nocache=' + nc, { cache: 'no-store' }).then(r => r.text()))
+    ).then(texts => {
+      const results = _verifyFiles.map((f, i) => {
+        const t = texts[i];
+        if (f === './index.html') {
+          const m = t.match(/id="app-version"[^>]*>v(\d+)</);
+          return { f, ver: m ? parseInt(m[1]) : 0 };
         }
-      })
-      .catch(() => {
-        statsEl.innerHTML = 'fetch failed';
-        statsEl.style.color = '#ff6666';
+        const m = t.match(/@version (\d+)/);
+        return { f, ver: m ? parseInt(m[1]) : 0 };
+      });
+      const stale = results.filter(r => r.ver !== localVer);
+      if (!stale.length) {
+        window._versionCheckState = 'synced';
+        statsEl.innerHTML = 'CDN synced v' + localVer;
+        statsEl.style.color = '#99ff99';
         statsEl.style.opacity = '1';
         _pending = false;
-      });
+      } else {
+        const minVer = Math.min(...stale.map(r => r.ver).filter(Boolean));
+        statsEl.innerHTML = 'CDN: v' + (minVer || '?') + '<br>' + stale.length + ' file' + (stale.length > 1 ? 's' : '') + ' stale';
+        statsEl.style.color = '#ffaa00';
+        statsEl.style.opacity = '1';
+        _pending = false;
+        setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 5000);
+      }
+    }).catch(() => {
+      statsEl.innerHTML = 'fetch failed';
+      statsEl.style.color = '#ff6666';
+      statsEl.style.opacity = '1';
+      _pending = false;
+    });
   };
 })();

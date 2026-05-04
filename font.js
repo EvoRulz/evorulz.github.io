@@ -1,3 +1,5 @@
+// @version 1222
+
 (function(){
   function getOpts() {
     var sel = document.getElementById('s-font');
