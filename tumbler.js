@@ -480,6 +480,7 @@ window._verifyDeployedVersion = (function() {
         statsEl.innerHTML = 'CDN synced v' + localVer;
         statsEl.style.color = '#99ff99';
         statsEl.style.opacity = '1';
+        try { const _ac=new AudioContext(); const _o=_ac.createOscillator(); const _g=_ac.createGain(); _o.connect(_g); _g.connect(_ac.destination); _o.frequency.value=1500; _g.gain.setValueAtTime(0.3,_ac.currentTime); _g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.4); _o.start(); _o.stop(_ac.currentTime+0.4); } catch(e) {}
         _pending = false;
       } else {
         const minVer = Math.min(...stale.map(r => r.ver).filter(Boolean));
