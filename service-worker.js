@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v1208";
+const CACHE = "habit-tracker-v1209";
 
 const ASSETS = [
   "./",
@@ -50,16 +50,6 @@ self.addEventListener("push", e => {
       tag: "habit-reminder"
     })
   );
-});
-
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => {
-      console.log("Caching assets...");
-      return c.addAll(ASSETS);
-    })
-  );
-  self.skipWaiting();
 });
 
 self.addEventListener("install", e => {

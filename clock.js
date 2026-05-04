@@ -201,20 +201,7 @@ dateEl.closest(".top-item").addEventListener("click", () => {
               vEl.style.color = vEl.dataset.swPrevColor || '';
               vEl.style.fontWeight = '';
             } else if (ev.data.type === 'sw-activated') {
-              const vEl = document.getElementById('app-version');
-              if (!vEl) return;
-              vEl.style.background = '#99ff99';
-              vEl.style.color = '#000';
-              vEl.style.borderRadius = '4px';
-              vEl.style.padding = '2px 6px';
-              vEl.style.fontWeight = 'bold';
-              setTimeout(() => {
-                vEl.style.background = '';
-                vEl.style.color = '';
-                vEl.style.borderRadius = '';
-                vEl.style.padding = '';
-                vEl.style.fontWeight = '';
-              }, 3000);
+              setTimeout(() => { window.location.reload(); }, 800);
             }
           });
         })
