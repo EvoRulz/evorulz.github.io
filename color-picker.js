@@ -591,7 +591,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   }
 
   // ── Intercept all swatch pointerdowns ──────────────────────
-  let _swatchDownX = null, _swatchDownY = null, _swatchDownEl = null;
+  let _swatchDownX = null, _swatchDownY = null, _swatchDownEl = null, _swatchGlowTimer = null;
 
   function _resolveSwatchEl(e) {
     let sw = e.target.closest('.color-swatch-wrap');
@@ -614,10 +614,11 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     const sw = _resolveSwatchEl(e);
     if (!sw) return;
     e.preventDefault();
-    _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw; sw.style.boxShadow = '0 0 10px 4px rgba(255,255,255,0.75)';
+    _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw; _swatchGlowTimer = setTimeout(() => { if (_swatchDownEl === sw) sw.style.boxShadow = '0 0 10px 4px rgba(255,255,255,0.75)'; }, 380);
   }, true);
 
   document.addEventListener('pointerup', function(e) {
+    if (_swatchGlowTimer) { clearTimeout(_swatchGlowTimer); _swatchGlowTimer = null; }
     if (!_swatchDownEl) return;
     const sw = _swatchDownEl;
     const moved = Math.hypot(e.clientX - (_swatchDownX || 0), e.clientY - (_swatchDownY || 0));
@@ -628,6 +629,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   }, true);
 
   document.addEventListener('pointercancel', function() {
+    if (_swatchGlowTimer) { clearTimeout(_swatchGlowTimer); _swatchGlowTimer = null; }
     if (_swatchDownEl) _swatchDownEl.style.boxShadow = '';
     _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null;
   }, true);

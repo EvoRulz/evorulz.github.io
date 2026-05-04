@@ -308,6 +308,7 @@ window.addEventListener('load', function() {
       if (swDrag) {
         swReady = true;
         swGrid.style.touchAction = 'none';
+        swGrid.setPointerCapture(swDrag.pointerId);
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
       }
     }, 400);
@@ -316,7 +317,7 @@ window.addEventListener('load', function() {
   swGrid.addEventListener('pointermove', e => {
     if (!swDrag) return;
     const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
-    if (!swReady) { swCancel(); return; }
+    if (!swReady) { if (moved > 10) swCancel(); return; }
     e.preventDefault();
     if (!swDrag.active) {
       if (moved < 4) return;
