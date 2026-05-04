@@ -202,3 +202,5 @@ dateEl.closest(".top-item").addEventListener("click", () => {
             setTimeout(() => { window.location.reload(); }, 800);
           }
         });
+    });
+}
