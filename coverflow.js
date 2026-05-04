@@ -53,6 +53,7 @@ items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true 
 items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
 items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
 items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
+items.push({ id: 'top-hard-reload',    label: 'Hard Reload',    isTopGrid: true });
 items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
   items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
   items.push({ id: 'top-version',        label: 'Version',        isTopGrid: true });

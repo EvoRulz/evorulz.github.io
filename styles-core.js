@@ -342,6 +342,7 @@ if (navigator.storage && navigator.storage.persist) {
       { id: 'top-import-layout', el: '.top-item[data-item="import-layout"]', prefix: '--import-layout' },
       { id: 'top-clear-all',     el: '.top-item[data-item="clear-all"]',     prefix: '--clear-all' },
       { id: 'top-my-files',      el: '.top-item[data-item="my-files"]',      prefix: '--my-files' },
+      { id: 'top-hard-reload',   el: '.top-item[data-item="hard-reload"]',   prefix: '--hard-reload' },
       { id: 'top-manage-habits', el: '.top-item[data-item="manage-habits"]', prefix: '--manage-habits' },
       { id: 'top-orient-lock',    el: '.top-item[data-item="orient-lock"]',    prefix: '--orient-lock' },
       { id: 'top-settings',      el: '.top-item[data-item="settings"]',      prefix: '--settings' },
