@@ -181,7 +181,25 @@ dateEl.closest(".top-item").addEventListener("click", () => {
   if ('serviceWorker' in navigator && !location.hostname.includes('claudeusercontent.com')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
-        .then(r => console.log('SW registered', r))
+        .then(r => {
+          console.log('SW registered', r);
+          navigator.serviceWorker.addEventListener('message', ev => {
+            const vEl = document.getElementById('app-version');
+            if (!vEl) return;
+            if (ev.data.type === 'sw-installing') {
+              vEl.dataset.swPrev = vEl.textContent;
+              vEl.textContent = 'loading...';
+              vEl.style.opacity = '0.5';
+            } else if (ev.data.type === 'sw-installed') {
+              vEl.textContent = vEl.dataset.swPrev || vEl.textContent;
+              vEl.style.opacity = '';
+            } else if (ev.data.type === 'sw-activated') {
+              vEl.style.outline = '2px solid #99ff99';
+              vEl.style.borderRadius = '3px';
+              setTimeout(() => { vEl.style.outline = ''; vEl.style.borderRadius = ''; }, 2000);
+            }
+          });
+        })
         .catch(err => console.error('SW failed', err));
     });
   }

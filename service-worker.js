@@ -1,4 +1,4 @@
-const CACHE = "habit-tracker-v1201";
+const CACHE = "habit-tracker-v1202";
 
 const ASSETS = [
   "./",
@@ -62,6 +62,19 @@ self.addEventListener("install", e => {
   self.skipWaiting();
 });
 
+self.addEventListener("install", e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => {
+      console.log("Caching assets...");
+      self.clients.matchAll().then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-installing"})));
+      return c.addAll(ASSETS);
+    }).then(() => {
+      self.clients.matchAll().then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-installed"})));
+    })
+  );
+  self.skipWaiting();
+});
+
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -73,19 +86,9 @@ self.addEventListener("activate", e => {
           }
         })
       )
-    )
-  );
-  self.clients.claim();
-});
-
-self.addEventListener("fetch", e => {
-  if (e.request.url.endsWith("index.html") || e.request.url.endsWith("/")) {
-    e.respondWith(fetch(e.request).catch(() => caches.match("./index.html")));
-    return;
-  }
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      return cached || fetch(e.request).catch(() => {});
+    ).then(() => {
+      self.clients.matchAll().then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-activated"})));
     })
   );
+  self.clients.claim();
 });
