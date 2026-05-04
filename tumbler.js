@@ -428,6 +428,11 @@
 }, 1000);
   })();
 
+if (localStorage.getItem('_swJustUpdated') === '1') {
+  localStorage.removeItem('_swJustUpdated');
+  setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 2500);
+}
+
 window._verifyDeployedVersion = (function() {
   let _pending = false;
   return function() {
@@ -437,8 +442,12 @@ window._verifyDeployedVersion = (function() {
     const statsEl = document.getElementById('app-stats');
     if (!vEl || !statsEl) { _pending = false; return; }
     const localVer = parseInt(vEl.textContent.replace('v','')) || 0;
-    const orig = statsEl.innerHTML;
-    const origColor = statsEl.style.color;
+    if (!statsEl.dataset.swOrig) {
+      statsEl.dataset.swOrig = statsEl.innerHTML;
+      statsEl.dataset.swOrigColor = statsEl.style.color;
+    }
+    const orig = statsEl.dataset.swOrig;
+    const origColor = statsEl.dataset.swOrigColor;
     statsEl.innerHTML = 'checking CDN...';
     statsEl.style.color = hex8ToCss(_btnStyleFor('top-version').fg);
     statsEl.style.opacity = '1';
@@ -450,18 +459,21 @@ window._verifyDeployedVersion = (function() {
         if (remoteVer === localVer) {
           statsEl.innerHTML = 'CDN synced v' + remoteVer;
           statsEl.style.color = '#99ff99';
+          statsEl.style.opacity = '1';
+          _pending = false;
         } else {
           statsEl.innerHTML = 'CDN: v' + remoteVer + '<br>local: v' + localVer;
           statsEl.style.color = '#ffaa00';
+          statsEl.style.opacity = '1';
+          _pending = false;
+          setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 5000);
         }
-        statsEl.style.opacity = '1';
-        setTimeout(() => { statsEl.innerHTML = orig; statsEl.style.color = origColor; statsEl.style.opacity = '0.4'; _pending = false; }, 3000);
       })
       .catch(() => {
         statsEl.innerHTML = 'fetch failed';
         statsEl.style.color = '#ff6666';
         statsEl.style.opacity = '1';
-        setTimeout(() => { statsEl.innerHTML = orig; statsEl.style.color = origColor; statsEl.style.opacity = '0.4'; _pending = false; }, 3000);
+        _pending = false;
       });
   };
 })();

@@ -198,6 +198,7 @@ dateEl.closest(".top-item").addEventListener("click", () => {
             vEl.style.color = vEl.dataset.swPrevColor || '';
             vEl.style.fontWeight = '';
           } else if (ev.data.type === 'sw-activated') {
+            localStorage.setItem('_swJustUpdated', '1');
             setTimeout(() => { window.location.reload(); }, 800);
           }
         });
