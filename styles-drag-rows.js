@@ -292,7 +292,7 @@ window.addEventListener('load', function() {
   }
 
   swGrid.addEventListener('pointerdown', e => {
-    if (e.target.closest('input, select, button, textarea, .color-swatch-wrap')) return;
+    if (e.target.closest('input, select, button, textarea')) return;
     const item = e.target.closest('[data-swatch-row]');
     if (!item || swDrag) return;
     const rect = item.getBoundingClientRect();
