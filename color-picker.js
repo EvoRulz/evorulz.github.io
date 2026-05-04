@@ -710,7 +710,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
         el.style.webkitBackgroundClip = 'text';
         el.style.backgroundClip = 'text';
       } else {
-        el.style.webkitTextStroke = '1px ' + outlineColor;
+        el.style.webkitTextStroke = '0.5px ' + outlineColor;
         el.style.background = '';
         el.style.webkitBackgroundClip = '';
         el.style.backgroundClip = '';
