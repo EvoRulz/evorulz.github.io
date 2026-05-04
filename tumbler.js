@@ -1,4 +1,4 @@
-// @version 1238
+// @version 1239
 
 // ── Clock tumbler ──────────────────────────────────────────
   (function() {
@@ -440,11 +440,13 @@ window._verifyDeployedVersion = (function() {
   const _verifyFiles = [
     './index.html',
     './service-worker.js',
+    './manifest.json',
     './utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
     './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
     './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
     './slider-init.js','./color-picker.js','./app-data.js','./clock.js',
     './app.css','./settings-ui.css',
+    './LauncherActivity.java','./NotificationReceiver.java','./BootReceiver.java','./AndroidManifest.xml',
   ];
   return function() {
     if (_pending) return;
@@ -469,6 +471,10 @@ window._verifyDeployedVersion = (function() {
         const t = texts[i];
         if (f === './index.html') {
           const m = t.match(/id="app-version"[^>]*>v(\d+)</);
+          return { f, ver: m ? parseInt(m[1]) : 0 };
+        }
+        if (f === './manifest.json') {
+          const m = t.match(/\?v=(\d+)/);
           return { f, ver: m ? parseInt(m[1]) : 0 };
         }
         const m = t.match(/@version (\d+)/);
@@ -498,6 +504,7 @@ window._verifyDeployedVersion = (function() {
     });
   };
 })();
+
 
 
 
