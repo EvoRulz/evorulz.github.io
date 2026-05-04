@@ -1,4 +1,4 @@
-// @version 1237
+// @version 1238
 
 // ── Clock tumbler ──────────────────────────────────────────
   (function() {
@@ -477,7 +477,7 @@ window._verifyDeployedVersion = (function() {
       const stale = results.filter(r => r.ver !== localVer);
       if (!stale.length) {
         window._versionCheckState = 'synced';
-        statsEl.innerHTML = 'CDN synced v' + localVer;
+        statsEl.innerHTML = 'CDN synced v' + localVer + '<br>' + _verifyFiles.length + ' files ok';
         statsEl.style.color = '#99ff99';
         statsEl.style.opacity = '1';
         try { const _ac=new AudioContext(); const _o=_ac.createOscillator(); const _g=_ac.createGain(); _o.connect(_g); _g.connect(_ac.destination); _o.frequency.value=1500; _g.gain.setValueAtTime(0.3,_ac.currentTime); _g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.4); _o.start(); _o.stop(_ac.currentTime+0.4); } catch(e) {}
@@ -498,6 +498,7 @@ window._verifyDeployedVersion = (function() {
     });
   };
 })();
+
 
 
 
