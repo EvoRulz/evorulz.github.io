@@ -1,4 +1,4 @@
-// @version 1262
+// @version 1263
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -81,7 +81,9 @@
     setColorValue('s-sliderfill',         btnStyle.sliderFill         || '#9659FFFF');
     setColorValue('s-slidertrack',        btnStyle.sliderTrack        || '#333333FF');
     setColorValue('s-sliderhandle',       btnStyle.sliderHandle       || '#FFFFFFFF');
-    setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
+    setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
+    setColorValue('s-sliderhandleglow',      btnStyle.sliderHandleGlow      || '#FFFFFF00');
+    setColorValue('s-sliderhandleactiveglow', btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
     const _sv  = (id, v)      => { const el = document.getElementById(id); if (el) el.value = String(v); };
     const _svl = (id, v, sfx) => { const el = document.getElementById(id); if (el) el.textContent = v + sfx; };
     _sv('s-sliderh',       btnStyle.sliderH      ?? 8);   _svl('s-sliderh-val',       btnStyle.sliderH      ?? 8,   'px');
@@ -233,7 +235,9 @@
     setColorValue('s-sliderfill',      btnStyle.sliderFill   || '#9659FFFF');
     setColorValue('s-slidertrack',     btnStyle.sliderTrack  || '#333333FF');
     setColorValue('s-sliderhandle',    btnStyle.sliderHandle || '#FFFFFFFF');
-    setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
+    setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
+    setColorValue('s-sliderhandleglow',      btnStyle.sliderHandleGlow      || '#FFFFFF00');
+    setColorValue('s-sliderhandleactiveglow', btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
     setColorValue('s-sliderborder',    btnStyle.sliderBorder    || '#555555FF');
     setColorValue('s-sliderbtnbg',     btnStyle.sliderBtnBg     || '#2a2a2aFF');
     setColorValue('s-sliderbtnfg',     btnStyle.sliderBtnFg     || '#aaaaaaFF');
@@ -413,6 +417,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 

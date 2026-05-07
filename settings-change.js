@@ -1,4 +1,4 @@
-// @version 1262
+// @version 1263
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -44,7 +44,9 @@ function settingsExport() {
           setColorValue('s-sliderfill',    btnStyle.sliderFill   || '#9659FFFF');
           setColorValue('s-slidertrack',   btnStyle.sliderTrack  || '#333333FF');
           setColorValue('s-sliderhandle',  btnStyle.sliderHandle || '#FFFFFFFF');
-          setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
+          setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
+          setColorValue('s-sliderhandleglow',      btnStyle.sliderHandleGlow      || '#FFFFFF00');
+          setColorValue('s-sliderhandleactiveglow', btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
 
           const _sv = (id, val) => { const el = document.getElementById(id); if (el) el.value = String(val); };
           _sv('s-sliderh',       btnStyle.sliderH);
@@ -206,6 +208,8 @@ else {
     if (document.getElementById('s-slidertrack'))  btnStyle.sliderTrack  = getStyleValue('s-slidertrack');
     if (document.getElementById('s-sliderhandle')) btnStyle.sliderHandle = getStyleValue('s-sliderhandle');
     if (document.getElementById('s-sliderhandleborder')) btnStyle.sliderHandleBorder = getStyleValue('s-sliderhandleborder');
+    if (document.getElementById('s-sliderhandleglow')) btnStyle.sliderHandleGlow = getColorValue('s-sliderhandleglow');
+    if (document.getElementById('s-sliderhandleactiveglow')) btnStyle.sliderHandleActiveGlow = getColorValue('s-sliderhandleactiveglow');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
     btnStyle.sliderR        = Number(document.getElementById("s-sliderr").value);
     btnStyle.sliderSpread   = Number(document.getElementById("s-sliderspread").value);
@@ -320,7 +324,9 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-sliderfill',      btnStyle.sliderFill   || '#9659FFFF');
     setColorValue('s-slidertrack',     btnStyle.sliderTrack  || '#333333FF');
     setColorValue('s-sliderhandle',    btnStyle.sliderHandle || '#FFFFFFFF');
-    setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
+    setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
+    setColorValue('s-sliderhandleglow',      BTN_STYLE_DEFAULTS.sliderHandleGlow);
+    setColorValue('s-sliderhandleactiveglow', BTN_STYLE_DEFAULTS.sliderHandleActiveGlow);
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     const _shv = document.getElementById("s-sliderh-val"); if (_shv) _shv.textContent = btnStyle.sliderH + "px";
@@ -400,6 +406,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 

@@ -1,4 +1,4 @@
-// @version 1262
+// @version 1263
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -292,7 +292,7 @@ if (navigator.storage && navigator.storage.persist) {
   }
   applyAppStyle();
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -436,6 +436,11 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--slider-track-bg",      _bgCss(btnStyle.sliderTrack  || '#333333FF'));
     document.documentElement.style.setProperty("--slider-handle-color",  _bgCss(btnStyle.sliderHandle || '#FFFFFFFF'));
     document.documentElement.style.setProperty("--slider-handle-border", _bgCss(btnStyle.sliderHandleBorder || '#00000000'));
+    let _sliderGlowStyle = document.getElementById('_slider-glow-style');
+    if (!_sliderGlowStyle) { _sliderGlowStyle = document.createElement('style'); _sliderGlowStyle.id = '_slider-glow-style'; document.head.appendChild(_sliderGlowStyle); }
+    const _hGlow = hex8ToCss(btnStyle.sliderHandleGlow || '#FFFFFF00');
+    const _haGlow = hex8ToCss(btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
+    _sliderGlowStyle.textContent = `.alpha-slider::-webkit-slider-thumb{box-shadow:0 0 8px 4px ${_hGlow}}.alpha-slider::-moz-range-thumb{box-shadow:0 0 8px 4px ${_hGlow}}.alpha-slider.handle-active::-webkit-slider-thumb{box-shadow:0 0 8px 4px ${_haGlow}}.alpha-slider.handle-active::-moz-range-thumb{box-shadow:0 0 8px 4px ${_haGlow}}`;
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
@@ -589,6 +594,7 @@ if (navigator.storage && navigator.storage.persist) {
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
