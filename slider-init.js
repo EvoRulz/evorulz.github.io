@@ -1,4 +1,4 @@
-// @version 1261
+// @version 1262
 
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
@@ -46,7 +46,7 @@ var dragging = false;
     var ratio = (e.clientX - trackLeft) / trackWidth;
     var newVal = cachedMin + ratio * (cachedMax - cachedMin);
     s.value = Math.max(cachedMin, Math.min(cachedMax, newVal));
-    s.dispatchEvent(new Event('input', {bubbles:true}));
+    s.dispatchEvent(new InputEvent('input', {bubbles:true}));
   });
 
   overlay.addEventListener('pointerup', function(e){
@@ -78,13 +78,14 @@ document.querySelectorAll('.alpha-slider').forEach(function(s) {
   par.insertBefore(plus, s.nextSibling);
   function step(dir) {
     s.value = Math.max(parseFloat(s.min)||0, Math.min(parseFloat(s.max)||255, parseFloat(s.value)+dir));
-    s.dispatchEvent(new Event('input', {bubbles:true}));
+    s.dispatchEvent(new InputEvent('input', {bubbles:true}));
   }
   minus.addEventListener('pointerdown', function(e){e.stopPropagation();});
   plus.addEventListener('pointerdown', function(e){e.stopPropagation();});
   minus.addEventListener('click', function(e){e.stopPropagation();step(-1);});
   plus.addEventListener('click', function(e){e.stopPropagation();step(1);});
 });
+
 
 
 
