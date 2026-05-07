@@ -1,4 +1,4 @@
-// @version 1258
+// @version 1259
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -439,7 +439,7 @@
       ? `font-size:11px;background:${_lblGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;margin-bottom:2px;`
       : `font-size:11px;color:${txt};margin-bottom:2px;`;
     el.innerHTML =
-  `<div style="display:flex;gap:calc(${v.hW} * 1.5);align-items:center;">` +
+  `<div style="display:flex;gap:var(--slider-btn-gap,0px);align-items:center;">` +
     `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
     `<div style="position:relative;height:${v.height};flex:1;max-width:${v.w};">` +
   `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
@@ -823,6 +823,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
