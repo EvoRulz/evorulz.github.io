@@ -1,4 +1,4 @@
-// @version 1255
+// @version 1256
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -418,6 +418,9 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--slider-handle-r",      (btnStyle.sliderHandleR ?? 3) + "%");
     document.documentElement.style.setProperty("--slider-handle-hole",  (btnStyle.sliderHandleHole ?? 0));
     document.documentElement.style.setProperty("--slider-btn-gap",      (btnStyle.sliderBtnGap ?? 0) + "px");
+    const _sbGap = (btnStyle.sliderBtnGap ?? 0) + 'px';
+    document.querySelectorAll('.slider-step-minus').forEach(b => b.style.marginRight = _sbGap);
+    document.querySelectorAll('.slider-step-plus').forEach(b => b.style.marginLeft = _sbGap);
     document.documentElement.style.setProperty("--slider-fill-color",    _bgCss(btnStyle.sliderFill   || '#9659FFFF'));
     document.documentElement.style.setProperty("--slider-track-bg",      _bgCss(btnStyle.sliderTrack  || '#333333FF'));
     document.documentElement.style.setProperty("--slider-handle-color",  _bgCss(btnStyle.sliderHandle || '#FFFFFFFF'));
@@ -575,6 +578,7 @@ if (navigator.storage && navigator.storage.persist) {
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
