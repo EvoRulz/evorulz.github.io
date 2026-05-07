@@ -1,4 +1,4 @@
-// @version 1259
+// @version 1260
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -75,6 +75,9 @@
   function _syncSettingsPanelUI() {
     if (window._cfBuild) window._cfBuild();
     setColorValue('s-sliderborder',       btnStyle.sliderBorder       || '#555555FF');
+    setColorValue('s-sliderbtnbg',        btnStyle.sliderBtnBg        || '#2a2a2aFF');
+    setColorValue('s-sliderbtnfg',        btnStyle.sliderBtnFg        || '#aaaaaaFF');
+    setColorValue('s-sliderbtnborder',    btnStyle.sliderBtnBorder    || '#555555FF');
     setColorValue('s-sliderfill',         btnStyle.sliderFill         || '#9659FFFF');
     setColorValue('s-slidertrack',        btnStyle.sliderTrack        || '#333333FF');
     setColorValue('s-sliderhandle',       btnStyle.sliderHandle       || '#FFFFFFFF');
@@ -228,7 +231,10 @@
     setColorValue('s-slidertrack',     btnStyle.sliderTrack  || '#333333FF');
     setColorValue('s-sliderhandle',    btnStyle.sliderHandle || '#FFFFFFFF');
     setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
-    setColorValue('s-sliderborder', btnStyle.sliderBorder || '#555555FF');
+    setColorValue('s-sliderborder',    btnStyle.sliderBorder    || '#555555FF');
+    setColorValue('s-sliderbtnbg',     btnStyle.sliderBtnBg     || '#2a2a2aFF');
+    setColorValue('s-sliderbtnfg',     btnStyle.sliderBtnFg     || '#aaaaaaFF');
+    setColorValue('s-sliderbtnborder', btnStyle.sliderBtnBorder || '#555555FF');
     setColorValue('s-checkbox-checked', btnStyle.checkboxChecked);
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
@@ -398,6 +404,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 

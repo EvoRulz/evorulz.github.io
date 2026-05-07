@@ -32,7 +32,7 @@
 <div id="zoom-content">
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1259</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1260</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -318,7 +318,40 @@
           <label>Handle width <span id="s-sliderhandlew-val">16px</span></label>
           <input type="range" class="alpha-slider" id="s-sliderhandlew" min="4" max="60" value="16" oninput="document.getElementById('s-sliderhandlew-val').textContent=this.value+'px';settingsChange()">
         </div>
-        <div class="settings-row" data-slider-row="sliderbtnspacing"><span class="slider-row-handle">⠿</span>
+        <div class="color-settings-row" data-slider-row="sliderbtnbg"><span class="slider-row-handle">⠿</span>
+        <label>Button background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sliderbtnbg" oninput="onColorPickerChange('s-sliderbtnbg')">
+          <input type="range" class="alpha-slider" id="s-sliderbtnbg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderbtnbg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sliderbtnbg-hex" maxlength="9" oninput="onHexInput('s-sliderbtnbg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sliderbtnbg',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-slider-row="sliderbtnfg"><span class="slider-row-handle">⠿</span>
+        <label>Button text color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sliderbtnfg" oninput="onColorPickerChange('s-sliderbtnfg')">
+          <input type="range" class="alpha-slider" id="s-sliderbtnfg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderbtnfg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sliderbtnfg-hex" maxlength="9" oninput="onHexInput('s-sliderbtnfg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sliderbtnfg',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-slider-row="sliderbtnborder"><span class="slider-row-handle">⠿</span>
+        <label>Button border color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sliderbtnborder" oninput="onColorPickerChange('s-sliderbtnborder')">
+          <input type="range" class="alpha-slider" id="s-sliderbtnborder-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderbtnborder')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sliderbtnborder-hex" maxlength="9" oninput="onHexInput('s-sliderbtnborder')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sliderbtnborder',this)">Copy</button>
+        </div>
+      </div>
+      <div class="settings-row" data-slider-row="sliderbtnspacing"><span class="slider-row-handle">⠿</span>
           <label>Button spacing <span id="s-sliderbtnspacing-val">0px</span></label>
           <input type="range" class="alpha-slider" id="s-sliderbtnspacing" min="-15" max="20" value="0" oninput="document.getElementById('s-sliderbtnspacing-val').textContent=this.value+'px';settingsChange()">
         </div>

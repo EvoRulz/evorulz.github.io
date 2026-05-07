@@ -1,4 +1,4 @@
-// @version 1259
+// @version 1260
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -209,6 +209,9 @@ else {
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     btnStyle.sliderBtnGap     = Number(document.getElementById("s-sliderbtnspacing").value);
+    btnStyle.sliderBtnBg      = getColorValue('s-sliderbtnbg');
+    btnStyle.sliderBtnFg      = getColorValue('s-sliderbtnfg');
+    btnStyle.sliderBtnBorder  = getColorValue('s-sliderbtnborder');
     btnStyle.checkboxChecked = getColorValue('s-checkbox-checked');
     btnStyle.checkboxMark    = getColorValue('s-checkbox-mark');
     btnStyle.checkboxBorder  = getColorValue('s-checkbox-border');
@@ -323,6 +326,9 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     const _shwRvEl = document.getElementById("s-sliderhandlew-val"); if (_shwRvEl) _shwRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderHandleW ?? 16) + 'px';
     const _shheREl = document.getElementById("s-sliderhandlehole"); if (_shheREl) _shheREl.value = String(BTN_STYLE_DEFAULTS.sliderHandleHole ?? 0);
     const _sbgREl = document.getElementById("s-sliderbtnspacing"); if (_sbgREl) _sbgREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnGap ?? 0);
+    setColorValue('s-sliderbtnbg',     BTN_STYLE_DEFAULTS.sliderBtnBg);
+    setColorValue('s-sliderbtnfg',     BTN_STYLE_DEFAULTS.sliderBtnFg);
+    setColorValue('s-sliderbtnborder', BTN_STYLE_DEFAULTS.sliderBtnBorder);
     const _sbgvREl = document.getElementById("s-sliderbtnspacing-val"); if (_sbgvREl) _sbgvREl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnGap ?? 0) + 'px';
     const _shhevREl = document.getElementById("s-sliderhandlehole-val"); if (_shhevREl) _shhevREl.textContent = (BTN_STYLE_DEFAULTS.sliderHandleHole ?? 0) + '%';
     const _sspv = document.getElementById("s-sliderspread-val"); if (_sspv) _sspv.textContent = (btnStyle.sliderSpread ?? 4) + "px";
@@ -379,6 +385,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
