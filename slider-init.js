@@ -1,4 +1,4 @@
-// @version 1260
+// @version 1261
 
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
@@ -68,7 +68,7 @@ document.querySelectorAll('.alpha-slider').forEach(function(s) {
   var par = s.parentElement;
   var minus = document.createElement('button');
   minus.textContent = '\u2212';
-  minus.style.cssText = 'background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:4px;color:var(--slider-btn-fg,#aaa);cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:20;touch-action:manipulation;';
+  minus.style.cssText = 'background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:20;touch-action:manipulation;';
   minus.classList.add('slider-step-minus');
   var plus = document.createElement('button');
   plus.textContent = '+';
@@ -85,6 +85,7 @@ document.querySelectorAll('.alpha-slider').forEach(function(s) {
   minus.addEventListener('click', function(e){e.stopPropagation();step(-1);});
   plus.addEventListener('click', function(e){e.stopPropagation();step(1);});
 });
+
 
 
 

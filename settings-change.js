@@ -1,4 +1,4 @@
-// @version 1260
+// @version 1261
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -60,6 +60,12 @@ function settingsExport() {
           const _shholeEl = document.getElementById('s-sliderhandlehole'); if (_shholeEl) _shholeEl.value = String(btnStyle.sliderHandleHole ?? 0);
           const _sbgIEl = document.getElementById('s-sliderbtnspacing'); if (_sbgIEl) _sbgIEl.value = String(btnStyle.sliderBtnGap ?? 0);
           const _sbgIvEl = document.getElementById('s-sliderbtnspacing-val'); if (_sbgIvEl) _sbgIvEl.textContent = (btnStyle.sliderBtnGap ?? 0) + 'px';
+          const _sbwIEl = document.getElementById('s-sliderbtnw'); if (_sbwIEl) _sbwIEl.value = String(btnStyle.sliderBtnW ?? 22);
+          const _sbwIvEl = document.getElementById('s-sliderbtnw-val'); if (_sbwIvEl) _sbwIvEl.textContent = (btnStyle.sliderBtnW ?? 22) + 'px';
+          const _sbhIEl = document.getElementById('s-sliderbtnh'); if (_sbhIEl) _sbhIEl.value = String(btnStyle.sliderBtnH ?? 22);
+          const _sbhIvEl = document.getElementById('s-sliderbtnh-val'); if (_sbhIvEl) _sbhIvEl.textContent = (btnStyle.sliderBtnH ?? 22) + 'px';
+          const _sbrIEl = document.getElementById('s-sliderbtnr'); if (_sbrIEl) _sbrIEl.value = String(btnStyle.sliderBtnR ?? 4);
+          const _sbrIvEl = document.getElementById('s-sliderbtnr-val'); if (_sbrIvEl) _sbrIvEl.textContent = (btnStyle.sliderBtnR ?? 4) + 'px';
           const _shv2 = document.getElementById('s-sliderh-val');       if (_shv2) _shv2.textContent = btnStyle.sliderH + 'px';
           const _srv2 = document.getElementById('s-sliderr-val');       if (_srv2) _srv2.textContent = btnStyle.sliderR + '%';
           const _sspv2 = document.getElementById('s-sliderspread-val'); if (_sspv2) _sspv2.textContent = (btnStyle.sliderSpread ?? 4) + 'px';
@@ -209,6 +215,9 @@ else {
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     btnStyle.sliderBtnGap     = Number(document.getElementById("s-sliderbtnspacing").value);
+    btnStyle.sliderBtnW       = Number(document.getElementById("s-sliderbtnw")?.value ?? 22);
+    btnStyle.sliderBtnH       = Number(document.getElementById("s-sliderbtnh")?.value ?? 22);
+    btnStyle.sliderBtnR       = Number(document.getElementById("s-sliderbtnr")?.value ?? 4);
     btnStyle.sliderBtnBg      = getColorValue('s-sliderbtnbg');
     btnStyle.sliderBtnFg      = getColorValue('s-sliderbtnfg');
     btnStyle.sliderBtnBorder  = getColorValue('s-sliderbtnborder');
@@ -330,6 +339,12 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-sliderbtnfg',     BTN_STYLE_DEFAULTS.sliderBtnFg);
     setColorValue('s-sliderbtnborder', BTN_STYLE_DEFAULTS.sliderBtnBorder);
     const _sbgvREl = document.getElementById("s-sliderbtnspacing-val"); if (_sbgvREl) _sbgvREl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnGap ?? 0) + 'px';
+    const _sbwREl = document.getElementById("s-sliderbtnw"); if (_sbwREl) _sbwREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnW ?? 22);
+    const _sbwRvEl = document.getElementById("s-sliderbtnw-val"); if (_sbwRvEl) _sbwRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnW ?? 22) + 'px';
+    const _sbhREl = document.getElementById("s-sliderbtnh"); if (_sbhREl) _sbhREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnH ?? 22);
+    const _sbhRvEl = document.getElementById("s-sliderbtnh-val"); if (_sbhRvEl) _sbhRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnH ?? 22) + 'px';
+    const _sbrREl = document.getElementById("s-sliderbtnr"); if (_sbrREl) _sbrREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnR ?? 4);
+    const _sbrRvEl = document.getElementById("s-sliderbtnr-val"); if (_sbrRvEl) _sbrRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnR ?? 4) + 'px';
     const _shhevREl = document.getElementById("s-sliderhandlehole-val"); if (_shhevREl) _shhevREl.textContent = (BTN_STYLE_DEFAULTS.sliderHandleHole ?? 0) + '%';
     const _sspv = document.getElementById("s-sliderspread-val"); if (_sspv) _sspv.textContent = (btnStyle.sliderSpread ?? 4) + "px";
     const _sspEl = document.getElementById("s-sliderspread"); if (_sspEl) _sspEl.value = btnStyle.sliderSpread ?? 4;
@@ -385,6 +400,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
