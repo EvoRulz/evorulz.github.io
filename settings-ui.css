@@ -1,4 +1,4 @@
-/* @version 1271 */
+/* @version 1272 */
 
 /* ── Settings cog & panel ── */
     #settings-cog {
@@ -504,10 +504,12 @@ input[type="checkbox"]:hover {
     body.interact-locked .cf-arrow { pointer-events: none; }
     body { padding-bottom: 80px !important; }
     #zoom-slider {
-      width: var(--slider-w, 100%);
+      flex: 1;
+      min-width: 0;
+      width: auto;
       height: var(--slider-h, 8px);
       cursor: pointer;
-      flex-shrink: 0;
+      flex-shrink: 1;
       border-radius: var(--slider-spread, 4px) / var(--slider-r, 4px);
       border: 1px solid var(--slider-border-color, #555);
       outline: none;
@@ -562,6 +564,7 @@ input[type="checkbox"]:hover {
   padding: 20px;
   box-sizing: border-box;
 }
+
 
 
 
