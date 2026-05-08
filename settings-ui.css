@@ -1,4 +1,4 @@
-/* @version 1270 */
+/* @version 1271 */
 
 /* ── Settings cog & panel ── */
     #settings-cog {
@@ -516,6 +516,11 @@ input[type="checkbox"]:hover {
       background: var(--slider-track-bg, #333);
       touch-action: pan-y;
     }
+    #ctrl-bar #zoom-slider {
+      flex: 1;
+      min-width: 0;
+      width: auto;
+    }
     #zoom-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: var(--slider-handle-w, 16px);
@@ -557,6 +562,7 @@ input[type="checkbox"]:hover {
   padding: 20px;
   box-sizing: border-box;
 }
+
 
 
 
