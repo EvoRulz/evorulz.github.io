@@ -1,4 +1,4 @@
-/* @version 1268 */
+/* @version 1269 */
 
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
     *::-webkit-scrollbar { display: none; width: 0; height: 0; }
@@ -97,6 +97,7 @@
 
     /* ── Tracker toggle buttons in the drag grid ── */
     #buttons {
+      position: relative;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
@@ -114,13 +115,25 @@
       font-size: 16px;
       user-select: none;
       -webkit-user-select: none;
+      position: relative;
       touch-action: none; /* required for pointer capture on mobile/TWA */
-      transition: box-shadow 0.2s, background 0.2s;
-  box-shadow: 0 0 16px 5px var(--btn-glow, rgba(150, 90, 255, 0.65));
+      transition: background 0.2s;
     }
     .top-item button { border-radius: 6px; }
     .tracker-btn.active {
       background: var(--btn-active-bg, #555);
+    }
+    .tracker-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: 0 0 16px 5px var(--btn-glow, rgba(150, 90, 255, 0.65));
+      z-index: -1;
+      pointer-events: none;
+      transition: box-shadow 0.2s;
+    }
+    .tracker-btn.active::before {
       box-shadow: 0 0 16px 5px var(--btn-active-glow, var(--btn-glow, rgba(150, 90, 255, 0.65)));
     }
     .is-dragging .tracker-btn { pointer-events: none; }
@@ -272,6 +285,7 @@
       font-size: 13px; align-self: flex-start;
     }
     #confirm-cancel:hover { background: #444; }
+
 
 
 
