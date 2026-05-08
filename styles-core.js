@@ -1,4 +1,4 @@
-// @version 1267
+// @version 1268
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -530,7 +530,9 @@ if (navigator.storage && navigator.storage.persist) {
       const _vNumSpan = document.getElementById('app-version');
       if (_vNumSpan) _vNumSpan.style.fontFamily = _btnStyleFor('top-version').font;
     if (_vBtn) {
-      _vBtn.onpointerdown = () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
+      let _vTapX = 0, _vTapY = 0;
+_vBtn.onpointerdown = (e) => { _vTapX = e.clientX; _vTapY = e.clientY; _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
+_vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _vTapY) > 6) _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
       _vBtn.onpointerleave = () => { _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
       _vBtn.onpointerup = () => {
         _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
@@ -594,6 +596,7 @@ if (navigator.storage && navigator.storage.persist) {
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
