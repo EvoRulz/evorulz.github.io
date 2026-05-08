@@ -1,4 +1,4 @@
-// @version 1297
+// @version 1298
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -178,6 +178,7 @@ var _srGlowStyle = document.createElement('style');
         if (window._dragEnabled === false) { rDrag = null; return; }
         rDrag.active = true;
         window._settingsRowDragging = true;
+        const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
         const rect = rDrag.item.getBoundingClientRect();
         rDrag.ghost = rDrag.item.cloneNode(true);
         Object.assign(rDrag.ghost.style, {
@@ -217,6 +218,7 @@ var _srGlowStyle = document.createElement('style');
         if (rDrag.ghost) rDrag.ghost.remove();
         saveOrder();
       }
+      const _so2 = document.getElementById('settings-overlay'); if (_so2) _so2.style.overflowY = '';
       rDrag = null;
       setTimeout(() => { window._settingsRowDragging = false; }, 0);
     });
@@ -224,6 +226,7 @@ var _srGlowStyle = document.createElement('style');
       if (!rDrag) return;
       rDrag.item.style.opacity = '';
       if (rDrag.ghost) rDrag.ghost.remove();
+      const _so3 = document.getElementById('settings-overlay'); if (_so3) _so3.style.overflowY = '';
       rDrag = null;
       setTimeout(() => { window._settingsRowDragging = false; }, 0);
     });
@@ -377,6 +380,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
