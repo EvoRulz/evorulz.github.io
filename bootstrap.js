@@ -1,4 +1,4 @@
-// @version 1292
+// @version 1293
 
   // ── Bootstrap ──────────────────────────────────────────────
   const buttonsEl  = document.getElementById("buttons");
@@ -75,7 +75,7 @@
     const btn = document.createElement("button");
     btn.className   = "tracker-btn";
     btn.dataset.id  = config.id;
-    btn.textContent = config.label;
+    const _bspan = document.createElement('span'); _bspan.className = 'btn-text-label'; _bspan.dataset.text = config.label; _bspan.textContent = config.label; btn.appendChild(_bspan);
     let _tapX = null, _tapY = null;
 btn.addEventListener('pointerdown', (e) => {
   _tapX = e.clientX; _tapY = e.clientY;
@@ -151,6 +151,7 @@ btn.addEventListener('pointercancel', () => {
     topGrid.style.gridAutoRows = maxH + 'px';
   }
   requestAnimationFrame(equalizeTopGrid);
+
 
 
 

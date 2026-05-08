@@ -1,4 +1,4 @@
-// @version 1292
+// @version 1293
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -292,7 +292,7 @@ if (navigator.storage && navigator.storage.persist) {
   }
   applyAppStyle();
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16 };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16, fgStroke: '#00000000', fgStrokeW: 0 };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -399,7 +399,34 @@ if (navigator.storage && navigator.storage.persist) {
     return Object.assign({}, base, TOP_GRID_DEFAULTS[id] || {}, _btnStyles[id] || {});
   }
   function _saveBtnStyles() { localStorage.setItem("_btnStyles", JSON.stringify(_btnStyles)); }
-
+  function _applyTextStyle(el, s) {
+  if (!el) return;
+  const fgStops = s.fgStops;
+  const strokeW = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0;
+  const strokeC = hex8ToCss(s.fgStroke ?? btnStyle.fgStroke ?? '#00000000');
+  if (fgStops && fgStops.length >= 2) {
+    const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
+    el.style.background = grad;
+    el.style.webkitBackgroundClip = 'text';
+    el.style.backgroundClip = 'text';
+    el.style.webkitTextFillColor = 'transparent';
+    el.style.color = 'transparent';
+  } else {
+    el.style.background = '';
+    el.style.webkitBackgroundClip = '';
+    el.style.backgroundClip = '';
+    el.style.webkitTextFillColor = hex8ToCss(s.fg);
+    el.style.color = hex8ToCss(s.fg);
+  }
+  if (strokeW > 0) {
+    el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
+    el.style.paintOrder = 'stroke fill';
+  } else {
+    el.style.webkitTextStroke = '';
+    el.style.paintOrder = '';
+  }
+}
+window._applyTextStyle = _applyTextStyle;
   function applyBtnStyle(skipHabitsBtn) {
     buttonsEl.style.setProperty("--btn-bg",        _bgCss(btnStyle.bg));
     buttonsEl.style.setProperty("--btn-fg",        hex8ToCss(btnStyle.fg));
@@ -587,6 +614,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.cssText += `;font-family:${s.font} !important`;
       btn.style.borderRadius = (s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+      const _tspan = btn.querySelector('.btn-text-label'); if (_tspan) _applyTextStyle(_tspan, s);
     });
   }
   // ── Wrap all color pickers in swatch containers ────────────
@@ -609,6 +637,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

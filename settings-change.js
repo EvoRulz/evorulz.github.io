@@ -1,4 +1,4 @@
-// @version 1292
+// @version 1293
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -35,8 +35,12 @@ function settingsExport() {
           btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS, JSON.parse(data["_btnStyle"]));
           applyBtnStyle();
           setColorValue('s-bg',       btnStyle.bg);
-          setColorValue('s-fg',       btnStyle.fg);
-          setColorValue('s-glow',     btnStyle.glow);
+          setColorValue('s-fg',       s.fg);
+          if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null);
+          updateAlphaSliderBg('s-fg');
+          setColorValue('s-fgstroke', s.fgStroke || btnStyle.fgStroke || '#00000000');
+          const _fgsWCEl = document.getElementById('s-fgstrokew'); if (_fgsWCEl) { _fgsWCEl.value = String(s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0); const _fgsWVCEl = document.getElementById('s-fgstrokew-val'); if (_fgsWVCEl) _fgsWVCEl.textContent = (s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0) + 'px'; }
+          setColorValue('s-glow',     s.glow);
           setColorValue('s-activeglow', btnStyle.activeGlow || btnStyle.glow);
           setColorValue('s-activebg', btnStyle.activeBg);
           setColorValue('s-tap',      btnStyle.tap);
@@ -187,6 +191,9 @@ function settingsExport() {
           glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
           activeBg: getStyleValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
+          fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+          fgStroke: getColorValue('s-fgstroke'),
+          fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
         });
       }
       _saveBtnStyles();
@@ -200,6 +207,8 @@ else {
   if (_cfId === 'top-time') { const _ctrSEl = document.getElementById("s-clock-time-radius"); if (_ctrSEl) { _ctrSEl.value = document.getElementById("s-radius").value; const _ctrsVEl = document.getElementById("s-clock-time-radius-val"); if (_ctrsVEl) _ctrsVEl.textContent = document.getElementById("s-radius").value + "px"; } }
 }
     btnStyle.tap            = getColorValue('s-tap');
+    btnStyle.fgStroke = getColorValue('s-fgstroke');
+    btnStyle.fgStrokeW = Number(document.getElementById('s-fgstrokew')?.value ?? 0);
     btnStyle.glow           = getColorValue('s-glow');
     btnStyle.activeGlow     = getColorValue('s-activeglow');
     btnStyle.tapHighlight   = getColorValue('s-taphighlight');
@@ -373,6 +382,8 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     const _sspv = document.getElementById("s-sliderspread-val"); if (_sspv) _sspv.textContent = (btnStyle.sliderSpread ?? 4) + "px";
     const _sspEl = document.getElementById("s-sliderspread"); if (_sspEl) _sspEl.value = btnStyle.sliderSpread ?? 4;
     document.getElementById("s-font").value    = btnStyle.font;
+    setColorValue('s-fgstroke', '#00000000');
+    const _fgsWREl = document.getElementById('s-fgstrokew'); if (_fgsWREl) { _fgsWREl.value = '0'; const _fgsWVREl = document.getElementById('s-fgstrokew-val'); if (_fgsWVREl) _fgsWVREl.textContent = '0px'; }
     document.getElementById("s-radius").value  = String(BTN_STYLE_DEFAULTS.btnRadius ?? 6);
 const _rvDef = document.getElementById("s-radius-val"); if (_rvDef) _rvDef.textContent = (BTN_STYLE_DEFAULTS.btnRadius ?? 6) + "px";
 _btnStyles = {};
@@ -424,6 +435,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
