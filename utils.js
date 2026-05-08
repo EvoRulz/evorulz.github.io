@@ -1,4 +1,4 @@
- // @version 1293
+ // @version 1294
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -194,7 +194,11 @@ async function toggleOrientLock() {
   _zsOverlay.style.cssText = 'position:absolute;inset:0;z-index:10;cursor:pointer;touch-action:none;';
   var _zsPar = _zs.parentElement;
   if (getComputedStyle(_zsPar).position === 'static') _zsPar.style.position = 'relative';
-  _zsPar.appendChild(_zsOverlay);
+  var _zsWrap = document.createElement('div');
+  _zsWrap.style.cssText = 'position:relative;flex:1;min-width:0;';
+  _zsPar.insertBefore(_zsWrap, _zs);
+  _zsWrap.appendChild(_zs);
+  _zsWrap.appendChild(_zsOverlay);
   _zs.style.pointerEvents = 'none';
   let _zsActive = false, _zsRect = null, _zsHW = 16;
   _zsOverlay.addEventListener('pointerdown', function(e) {
@@ -229,6 +233,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
