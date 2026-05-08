@@ -1,4 +1,4 @@
- // @version 1272
+ // @version 1273
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -148,9 +148,9 @@ async function toggleOrientLock() {
     if (z <= 100) return 50 + (z - 50) * 125 / 50;
     return 175 + (z - 100) * 125 / 200;
   }
-  function ctrlZoom(sliderVal) {
+  function ctrlZoom(sliderVal, snap = true) {
     sliderVal = Number(sliderVal);
-    if (Math.abs(sliderVal - 175) <= 8) sliderVal = 175;
+    if (snap && Math.abs(sliderVal - 175) <= 8) sliderVal = 175;
     const zoom = Math.round(sliderToZoom(sliderVal));
     const sl = document.getElementById('zoom-slider');
     if (sl) sl.value = sliderVal;
@@ -194,6 +194,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
