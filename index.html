@@ -32,7 +32,7 @@
 <div id="zoom-content">
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1281</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1282</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -98,6 +98,7 @@
       <div class="settings-group-item" data-group="sg-app">App</div>
       <div class="settings-group-item" data-group="sg-notifications">Notifications</div>
       <div class="settings-group-item" data-group="sg-swatches">Swatches</div>
+      <div class="settings-group-item" data-group="sg-toggles">Toggles</div>
     </div>
     <div class="settings-group-content" id="sg-buttons">
       <div id="cf-outer" style="margin-left:-20px;margin-right:-20px;">
@@ -976,6 +977,99 @@
           <option value="ui-monospace">UI Monospace</option>
         </select>
         <div id="font-tumbler-wrap-swatch" style="flex:1;max-width:180px;background:#1c1c1c;border:1px solid #444;border-radius:6px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;min-height:52px;"></div>
+      </div>
+    </div>
+    <div class="settings-group-content" id="sg-toggles">
+      <div class="color-settings-row" data-toggle-row="off-bg">
+        <label>Track off background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-toggle-off-bg" oninput="onColorPickerChange('s-toggle-off-bg')">
+          <input type="range" class="alpha-slider" id="s-toggle-off-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-off-bg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-toggle-off-bg-hex" maxlength="9" oninput="onHexInput('s-toggle-off-bg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-off-bg',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-toggle-row="on-bg">
+        <label>Track on background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-toggle-on-bg" oninput="onColorPickerChange('s-toggle-on-bg')">
+          <input type="range" class="alpha-slider" id="s-toggle-on-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-on-bg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-toggle-on-bg-hex" maxlength="9" oninput="onHexInput('s-toggle-on-bg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-on-bg',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-toggle-row="knob-off">
+        <label>Knob off color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-toggle-knob-off" oninput="onColorPickerChange('s-toggle-knob-off')">
+          <input type="range" class="alpha-slider" id="s-toggle-knob-off-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-knob-off')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-toggle-knob-off-hex" maxlength="9" oninput="onHexInput('s-toggle-knob-off')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-knob-off',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-toggle-row="knob-on">
+        <label>Knob on color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-toggle-knob-on" oninput="onColorPickerChange('s-toggle-knob-on')">
+          <input type="range" class="alpha-slider" id="s-toggle-knob-on-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-knob-on')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-toggle-knob-on-hex" maxlength="9" oninput="onHexInput('s-toggle-knob-on')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-knob-on',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-toggle-row="border-off">
+        <label>Border off color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-toggle-border-off" oninput="onColorPickerChange('s-toggle-border-off')">
+          <input type="range" class="alpha-slider" id="s-toggle-border-off-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-border-off')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-toggle-border-off-hex" maxlength="9" oninput="onHexInput('s-toggle-border-off')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-border-off',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-toggle-row="border-on">
+        <label>Border on color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-toggle-border-on" oninput="onColorPickerChange('s-toggle-border-on')">
+          <input type="range" class="alpha-slider" id="s-toggle-border-on-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-border-on')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-toggle-border-on-hex" maxlength="9" oninput="onHexInput('s-toggle-border-on')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-border-on',this)">Copy</button>
+        </div>
+      </div>
+      <div class="settings-row" data-toggle-row="w">
+        <label>Toggle width <span id="s-toggle-w-val">44px</span></label>
+        <input type="range" class="alpha-slider" id="s-toggle-w" min="24" max="80" value="44" oninput="document.getElementById('s-toggle-w-val').textContent=this.value+'px';settingsChange()">
+      </div>
+      <div class="settings-row" data-toggle-row="h">
+        <label>Toggle height <span id="s-toggle-h-val">24px</span></label>
+        <input type="range" class="alpha-slider" id="s-toggle-h" min="14" max="48" value="24" oninput="document.getElementById('s-toggle-h-val').textContent=this.value+'px';settingsChange()">
+      </div>
+      <div class="settings-row" data-toggle-row="knob-size">
+        <label>Knob size <span id="s-toggle-knob-size-val">16px</span></label>
+        <input type="range" class="alpha-slider" id="s-toggle-knob-size" min="8" max="40" value="16" oninput="document.getElementById('s-toggle-knob-size-val').textContent=this.value+'px';settingsChange()">
+      </div>
+      <div data-toggle-row="demo" style="margin-top:12px;padding-top:12px;border-top:1px solid #444;width:100%">
+        <label style="font-size:13px;color:#bbb">Demo:</label>
+        <div style="display:flex;gap:16px;align-items:center;margin-top:8px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div class="ctrl-toggle"><div class="ctrl-knob"></div></div>
+            <span style="font-size:11px;color:#666">Off</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div class="ctrl-toggle on"><div class="ctrl-knob"></div></div>
+            <span style="font-size:11px;color:#666">On</span>
+          </div>
+        </div>
       </div>
     </div>
     <div id="settings-footer">

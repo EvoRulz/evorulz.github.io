@@ -1,4 +1,4 @@
-// @version 1281
+// @version 1282
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -292,7 +292,7 @@ if (navigator.storage && navigator.storage.persist) {
   }
   applyAppStyle();
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleKnobOff: "#666666FF", toggleKnobOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleKnobSize: 16 };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -460,6 +460,15 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--clock-bg",             hex8ToCss(btnStyle.clockBg));
     document.documentElement.style.setProperty("--clock-date-bg",        _bgCss(_btnStyleFor('top-date').bg));
     document.documentElement.style.setProperty("--clock-time-bg",        _bgCss(_btnStyleFor('top-time').bg));
+    document.documentElement.style.setProperty("--toggle-off-bg",     hex8ToCss(btnStyle.toggleOffBg    || '#333333FF'));
+    document.documentElement.style.setProperty("--toggle-on-bg",      hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF'));
+    document.documentElement.style.setProperty("--toggle-knob-off",   hex8ToCss(btnStyle.toggleKnobOff  || '#666666FF'));
+    document.documentElement.style.setProperty("--toggle-knob-on",    hex8ToCss(btnStyle.toggleKnobOn   || '#99ff99FF'));
+    document.documentElement.style.setProperty("--toggle-border-off", hex8ToCss(btnStyle.toggleBorderOff|| '#555555FF'));
+    document.documentElement.style.setProperty("--toggle-border-on",  hex8ToCss(btnStyle.toggleBorderOn || '#2a7a2aFF'));
+    document.documentElement.style.setProperty("--toggle-w",          (btnStyle.toggleW        ?? 44) + 'px');
+    document.documentElement.style.setProperty("--toggle-h",          (btnStyle.toggleH        ?? 24) + 'px');
+    document.documentElement.style.setProperty("--toggle-knob-size",  (btnStyle.toggleKnobSize ?? 16) + 'px');
     const topGridMap = [
       { id: 'top-export-all',    el: '.top-item[data-item="export-all"]',    prefix: '--export-all' },
       { id: 'top-import-all',    el: '.top-item[data-item="import-all"]',    prefix: '--import-all' },
@@ -600,6 +609,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
