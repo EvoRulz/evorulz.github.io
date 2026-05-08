@@ -1,4 +1,4 @@
-/* @version 1284 */
+/* @version 1285 */
 
 /* ── Settings cog & panel ── */
     #settings-cog {
@@ -469,17 +469,17 @@ input[type="checkbox"]:hover {
       touch-action: manipulation;
     }
     .ctrl-toggle.on { background: var(--toggle-on-bg, #1a5a1a); border-color: var(--toggle-border-on, #2a7a2a); }
-    .ctrl-knob {
+    .ctrl-switch {
       position: absolute;
       top: 3px; left: 3px;
-      width: var(--toggle-knob-size, 16px);
-      height: var(--toggle-knob-size, 16px);
+      width: var(--toggle-switch-size, 16px);
+      height: var(--toggle-switch-size, 16px);
       border-radius: 50%;
-      background: var(--toggle-knob-off, #666);
+      background: var(--toggle-switch-off, #666);
       transition: left 0.2s, background 0.2s;
       pointer-events: none;
     }
-    .ctrl-toggle.on .ctrl-knob { left: calc(var(--toggle-w, 44px) - var(--toggle-knob-size, 16px) - 5px); background: var(--toggle-knob-on, #99ff99); }
+    .ctrl-toggle.on .ctrl-switch { left: calc(var(--toggle-w, 44px) - var(--toggle-switch-size, 16px) - 5px); background: var(--toggle-switch-on, #99ff99); }
     body.interact-locked .top-item > button,
     body.interact-locked .top-item > label { pointer-events: none; }
     body.interact-locked #sections { pointer-events: none; }
@@ -565,7 +565,6 @@ input[type="checkbox"]:hover {
   padding: 20px;
   box-sizing: border-box;
 }
-
 
 
 
