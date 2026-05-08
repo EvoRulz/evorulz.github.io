@@ -1,4 +1,4 @@
- // @version 1275
+ // @version 1276
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -186,14 +186,21 @@ async function toggleOrientLock() {
   const keys = await caches.keys();
   for (const k of keys) await caches.delete(k);
   window.location.replace(location.href.replace(/[?#].*$/, '') + '?t=' + Date.now());
-}
-  
+  }
+  (function() {
+    const _zs = document.getElementById('zoom-slider');
+    if (!_zs) return;
+    _zs.addEventListener('pointerdown', () => _zs.classList.add('handle-active'));
+    _zs.addEventListener('pointerup',   () => _zs.classList.remove('handle-active'));
+    _zs.addEventListener('pointercancel', () => _zs.classList.remove('handle-active'));
+  })();
   function ctrlToggleInteract() {
     window._interactEnabled = !window._interactEnabled;
     const t = document.getElementById('interact-toggle');
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
