@@ -1,4 +1,4 @@
-/* @version 1273 */
+/* @version 1274 */
 
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
     *::-webkit-scrollbar { display: none; width: 0; height: 0; }
@@ -13,8 +13,6 @@
     .alpha-slider { flex:1; max-width:var(--slider-w,100%); height:var(--slider-h,8px); border-radius:var(--slider-spread,4px) / var(--slider-r,4px); cursor:pointer; border:1px solid var(--slider-border-color,#555); outline:none; appearance:none; -webkit-appearance:none; background:var(--slider-track-bg,#333); touch-action: pan-y; }
 .alpha-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:var(--slider-handle-w,16px); height:var(--slider-handle-h,16px); background:radial-gradient(circle, transparent calc(var(--slider-handle-hole, 0) * 1%), var(--slider-handle-color,#fff) calc(var(--slider-handle-hole, 0) * 1%)); border-radius:var(--slider-handle-r,3%); cursor:pointer; border:1px solid var(--slider-handle-border,transparent); box-sizing:border-box; }
 .alpha-slider::-moz-range-thumb { width:var(--slider-handle-w,16px); height:var(--slider-handle-h,16px); background:radial-gradient(circle, transparent calc(var(--slider-handle-hole, 0) * 1%), var(--slider-handle-color,#fff) calc(var(--slider-handle-hole, 0) * 1%)); border-radius:var(--slider-handle-r,3%); cursor:pointer; border:1px solid var(--slider-handle-border,transparent); box-sizing:border-box; }
-.alpha-slider.handle-active::-webkit-slider-thumb { box-shadow: 0 0 8px 4px rgba(255,255,255,0.85); }
-.alpha-slider.handle-active::-moz-range-thumb { box-shadow: 0 0 8px 4px rgba(255,255,255,0.85); }
     .hex-copy-row { display:flex; align-items:center; gap:6px; flex:0 0 auto; }
     .hex-input { flex:none; width:10ch; background:#111; color:#fff; border:1px solid #555; border-radius:4px; padding:4px 8px; font-size:12px; font-family:monospace; outline:none; text-transform:uppercase; letter-spacing:0.04em; }
     .copy-btn { background:#2a2a2a; border:1px solid #555; border-radius:4px; color:#aaa; cursor:pointer; padding:4px 10px; font-size:12px; flex-shrink:0; }
@@ -285,6 +283,7 @@
       font-size: 13px; align-self: flex-start;
     }
     #confirm-cancel:hover { background: #444; }
+
 
 
 
