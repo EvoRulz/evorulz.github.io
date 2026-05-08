@@ -1,4 +1,4 @@
-// @version 1295
+// @version 1296
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -177,6 +177,7 @@ var _srGlowStyle = document.createElement('style');
         if (Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY) < DRAG_THRESHOLD) return;
         if (window._dragEnabled === false) { rDrag = null; return; }
         rDrag.active = true;
+        window._settingsRowDragging = true;
         const rect = rDrag.item.getBoundingClientRect();
         rDrag.ghost = rDrag.item.cloneNode(true);
         Object.assign(rDrag.ghost.style, {
@@ -217,12 +218,14 @@ var _srGlowStyle = document.createElement('style');
         saveOrder();
       }
       rDrag = null;
+      setTimeout(() => { window._settingsRowDragging = false; }, 0);
     });
     document.addEventListener('pointercancel', () => {
       if (!rDrag) return;
       rDrag.item.style.opacity = '';
       if (rDrag.ghost) rDrag.ghost.remove();
       rDrag = null;
+      setTimeout(() => { window._settingsRowDragging = false; }, 0);
     });
     applyOrder();
   }
@@ -374,6 +377,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 

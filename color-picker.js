@@ -1,4 +1,4 @@
-// @version 1295
+// @version 1296
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -661,6 +661,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null;
     sw.style.boxShadow = '';
     if (moved > 8) return;
+    if (window._settingsRowDragging) return;
     activeSwatch === sw ? close() : openFor(sw);
   }, true);
 
@@ -823,6 +824,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
