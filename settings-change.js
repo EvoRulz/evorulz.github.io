@@ -1,4 +1,4 @@
-// @version 1286
+// @version 1287
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -231,13 +231,13 @@ else {
     btnStyle.checkboxBg      = getColorValue('s-checkbox-bg');
     btnStyle.toggleOffBg     = getColorValue('s-toggle-off-bg');
     btnStyle.toggleOnBg      = getColorValue('s-toggle-on-bg');
-    btnStyle.toggleKnobOff   = getColorValue('s-toggle-knob-off');
-    btnStyle.toggleKnobOn    = getColorValue('s-toggle-knob-on');
+    btnStyle.toggleSwitchOff   = getColorValue('s-toggle-switch-off');
+    btnStyle.toggleSwitchOn    = getColorValue('s-toggle-switch-on');
     btnStyle.toggleBorderOff = getColorValue('s-toggle-border-off');
     btnStyle.toggleBorderOn  = getColorValue('s-toggle-border-on');
     btnStyle.toggleW         = Number(document.getElementById('s-toggle-w')?.value       ?? 44);
     btnStyle.toggleH         = Number(document.getElementById('s-toggle-h')?.value       ?? 24);
-    btnStyle.toggleKnobSize  = Number(document.getElementById('s-toggle-knob-size')?.value ?? 16);
+    btnStyle.toggleSwitchSize  = Number(document.getElementById('s-toggle-switch-size')?.value ?? 16);
     btnStyle.clockBg         = getColorValue('s-clock-bg');
     if (_cfId !== 'top-date') {
       _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
@@ -329,13 +329,13 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
     setColorValue('s-toggle-off-bg',     BTN_STYLE_DEFAULTS.toggleOffBg);
     setColorValue('s-toggle-on-bg',      BTN_STYLE_DEFAULTS.toggleOnBg);
-    setColorValue('s-toggle-knob-off',   BTN_STYLE_DEFAULTS.toggleKnobOff);
-    setColorValue('s-toggle-knob-on',    BTN_STYLE_DEFAULTS.toggleKnobOn);
+    setColorValue('s-toggle-switch-off',   BTN_STYLE_DEFAULTS.toggleSwitchOff);
+    setColorValue('s-toggle-switch-on',    BTN_STYLE_DEFAULTS.toggleSwitchOn);
     setColorValue('s-toggle-border-off', BTN_STYLE_DEFAULTS.toggleBorderOff);
     setColorValue('s-toggle-border-on',  BTN_STYLE_DEFAULTS.toggleBorderOn);
     const _twREl = document.getElementById('s-toggle-w'); if (_twREl) { _twREl.value = '44'; const _twvREl = document.getElementById('s-toggle-w-val'); if (_twvREl) _twvREl.textContent = '44px'; }
     const _thREl = document.getElementById('s-toggle-h'); if (_thREl) { _thREl.value = '24'; const _thvREl = document.getElementById('s-toggle-h-val'); if (_thvREl) _thvREl.textContent = '24px'; }
-    const _tksREl = document.getElementById('s-toggle-knob-size'); if (_tksREl) { _tksREl.value = '16'; const _tksVREl = document.getElementById('s-toggle-knob-size-val'); if (_tksVREl) _tksVREl.textContent = '16px'; }
+    const _tksREl = document.getElementById('s-toggle-switch-size'); if (_tksREl) { _tksREl.value = '16'; const _tksVREl = document.getElementById('s-toggle-switch-size-val'); if (_tksVREl) _tksVREl.textContent = '16px'; }
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     setColorValue('s-sliderborder',    btnStyle.sliderBorder);
@@ -424,6 +424,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
