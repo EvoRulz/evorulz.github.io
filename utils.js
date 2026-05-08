@@ -1,4 +1,4 @@
- // @version 1264
+ // @version 1265
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -117,15 +117,16 @@ async function toggleOrientLock() {
 (function() {
   const saved = localStorage.getItem('_zoom');
   if (saved) {
-    const val = parseInt(saved);
+    const zoom = parseInt(saved);
+    const sliderVal = Math.round(zoomToSlider(zoom));
     const content = document.getElementById('zoom-content');
     if (content) {
-      if (val === 100) {
+      if (zoom === 100) {
         content.style.transform = '';
         content.style.transformOrigin = '';
         content.style.height = '';
       } else {
-        const scale = val / 100;
+        const scale = zoom / 100;
         content.style.transformOrigin = 'top center';
         content.style.transform = 'scale(' + scale + ')';
         content.style.height = (content.scrollHeight * scale) + 'px';
@@ -133,30 +134,42 @@ async function toggleOrientLock() {
     }
     const sl = document.getElementById('zoom-slider');
     const lb = document.getElementById('zoom-label');
-    if (sl) sl.value = saved;
-    if (lb) lb.textContent = saved + '%';
+    if (sl) sl.value = sliderVal;
+    if (lb) lb.textContent = zoom + '%';
   }
 })();
-  function ctrlZoom(val) {
-    val = Math.abs(val - 100) <= 8 ? 100 : val;
+  function sliderToZoom(s) {
+    s = Number(s);
+    if (s <= 175) return 50 + (s - 50) * 50 / 125;
+    return 100 + (s - 175) * 200 / 125;
+  }
+  function zoomToSlider(z) {
+    z = Number(z);
+    if (z <= 100) return 50 + (z - 50) * 125 / 50;
+    return 175 + (z - 100) * 125 / 200;
+  }
+  function ctrlZoom(sliderVal) {
+    sliderVal = Number(sliderVal);
+    if (Math.abs(sliderVal - 175) <= 8) sliderVal = 175;
+    const zoom = Math.round(sliderToZoom(sliderVal));
     const sl = document.getElementById('zoom-slider');
-    if (sl) sl.value = val;
+    if (sl) sl.value = sliderVal;
     const content = document.getElementById('zoom-content');
     if (content) {
-      if (val === 100) {
+      if (zoom === 100) {
         content.style.transform = '';
         content.style.transformOrigin = '';
         content.style.height = '';
       } else {
-        const scale = val / 100;
+        const scale = zoom / 100;
         content.style.transformOrigin = 'top center';
         content.style.transform = 'scale(' + scale + ')';
         content.style.height = (content.scrollHeight * scale) + 'px';
       }
     }
     const lb = document.getElementById('zoom-label');
-    if (lb) lb.textContent = val + '%';
-    localStorage.setItem('_zoom', val);
+    if (lb) lb.textContent = zoom + '%';
+    localStorage.setItem('_zoom', zoom);
   }
   window._dragEnabled = true;
   window._interactEnabled = true;
@@ -181,6 +194,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
