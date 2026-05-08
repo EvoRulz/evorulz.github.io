@@ -1,4 +1,4 @@
-// @version 1279
+// @version 1281
 
 // ── Tracker configs (dynamic) ──────────────────────────────
   const CONFIG_DEFAULTS = [
@@ -423,6 +423,8 @@
     return { init, reload, onSelectChange, onReasonInput, onInput,
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
+
+
 
 
 
