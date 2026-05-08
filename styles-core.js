@@ -1,4 +1,4 @@
-// @version 1274
+// @version 1275
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -440,7 +440,7 @@ if (navigator.storage && navigator.storage.persist) {
     if (!_sliderGlowStyle) { _sliderGlowStyle = document.createElement('style'); _sliderGlowStyle.id = '_slider-glow-style'; document.head.appendChild(_sliderGlowStyle); }
     const _hGlow = hex8ToCss(btnStyle.sliderHandleGlow || '#FFFFFF00');
     const _haGlow = hex8ToCss(btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
-    _sliderGlowStyle.textContent = `.alpha-slider::-webkit-slider-thumb{box-shadow:0 0 8px 4px ${_hGlow}}.alpha-slider::-moz-range-thumb{box-shadow:0 0 8px 4px ${_hGlow}}.alpha-slider.handle-active::-webkit-slider-thumb{box-shadow:0 0 8px 4px ${_haGlow}}.alpha-slider.handle-active::-moz-range-thumb{box-shadow:0 0 8px 4px ${_haGlow}}`;
+    _sliderGlowStyle.textContent = `.alpha-slider::-webkit-slider-thumb,#zoom-slider::-webkit-slider-thumb,#cp-popup input[type=range]::-webkit-slider-thumb{box-shadow:0 0 8px 4px ${_hGlow}}.alpha-slider::-moz-range-thumb,#zoom-slider::-moz-range-thumb,#cp-popup input[type=range]::-moz-range-thumb{box-shadow:0 0 8px 4px ${_hGlow}}.alpha-slider.handle-active::-webkit-slider-thumb{box-shadow:0 0 8px 4px ${_haGlow}}.alpha-slider.handle-active::-moz-range-thumb{box-shadow:0 0 8px 4px ${_haGlow}}`;
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
@@ -596,6 +596,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
