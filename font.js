@@ -1,4 +1,4 @@
-// @version 1288
+// @version 1289
 
 function _makeFontTumbler(selectId, wrapId, onChangeCb) {
   function getOpts() {
@@ -110,6 +110,7 @@ function _makeFontTumbler(selectId, wrapId, onChangeCb) {
     _buildSwatch();
   }
 })();
+
 
 
 

@@ -1,4 +1,4 @@
-// @version 1288
+// @version 1289
 
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
@@ -85,49 +85,7 @@ document.querySelectorAll('.alpha-slider').forEach(function(s) {
   minus.addEventListener('click', function(e){e.stopPropagation();step(-1);});
   plus.addEventListener('click', function(e){e.stopPropagation();step(1);});
 });
-(function() {
-  var s = document.getElementById('zoom-slider');
-  if (!s) return;
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:absolute;inset:0;z-index:10;cursor:pointer;touch-action:pan-y;';
-  var par = s.parentElement;
-  if (getComputedStyle(par).position === 'static') par.style.position = 'relative';
-  par.appendChild(overlay);
-  var dragging = false, cachedRect = null, cachedHandleW = 16;
-  overlay.addEventListener('pointerdown', function(e) {
-    cachedRect = s.getBoundingClientRect();
-    cachedHandleW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-w')) || 16;
-    var ratio = (parseFloat(s.value) - parseFloat(s.min)) / (parseFloat(s.max) - parseFloat(s.min));
-    var thumbCX = cachedRect.left + ratio * (cachedRect.width - cachedHandleW) + cachedHandleW / 2;
-    if (Math.abs(e.clientX - thumbCX) > Math.max(cachedHandleW, 28)) return;
-    overlay.style.touchAction = 'none';
-    s.classList.add('handle-active');
-    e.preventDefault(); e.stopPropagation();
-    dragging = true;
-    overlay.setPointerCapture(e.pointerId);
-  });
-  overlay.addEventListener('pointermove', function(e) {
-    if (!dragging) return;
-    e.preventDefault(); e.stopPropagation();
-    var trackLeft = cachedRect.left + cachedHandleW / 2;
-    var trackWidth = cachedRect.width - cachedHandleW;
-    var ratio = (e.clientX - trackLeft) / trackWidth;
-    var newVal = parseFloat(s.min) + ratio * (parseFloat(s.max) - parseFloat(s.min));
-    s.value = Math.max(parseFloat(s.min), Math.min(parseFloat(s.max), newVal));
-    s.dispatchEvent(new InputEvent('input', {bubbles: true}));
-  });
-  overlay.addEventListener('pointerup', function(e) {
-    if (dragging) e.stopPropagation();
-    dragging = false;
-    overlay.style.touchAction = 'pan-y';
-    s.classList.remove('handle-active');
-  });
-  overlay.addEventListener('pointercancel', function() {
-    dragging = false;
-    overlay.style.touchAction = 'pan-y';
-    s.classList.remove('handle-active');
-  });
-})();
+
 
 
 

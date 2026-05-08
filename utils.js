@@ -1,4 +1,4 @@
- // @version 1288
+ // @version 1289
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -189,10 +189,39 @@ async function toggleOrientLock() {
   }
   (function() {
     const _zs = document.getElementById('zoom-slider');
-    if (!_zs) return;
-    _zs.addEventListener('pointerdown', () => _zs.classList.add('handle-active'));
-    _zs.addEventListener('pointerup',   () => _zs.classList.remove('handle-active'));
-    _zs.addEventListener('pointercancel', () => _zs.classList.remove('handle-active'));
+  if (!_zs) return;
+  let _zsActive = false, _zsRect = null, _zsHW = 16;
+  _zs.addEventListener('pointerdown', function(e) {
+    _zsRect = _zs.getBoundingClientRect();
+    _zsHW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-w')) || 16;
+    _zs.setPointerCapture(e.pointerId);
+    _zs.style.touchAction = 'none';
+    _zs.classList.add('handle-active');
+    _zsActive = true;
+    e.preventDefault();
+    var min = parseFloat(_zs.min), max = parseFloat(_zs.max);
+    var ratio = (e.clientX - (_zsRect.left + _zsHW/2)) / (_zsRect.width - _zsHW);
+    _zs.value = Math.max(min, Math.min(max, min + ratio*(max-min)));
+    _zs.dispatchEvent(new InputEvent('input', {bubbles:true}));
+  });
+  _zs.addEventListener('pointermove', function(e) {
+    if (!_zsActive) return;
+    e.preventDefault();
+    var min = parseFloat(_zs.min), max = parseFloat(_zs.max);
+    var ratio = (e.clientX - (_zsRect.left + _zsHW/2)) / (_zsRect.width - _zsHW);
+    _zs.value = Math.max(min, Math.min(max, min + ratio*(max-min)));
+    _zs.dispatchEvent(new InputEvent('input', {bubbles:true}));
+  });
+  _zs.addEventListener('pointerup', function() {
+    _zsActive = false;
+    _zs.style.touchAction = 'pan-y';
+    _zs.classList.remove('handle-active');
+  });
+  _zs.addEventListener('pointercancel', function() {
+    _zsActive = false;
+    _zs.style.touchAction = 'pan-y';
+    _zs.classList.remove('handle-active');
+  });
   })();
   function ctrlToggleInteract() {
     window._interactEnabled = !window._interactEnabled;
@@ -200,6 +229,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
