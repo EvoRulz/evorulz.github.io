@@ -32,7 +32,7 @@
 <div id="zoom-content">
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1285</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1286</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -751,7 +751,7 @@
         <div class="settings-row" style="justify-content:space-between;gap:12px;">
         <label style="font-size:13px;color:#bbb;">Notifications enabled</label>
         <div id="notif-toggle-wrap" onclick="notifToggle()" style="width:48px;height:26px;border-radius:13px;background:#333;border:1px solid #555;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;touch-action:manipulation;">
-          <div id="notif-toggle-knob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#666;transition:left 0.2s,background 0.2s;pointer-events:none;"></div>
+          <div id="notif-toggle-switch" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#666;transition:left 0.2s,background 0.2s;pointer-events:none;"></div>
         </div>
       </div>
       <div id="notif-off-wrap" style="display:flex;flex-direction:column;gap:8px;padding:10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;">
@@ -1002,26 +1002,26 @@
           <button class="copy-btn" onclick="copyHex('s-toggle-on-bg',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row" data-toggle-row="knob-off">
-        <label>Knob off color</label>
+      <div class="color-settings-row" data-toggle-row="switch-off">
+        <label>Switch off color</label>
         <div class="color-picker-row">
-          <input type="color" id="s-toggle-knob-off" oninput="onColorPickerChange('s-toggle-knob-off')">
-          <input type="range" class="alpha-slider" id="s-toggle-knob-off-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-knob-off')">
+          <input type="color" id="s-toggle-switch-off" oninput="onColorPickerChange('s-toggle-switch-off')">
+          <input type="range" class="alpha-slider" id="s-toggle-switch-off-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-switch-off')">
         </div>
         <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-knob-off-hex" maxlength="9" oninput="onHexInput('s-toggle-knob-off')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-knob-off',this)">Copy</button>
+          <input type="text" class="hex-input" id="s-toggle-switch-off-hex" maxlength="9" oninput="onHexInput('s-toggle-switch-off')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-switch-off',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row" data-toggle-row="knob-on">
-        <label>Knob on color</label>
+      <div class="color-settings-row" data-toggle-row="switch-on">
+        <label>Switch on color</label>
         <div class="color-picker-row">
-          <input type="color" id="s-toggle-knob-on" oninput="onColorPickerChange('s-toggle-knob-on')">
-          <input type="range" class="alpha-slider" id="s-toggle-knob-on-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-knob-on')">
+          <input type="color" id="s-toggle-switch-on" oninput="onColorPickerChange('s-toggle-switch-on')">
+          <input type="range" class="alpha-slider" id="s-toggle-switch-on-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-switch-on')">
         </div>
         <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-knob-on-hex" maxlength="9" oninput="onHexInput('s-toggle-knob-on')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-knob-on',this)">Copy</button>
+          <input type="text" class="hex-input" id="s-toggle-switch-on-hex" maxlength="9" oninput="onHexInput('s-toggle-switch-on')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-toggle-switch-on',this)">Copy</button>
         </div>
       </div>
       <div class="color-settings-row" data-toggle-row="border-off">
@@ -1054,19 +1054,19 @@
         <label>Toggle height <span id="s-toggle-h-val">24px</span></label>
         <input type="range" class="alpha-slider" id="s-toggle-h" min="14" max="48" value="24" oninput="document.getElementById('s-toggle-h-val').textContent=this.value+'px';settingsChange()">
       </div>
-      <div class="settings-row" data-toggle-row="knob-size">
-        <label>Knob size <span id="s-toggle-knob-size-val">16px</span></label>
-        <input type="range" class="alpha-slider" id="s-toggle-knob-size" min="8" max="40" value="16" oninput="document.getElementById('s-toggle-knob-size-val').textContent=this.value+'px';settingsChange()">
+      <div class="settings-row" data-toggle-row="switch-size">
+        <label>Switch size <span id="s-toggle-switch-size-val">16px</span></label>
+        <input type="range" class="alpha-slider" id="s-toggle-switch-size" min="8" max="40" value="16" oninput="document.getElementById('s-toggle-switch-size-val').textContent=this.value+'px';settingsChange()">
       </div>
       <div data-toggle-row="demo" style="margin-top:12px;padding-top:12px;border-top:1px solid #444;width:100%">
         <label style="font-size:13px;color:#bbb">Demo:</label>
         <div style="display:flex;gap:16px;align-items:center;margin-top:8px;">
           <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div class="ctrl-toggle"><div class="ctrl-knob"></div></div>
+            <div class="ctrl-toggle"><div class="ctrl-switch"></div></div>
             <span style="font-size:11px;color:#666">Off</span>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div class="ctrl-toggle on"><div class="ctrl-knob"></div></div>
+            <div class="ctrl-toggle on"><div class="ctrl-switch"></div></div>
             <span style="font-size:11px;color:#666">On</span>
           </div>
         </div>
@@ -1088,7 +1088,7 @@
 </div>
 <div id="ctrl-bar">
   <div class="ctrl-group">
-    <div class="ctrl-toggle on" id="drag-toggle" onclick="ctrlToggleDrag()"><div class="ctrl-knob"></div></div>
+    <div class="ctrl-toggle on" id="drag-toggle" onclick="ctrlToggleDrag()"><div class="ctrl-switch"></div></div>
     <span class="ctrl-label">Drag</span>
   </div>
   <div class="ctrl-group ctrl-zoom-group">
@@ -1098,7 +1098,7 @@
     <span class="ctrl-label" id="zoom-label">100%</span>
   </div>
   <div class="ctrl-group">
-    <div class="ctrl-toggle on" id="interact-toggle" onclick="ctrlToggleInteract()"><div class="ctrl-knob"></div></div>
+    <div class="ctrl-toggle on" id="interact-toggle" onclick="ctrlToggleInteract()"><div class="ctrl-switch"></div></div>
     <span class="ctrl-label">Controls</span>
   </div>
 </div>
