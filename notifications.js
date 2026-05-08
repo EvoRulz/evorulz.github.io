@@ -1,4 +1,4 @@
-// @version 1266
+// @version 1267
 
 (function() {
   function todayStr() {
@@ -315,6 +315,7 @@ window.notifSendTest = async function() {
     } catch(e) {}
   }
 };
+
 
 
 
