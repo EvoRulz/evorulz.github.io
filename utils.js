@@ -1,4 +1,4 @@
- // @version 1290
+ // @version 1291
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -173,6 +173,12 @@ async function toggleOrientLock() {
   }
   window._dragEnabled = true;
   window._interactEnabled = true;
+  function ctrlZoomStep(dir) {
+  var sl = document.getElementById('zoom-slider');
+  var z = Math.round(sliderToZoom(+sl.value)) + dir;
+  z = Math.max(50, Math.min(300, z));
+  ctrlZoom(zoomToSlider(z), false);
+  }
   function ctrlToggleDrag() {
     window._dragEnabled = !window._dragEnabled;
     const t = document.getElementById('drag-toggle');
@@ -203,7 +209,7 @@ async function toggleOrientLock() {
     var min = parseFloat(_zs.min), max = parseFloat(_zs.max);
     var ratio = (parseFloat(_zs.value)-min)/(max-min);
     var thumbCX = _zsRect.left + ratio*(_zsRect.width-_zsHW) + _zsHW/2;
-    if (Math.abs(e.clientX - thumbCX) > Math.max(_zsHW, 28)) return;
+    if (Math.abs(e.clientX - thumbCX) > Math.max(_zsHW / 2, 14)) return;
     e.preventDefault(); e.stopPropagation();
     _zsActive = true;
     _zs.classList.add('handle-active');
@@ -229,6 +235,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
