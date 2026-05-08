@@ -1,4 +1,4 @@
-// @version 1294
+// @version 1295
 
 // ── Settings panel logic ───────────────────────────────────
   function onColorPickerChange(id) {
@@ -283,6 +283,7 @@ function onHexInput(id) {
     if (thumb) { thumb.src = ""; prev.style.display = "none"; }
     buildAppBg();
   }
+
 
 
 
