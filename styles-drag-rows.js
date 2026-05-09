@@ -1,4 +1,4 @@
-// @version 1303
+// @version 1304
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -61,7 +61,9 @@ var _srGlowStyle = document.createElement('style');
         srReady = true;
         srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         grid.style.touchAction = 'none';
-        const _srOv = document.getElementById('settings-overlay'); if (_srOv) _srOv.style.overflowY = 'hidden';
+        const _srOv = document.getElementById('settings-overlay'); if (_srOv) { _srOv.style.overflowY = 'hidden'; _srOv.style.touchAction = 'none'; }
+        grid.setPointerCapture(e.pointerId);
+        e.preventDefault();
         return;
       }
       srHoldTimer = setTimeout(() => {
@@ -301,7 +303,7 @@ window.addEventListener('load', function() {
 
   function swCancel() {
     clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
-    const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
+    const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     if (swDrag) {
       try { swGrid.releasePointerCapture(swDrag.pointerId); } catch {}
       swDrag.item.style.boxShadow = '';
@@ -339,6 +341,8 @@ window.addEventListener('load', function() {
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
     };
     swGrid.setPointerCapture(e.pointerId);
+    e.preventDefault();
+    const _swSo = document.getElementById('settings-overlay'); if (_swSo) { _swSo.style.overflowY = 'hidden'; _swSo.style.touchAction = 'none'; }
     swReady = false;
     swHoldTimer = setTimeout(() => {
       if (swDrag) {
@@ -405,6 +409,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
