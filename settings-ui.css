@@ -1,4 +1,4 @@
-/* @version 1299 */
+/* @version 1300 */
 
 /* ── Settings cog & panel ── */
     #settings-cog {
@@ -565,6 +565,7 @@ input[type="checkbox"]:hover {
   padding: 20px;
   box-sizing: border-box;
 }
+
 
 
 

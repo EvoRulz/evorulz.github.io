@@ -1,4 +1,4 @@
-// @version 1299
+// @version 1300
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -140,6 +140,8 @@ var _srGlowStyle = document.createElement('style');
   function makeRowsDraggable(containerId, itemAttr, saveKey) {
     const DRAG_THRESHOLD = 6;
     let rDrag = null;
+    let rHoldTimer = null;
+    let rReady = false;
     const grid = document.getElementById(containerId);
     if (!grid) return;
     function saveOrder() {
@@ -159,8 +161,19 @@ var _srGlowStyle = document.createElement('style');
         });
       } catch {}
     }
+    function rCancel() {
+      clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
+      if (rDrag) {
+        rDrag.item.style.opacity = '';
+        rDrag.item.style.boxShadow = '';
+        if (rDrag.ghost) { rDrag.ghost.remove(); rDrag.ghost = null; }
+        try { grid.releasePointerCapture(rDrag.pointerId); } catch {}
+      }
+      rDrag = null;
+      const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
+      setTimeout(() => { window._settingsRowDragging = false; }, 0);
+    }
     grid.addEventListener('pointerdown', e => {
-      if (e.target.closest('input, select, button, textarea')) return;
       const item = e.target.closest('[' + itemAttr + ']');
       if (!item || rDrag) return;
       const rect = item.getBoundingClientRect();
@@ -169,17 +182,39 @@ var _srGlowStyle = document.createElement('style');
         offX: e.clientX - rect.left, offY: e.clientY - rect.top,
         w: rect.width, h: rect.height,
         ghost: null, lastOver: null, active: false,
+        pointerId: e.pointerId,
       };
+      rReady = false;
+      if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
+        rReady = true;
+        item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+      } else {
+        rHoldTimer = setTimeout(() => {
+          if (rDrag) {
+            rReady = true;
+            rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+          }
+        }, 500);
+      }
     });
-    document.addEventListener('pointermove', e => {
+    grid.addEventListener('pointermove', e => {
       if (!rDrag) return;
+      const moved = Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY);
+      if (!rReady) {
+        if (moved > 10) rCancel();
+        return;
+      }
+      e.preventDefault();
       if (!rDrag.active) {
-        if (Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY) < DRAG_THRESHOLD) return;
-        if (window._dragEnabled === false) { rDrag = null; return; }
+        if (moved < DRAG_THRESHOLD) return;
         rDrag.active = true;
+        rDrag.item.style.boxShadow = '';
         window._settingsRowDragging = true;
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
+        grid.setPointerCapture(rDrag.pointerId);
         const rect = rDrag.item.getBoundingClientRect();
+        rDrag.offX = rDrag.startX - rect.left;
+        rDrag.offY = rDrag.startY - rect.top;
         rDrag.ghost = rDrag.item.cloneNode(true);
         Object.assign(rDrag.ghost.style, {
           position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
@@ -210,26 +245,14 @@ var _srGlowStyle = document.createElement('style');
         grid.insertBefore(rDrag.item, overNext || null);
         grid.insertBefore(over, iNext || null);
       }
-    });
-    document.addEventListener('pointerup', () => {
+    }, { passive: false });
+    grid.addEventListener('pointerup', () => {
       if (!rDrag) return;
-      if (rDrag.active) {
-        rDrag.item.style.opacity = '';
-        if (rDrag.ghost) rDrag.ghost.remove();
-        saveOrder();
-      }
-      const _so2 = document.getElementById('settings-overlay'); if (_so2) _so2.style.overflowY = '';
-      rDrag = null;
-      setTimeout(() => { window._settingsRowDragging = false; }, 0);
+      const wasActive = rDrag.active;
+      rCancel();
+      if (wasActive) saveOrder();
     });
-    document.addEventListener('pointercancel', () => {
-      if (!rDrag) return;
-      rDrag.item.style.opacity = '';
-      if (rDrag.ghost) rDrag.ghost.remove();
-      const _so3 = document.getElementById('settings-overlay'); if (_so3) _so3.style.overflowY = '';
-      rDrag = null;
-      setTimeout(() => { window._settingsRowDragging = false; }, 0);
-    });
+    grid.addEventListener('pointercancel', rCancel);
     applyOrder();
   }
 
@@ -380,6 +403,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
