@@ -1,4 +1,4 @@
-/* @version 1309 */
+/* @version 1310 */
 
 /* ── Settings cog & panel ── */
     #settings-cog {
@@ -560,11 +560,19 @@ input[type="checkbox"]:hover {
   -ms-overflow-style: none;
 }
 #zoom-wrapper::-webkit-scrollbar { display: none; }
+.slider-step-minus, .slider-step-plus,
+[data-toggle-row="demo"] label,
+[data-toggle-row="demo"] span,
+[data-checkbox-row="demo"] label {
+  user-select: none;
+  -webkit-user-select: none;
+}
 #zoom-content {
   transform-origin: top center;
   padding: 20px;
   box-sizing: border-box;
 }
+
 
 
 
