@@ -1,4 +1,4 @@
-// @version 1311
+// @version 1312
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -45,7 +45,6 @@ var _srGlowStyle = document.createElement('style');
     }
 
     grid.addEventListener('pointerdown', e => {
-      if (e.target.closest('input, select, button, textarea')) return;
       const item = e.target.closest('[data-slider-row]');
       if (!item || srDrag) return;
       const rect = item.getBoundingClientRect();
@@ -57,13 +56,13 @@ var _srGlowStyle = document.createElement('style');
         pointerId: e.pointerId,
       };
       srReady = false;
+      grid.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      const _srSo = document.getElementById('settings-overlay'); if (_srSo) { _srSo.style.overflowY = 'hidden'; _srSo.style.touchAction = 'none'; }
       if (e.target.closest('.slider-row-handle')) {
         srReady = true;
         srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         grid.style.touchAction = 'none';
-        const _srOv = document.getElementById('settings-overlay'); if (_srOv) { _srOv.style.overflowY = 'hidden'; _srOv.style.touchAction = 'none'; }
-        grid.setPointerCapture(e.pointerId);
-        e.preventDefault();
         return;
       }
       srHoldTimer = setTimeout(() => {
@@ -334,7 +333,6 @@ window.addEventListener('load', function() {
   }
 
   swGrid.addEventListener('pointerdown', e => {
-    if (e.target.closest('input, select, button, textarea')) return;
     const item = e.target.closest('[data-swatch-row]');
     if (!item || swDrag) return;
     const rect = item.getBoundingClientRect();
@@ -410,6 +408,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
