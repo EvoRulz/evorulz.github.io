@@ -1,4 +1,4 @@
-// @version 1307
+// @version 1308
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -167,6 +167,7 @@ var _srGlowStyle = document.createElement('style');
     }
     function rCancel() {
       clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
+      const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
       if (rDrag) {
         rDrag.item.style.opacity = '';
         rDrag.item.style.boxShadow = '';
@@ -189,22 +190,20 @@ var _srGlowStyle = document.createElement('style');
         pointerId: e.pointerId,
       };
       rReady = false;
-      if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
-        rReady = true;
-        item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-        e.preventDefault();
-        grid.setPointerCapture(e.pointerId);
-        const _rsoI = document.getElementById('settings-overlay'); if (_rsoI) _rsoI.style.overflowY = 'hidden';
-      } else {
-        rHoldTimer = setTimeout(() => {
-          if (rDrag) {
-            rReady = true;
-            rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-            try { grid.setPointerCapture(rDrag.pointerId); } catch(e) {}
-            const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
-          }
-        }, 500);
-      }
+    grid.setPointerCapture(e.pointerId);
+    e.preventDefault();
+    const _rsoI = document.getElementById('settings-overlay'); if (_rsoI) { _rsoI.style.overflowY = 'hidden'; _rsoI.style.touchAction = 'none'; }
+    if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
+      rReady = true;
+      item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+    } else {
+      rHoldTimer = setTimeout(() => {
+        if (rDrag) {
+          rReady = true;
+          rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+        }
+      }, 400);
+    }
     });
     grid.addEventListener('pointermove', e => {
       if (!rDrag) return;
@@ -419,6 +418,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
