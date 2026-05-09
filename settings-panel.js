@@ -1,4 +1,4 @@
-// @version 1298
+// @version 1299
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -113,13 +113,13 @@
     setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
     setColorValue('s-toggle-off-bg',     btnStyle.toggleOffBg    || '#333333FF');
     setColorValue('s-toggle-on-bg',      btnStyle.toggleOnBg     || '#1a5a1aFF');
-    setColorValue('s-toggle-knob-off',   btnStyle.toggleKnobOff  || '#666666FF');
-    setColorValue('s-toggle-knob-on',    btnStyle.toggleKnobOn   || '#99ff99FF');
+    setColorValue('s-toggle-switch-off',   btnStyle.toggleSwitchOff  || '#666666FF');
+    setColorValue('s-toggle-switch-on',    btnStyle.toggleSwitchOn   || '#99ff99FF');
     setColorValue('s-toggle-border-off', btnStyle.toggleBorderOff|| '#555555FF');
     setColorValue('s-toggle-border-on',  btnStyle.toggleBorderOn || '#2a7a2aFF');
     const _twSEl = document.getElementById('s-toggle-w'); if (_twSEl) { _twSEl.value = String(btnStyle.toggleW ?? 44); const _twvSEl = document.getElementById('s-toggle-w-val'); if (_twvSEl) _twvSEl.textContent = (btnStyle.toggleW ?? 44) + 'px'; }
     const _thSEl = document.getElementById('s-toggle-h'); if (_thSEl) { _thSEl.value = String(btnStyle.toggleH ?? 24); const _thvSEl = document.getElementById('s-toggle-h-val'); if (_thvSEl) _thvSEl.textContent = (btnStyle.toggleH ?? 24) + 'px'; }
-    const _tksSEl = document.getElementById('s-toggle-knob-size'); if (_tksSEl) { _tksSEl.value = String(btnStyle.toggleKnobSize ?? 16); const _tksVSEl = document.getElementById('s-toggle-knob-size-val'); if (_tksVSEl) _tksVSEl.textContent = (btnStyle.toggleKnobSize ?? 16) + 'px'; }
+    const _tksSEl = document.getElementById('s-toggle-switch-size'); if (_tksSEl) { _tksSEl.value = String(btnStyle.toggleSwitchSize ?? 16); const _tksVSEl = document.getElementById('s-toggle-switch-size-val'); if (_tksVSEl) _tksVSEl.textContent = (btnStyle.toggleSwitchSize ?? 16) + 'px'; }
     const _bgTypeEl  = document.getElementById('s-app-bg-type');  if (_bgTypeEl)  _bgTypeEl.value  = appStyle.bgType;
     const _gradDirEl = document.getElementById('s-app-grad-dir'); if (_gradDirEl) _gradDirEl.value = appStyle.gradDir;
     setColorValue('s-app-pat-color',  appStyle.patColor);
@@ -260,13 +260,13 @@
     setColorValue('s-checkbox-bg', btnStyle.checkboxBg);
     setColorValue('s-toggle-off-bg',     btnStyle.toggleOffBg    || '#333333FF');
     setColorValue('s-toggle-on-bg',      btnStyle.toggleOnBg     || '#1a5a1aFF');
-    setColorValue('s-toggle-knob-off',   btnStyle.toggleKnobOff  || '#666666FF');
-    setColorValue('s-toggle-knob-on',    btnStyle.toggleKnobOn   || '#99ff99FF');
+    setColorValue('s-toggle-switch-off', btnStyle.toggleSwitchOff || '#666666FF');
+    setColorValue('s-toggle-switch-on',  btnStyle.toggleSwitchOn  || '#99ff99FF');
     setColorValue('s-toggle-border-off', btnStyle.toggleBorderOff|| '#555555FF');
     setColorValue('s-toggle-border-on',  btnStyle.toggleBorderOn || '#2a7a2aFF');
     const _twEl = document.getElementById('s-toggle-w'); if (_twEl) { _twEl.value = String(btnStyle.toggleW ?? 44); const _twvEl = document.getElementById('s-toggle-w-val'); if (_twvEl) _twvEl.textContent = (btnStyle.toggleW ?? 44) + 'px'; }
     const _thEl = document.getElementById('s-toggle-h'); if (_thEl) { _thEl.value = String(btnStyle.toggleH ?? 24); const _thvEl = document.getElementById('s-toggle-h-val'); if (_thvEl) _thvEl.textContent = (btnStyle.toggleH ?? 24) + 'px'; }
-    const _tksEl = document.getElementById('s-toggle-knob-size'); if (_tksEl) { _tksEl.value = String(btnStyle.toggleKnobSize ?? 16); const _tksvEl = document.getElementById('s-toggle-knob-size-val'); if (_tksvEl) _tksvEl.textContent = (btnStyle.toggleKnobSize ?? 16) + 'px'; }
+    const _tksEl = document.getElementById('s-toggle-switch-size'); if (_tksEl) { _tksEl.value = String(btnStyle.toggleSwitchSize ?? 16); const _tksvEl = document.getElementById('s-toggle-switch-size-val'); if (_tksvEl) _tksvEl.textContent = (btnStyle.toggleSwitchSize ?? 16) + 'px'; }
     setColorValue('s-clock-date-color', _btnStyleFor('top-date').fg);
     setColorValue('s-clock-time-color', _btnStyleFor('top-time').fg);
     setColorValue('s-clock-date-bg',    _btnStyleFor('top-date').bg);
@@ -438,6 +438,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 
