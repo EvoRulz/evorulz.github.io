@@ -1,4 +1,4 @@
-// @version 1301
+// @version 1302
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -109,7 +109,7 @@ var _srGlowStyle = document.createElement('style');
         const r = t.getBoundingClientRect();
         if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
       }
-      if (!over) { srDrag.lastOver = null; return; }
+      if (!over) return;
       if (over === srDrag.lastOver) return;
       srDrag.lastOver = over;
       const overNext = over.nextSibling, iNext = srDrag.item.nextSibling;
@@ -235,7 +235,7 @@ var _srGlowStyle = document.createElement('style');
         const r = t.getBoundingClientRect();
         if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
       }
-      if (!over) { rDrag.lastOver = null; return; }
+      if (!over) return;
       if (over === rDrag.lastOver) return;
       rDrag.lastOver = over;
       const overNext = over.nextSibling, iNext = rDrag.item.nextSibling;
@@ -381,7 +381,7 @@ window.addEventListener('load', function() {
       const r = t.getBoundingClientRect();
       if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
     }
-    if (!over) { swDrag.lastOver = null; return; }
+    if (!over) return;
     if (over === swDrag.lastOver) return;
     swDrag.lastOver = over;
     const overNext = over.nextSibling, iNext = swDrag.item.nextSibling;
@@ -403,6 +403,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
