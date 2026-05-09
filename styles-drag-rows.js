@@ -1,4 +1,4 @@
-// @version 1310
+// @version 1311
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -347,17 +347,13 @@ window.addEventListener('load', function() {
     swGrid.setPointerCapture(e.pointerId);
     e.preventDefault();
     const _swSo = document.getElementById('settings-overlay'); if (_swSo) { _swSo.style.overflowY = 'hidden'; _swSo.style.touchAction = 'none'; }
+    swReady = true;
     if (!e.target.closest('.color-swatch-wrap, .alpha-slider')) {
-      swReady = true;
       swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
     } else {
-      swReady = false;
       swHoldTimer = setTimeout(() => {
-      if (swDrag) {
-        swReady = true;
-        swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-      }
-    }, 400);
+        if (swDrag) swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+      }, 400);
     }
   });
 
@@ -365,10 +361,6 @@ window.addEventListener('load', function() {
     if (!swDrag) return;
     const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
     e.preventDefault();
-    if (!swReady) {
-      if (moved > 10) swCancel();
-      return;
-    }
     if (!swDrag.active) {
       if (moved < 6) return;
       swDrag.active = true;
@@ -418,6 +410,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
