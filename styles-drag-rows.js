@@ -1,4 +1,4 @@
-// @version 1304
+// @version 1305
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -192,6 +192,9 @@ var _srGlowStyle = document.createElement('style');
       if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
         rReady = true;
         item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+        e.preventDefault();
+        grid.setPointerCapture(e.pointerId);
+        const _rsoI = document.getElementById('settings-overlay'); if (_rsoI) _rsoI.style.overflowY = 'hidden';
       } else {
         rHoldTimer = setTimeout(() => {
           if (rDrag) {
@@ -343,13 +346,18 @@ window.addEventListener('load', function() {
     swGrid.setPointerCapture(e.pointerId);
     e.preventDefault();
     const _swSo = document.getElementById('settings-overlay'); if (_swSo) { _swSo.style.overflowY = 'hidden'; _swSo.style.touchAction = 'none'; }
-    swReady = false;
-    swHoldTimer = setTimeout(() => {
+    if (!e.target.closest('.color-swatch-wrap, .alpha-slider')) {
+      swReady = true;
+      swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+    } else {
+      swReady = false;
+      swHoldTimer = setTimeout(() => {
       if (swDrag) {
         swReady = true;
         swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
       }
     }, 400);
+    }
   });
 
   swGrid.addEventListener('pointermove', e => {
@@ -409,6 +417,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
