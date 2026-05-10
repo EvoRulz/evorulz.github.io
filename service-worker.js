@@ -1,35 +1,35 @@
-// @version 1330
+// @version 1331
 
-const CACHE = "habit-tracker-v1330";
+const CACHE = "habit-tracker-v1331";
 
 const ASSETS = [
   "./",
-  "./index.html?v=1330",
-  "./manifest.json?v=1330",
-  "./icon-192.png?v=1330",
-  "./icon-512.png?v=1330",
-  "./settings-overlay-1.js?v=1330",
-  "./settings-overlay-2.js?v=1330",
-  "./utils.js?v=1330",
-  "./clock.js?v=1330",
-  "./tracker.js?v=1330",
-  "./app-data.js?v=1330",
-  "./styles-core.js?v=1330",
-  "./styles-colors.js?v=1330",
-  "./settings-panel.js?v=1330",
-  "./settings-change.js?v=1330",
-  "./styles-drag-rows.js?v=1330",
-  "./coverflow.js?v=1330",
-  "./drag.js?v=1330",
-  "./manage.js?v=1330",
-  "./tumbler.js?v=1330",
-  "./bootstrap.js?v=1330",
-  "./font.js?v=1330",
-  "./notifications.js?v=1330",
-  "./slider-init.js?v=1330",
-  "./color-picker.js?v=1330",
-  "./app.css?v=1330",
-  "./settings-ui.css?v=1330"
+  "./index.html?v=1331",
+  "./manifest.json?v=1331",
+  "./icon-192.png?v=1331",
+  "./icon-512.png?v=1331",
+  "./settings-overlay-1.js?v=1331",
+  "./settings-overlay-2.js?v=1331",
+  "./utils.js?v=1331",
+  "./clock.js?v=1331",
+  "./tracker.js?v=1331",
+  "./app-data.js?v=1331",
+  "./styles-core.js?v=1331",
+  "./styles-colors.js?v=1331",
+  "./settings-panel.js?v=1331",
+  "./settings-change.js?v=1331",
+  "./styles-drag-rows.js?v=1331",
+  "./coverflow.js?v=1331",
+  "./drag.js?v=1331",
+  "./manage.js?v=1331",
+  "./tumbler.js?v=1331",
+  "./bootstrap.js?v=1331",
+  "./font.js?v=1331",
+  "./notifications.js?v=1331",
+  "./slider-init.js?v=1331",
+  "./color-picker.js?v=1331",
+  "./app.css?v=1331",
+  "./settings-ui.css?v=1331"
 ];
 
 self.addEventListener("notificationclick", e => {

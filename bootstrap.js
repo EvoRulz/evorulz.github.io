@@ -1,4 +1,4 @@
-// @version 1330
+// @version 1331
 
   // ── Bootstrap ──────────────────────────────────────────────
   const buttonsEl  = document.getElementById("buttons");
@@ -144,13 +144,16 @@ btn.addEventListener('pointercancel', () => {
   equalizeButtonSizes();
   new ResizeObserver(equalizeButtonSizes).observe(buttonsEl);
   function equalizeTopGrid() {
-    const items = [...topGrid.querySelectorAll('.top-item')];
+    const _tg = document.getElementById('top-grid');
+    if (!_tg) return;
+    const items = [..._tg.querySelectorAll('.top-item')];
     if (!items.length) return;
-    topGrid.style.gridAutoRows = '';
+    _tg.style.gridAutoRows = '';
     const maxH = Math.max(...items.map(i => i.offsetHeight));
-    topGrid.style.gridAutoRows = maxH + 'px';
+    _tg.style.gridAutoRows = maxH + 'px';
   }
   requestAnimationFrame(equalizeTopGrid);
+
 
 
 
