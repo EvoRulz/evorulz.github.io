@@ -1,4 +1,4 @@
-// @version 1329
+// @version 1330
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -446,6 +446,7 @@ if (navigator.storage && navigator.storage.persist) {
     el.classList.remove('has-stroke');
   }
 }
+}
 window._applyTextStyle = _applyTextStyle;
   function applyBtnStyle(skipHabitsBtn) {
     buttonsEl.style.setProperty("--btn-bg",        _bgCss(btnStyle.bg));
@@ -657,6 +658,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
