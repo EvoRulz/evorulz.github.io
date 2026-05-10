@@ -1,4 +1,4 @@
-// @version 1338
+// @version 1339
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -102,6 +102,10 @@ document.body.insertAdjacentHTML('beforeend', `
       <div class="settings-row" data-btn-row="radius">
         <label>Corner radius <span id="s-radius-val">6px</span></label>
         <input type="range" class="alpha-slider" id="s-radius" min="0" max="50" value="6" oninput="document.getElementById('s-radius-val').textContent=this.value+'px';settingsChange()">
+      </div>
+  <div class="settings-row" data-btn-row="fontsize">
+        <label>Text size <span id="s-fontsize-val">16px</span></label>
+        <input type="range" class="alpha-slider" id="s-fontsize" min="8" max="40" value="16" oninput="document.getElementById('s-fontsize-val').textContent=this.value+'px';settingsChange()">
       </div>
         <div class="settings-row" data-btn-row="font">
         <label>Font</label>
@@ -324,6 +328,7 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
+
 
 
 

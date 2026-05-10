@@ -1,4 +1,4 @@
-// @version 1338
+// @version 1339
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -211,6 +211,7 @@ else {
   if (_cfId === 'top-time') { const _ctrSEl = document.getElementById("s-clock-time-radius"); if (_ctrSEl) { _ctrSEl.value = document.getElementById("s-radius").value; const _ctrsVEl = document.getElementById("s-clock-time-radius-val"); if (_ctrsVEl) _ctrsVEl.textContent = document.getElementById("s-radius").value + "px"; } }
 }
     btnStyle.tap            = getColorValue('s-tap');
+    btnStyle.fontSize       = Number(document.getElementById("s-fontsize")?.value ?? 16);
     if (!_cfId) {
       btnStyle.fgStroke = getStyleValue('s-fgstroke');
       btnStyle.fgStrokeW = Number(document.getElementById('s-fgstrokew')?.value ?? 0);
@@ -441,6 +442,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
