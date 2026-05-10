@@ -1,4 +1,4 @@
-// @version 1302
+// @version 1284
 
   // ── App-level export / import / clear ─────────────────────
   let APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id + ":");
@@ -174,24 +174,6 @@ function appExport() {
     keys.forEach(k=>localStorage.removeItem(k));
     Object.values(trackers).forEach(t=>{ if (t.reload) t.reload(); });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

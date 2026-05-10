@@ -1,4 +1,4 @@
-// @version 1302
+// @version 1284
 
 /*
  * Copyright 2020 Google Inc.
@@ -300,24 +300,6 @@ public class LauncherActivity
         return uri;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

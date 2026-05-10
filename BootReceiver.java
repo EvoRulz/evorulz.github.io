@@ -1,4 +1,4 @@
-// @version 1302
+// @version 1284
 
 package io.github.evorulz.twa;
 
@@ -26,24 +26,6 @@ public class BootReceiver extends BroadcastReceiver {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

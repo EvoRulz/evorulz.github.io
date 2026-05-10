@@ -1,4 +1,4 @@
-// @version 1302
+// @version 1284
 
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
@@ -85,24 +85,6 @@ document.querySelectorAll('.alpha-slider').forEach(function(s) {
   minus.addEventListener('click', function(e){e.stopPropagation();step(-1);});
   plus.addEventListener('click', function(e){e.stopPropagation();step(1);});
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

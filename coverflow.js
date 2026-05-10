@@ -1,4 +1,4 @@
-// @version 1302
+// @version 1284
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -284,9 +284,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
           el.style.flexDirection = '';
           el.style.alignItems = '';
           el.style.gap = '';
-          const _cfRInner = el.querySelector('.btn-text-label');
-          if (_cfRInner) { _cfRInner.textContent = items[i].label; _cfRInner.dataset.text = items[i].label; if (window._applyTextStyle) window._applyTextStyle(_cfRInner, s2); }
-          else el.textContent = items[i].label;
+          el.textContent = items[i].label;
         }
         }
         el.style.left      = kf.tx + 'px';
@@ -316,7 +314,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
         const el = document.createElement('button');
         el.className   = 'cf-item';
         el.dataset.cfI = i;
-        const _cfInner = document.createElement('span'); _cfInner.className = 'btn-text-label'; _cfInner.dataset.text = item.label; _cfInner.textContent = item.label; el.appendChild(_cfInner);
+        el.textContent = item.label;
         el.style.width = iW + 'px';
         el.style.pointerEvents = 'none';
         el.style.webkitTapHighlightColor = 'transparent';
@@ -500,24 +498,6 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

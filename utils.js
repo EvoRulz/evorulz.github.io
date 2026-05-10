@@ -1,4 +1,4 @@
- // @version 1302
+ // @version 1284
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -188,70 +188,18 @@ async function toggleOrientLock() {
   window.location.replace(location.href.replace(/[?#].*$/, '') + '?t=' + Date.now());
   }
   (function() {
-  const _zs = document.getElementById('zoom-slider');
-  if (!_zs) return;
-  var _zsOverlay = document.createElement('div');
-  _zsOverlay.style.cssText = 'position:absolute;inset:0;z-index:10;cursor:pointer;touch-action:none;';
-  var _zsPar = _zs.parentElement;
-  if (getComputedStyle(_zsPar).position === 'static') _zsPar.style.position = 'relative';
-  var _zsWrap = document.createElement('div');
-  _zsWrap.style.cssText = 'position:relative;flex:1;min-width:0;';
-  _zsPar.insertBefore(_zsWrap, _zs);
-  _zsWrap.appendChild(_zs);
-  _zs.style.width = '100%';
-  _zsWrap.appendChild(_zsOverlay);
-  _zs.style.pointerEvents = 'none';
-  let _zsActive = false, _zsRect = null, _zsHW = 16;
-  _zsOverlay.addEventListener('pointerdown', function(e) {
-    _zsRect = _zs.getBoundingClientRect();
-    _zsHW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-w'))||16;
-    var min = parseFloat(_zs.min), max = parseFloat(_zs.max);
-    var ratio = (parseFloat(_zs.value)-min)/(max-min);
-    var thumbCX = _zsRect.left + ratio*(_zsRect.width-_zsHW) + _zsHW/2;
-    if (Math.abs(e.clientX - thumbCX) > Math.max(_zsHW, 28)) return;
-    e.preventDefault(); e.stopPropagation();
-    _zsActive = true;
-    _zs.classList.add('handle-active');
-    _zsOverlay.setPointerCapture(e.pointerId);
-    ratio = (e.clientX - (_zsRect.left + _zsHW/2)) / (_zsRect.width - _zsHW);
-    _zs.value = Math.max(min, Math.min(max, min + ratio*(max-min)));
-    _zs.dispatchEvent(new InputEvent('input', {bubbles:true}));
-  });
-  _zsOverlay.addEventListener('pointermove', function(e) {
-    if (!_zsActive) return;
-    e.preventDefault();
-    var min = parseFloat(_zs.min), max = parseFloat(_zs.max);
-    var ratio = (e.clientX - (_zsRect.left + _zsHW/2)) / (_zsRect.width - _zsHW);
-    _zs.value = Math.max(min, Math.min(max, min + ratio*(max-min)));
-    _zs.dispatchEvent(new InputEvent('input', {bubbles:true}));
-  });
-  _zsOverlay.addEventListener('pointerup', function() { _zsActive = false; _zs.classList.remove('handle-active'); });
-  _zsOverlay.addEventListener('pointercancel', function() { _zsActive = false; _zs.classList.remove('handle-active'); });
-})();
+    const _zs = document.getElementById('zoom-slider');
+    if (!_zs) return;
+    _zs.addEventListener('pointerdown', () => _zs.classList.add('handle-active'));
+    _zs.addEventListener('pointerup',   () => _zs.classList.remove('handle-active'));
+    _zs.addEventListener('pointercancel', () => _zs.classList.remove('handle-active'));
+  })();
   function ctrlToggleInteract() {
     window._interactEnabled = !window._interactEnabled;
     const t = document.getElementById('interact-toggle');
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
