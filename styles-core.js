@@ -1,4 +1,4 @@
-// @version 1343
+// @version 1344
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -551,7 +551,10 @@ window._applyTextStyle = _applyTextStyle;
       el.style.setProperty(prefix + '-font', _s.font);
       el.style.setProperty(prefix + '-glow', hex8ToCss(_s.glow));
       const _btn = el.querySelector('button');
-      if (_btn) _btn.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+      if (_btn) {
+        _btn.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+        _btn.style.fontSize = (_s.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
+      }
     });
     const _olBtn = document.getElementById('orient-lock-btn');
     if (_olBtn) {
@@ -672,6 +675,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

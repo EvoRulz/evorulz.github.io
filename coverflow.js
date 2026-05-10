@@ -1,4 +1,4 @@
-// @version 1343
+// @version 1344
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -280,7 +280,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
         const s2 = _btnStyleFor(styleId);
         el.style.background = _bgCss(s2.bg);
         el.style.color      = hex8ToCss(s2.fg);
-        el.style.fontSize   = '';
+        el.style.fontSize   = (s2.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
         el.style.fontFamily = s2.font;
         if (items[i].id === 'top-version') {
           const vNum = document.getElementById('app-version');
@@ -511,6 +511,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 
