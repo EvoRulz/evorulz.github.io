@@ -1,4 +1,4 @@
-// @version 1350
+// @version 1351
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -541,7 +541,8 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   el.querySelector('#cp-hex').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
   });
-
+  el.querySelector('#cp-hex').addEventListener('focus', function() { window._cpHexEditing = true; });
+  el.querySelector('#cp-hex').addEventListener('blur',  function() { window._cpHexEditing = false; });
   const _cpCopyBtn = el.querySelector('#cp-copy');
   _cpCopyBtn.addEventListener('pointerdown', e => e.stopPropagation());
   _cpCopyBtn.addEventListener('click', function() {
@@ -824,6 +825,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 

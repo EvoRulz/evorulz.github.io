@@ -1,4 +1,4 @@
-// @version 1350
+// @version 1351
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -330,7 +330,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     if (document.getElementById('s-app-text'))       appStyle.textColor   = getColorValue('s-app-text');
     applyAppStyle();
     _applyStatusBarColor();
-    if (window._cpRebuild && !window._cpActiveDrag) window._cpRebuild();
+    if (window._cpRebuild && !window._cpActiveDrag && !window._cpHexEditing) window._cpRebuild();
   }
   async function settingsReset() {
     const ok = await confirmClear("This will reset all styles to their <strong>factory defaults</strong>.");
@@ -462,6 +462,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
