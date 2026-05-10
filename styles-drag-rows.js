@@ -1,4 +1,4 @@
-// @version 1321
+// @version 1322
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -7,6 +7,7 @@ var _srGlowStyle = document.createElement('style');
   function saveSliderRowOrder() {
     const grid = document.getElementById('sg-sliders');
     if (!grid) return;
+    grid.style.touchAction = 'none';
     const order = [...grid.querySelectorAll('[data-slider-row]')].map(el => el.dataset.sliderRow);
     localStorage.setItem('_sliderRowOrder', JSON.stringify(order));
   }
@@ -146,6 +147,7 @@ var _srGlowStyle = document.createElement('style');
     let rReady = false;
     const grid = document.getElementById(containerId);
     if (!grid) return;
+    grid.style.touchAction = 'none';
     function saveOrder() {
       const order = [...grid.querySelectorAll('[' + itemAttr + ']')].map(el => el.getAttribute(itemAttr));
       localStorage.setItem(saveKey, JSON.stringify(order));
@@ -426,6 +428,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
