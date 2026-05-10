@@ -1,4 +1,4 @@
-// @version 1349
+// @version 1350
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -321,6 +321,14 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     appStyle.statusBarColor = getColorValue('s-app-statusbar-color');
     appStyle.statusBarStops = window._cpGetGradientStops ? window._cpGetGradientStops('s-app-statusbar-color') : null;
     appStyle.statusBarIconStyle = document.getElementById('s-app-statusbar-icons')?.value || 'auto';
+    if (document.getElementById('s-app-border'))     appStyle.borderColor = getStyleValue('s-app-border');
+    if (document.getElementById('s-app-thead'))      appStyle.theadBg     = getStyleValue('s-app-thead');
+    if (document.getElementById('s-app-cell-bg'))    appStyle.cellBg      = getStyleValue('s-app-cell-bg');
+    if (document.getElementById('s-app-bar-set'))    appStyle.barSet      = getColorValue('s-app-bar-set');
+    if (document.getElementById('s-app-bar-total'))  appStyle.barTotal    = getColorValue('s-app-bar-total');
+    if (document.getElementById('s-app-bar-streak')) appStyle.barStreak   = getColorValue('s-app-bar-streak');
+    if (document.getElementById('s-app-text'))       appStyle.textColor   = getColorValue('s-app-text');
+    applyAppStyle();
     _applyStatusBarColor();
     if (window._cpRebuild && !window._cpActiveDrag) window._cpRebuild();
   }
@@ -454,6 +462,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
