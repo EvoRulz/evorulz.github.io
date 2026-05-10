@@ -1,3 +1,5 @@
+// @version 1339
+
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().catch(() => {});
@@ -97,18 +99,116 @@ if (navigator.storage && navigator.storage.persist) {
     barSet: "#7030A0FF",
     barTotal: "#8000FFFF",
     barStreak: "#375623FF",
+    statusBarMode: 'auto',
+    statusBarColor: '#111111FF',
+    statusBarStops: null,
+    statusBarIconStyle: 'auto',
     padding: 20,
   };
+  function _blendHexStops(hexArr, gradDir) {
+    if (!hexArr || !hexArr.length) return '#111111';
+    if (hexArr.length === 1) return hexArr[0].slice(0, 7);
+    const weights = hexArr.map((_, i) =>
+      gradDir === 'to bottom' ? 1 - (i / hexArr.length) : 1
+    );
+    const tw = weights.reduce((a, b) => a + b, 0);
+    let r = 0, g = 0, b = 0;
+    hexArr.forEach((hex, i) => {
+      const c = hex8ToComponents(hex);
+      const w = weights[i] / tw;
+      r += c.r * w; g += c.g * w; b += c.b * w;
+    });
+    return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+  }
+  function _blendStopObjects(stops) {
+    if (!stops || !stops.length) return '#111111';
+    if (stops.length === 1) return stops[0].hex8.slice(0, 7);
+    let r = 0, g = 0, b = 0;
+    stops.forEach(s => {
+      const c = hex8ToComponents(s.hex8);
+      r += c.r / stops.length; g += c.g / stops.length; b += c.b / stops.length;
+    });
+    return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+  }
+  function _statusBarLuminance(hex) {
+    const {r, g, b} = hex8ToComponents(hex.length < 8 ? hex + 'FF' : hex);
+    const toL = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    return 0.2126 * toL(r) + 0.7152 * toL(g) + 0.0722 * toL(b);
+  }
+  function _applyStatusBarIcons(hex) {
+    const style = appStyle.statusBarIconStyle || 'auto';
+    let lightIcons;
+    if (style === 'light') lightIcons = true;
+    else if (style === 'dark') lightIcons = false;
+    else lightIcons = _statusBarLuminance(hex) <= 0.179;
+    if (window.AndroidSettings && window.AndroidSettings.setStatusBarIconColor) {
+      window.AndroidSettings.setStatusBarIconColor(lightIcons);
+    }
+  }
+  let _imgSampledColor = '#111111';
+  function _applyStatusBarColor() {
+    const _m = document.querySelector('meta[name="theme-color"]');
+    if (!_m) return;
+    let _tc = '#111111';
+    if (appStyle.bgType === 'image') {
+      const mode = appStyle.statusBarMode || 'auto';
+      if (mode === 'solid') {
+        _tc = appStyle.statusBarColor?.slice(0, 7) || '#111111';
+      } else if (mode === 'gradient') {
+        const stops = appStyle.statusBarStops;
+        _tc = stops && stops.length > 1
+          ? _blendStopObjects(stops)
+          : (stops && stops[0] ? stops[0].hex8.slice(0, 7) : (appStyle.statusBarColor?.slice(0, 7) || '#111111'));
+      } else {
+        _tc = _imgSampledColor;
+      }
+    } else if (appStyle.bgType === 'solid') {
+      _tc = appStyle.stops[0]?.slice(0, 7) || '#111111';
+    } else if (appStyle.bgType.startsWith('gradient')) {
+      _tc = _blendHexStops(appStyle.stops, appStyle.gradDir);
+    } else if (appStyle.bgType.startsWith('pattern')) {
+      _tc = appStyle.patBg?.slice(0, 7) || '#111111';
+    }
+    _m.setAttribute('content', _tc);
+    _applyStatusBarIcons(_tc);
+  }
   let appStyle = Object.assign({}, APP_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_appStyle"));
     if (saved) appStyle = Object.assign({}, APP_STYLE_DEFAULTS, saved);
   } catch {}
+  function _sampleImgTopColor(imgData) {
+    if (!imgData) { _imgSampledColor = '#111111'; return; }
+    const img = new Image();
+    img.onload = function() {
+      try {
+        const c = document.createElement('canvas');
+        c.width = 50; c.height = 10;
+        const ctx = c.getContext('2d');
+        const posMap = { top: 0, center: 0.5, bottom: 1, left: 0, right: 0.5 };
+        const yFrac = posMap[appStyle.imgPos] ?? 0;
+        const srcY = Math.floor((img.height - 10) * yFrac);
+        ctx.drawImage(img, 0, srcY, img.width, 10, 0, 0, 50, 10);
+        const px = ctx.getImageData(0, 0, 50, 10).data;
+        let r = 0, g = 0, b = 0, n = 0;
+        for (let i = 0; i < px.length; i += 4) { r += px[i]; g += px[i+1]; b += px[i+2]; n++; }
+        r = Math.round(r/n); g = Math.round(g/n); b = Math.round(b/n);
+        const {r: tr, g: tg, b: tb, a: ta} = hex8ToComponents(appStyle.imgTint || '#00000000');
+        const tA = ta / 255;
+        r = Math.round(r * (1 - tA) + tr * tA);
+        g = Math.round(g * (1 - tA) + tg * tA);
+        b = Math.round(b * (1 - tA) + tb * tA);
+        _imgSampledColor = '#' + [r, g, b].map(v => v.toString(16).padStart(2,'0')).join('');
+        _applyStatusBarColor();
+      } catch(e) { _imgSampledColor = '#111111'; }
+    };
+    img.src = imgData;
+  }
   (async function loadBgImage() {
     for (let attempt = 0; attempt < 4; attempt++) {
       try {
         const img = await ImgDB.get("bgImage");
-        if (img) { appStyle.imgData = img; applyAppStyle(); }
+        if (img) { appStyle.imgData = img; _sampleImgTopColor(img); applyAppStyle(); }
         return;
       } catch (e) {
         if (attempt < 3) await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
@@ -135,7 +235,7 @@ if (navigator.storage && navigator.storage.persist) {
     document.body.style.backgroundRepeat = "";
     document.body.style.backgroundAttachment = "";
     if (t === "solid") {
-      document.body.style.background = hex8ToCss(appStyle.stops[0]);
+      document.body.style.background = _bgCss(appStyle.stops[0]);
       return;
     }
     if (t.startsWith("gradient")) {
@@ -176,18 +276,23 @@ if (navigator.storage && navigator.storage.persist) {
     buildAppBg();
     document.body.style.color   = hex8ToCss(appStyle.textColor);
     document.body.style.padding = appStyle.padding + "px";
-    document.documentElement.style.setProperty("--app-border-color", hex8ToCss(appStyle.borderColor));
-    document.documentElement.style.setProperty("--app-thead-bg",     hex8ToCss(appStyle.theadBg));
-    document.documentElement.style.setProperty("--app-cell-bg",      hex8ToCss(appStyle.cellBg || "#111111FF"));
+    document.body.style.paddingTop = `calc(${appStyle.padding}px + env(safe-area-inset-top, 0px))`;
+    const _borderVal = _bgCss(appStyle.borderColor);
+    const _isBorderGrad = _borderVal.startsWith('linear-gradient') || _borderVal.startsWith('radial-gradient');
+    document.documentElement.style.setProperty("--app-border-color", _isBorderGrad ? 'transparent' : _borderVal);
+    document.documentElement.style.setProperty("--app-border-image", _isBorderGrad ? _borderVal + ' 1' : 'none');
+    document.documentElement.style.setProperty("--app-thead-bg",     _bgCss(appStyle.theadBg));
+    document.documentElement.style.setProperty("--app-cell-bg",      _bgCss(appStyle.cellBg || "#111111FF"));
     document.documentElement.style.setProperty("--app-table-bg",      hex8ToCss(appStyle.tableBg || "#111111FF"));
     document.documentElement.style.setProperty("--app-table-text",    hex8ToCss(appStyle.tableText || "#FFFFFFFF"));
     document.documentElement.style.setProperty("--bar-set-color",    hex8ToCss(appStyle.barSet));
     document.documentElement.style.setProperty("--bar-total-color",  hex8ToCss(appStyle.barTotal));
     document.documentElement.style.setProperty("--bar-streak-color", hex8ToCss(appStyle.barStreak));
+    _applyStatusBarColor();
   }
   applyAppStyle();
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16, fgStroke: '#00000000', fgStrokeW: 0 };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -227,7 +332,17 @@ if (navigator.storage && navigator.storage.persist) {
     const a = alpha ? parseInt(alpha.value).toString(16).padStart(2,'0').toUpperCase() : 'FF';
     return '#'+h+a;
   }
+  function getStyleValue(id) {
+  if (window._cpGetGradient) { const g = window._cpGetGradient(id); if (g) return g; }
+  return getColorValue(id);
+  }
+  function _bgCss(val) {
+    if (!val) return 'transparent';
+    if (typeof val === 'string' && (val.startsWith('linear-gradient') || val.startsWith('radial-gradient'))) return val;
+    return hex8ToCss(val);
+  }
   function setColorValue(id, hex) {
+    if (!hex || typeof hex !== 'string' || hex.startsWith('linear-gradient') || hex.startsWith('radial-gradient')) return;
     const {r,g,b,a} = hex8ToComponents(hex);
     const picker = document.getElementById(id);
     const slider = document.getElementById(id+'-alpha');
@@ -250,10 +365,15 @@ if (navigator.storage && navigator.storage.persist) {
     // Update swatch overlay to show color+alpha
     const overlay = document.getElementById(id+'-swatch-overlay');
     if (overlay) {
-      const a = parseInt(slider.value) / 255;
-      const hex = picker.value;
-      const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-      overlay.style.background = `rgba(${r},${g},${b},${a})`;
+      const gradCSS = window._cpGetGradient && window._cpGetGradient(id);
+      if (gradCSS) {
+        overlay.style.background = gradCSS;
+      } else {
+        const a = parseInt(slider.value) / 255;
+        const hex = picker.value;
+        const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+        overlay.style.background = `rgba(${r},${g},${b},${a})`;
+      }
     }
   }
 
@@ -264,7 +384,8 @@ if (navigator.storage && navigator.storage.persist) {
     if (_s && typeof _s === "object") _btnStyles = _s;
   } catch {}
   function _btnStyleFor(id) {
-    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6 };
+    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6, fgStroke: btnStyle.fgStroke || '#00000000', fgStrokeW: btnStyle.fgStrokeW ?? 0 };
+    const _cachedVersionColor = localStorage.getItem('_versionColor');
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
       'top-settings':      { bg: '#2a2a2aFF', fg: '#999999FF' },
@@ -273,19 +394,80 @@ if (navigator.storage && navigator.storage.persist) {
       'top-manage-habits': { bg: '#444444FF', fg: '#FFFFFFFF' },
       'top-orient-lock':        { bg: '#2a2a2aFF', fg: '#999999FF', glow: '#00000000' },
       'top-orient-lock-locked': { bg: '#2a2a2aFF', fg: '#99ff99FF', glow: '#00000000' },
-      'top-version':       { bg: '#444444FF', fg: '#FFFFFFFF' },
+      'top-version':       { bg: '#444444FF', fg: _cachedVersionColor || '#FFFFFFFF' },
       };
     return Object.assign({}, base, TOP_GRID_DEFAULTS[id] || {}, _btnStyles[id] || {});
   }
   function _saveBtnStyles() { localStorage.setItem("_btnStyles", JSON.stringify(_btnStyles)); }
-
+  function _applyTextStyle(el, s) {
+  if (!el) return;
+  const fgStops = s.fgStops;
+  const hasFgGrad = fgStops && fgStops.length >= 2;
+  const strokeW = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0;
+  const _fgSv = s.fgStroke ?? btnStyle.fgStroke ?? '#00000000';
+  const _strokeIsGrad = s.fgStrokeStops && s.fgStrokeStops.length >= 2;
+  const strokeGrad = _strokeIsGrad
+    ? 'linear-gradient(to right,' + s.fgStrokeStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')'
+    : null;
+  const strokeC = _strokeIsGrad
+    ? 'transparent'
+    : (typeof _fgSv === 'string' && (_fgSv.startsWith('linear-gradient') || _fgSv.startsWith('radial-gradient')))
+      ? (s.fgStrokeStops && s.fgStrokeStops[0] ? hex8ToCss(s.fgStrokeStops[0].hex8) : 'transparent')
+      : hex8ToCss(_fgSv);
+  el.classList.remove('has-stroke');
+  el.style.removeProperty('--_btn-fg');
+  el.style.removeProperty('--_btn-fg-grad');
+  el.style.removeProperty('--_btn-fg-fill');
+  if (strokeW > 0) {
+    el.classList.add('has-stroke');
+    el.style.webkitTextFillColor = 'transparent';
+    el.style.color = 'transparent';
+    el.style.paintOrder = 'stroke fill';
+    if (_strokeIsGrad) {
+      el.style.webkitTextStroke = strokeW + 'px transparent';
+      el.style.background = strokeGrad;
+      el.style.webkitBackgroundClip = 'text';
+      el.style.backgroundClip = 'text';
+    } else {
+      el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
+      el.style.background = '';
+      el.style.webkitBackgroundClip = '';
+      el.style.backgroundClip = '';
+    }
+    if (hasFgGrad) {
+      const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
+      el.style.setProperty('--_btn-fg-grad', grad);
+      el.style.setProperty('--_btn-fg-fill', 'transparent');
+    } else {
+      el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
+    }
+  } else {
+    el.style.webkitTextStroke = '';
+    el.style.paintOrder = '';
+    if (hasFgGrad) {
+      const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
+      el.style.background = grad;
+      el.style.webkitBackgroundClip = 'text';
+      el.style.backgroundClip = 'text';
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.color = 'transparent';
+    } else {
+      el.style.background = '';
+      el.style.webkitBackgroundClip = '';
+      el.style.backgroundClip = '';
+      el.style.webkitTextFillColor = hex8ToCss(s.fg);
+      el.style.color = hex8ToCss(s.fg);
+    }
+  }
+}
+window._applyTextStyle = _applyTextStyle;
   function applyBtnStyle(skipHabitsBtn) {
-    buttonsEl.style.setProperty("--btn-bg",        hex8ToCss(btnStyle.bg));
+    buttonsEl.style.setProperty("--btn-bg",        _bgCss(btnStyle.bg));
     buttonsEl.style.setProperty("--btn-fg",        hex8ToCss(btnStyle.fg));
     buttonsEl.style.setProperty("--btn-font",      btnStyle.font);
     buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-glow", hex8ToCss(btnStyle.activeGlow || btnStyle.glow));
-    buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
+    buttonsEl.style.setProperty("--btn-active-bg", _bgCss(btnStyle.activeBg));
     document.documentElement.style.setProperty("--btn-radius", (btnStyle.btnRadius ?? 6) + 'px');
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
@@ -295,10 +477,35 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--slider-handle-w",      (btnStyle.sliderHandleW ?? 16) + "px");
     document.documentElement.style.setProperty("--slider-w",             (btnStyle.sliderW ?? 100) + "%");
     document.documentElement.style.setProperty("--slider-handle-r",      (btnStyle.sliderHandleR ?? 3) + "%");
-    document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));
-    document.documentElement.style.setProperty("--slider-track-bg",      hex8ToCss(btnStyle.sliderTrack  || '#333333FF'));
-    document.documentElement.style.setProperty("--slider-handle-color",  hex8ToCss(btnStyle.sliderHandle || '#FFFFFFFF'));
-    document.documentElement.style.setProperty("--slider-handle-border", hex8ToCss(btnStyle.sliderHandleBorder || '#00000000'));
+    document.documentElement.style.setProperty("--slider-handle-hole",  (btnStyle.sliderHandleHole ?? 0));
+    document.documentElement.style.setProperty("--slider-btn-gap",      (btnStyle.sliderBtnGap ?? 0) + "px");
+    const _sbGap = (btnStyle.sliderBtnGap ?? 0) + 'px';
+    document.querySelectorAll('.slider-step-minus').forEach(b => b.style.marginRight = _sbGap);
+    document.querySelectorAll('.slider-step-plus').forEach(b => b.style.marginLeft = _sbGap);
+    document.documentElement.style.setProperty("--slider-btn-bg",     hex8ToCss(btnStyle.sliderBtnBg     || '#2a2a2aFF'));
+    document.documentElement.style.setProperty("--slider-btn-fg",     hex8ToCss(btnStyle.sliderBtnFg     || '#aaaaaaFF'));
+    document.documentElement.style.setProperty("--slider-btn-border", hex8ToCss(btnStyle.sliderBtnBorder || '#555555FF'));
+    document.documentElement.style.setProperty("--slider-btn-w",      (btnStyle.sliderBtnW ?? 22) + "px");
+    document.documentElement.style.setProperty("--slider-btn-h",      (btnStyle.sliderBtnH ?? 22) + "px");
+    document.documentElement.style.setProperty("--slider-btn-r",      (btnStyle.sliderBtnR ?? 4)  + "px");
+    document.querySelectorAll('.slider-step-minus, .slider-step-plus').forEach(b => {
+      b.style.width        = (btnStyle.sliderBtnW ?? 22) + 'px';
+      b.style.height       = (btnStyle.sliderBtnH ?? 22) + 'px';
+      b.style.borderRadius = (btnStyle.sliderBtnR ?? 4)  + 'px';
+    });
+    document.documentElement.style.setProperty("--slider-fill-color",    _bgCss(btnStyle.sliderFill   || '#9659FFFF'));
+    document.documentElement.style.setProperty("--slider-track-bg",      _bgCss(btnStyle.sliderTrack  || '#333333FF'));
+    document.documentElement.style.setProperty("--slider-handle-color",  _bgCss(btnStyle.sliderHandle || '#FFFFFFFF'));
+    document.documentElement.style.setProperty("--slider-handle-border", _bgCss(btnStyle.sliderHandleBorder || '#00000000'));
+    let _sliderGlowStyle = document.getElementById('_slider-glow-style');
+    if (!_sliderGlowStyle) { _sliderGlowStyle = document.createElement('style'); _sliderGlowStyle.id = '_slider-glow-style'; document.head.appendChild(_sliderGlowStyle); }
+    const _hGlow = hex8ToCss(btnStyle.sliderHandleGlow || '#FFFFFF00');
+    const _haGlow = hex8ToCss(btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
+    _sliderGlowStyle.textContent =
+      '.alpha-slider::-webkit-slider-thumb, #zoom-slider::-webkit-slider-thumb, #cp-popup input[type=range]::-webkit-slider-thumb { box-shadow: 0 0 8px 4px ' + _hGlow + ' !important; }\n' +
+      '.alpha-slider::-moz-range-thumb, #zoom-slider::-moz-range-thumb, #cp-popup input[type=range]::-moz-range-thumb { box-shadow: 0 0 8px 4px ' + _hGlow + ' !important; }\n' +
+      '.alpha-slider.handle-active::-webkit-slider-thumb, #zoom-slider.handle-active::-webkit-slider-thumb { box-shadow: 0 0 8px 4px ' + _haGlow + ' !important; }\n' +
+      '.alpha-slider.handle-active::-moz-range-thumb, #zoom-slider.handle-active::-moz-range-thumb { box-shadow: 0 0 8px 4px ' + _haGlow + ' !important; }';
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
@@ -312,8 +519,17 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--clock-date-size",      (_btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize) + "px");
     document.documentElement.style.setProperty("--clock-time-size",      (_btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize) + "px");
     document.documentElement.style.setProperty("--clock-bg",             hex8ToCss(btnStyle.clockBg));
-    document.documentElement.style.setProperty("--clock-date-bg",        hex8ToCss(_btnStyleFor('top-date').bg));
-    document.documentElement.style.setProperty("--clock-time-bg",        hex8ToCss(_btnStyleFor('top-time').bg));
+    document.documentElement.style.setProperty("--clock-date-bg",        _bgCss(_btnStyleFor('top-date').bg));
+    document.documentElement.style.setProperty("--clock-time-bg",        _bgCss(_btnStyleFor('top-time').bg));
+    document.documentElement.style.setProperty("--toggle-off-bg",     hex8ToCss(btnStyle.toggleOffBg    || '#333333FF'));
+    document.documentElement.style.setProperty("--toggle-on-bg",      hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF'));
+    document.documentElement.style.setProperty("--toggle-switch-off",   hex8ToCss(btnStyle.toggleSwitchOff  || '#666666FF'));
+    document.documentElement.style.setProperty("--toggle-switch-on",    hex8ToCss(btnStyle.toggleSwitchOn   || '#99ff99FF'));
+    document.documentElement.style.setProperty("--toggle-border-off", hex8ToCss(btnStyle.toggleBorderOff|| '#555555FF'));
+    document.documentElement.style.setProperty("--toggle-border-on",  hex8ToCss(btnStyle.toggleBorderOn || '#2a7a2aFF'));
+    document.documentElement.style.setProperty("--toggle-w",          (btnStyle.toggleW        ?? 44) + 'px');
+    document.documentElement.style.setProperty("--toggle-h",          (btnStyle.toggleH        ?? 24) + 'px');
+    document.documentElement.style.setProperty("--toggle-switch-size",  (btnStyle.toggleSwitchSize ?? 16) + 'px');
     const topGridMap = [
       { id: 'top-export-all',    el: '.top-item[data-item="export-all"]',    prefix: '--export-all' },
       { id: 'top-import-all',    el: '.top-item[data-item="import-all"]',    prefix: '--import-all' },
@@ -321,6 +537,7 @@ if (navigator.storage && navigator.storage.persist) {
       { id: 'top-import-layout', el: '.top-item[data-item="import-layout"]', prefix: '--import-layout' },
       { id: 'top-clear-all',     el: '.top-item[data-item="clear-all"]',     prefix: '--clear-all' },
       { id: 'top-my-files',      el: '.top-item[data-item="my-files"]',      prefix: '--my-files' },
+      { id: 'top-hard-reload',   el: '.top-item[data-item="hard-reload"]',   prefix: '--hard-reload' },
       { id: 'top-manage-habits', el: '.top-item[data-item="manage-habits"]', prefix: '--manage-habits' },
       { id: 'top-orient-lock',    el: '.top-item[data-item="orient-lock"]',    prefix: '--orient-lock' },
       { id: 'top-settings',      el: '.top-item[data-item="settings"]',      prefix: '--settings' },
@@ -329,7 +546,7 @@ if (navigator.storage && navigator.storage.persist) {
       const el = document.querySelector(sel);
       if (!el) return;
       const _s = _btnStyleFor(id);
-      el.style.setProperty(prefix + '-bg',   hex8ToCss(_s.bg));
+      el.style.setProperty(prefix + '-bg',   _bgCss(_s.bg));
       el.style.setProperty(prefix + '-fg',   hex8ToCss(_s.fg));
       el.style.setProperty(prefix + '-font', _s.font);
       el.style.setProperty(prefix + '-glow', hex8ToCss(_s.glow));
@@ -340,7 +557,7 @@ if (navigator.storage && navigator.storage.persist) {
     if (_olBtn) {
       const _olId = (typeof _orientLocked !== 'undefined' && _orientLocked) ? 'top-orient-lock-locked' : 'top-orient-lock';
       const _ols = _btnStyleFor(_olId);
-      _olBtn.style.background = hex8ToCss(_ols.bg);
+      _olBtn.style.background = _bgCss(_ols.bg);
       _olBtn.style.color = hex8ToCss(_ols.fg);
       _olBtn.style.borderColor = hex8ToCss(_ols.fg);
       _olBtn.style.boxShadow = `0 0 16px 5px ${hex8ToCss(_ols.glow)}`;
@@ -348,7 +565,7 @@ if (navigator.storage && navigator.storage.persist) {
     const _cogEl = document.getElementById('settings-cog');
     if (_cogEl) {
       const _ss = _btnStyleFor('top-settings');
-      _cogEl.style.background   = hex8ToCss(_ss.bg);
+      _cogEl.style.background   = _bgCss(_ss.bg);
       _cogEl.style.color        = hex8ToCss(_ss.fg);
       _cogEl.style.borderColor  = hex8ToCss(_ss.fg);
       _cogEl.style.boxShadow    = `0 0 16px 5px ${hex8ToCss(_ss.glow)}`;
@@ -356,7 +573,7 @@ if (navigator.storage && navigator.storage.persist) {
     const _habEl = document.querySelector('.top-item[data-item="hide-habits"]');
     if (_habEl) {
       const _hs = _btnStyleFor(!skipHabitsBtn && habitsVisible ? 'top-hide-habits' : 'top-show-habits');
-      _habEl.style.setProperty('--hide-habits-bg',   hex8ToCss(_hs.bg));
+      _habEl.style.setProperty('--hide-habits-bg',   _bgCss(_hs.bg));
       _habEl.style.setProperty('--hide-habits-fg',   hex8ToCss(_hs.fg));
       _habEl.style.setProperty('--hide-habits-font', _hs.font);
       _habEl.style.setProperty('--hide-habits-glow', hex8ToCss(_hs.glow || '#00000000'));
@@ -382,38 +599,56 @@ if (navigator.storage && navigator.storage.persist) {
     if (_versionItem) {
       _versionItem.style.borderRadius = (_btnStyles['top-version']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       _versionItem.style.setProperty('--btn-glow', hex8ToCss(_btnStyleFor('top-version').glow));
-      _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg);
+      _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
       const _vBtn = _versionItem.querySelector('div');
       const _vNumSpan = document.getElementById('app-version');
       if (_vNumSpan) _vNumSpan.style.fontFamily = _btnStyleFor('top-version').font;
     if (_vBtn) {
-      _vBtn.addEventListener('pointerdown', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); });
-      _vBtn.addEventListener('pointerup', () => {
-        _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg);
+      let _vTapX = 0, _vTapY = 0;
+_vBtn.onpointerdown = (e) => { _vTapX = e.clientX; _vTapY = e.clientY; _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
+_vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _vTapY) > 6) _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
+      _vBtn.onpointerleave = () => { _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
+      _vBtn.onpointerup = () => {
+        _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
         if(localStorage.getItem('_versionUpdatePending')==='1'){
           const _prev=localStorage.getItem('_versionPrevFg');
           if(_prev){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:_prev});localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}
           localStorage.removeItem('_versionUpdatePending');
+      return;
+    }
+    if (window._versionCheckState === 'synced') {
+          const _statsEl = document.getElementById('app-stats');
+          if (_statsEl && _statsEl.dataset.swOrig) {
+            _statsEl.innerHTML = _statsEl.dataset.swOrig;
+            _statsEl.style.color = _statsEl.dataset.swOrigColor || '';
+            _statsEl.style.opacity = '0.4';
+            delete _statsEl.dataset.swOrig;
+            delete _statsEl.dataset.swOrigColor;
+          }
+          window._versionCheckState = 'idle';
+        } else {
+          if (window._verifyDeployedVersion) window._verifyDeployedVersion();
         }
-      });
-      _vBtn.addEventListener('pointercancel', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); });
+      };
+      _vBtn.onpointercancel = () => { _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
     }
     }
     const _versionNumSpan = document.getElementById('app-version');
     const _versionStatsSpan = document.getElementById('app-stats');
-    if (_versionNumSpan) _versionNumSpan.style.color = _versionColor;
+    if (_versionNumSpan) { _versionNumSpan.style.color = _versionColor; _versionNumSpan.style.visibility = ''; }
     if (_versionStatsSpan) { _versionStatsSpan.style.color = _versionColor; _versionStatsSpan.style.opacity = '0.4'; }
 
     buttonsEl.querySelectorAll(".tracker-btn[data-id]").forEach(btn => {
       const s = _btnStyleFor(btn.dataset.id);
-      btn.style.setProperty("--btn-bg",        hex8ToCss(s.bg));
+      btn.style.setProperty("--btn-bg",        _bgCss(s.bg));
       btn.style.setProperty("--btn-fg",        hex8ToCss(s.fg));
       btn.style.setProperty("--btn-glow",      hex8ToCss(s.glow));
       btn.style.setProperty("--btn-active-glow", hex8ToCss(s.activeGlow || s.glow));
-      btn.style.setProperty("--btn-active-bg", hex8ToCss(s.activeBg));
+      btn.style.setProperty("--btn-active-bg", _bgCss(s.activeBg));
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.cssText += `;font-family:${s.font} !important`;
       btn.style.borderRadius = (s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+      const _tspan = btn.querySelector('.btn-text-label'); if (_tspan) _applyTextStyle(_tspan, s);
     });
   }
   // ── Wrap all color pickers in swatch containers ────────────
@@ -426,6 +661,127 @@ if (navigator.storage && navigator.storage.persist) {
     const overlay = document.createElement('div');
     overlay.className = 'color-swatch-overlay';
     overlay.id = id + '-swatch-overlay';
+    const labelEl = wrap.closest('.color-settings-row') && wrap.closest('.color-settings-row').querySelector(':scope > label');
+    if (labelEl) {
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'color-swatch-label';
+      labelSpan.textContent = labelEl.textContent.trim();
+      overlay.appendChild(labelSpan);
+    }
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

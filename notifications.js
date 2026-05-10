@@ -1,3 +1,5 @@
+// @version 1339
+
 (function() {
   function todayStr() {
     const d = new Date();
@@ -170,8 +172,14 @@ function _notifUpdateToggleUI() {
   const wrap  = document.getElementById('notif-toggle-wrap');
   const knob  = document.getElementById('notif-toggle-knob');
   const offWrap = document.getElementById('notif-off-wrap');
-  if (wrap)  { wrap.style.background = enabled ? '#1a5a1a' : '#333'; }
-  if (knob)  { knob.style.left = enabled ? '27px' : '3px'; knob.style.background = enabled ? '#99ff99' : '#666'; }
+  const _onBg      = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF') : '#1a5a1a';
+  const _offBg     = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOffBg    || '#333333FF') : '#333';
+  const _knobOn    = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleKnobOn   || '#99ff99FF') : '#99ff99';
+  const _knobOff   = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleKnobOff  || '#666666FF') : '#666';
+  const _borderOn  = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOn || '#2a7a2aFF') : '#2a7a2a';
+  const _borderOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOff|| '#555555FF') : '#555';
+  if (wrap)    { wrap.style.background = enabled ? _onBg : _offBg; wrap.style.borderColor = enabled ? _borderOn : _borderOff; }
+  if (knob)    { knob.style.left = enabled ? '27px' : '3px'; knob.style.background = enabled ? _knobOn : _knobOff; }
   if (offWrap) { offWrap.style.display = enabled ? 'none' : 'flex'; }
 }
 
@@ -313,3 +321,117 @@ window.notifSendTest = async function() {
     } catch(e) {}
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

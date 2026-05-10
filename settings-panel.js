@@ -1,3 +1,5 @@
+// @version 1339
+
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
   let _clockSnapshot    = null;
@@ -65,7 +67,7 @@
     const undoBtn   = document.getElementById('settings-undo');
     const redoBtn   = document.getElementById('settings-redo');
     const anyActivity = _settingsHasChanges || _history.length > 1;
-    if (saveBtn)   { saveBtn.style.display = anyActivity ? '' : 'none'; saveBtn.disabled = !_settingsHasChanges; saveBtn.style.opacity = _settingsHasChanges ? '' : '0.35'; }
+    if (saveBtn)   { saveBtn.disabled = !_settingsHasChanges; saveBtn.style.opacity = _settingsHasChanges ? '' : '0.35'; }
     if (cancelBtn) cancelBtn.textContent = _settingsHasChanges ? 'Cancel' : 'Close';
     if (undoBtn)   { undoBtn.style.display = anyActivity ? '' : 'none'; undoBtn.disabled = !_canUndo(); undoBtn.style.opacity = _canUndo() ? '' : '0.35'; }
     if (redoBtn)   { redoBtn.style.display = anyActivity ? '' : 'none'; redoBtn.disabled = !_canRedo(); redoBtn.style.opacity = _canRedo() ? '' : '0.35'; }
@@ -73,10 +75,15 @@
   function _syncSettingsPanelUI() {
     if (window._cfBuild) window._cfBuild();
     setColorValue('s-sliderborder',       btnStyle.sliderBorder       || '#555555FF');
+    setColorValue('s-sliderbtnbg',        btnStyle.sliderBtnBg        || '#2a2a2aFF');
+    setColorValue('s-sliderbtnfg',        btnStyle.sliderBtnFg        || '#aaaaaaFF');
+    setColorValue('s-sliderbtnborder',    btnStyle.sliderBtnBorder    || '#555555FF');
     setColorValue('s-sliderfill',         btnStyle.sliderFill         || '#9659FFFF');
     setColorValue('s-slidertrack',        btnStyle.sliderTrack        || '#333333FF');
     setColorValue('s-sliderhandle',       btnStyle.sliderHandle       || '#FFFFFFFF');
-    setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
+    setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
+    setColorValue('s-sliderhandleglow',      btnStyle.sliderHandleGlow      || '#FFFFFF00');
+    setColorValue('s-sliderhandleactiveglow', btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
     const _sv  = (id, v)      => { const el = document.getElementById(id); if (el) el.value = String(v); };
     const _svl = (id, v, sfx) => { const el = document.getElementById(id); if (el) el.textContent = v + sfx; };
     _sv('s-sliderh',       btnStyle.sliderH      ?? 8);   _svl('s-sliderh-val',       btnStyle.sliderH      ?? 8,   'px');
@@ -86,6 +93,11 @@
     _sv('s-sliderhandler', btnStyle.sliderHandleR?? 3);   _svl('s-sliderhandler-val', btnStyle.sliderHandleR?? 3,   '%');
     _sv('s-sliderw',       btnStyle.sliderW      ?? 100); _svl('s-sliderw-val',       btnStyle.sliderW      ?? 100, '%');
     _sv('s-sliderhandlew', btnStyle.sliderHandleW?? 16);  _svl('s-sliderhandlew-val', btnStyle.sliderHandleW?? 16,  'px');
+    _sv('s-sliderhandlehole', btnStyle.sliderHandleHole ?? 0); _svl('s-sliderhandlehole-val', btnStyle.sliderHandleHole ?? 0, '%');
+    _sv('s-sliderbtnspacing',  btnStyle.sliderBtnGap     ?? 0);
+    _sv('s-sliderbtnw',        btnStyle.sliderBtnW       ?? 22); _svl('s-sliderbtnw-val',  btnStyle.sliderBtnW  ?? 22, 'px');
+    _sv('s-sliderbtnh',        btnStyle.sliderBtnH       ?? 22); _svl('s-sliderbtnh-val',  btnStyle.sliderBtnH  ?? 22, 'px');
+    _sv('s-sliderbtnr',        btnStyle.sliderBtnR       ?? 4);  _svl('s-sliderbtnr-val',  btnStyle.sliderBtnR  ?? 4,  'px'); _svl('s-sliderbtnspacing-val',  btnStyle.sliderBtnGap     ?? 0, 'px');
     setColorValue('s-clock-date-color', _btnStyleFor('top-date').fg);
     setColorValue('s-clock-time-color', _btnStyleFor('top-time').fg);
     setColorValue('s-clock-date-bg',    _btnStyleFor('top-date').bg);
@@ -99,6 +111,15 @@
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
     setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
+    setColorValue('s-toggle-off-bg',     btnStyle.toggleOffBg    || '#333333FF');
+    setColorValue('s-toggle-on-bg',      btnStyle.toggleOnBg     || '#1a5a1aFF');
+    setColorValue('s-toggle-switch-off',   btnStyle.toggleSwitchOff  || '#666666FF');
+    setColorValue('s-toggle-switch-on',    btnStyle.toggleSwitchOn   || '#99ff99FF');
+    setColorValue('s-toggle-border-off', btnStyle.toggleBorderOff|| '#555555FF');
+    setColorValue('s-toggle-border-on',  btnStyle.toggleBorderOn || '#2a7a2aFF');
+    const _twSEl = document.getElementById('s-toggle-w'); if (_twSEl) { _twSEl.value = String(btnStyle.toggleW ?? 44); const _twvSEl = document.getElementById('s-toggle-w-val'); if (_twvSEl) _twvSEl.textContent = (btnStyle.toggleW ?? 44) + 'px'; }
+    const _thSEl = document.getElementById('s-toggle-h'); if (_thSEl) { _thSEl.value = String(btnStyle.toggleH ?? 24); const _thvSEl = document.getElementById('s-toggle-h-val'); if (_thvSEl) _thvSEl.textContent = (btnStyle.toggleH ?? 24) + 'px'; }
+    const _tksSEl = document.getElementById('s-toggle-switch-size'); if (_tksSEl) { _tksSEl.value = String(btnStyle.toggleSwitchSize ?? 16); const _tksVSEl = document.getElementById('s-toggle-switch-size-val'); if (_tksVSEl) _tksVSEl.textContent = (btnStyle.toggleSwitchSize ?? 16) + 'px'; }
     const _bgTypeEl  = document.getElementById('s-app-bg-type');  if (_bgTypeEl)  _bgTypeEl.value  = appStyle.bgType;
     const _gradDirEl = document.getElementById('s-app-grad-dir'); if (_gradDirEl) _gradDirEl.value = appStyle.gradDir;
     setColorValue('s-app-pat-color',  appStyle.patColor);
@@ -115,6 +136,12 @@
     document.getElementById('s-app-grad-dir-row').style.display = _isGrad ? '' : 'none';
     document.getElementById('s-app-pattern-wrap').style.display = _isPat  ? '' : 'none';
     document.getElementById('s-app-image-wrap').style.display   = _isImg  ? 'flex' : 'none';
+    const _sbModeEl2 = document.getElementById('s-app-statusbar-mode');
+    if (_sbModeEl2) _sbModeEl2.value = appStyle.statusBarMode || 'auto';
+    setColorValue('s-app-statusbar-color', appStyle.statusBarColor || '#111111FF');
+    const _sbRow2 = document.getElementById('s-app-statusbar-color-row');
+    if (_sbRow2) _sbRow2.style.display = (appStyle.statusBarMode === 'solid' || appStyle.statusBarMode === 'gradient') ? '' : 'none';
+    if (appStyle.statusBarStops && window._cpSetGradientStops) window._cpSetGradientStops('s-app-statusbar-color', appStyle.statusBarStops);
     if (window._cpSyncUI) window._cpSyncUI();
     const _fontSel = document.getElementById('s-font'); if (_fontSel) _fontSel.value = btnStyle.font;
     if (window.fontPickerSync) window.fontPickerSync();
@@ -189,8 +216,8 @@
           }
           btn.dataset.debounced = 'true';
           setTimeout(() => { btn.dataset.debounced = 'false'; }, btn.id === 'hide-habits-btn' ? 2 : 500);
-    }, true);
-    btn.dataset.debounceListener = 'true';
+        }, true);
+        btn.dataset.debounceListener = 'true';
       }
     });
     const _wasSkipSnap = _skipCancelSnapshot;
@@ -206,8 +233,16 @@
     }
     const _initId = window._cfActiveId ? window._cfActiveId() : null;
     const _initS  = _initId ? _btnStyleFor(_initId) : btnStyle;
+    if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', _initS.bgStops || null);
     setColorValue('s-bg',           _initS.bg);
     setColorValue('s-fg',           _initS.fg);
+    if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', _initS.fgStops || null);
+    if (window._cpSetGradientStops) window._cpSetGradientStops('s-fgstroke', _initS.fgStrokeStops || null);
+setColorValue('s-fgstroke', _initS.fgStroke || btnStyle.fgStroke || '#00000000');
+const _sfgsOv2 = document.getElementById('s-fgstroke-swatch-overlay');
+const _sfgsGrad2 = window._cpGetGradient ? window._cpGetGradient('s-fgstroke') : null;
+if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { updateAlphaSliderBg('s-fgstroke'); }
+    const _fgsWOEl = document.getElementById('s-fgstrokew'); if (_fgsWOEl) { _fgsWOEl.value = String(_initS.fgStrokeW ?? btnStyle.fgStrokeW ?? 0); const _fgsWVOEl = document.getElementById('s-fgstrokew-val'); if (_fgsWVOEl) _fgsWVOEl.textContent = (_initS.fgStrokeW ?? btnStyle.fgStrokeW ?? 0) + 'px'; }
     setColorValue('s-glow',         _initS.glow);
     setColorValue('s-activeglow',   _initS.activeGlow || _initS.glow);
     setColorValue('s-activebg',     _initS.activeBg);
@@ -216,12 +251,26 @@
     setColorValue('s-sliderfill',      btnStyle.sliderFill   || '#9659FFFF');
     setColorValue('s-slidertrack',     btnStyle.sliderTrack  || '#333333FF');
     setColorValue('s-sliderhandle',    btnStyle.sliderHandle || '#FFFFFFFF');
-    setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
-    setColorValue('s-sliderborder', btnStyle.sliderBorder || '#555555FF');
+    setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
+    setColorValue('s-sliderhandleglow',      btnStyle.sliderHandleGlow      || '#FFFFFF00');
+    setColorValue('s-sliderhandleactiveglow', btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
+    setColorValue('s-sliderborder',    btnStyle.sliderBorder    || '#555555FF');
+    setColorValue('s-sliderbtnbg',     btnStyle.sliderBtnBg     || '#2a2a2aFF');
+    setColorValue('s-sliderbtnfg',     btnStyle.sliderBtnFg     || '#aaaaaaFF');
+    setColorValue('s-sliderbtnborder', btnStyle.sliderBtnBorder || '#555555FF');
     setColorValue('s-checkbox-checked', btnStyle.checkboxChecked);
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
     setColorValue('s-checkbox-bg', btnStyle.checkboxBg);
+    setColorValue('s-toggle-off-bg',     btnStyle.toggleOffBg    || '#333333FF');
+    setColorValue('s-toggle-on-bg',      btnStyle.toggleOnBg     || '#1a5a1aFF');
+    setColorValue('s-toggle-switch-off', btnStyle.toggleSwitchOff || '#666666FF');
+    setColorValue('s-toggle-switch-on',  btnStyle.toggleSwitchOn  || '#99ff99FF');
+    setColorValue('s-toggle-border-off', btnStyle.toggleBorderOff|| '#555555FF');
+    setColorValue('s-toggle-border-on',  btnStyle.toggleBorderOn || '#2a7a2aFF');
+    const _twEl = document.getElementById('s-toggle-w'); if (_twEl) { _twEl.value = String(btnStyle.toggleW ?? 44); const _twvEl = document.getElementById('s-toggle-w-val'); if (_twvEl) _twvEl.textContent = (btnStyle.toggleW ?? 44) + 'px'; }
+    const _thEl = document.getElementById('s-toggle-h'); if (_thEl) { _thEl.value = String(btnStyle.toggleH ?? 24); const _thvEl = document.getElementById('s-toggle-h-val'); if (_thvEl) _thvEl.textContent = (btnStyle.toggleH ?? 24) + 'px'; }
+    const _tksEl = document.getElementById('s-toggle-switch-size'); if (_tksEl) { _tksEl.value = String(btnStyle.toggleSwitchSize ?? 16); const _tksvEl = document.getElementById('s-toggle-switch-size-val'); if (_tksvEl) _tksvEl.textContent = (btnStyle.toggleSwitchSize ?? 16) + 'px'; }
     setColorValue('s-clock-date-color', _btnStyleFor('top-date').fg);
     setColorValue('s-clock-time-color', _btnStyleFor('top-time').fg);
     setColorValue('s-clock-date-bg',    _btnStyleFor('top-date').bg);
@@ -255,6 +304,18 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     const _shhvEl2 = document.getElementById('s-sliderhandleh-val'); if (_shhvEl2) _shhvEl2.textContent = (btnStyle.sliderHandleH ?? 16) + 'px';
     const _shrEl2 = document.getElementById('s-sliderhandler'); if (_shrEl2) _shrEl2.value = String(btnStyle.sliderHandleR ?? 3);
     const _shrvEl2 = document.getElementById('s-sliderhandler-val'); if (_shrvEl2) _shrvEl2.textContent = (btnStyle.sliderHandleR ?? 3) + '%';
+    const _shheEl2 = document.getElementById('s-sliderhandlehole'); if (_shheEl2) _shheEl2.value = String(btnStyle.sliderHandleHole ?? 0);
+    const _sbgEl = document.getElementById('s-sliderbtnspacing'); if (_sbgEl) _sbgEl.value = String(btnStyle.sliderBtnGap ?? 0);
+    const _sbgvEl = document.getElementById('s-sliderbtnspacing-val'); if (_sbgvEl) _sbgvEl.textContent = (btnStyle.sliderBtnGap ?? 0) + 'px';
+    const _sbwEl = document.getElementById('s-sliderbtnw'); if (_sbwEl) _sbwEl.value = String(btnStyle.sliderBtnW ?? 22);
+    const _sbwvEl = document.getElementById('s-sliderbtnw-val'); if (_sbwvEl) _sbwvEl.textContent = (btnStyle.sliderBtnW ?? 22) + 'px';
+    const _sbhEl = document.getElementById('s-sliderbtnh'); if (_sbhEl) _sbhEl.value = String(btnStyle.sliderBtnH ?? 22);
+    const _sbhvEl = document.getElementById('s-sliderbtnh-val'); if (_sbhvEl) _sbhvEl.textContent = (btnStyle.sliderBtnH ?? 22) + 'px';
+    const _sbrEl = document.getElementById('s-sliderbtnr'); if (_sbrEl) _sbrEl.value = String(btnStyle.sliderBtnR ?? 4);
+    const _sbrvEl = document.getElementById('s-sliderbtnr-val'); if (_sbrvEl) _sbrvEl.textContent = (btnStyle.sliderBtnR ?? 4) + 'px';
+    const _shhevEl2 = document.getElementById('s-sliderhandlehole-val'); if (_shhevEl2) _shhevEl2.textContent = (btnStyle.sliderHandleHole ?? 0) + '%';
+    btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
+    btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
     const _s = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
     _s("s-app-bg-type",    appStyle.bgType);
@@ -264,6 +325,14 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     _s("s-app-img-pos",    appStyle.imgPos);
     _s("s-app-img-repeat", appStyle.imgRepeat);
     _s("s-app-img-attach", appStyle.imgAttach);
+    const _sbModeEl = document.getElementById('s-app-statusbar-mode');
+    if (_sbModeEl) _sbModeEl.value = appStyle.statusBarMode || 'auto';
+    const _sbIconEl = document.getElementById('s-app-statusbar-icons');
+    if (_sbIconEl) _sbIconEl.value = appStyle.statusBarIconStyle || 'auto';
+    setColorValue('s-app-statusbar-color', appStyle.statusBarColor || '#111111FF');
+    const _sbRow = document.getElementById('s-app-statusbar-color-row');
+    if (_sbRow) _sbRow.style.display = (appStyle.statusBarMode === 'solid' || appStyle.statusBarMode === 'gradient') ? '' : 'none';
+    if (appStyle.statusBarStops && window._cpSetGradientStops) window._cpSetGradientStops('s-app-statusbar-color', appStyle.statusBarStops);
     _s("s-app-padding",    appStyle.padding);
     setColorValue("s-app-pat-color",  appStyle.patColor);
     setColorValue("s-app-pat-bg",     appStyle.patBg);
@@ -294,6 +363,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
       window._cfBuild();
     }
     if(window.fontPickerSync)fontPickerSync();
+    if (window._cpSyncUI) window._cpSyncUI();
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
@@ -321,8 +391,10 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   }
   async function settingsSave() {
     _settingsHasChanges = false;
+    _updateSettingsBtns();
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderW        = Number(document.getElementById("s-sliderw").value);
+    btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     localStorage.setItem("_btnStyle",   JSON.stringify(btnStyle));
     localStorage.setItem("_btnStyles",  JSON.stringify(_btnStyles));
     try {
@@ -341,8 +413,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     localStorage.setItem("_clockTumbler", JSON.stringify(window._clockGet().tumblerCfg));
     applyBtnStyle();
     applyAppStyle();
-    if (window._cpSaveFromUI) window._cpSaveFromUI();
-    settingsClose();
   }
   function settingsCancel() {
     if (!_settingsHasChanges) {
@@ -358,3 +428,131 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     _settingsHasChanges = false;
     _updateUndoRedoBtns();
   }
+  (function() {
+    function dbounce(fn) {
+      var t = null;
+      return function() {
+        if (t) return;
+        t = setTimeout(function() { t = null; }, 100);
+        fn.apply(this, arguments);
+      };
+    }
+    settingsSave   = dbounce(settingsSave);
+    settingsUndo   = dbounce(settingsUndo);
+    settingsRedo   = dbounce(settingsRedo);
+    settingsCancel = dbounce(settingsCancel);
+    })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

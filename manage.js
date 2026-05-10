@@ -1,3 +1,5 @@
+// @version 1339
+
 // ── Manage Habits ──────────────────────────────────────────
   function manageOpen() {
     manageRenderList();
@@ -32,7 +34,7 @@
     cfg.label = newLabel;
     saveRawConfigs();
     const domBtn = buttonsEl.querySelector(`.tracker-btn[data-id="${id}"]`);
-    if (domBtn) domBtn.textContent = newLabel;
+    if (domBtn) { const _rspan = domBtn.querySelector('.btn-text-label'); if (_rspan) { _rspan.textContent = newLabel; _rspan.dataset.text = newLabel; } else domBtn.textContent = newLabel; }
     equalizeButtonSizes();
     const orig = btn.textContent;
     btn.textContent = "✓";
@@ -136,3 +138,117 @@
   document.getElementById("manage-overlay").addEventListener("click", e => {
   if (e.target === document.getElementById("manage-overlay")) manageClose();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

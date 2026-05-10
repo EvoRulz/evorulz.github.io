@@ -1,3 +1,5 @@
+// @version 1339
+
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
   try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -51,6 +53,7 @@ items.push({ id: 'top-export-layout',  label: 'Export Layout',  isTopGrid: true 
 items.push({ id: 'top-import-layout',  label: 'Import Layout',  isTopGrid: true });
 items.push({ id: 'top-clear-all',      label: 'Clear All',      isTopGrid: true });
 items.push({ id: 'top-my-files',       label: 'My Files',       isTopGrid: true });
+items.push({ id: 'top-hard-reload',    label: 'Hard Reload',    isTopGrid: true });
 items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true });
   items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
   items.push({ id: 'top-version',        label: 'Version',        isTopGrid: true });
@@ -84,16 +87,36 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   }
   const s = _btnStyleFor(id);
   setColorValue('s-bg',       s.bg);
+  if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', s.bgStops || null);
   setColorValue('s-fg',       s.fg);
+  if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null);
+  const _sfgOv = document.getElementById('s-fg-swatch-overlay');
+  const _sfgGrad = window._cpGetGradient ? window._cpGetGradient('s-fg') : null;
+  if (_sfgOv && _sfgGrad) { _sfgOv.style.background = _sfgGrad; } else { updateAlphaSliderBg('s-fg'); }
   setColorValue('s-glow',     s.glow);
   setColorValue('s-activeglow', s.activeGlow || s.glow);
   setColorValue('s-activebg', s.activeBg);
   setColorValue('s-tap',      s.tap);
   document.getElementById("s-font").value = s.font;
+  if (window._cpSetGradientStops) window._cpSetGradientStops('s-fgstroke', s.fgStrokeStops || null);
+setColorValue('s-fgstroke', s.fgStroke || btnStyle.fgStroke || '#00000000');
+const _sfgsOv = document.getElementById('s-fgstroke-swatch-overlay');
+const _sfgsGrad = window._cpGetGradient ? window._cpGetGradient('s-fgstroke') : null;
+if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updateAlphaSliderBg('s-fgstroke'); }
+  const _fgsWCfEl = document.getElementById('s-fgstrokew'); if (_fgsWCfEl) { const _fgsWVal = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0; _fgsWCfEl.value = String(_fgsWVal); const _fgsWVCfEl = document.getElementById('s-fgstrokew-val'); if (_fgsWVCfEl) _fgsWVCfEl.textContent = _fgsWVal + 'px'; }
   const _rVal = s.btnRadius ?? btnStyle.btnRadius ?? 6;
   const _rEl = document.getElementById("s-radius"); if (_rEl) _rEl.value = String(_rVal);
   const _rvEl = document.getElementById("s-radius-val"); if (_rvEl) _rvEl.textContent = _rVal + "px";
-  updateAlphaSliderBg('s-bg');
+  {
+    const _sbOv = document.getElementById('s-bg-swatch-overlay');
+    const _builtGrad = window._cpGetGradient ? window._cpGetGradient('s-bg') : null;
+    const _directGrad = typeof s.bg === 'string' && (s.bg.startsWith('linear-gradient') || s.bg.startsWith('radial-gradient')) ? s.bg : null;
+    if (_sbOv && (_builtGrad || _directGrad)) {
+      _sbOv.style.background = _builtGrad || _directGrad;
+    } else {
+      updateAlphaSliderBg('s-bg');
+    }
+  }
   updateAlphaSliderBg('s-fg');
   updateAlphaSliderBg('s-glow');
   updateAlphaSliderBg('s-activebg');
@@ -254,7 +277,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
         } else {
           const styleId = items[i].id === 'top-hide-habits' ? (habitsVisible ? 'top-hide-habits' : 'top-show-habits') : items[i].id;
         const s2 = _btnStyleFor(styleId);
-        el.style.background = hex8ToCss(s2.bg);
+        el.style.background = _bgCss(s2.bg);
         el.style.color      = hex8ToCss(s2.fg);
         el.style.fontSize   = '';
         el.style.fontFamily = s2.font;
@@ -271,7 +294,9 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
           el.style.flexDirection = '';
           el.style.alignItems = '';
           el.style.gap = '';
-          el.textContent = items[i].label;
+          const _cfRInner = el.querySelector('.btn-text-label');
+          if (_cfRInner) { _cfRInner.textContent = items[i].label; _cfRInner.dataset.text = items[i].label; if (window._applyTextStyle) window._applyTextStyle(_cfRInner, s2); }
+          else el.textContent = items[i].label;
         }
         }
         el.style.left      = kf.tx + 'px';
@@ -301,7 +326,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
         const el = document.createElement('button');
         el.className   = 'cf-item';
         el.dataset.cfI = i;
-        el.textContent = item.label;
+        const _cfInner = document.createElement('span'); _cfInner.className = 'btn-text-label'; _cfInner.dataset.text = item.label; _cfInner.textContent = item.label; el.appendChild(_cfInner);
         el.style.width = iW + 'px';
         el.style.pointerEvents = 'none';
         el.style.webkitTapHighlightColor = 'transparent';
@@ -309,8 +334,8 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
         const s2 = _btnStyleFor(items[i].id);
         el.style.background = hex8ToCss(s2.tap || btnStyle.tapHighlight);
       });
-      el.addEventListener('pointerup',     () => { const s2 = _btnStyleFor(items[i].id); el.style.background = hex8ToCss(s2.bg); });
-      el.addEventListener('pointercancel', () => { const s2 = _btnStyleFor(items[i].id); el.style.background = hex8ToCss(s2.bg); });
+      el.addEventListener('pointerup',     () => { const s2 = _btnStyleFor(items[i].id); el.style.background = _bgCss(s2.bg); });
+      el.addEventListener('pointercancel', () => { const s2 = _btnStyleFor(items[i].id); el.style.background = _bgCss(s2.bg); });
         el.onclick = () => {
           cfIdx = i;
           if (items[i].id === 'top-settings') {
@@ -485,3 +510,117 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

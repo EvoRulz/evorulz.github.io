@@ -1,24 +1,27 @@
-(function(){
+// @version 1339
+
+function _makeFontTumbler(selectId, wrapId, onChangeCb) {
   function getOpts() {
-    var sel = document.getElementById('s-font');
+    var sel = document.getElementById(selectId);
     if (!sel) return [];
     return Array.from(sel.options).map(function(o){ return { value: o.value, text: o.text }; });
   }
   function getIdx() {
-    var sel = document.getElementById('s-font');
+    var sel = document.getElementById(selectId);
     return sel ? Math.max(0, sel.selectedIndex) : 0;
   }
   function setIdx(idx) {
-    var sel = document.getElementById('s-font');
+    var sel = document.getElementById(selectId);
     var opts = getOpts();
     if (!sel || !opts.length) return;
     idx = ((idx % opts.length) + opts.length) % opts.length;
     sel.selectedIndex = idx;
     sel.dispatchEvent(new Event('change'));
     render();
+    if (onChangeCb) onChangeCb(sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].value : '');
   }
   function render() {
-    var wrap = document.getElementById('font-tumbler-wrap');
+    var wrap = document.getElementById(wrapId);
     if (!wrap) return;
     var opts = getOpts();
     if (!opts.length) return;
@@ -35,7 +38,7 @@
     items[2].style.fontFamily = opts[next].value;
   }
   function build() {
-    var wrap = document.getElementById('font-tumbler-wrap');
+    var wrap = document.getElementById(wrapId);
     if (!wrap) return;
     wrap.innerHTML = '';
     var opts = getOpts();
@@ -84,11 +87,140 @@
     });
     
   }
-  window.fontPickerSync   = function() { render(); };
+  return { build: build, render: render };
+}
+(function() {
+  var _main = _makeFontTumbler('s-font', 'font-tumbler-wrap', null);
+  var _swatch = null;
+  function _buildSwatch() {
+    _swatch = _makeFontTumbler('s-cp-label-font', 'font-tumbler-wrap-swatch', function() {
+      if (window._cpSaveFromUI) window._cpSaveFromUI();
+      if (window._applyLabelToSwatches) window._applyLabelToSwatches();
+    });
+    _swatch.build();
+  }
+  window.fontPickerSwatchSync  = function() { if (_swatch) _swatch.render(); else _buildSwatch(); };
+  window.fontPickerSwatchBuild = function() { _buildSwatch(); };
+  window.fontPickerSync   = function() { _main.render(); };
   window.fontPickerToggle = function() {};
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', build);
+    document.addEventListener('DOMContentLoaded', function() { _main.build(); _buildSwatch(); });
   } else {
-    build();
+    _main.build();
+    _buildSwatch();
   }
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

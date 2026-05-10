@@ -1,4 +1,7 @@
+// @version 1339
+
 document.querySelectorAll('.alpha-slider').forEach(function(s){
+  if (s.closest('.color-settings-row')) return;
   var overlay = document.createElement('div');
   overlay.style.cssText = 'position:absolute;inset:0;z-index:10;cursor:pointer;touch-action:pan-y;';
   var par = s.parentElement;
@@ -43,7 +46,7 @@ var dragging = false;
     var ratio = (e.clientX - trackLeft) / trackWidth;
     var newVal = cachedMin + ratio * (cachedMax - cachedMin);
     s.value = Math.max(cachedMin, Math.min(cachedMax, newVal));
-    s.dispatchEvent(new Event('input', {bubbles:true}));
+    s.dispatchEvent(new InputEvent('input', {bubbles:true}));
   });
 
   overlay.addEventListener('pointerup', function(e){
@@ -60,3 +63,139 @@ var dragging = false;
     s.classList.remove('handle-active');
   });
 });
+document.querySelectorAll('.alpha-slider').forEach(function(s) {
+  if (s.closest('.color-settings-row')) return;
+  var par = s.parentElement;
+  var minus = document.createElement('button');
+  minus.textContent = '\u2212';
+  minus.style.cssText = 'background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:20;touch-action:manipulation;';
+  minus.classList.add('slider-step-minus');
+  var plus = document.createElement('button');
+  plus.textContent = '+';
+  plus.style.cssText = minus.style.cssText;
+  plus.classList.add('slider-step-plus');
+  par.insertBefore(minus, s);
+  par.insertBefore(plus, s.nextSibling);
+  function step(dir) {
+    s.value = Math.max(parseFloat(s.min)||0, Math.min(parseFloat(s.max)||255, parseFloat(s.value)+dir));
+    s.dispatchEvent(new InputEvent('input', {bubbles:true}));
+  }
+  minus.addEventListener('pointerdown', function(e){e.stopPropagation();});
+  plus.addEventListener('pointerdown', function(e){e.stopPropagation();});
+  minus.addEventListener('click', function(e){e.stopPropagation();step(-1);});
+  plus.addEventListener('click', function(e){e.stopPropagation();step(1);});
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
