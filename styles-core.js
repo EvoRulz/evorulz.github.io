@@ -1,4 +1,4 @@
-// @version 1332
+// @version 1333
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -424,6 +424,10 @@ if (navigator.storage && navigator.storage.persist) {
     el.style.color = hex8ToCss(s.fg);
   }
   if (strokeW > 0) {
+    el.classList.add('has-stroke');
+    el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
+    el.style.webkitTextFillColor = 'transparent';
+    el.style.color = 'transparent';
     el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
     el.style.paintOrder = 'stroke fill';
   } else {
@@ -642,6 +646,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

@@ -1,4 +1,4 @@
-// @version 1332
+// @version 1333
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -85,7 +85,7 @@ document.body.insertAdjacentHTML('beforeend', `
         </div>
       </div>
       <div class="color-settings-row" data-btn-row="fgstroke">
-        <label>Text stroke color</label>
+        <label>Text outline color</label>
         <div class="color-picker-row">
           <input type="color" id="s-fgstroke" oninput="onColorPickerChange('s-fgstroke')">
           <input type="range" class="alpha-slider" id="s-fgstroke-alpha" min="0" max="255" value="0" oninput="onAlphaChange('s-fgstroke')">
@@ -96,7 +96,7 @@ document.body.insertAdjacentHTML('beforeend', `
         </div>
       </div>
       <div class="settings-row" data-btn-row="fgstrokew">
-        <label>Text stroke width <span id="s-fgstrokew-val">0px</span></label>
+        <label>Text outline width <span id="s-fgstrokew-val">0px</span></label>
         <input type="range" class="alpha-slider" id="s-fgstrokew" min="0" max="20" value="0" oninput="document.getElementById('s-fgstrokew-val').textContent=this.value+'px';settingsChange()">
       </div>
       <div class="settings-row" data-btn-row="radius">
@@ -324,6 +324,7 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
+
 
 
 
