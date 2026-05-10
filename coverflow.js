@@ -1,4 +1,4 @@
-// @version 1336
+// @version 1337
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -94,8 +94,11 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   setColorValue('s-activebg', s.activeBg);
   setColorValue('s-tap',      s.tap);
   document.getElementById("s-font").value = s.font;
-  setColorValue('s-fgstroke', s.fgStroke || btnStyle.fgStroke || '#00000000');
-  updateAlphaSliderBg('s-fgstroke');
+  if (window._cpSetGradientStops) window._cpSetGradientStops('s-fgstroke', s.fgStrokeStops || null);
+setColorValue('s-fgstroke', s.fgStroke || btnStyle.fgStroke || '#00000000');
+const _sfgsOv = document.getElementById('s-fgstroke-swatch-overlay');
+const _sfgsGrad = window._cpGetGradient ? window._cpGetGradient('s-fgstroke') : null;
+if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updateAlphaSliderBg('s-fgstroke'); }
   const _fgsWCfEl = document.getElementById('s-fgstrokew'); if (_fgsWCfEl) { const _fgsWVal = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0; _fgsWCfEl.value = String(_fgsWVal); const _fgsWVCfEl = document.getElementById('s-fgstrokew-val'); if (_fgsWVCfEl) _fgsWVCfEl.textContent = _fgsWVal + 'px'; }
   const _rVal = s.btnRadius ?? btnStyle.btnRadius ?? 6;
   const _rEl = document.getElementById("s-radius"); if (_rEl) _rEl.value = String(_rVal);
@@ -503,6 +506,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 
