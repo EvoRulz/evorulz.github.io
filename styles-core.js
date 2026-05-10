@@ -1,4 +1,4 @@
-// @version 1339
+// @version 1302
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -384,7 +384,7 @@ if (navigator.storage && navigator.storage.persist) {
     if (_s && typeof _s === "object") _btnStyles = _s;
   } catch {}
   function _btnStyleFor(id) {
-    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6, fgStroke: btnStyle.fgStroke || '#00000000', fgStrokeW: btnStyle.fgStrokeW ?? 0 };
+    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6 };
     const _cachedVersionColor = localStorage.getItem('_versionColor');
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
@@ -402,62 +402,28 @@ if (navigator.storage && navigator.storage.persist) {
   function _applyTextStyle(el, s) {
   if (!el) return;
   const fgStops = s.fgStops;
-  const hasFgGrad = fgStops && fgStops.length >= 2;
   const strokeW = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0;
-  const _fgSv = s.fgStroke ?? btnStyle.fgStroke ?? '#00000000';
-  const _strokeIsGrad = s.fgStrokeStops && s.fgStrokeStops.length >= 2;
-  const strokeGrad = _strokeIsGrad
-    ? 'linear-gradient(to right,' + s.fgStrokeStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')'
-    : null;
-  const strokeC = _strokeIsGrad
-    ? 'transparent'
-    : (typeof _fgSv === 'string' && (_fgSv.startsWith('linear-gradient') || _fgSv.startsWith('radial-gradient')))
-      ? (s.fgStrokeStops && s.fgStrokeStops[0] ? hex8ToCss(s.fgStrokeStops[0].hex8) : 'transparent')
-      : hex8ToCss(_fgSv);
-  el.classList.remove('has-stroke');
-  el.style.removeProperty('--_btn-fg');
-  el.style.removeProperty('--_btn-fg-grad');
-  el.style.removeProperty('--_btn-fg-fill');
-  if (strokeW > 0) {
-    el.classList.add('has-stroke');
+  const strokeC = hex8ToCss(s.fgStroke ?? btnStyle.fgStroke ?? '#00000000');
+  if (fgStops && fgStops.length >= 2) {
+    const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
+    el.style.background = grad;
+    el.style.webkitBackgroundClip = 'text';
+    el.style.backgroundClip = 'text';
     el.style.webkitTextFillColor = 'transparent';
     el.style.color = 'transparent';
+  } else {
+    el.style.background = '';
+    el.style.webkitBackgroundClip = '';
+    el.style.backgroundClip = '';
+    el.style.webkitTextFillColor = hex8ToCss(s.fg);
+    el.style.color = hex8ToCss(s.fg);
+  }
+  if (strokeW > 0) {
+    el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
     el.style.paintOrder = 'stroke fill';
-    if (_strokeIsGrad) {
-      el.style.webkitTextStroke = strokeW + 'px transparent';
-      el.style.background = strokeGrad;
-      el.style.webkitBackgroundClip = 'text';
-      el.style.backgroundClip = 'text';
-    } else {
-      el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
-      el.style.background = '';
-      el.style.webkitBackgroundClip = '';
-      el.style.backgroundClip = '';
-    }
-    if (hasFgGrad) {
-      const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
-      el.style.setProperty('--_btn-fg-grad', grad);
-      el.style.setProperty('--_btn-fg-fill', 'transparent');
-    } else {
-      el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
-    }
   } else {
     el.style.webkitTextStroke = '';
     el.style.paintOrder = '';
-    if (hasFgGrad) {
-      const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
-      el.style.background = grad;
-      el.style.webkitBackgroundClip = 'text';
-      el.style.backgroundClip = 'text';
-      el.style.webkitTextFillColor = 'transparent';
-      el.style.color = 'transparent';
-    } else {
-      el.style.background = '';
-      el.style.webkitBackgroundClip = '';
-      el.style.backgroundClip = '';
-      el.style.webkitTextFillColor = hex8ToCss(s.fg);
-      el.style.color = hex8ToCss(s.fg);
-    }
   }
 }
 window._applyTextStyle = _applyTextStyle;
@@ -671,43 +637,6 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

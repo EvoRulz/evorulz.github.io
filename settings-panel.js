@@ -1,4 +1,4 @@
-// @version 1339
+// @version 1302
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -237,11 +237,7 @@
     setColorValue('s-bg',           _initS.bg);
     setColorValue('s-fg',           _initS.fg);
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', _initS.fgStops || null);
-    if (window._cpSetGradientStops) window._cpSetGradientStops('s-fgstroke', _initS.fgStrokeStops || null);
-setColorValue('s-fgstroke', _initS.fgStroke || btnStyle.fgStroke || '#00000000');
-const _sfgsOv2 = document.getElementById('s-fgstroke-swatch-overlay');
-const _sfgsGrad2 = window._cpGetGradient ? window._cpGetGradient('s-fgstroke') : null;
-if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { updateAlphaSliderBg('s-fgstroke'); }
+    setColorValue('s-fgstroke', _initS.fgStroke || btnStyle.fgStroke || '#00000000');
     const _fgsWOEl = document.getElementById('s-fgstrokew'); if (_fgsWOEl) { _fgsWOEl.value = String(_initS.fgStrokeW ?? btnStyle.fgStrokeW ?? 0); const _fgsWVOEl = document.getElementById('s-fgstrokew-val'); if (_fgsWVOEl) _fgsWVOEl.textContent = (_initS.fgStrokeW ?? btnStyle.fgStrokeW ?? 0) + 'px'; }
     setColorValue('s-glow',         _initS.glow);
     setColorValue('s-activeglow',   _initS.activeGlow || _initS.glow);
@@ -442,43 +438,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,4 +1,4 @@
-// @version 1339
+// @version 1302
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -7,7 +7,6 @@ var _srGlowStyle = document.createElement('style');
   function saveSliderRowOrder() {
     const grid = document.getElementById('sg-sliders');
     if (!grid) return;
-    grid.style.touchAction = 'none';
     const order = [...grid.querySelectorAll('[data-slider-row]')].map(el => el.dataset.sliderRow);
     localStorage.setItem('_sliderRowOrder', JSON.stringify(order));
   }
@@ -35,7 +34,7 @@ var _srGlowStyle = document.createElement('style');
 
     function srCancel() {
       clearTimeout(srHoldTimer); srHoldTimer = null; srReady = false;
-      grid.style.touchAction = 'none';
+      grid.style.touchAction = '';
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
       if (srDrag) {
         srDrag.item.style.boxShadow = '';
@@ -46,6 +45,7 @@ var _srGlowStyle = document.createElement('style');
     }
 
     grid.addEventListener('pointerdown', e => {
+      if (e.target.closest('input, select, button, textarea')) return;
       const item = e.target.closest('[data-slider-row]');
       if (!item || srDrag) return;
       const rect = item.getBoundingClientRect();
@@ -57,12 +57,9 @@ var _srGlowStyle = document.createElement('style');
         pointerId: e.pointerId,
       };
       srReady = false;
-      e.preventDefault();
-      const _srSo = document.getElementById('settings-overlay'); if (_srSo) { _srSo.style.overflowY = 'hidden'; _srSo.style.touchAction = 'none'; }
       if (e.target.closest('.slider-row-handle')) {
         srReady = true;
         srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-        grid.style.touchAction = 'none';
         return;
       }
       srHoldTimer = setTimeout(() => {
@@ -112,7 +109,7 @@ var _srGlowStyle = document.createElement('style');
         const r = t.getBoundingClientRect();
         if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
       }
-      if (!over) return;
+      if (!over) { srDrag.lastOver = null; return; }
       if (over === srDrag.lastOver) return;
       srDrag.lastOver = over;
       const overNext = over.nextSibling, iNext = srDrag.item.nextSibling;
@@ -127,7 +124,7 @@ var _srGlowStyle = document.createElement('style');
     const srUp = () => {
       if (!srDrag) return;
       const wasActive = srDrag.active;
-      grid.style.touchAction = 'none';
+      grid.style.touchAction = '';
       srCancel();
       if (wasActive) saveSliderRowOrder();
     };
@@ -147,7 +144,6 @@ var _srGlowStyle = document.createElement('style');
     let rReady = false;
     const grid = document.getElementById(containerId);
     if (!grid) return;
-    grid.style.touchAction = 'none';
     function saveOrder() {
       const order = [...grid.querySelectorAll('[' + itemAttr + ']')].map(el => el.getAttribute(itemAttr));
       localStorage.setItem(saveKey, JSON.stringify(order));
@@ -167,16 +163,14 @@ var _srGlowStyle = document.createElement('style');
     }
     function rCancel() {
       clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
-      grid.style.touchAction = 'none';
-      const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
       if (rDrag) {
         rDrag.item.style.opacity = '';
         rDrag.item.style.boxShadow = '';
         if (rDrag.ghost) { rDrag.ghost.remove(); rDrag.ghost = null; }
-        try { rDrag.item.releasePointerCapture(rDrag.pointerId); } catch {}
+        try { grid.releasePointerCapture(rDrag.pointerId); } catch {}
       }
       rDrag = null;
-      if (_so) _so.style.overflowY = '';
+      const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
       setTimeout(() => { window._settingsRowDragging = false; }, 0);
     }
     grid.addEventListener('pointerdown', e => {
@@ -191,24 +185,19 @@ var _srGlowStyle = document.createElement('style');
         pointerId: e.pointerId,
       };
       rReady = false;
-    e.preventDefault();
-    try { item.setPointerCapture(e.pointerId); } catch(_) {}
-    const _rsoI = document.getElementById('settings-overlay'); if (_rsoI) { _rsoI.style.overflowY = 'hidden'; _rsoI.style.touchAction = 'none'; }
-    if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
-      rReady = true;
-      grid.style.touchAction = 'none';
-      item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-    } else {
-      rHoldTimer = setTimeout(() => {
-        if (rDrag) {
-          rReady = true;
-          grid.style.touchAction = 'none';
-          rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-        }
-      }, 400);
-    }
+      if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
+        rReady = true;
+        item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+      } else {
+        rHoldTimer = setTimeout(() => {
+          if (rDrag) {
+            rReady = true;
+            rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+          }
+        }, 500);
+      }
     });
-    document.addEventListener('pointermove', e => {
+    grid.addEventListener('pointermove', e => {
       if (!rDrag) return;
       const moved = Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY);
       if (!rReady) {
@@ -219,10 +208,10 @@ var _srGlowStyle = document.createElement('style');
       if (!rDrag.active) {
         if (moved < DRAG_THRESHOLD) return;
         rDrag.active = true;
+        rDrag.item.style.boxShadow = '';
         window._settingsRowDragging = true;
-        try { rDrag.item.setPointerCapture(rDrag.pointerId); } catch (_) {}
-        e.preventDefault();
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
+        grid.setPointerCapture(rDrag.pointerId);
         const rect = rDrag.item.getBoundingClientRect();
         rDrag.offX = rDrag.startX - rect.left;
         rDrag.offY = rDrag.startY - rect.top;
@@ -246,7 +235,7 @@ var _srGlowStyle = document.createElement('style');
         const r = t.getBoundingClientRect();
         if (gcx >= r.left && gcx <= r.right && gcy >= r.top && gcy <= r.bottom) { over = t; break; }
       }
-      if (!over) return;
+      if (!over) { rDrag.lastOver = null; return; }
       if (over === rDrag.lastOver) return;
       rDrag.lastOver = over;
       const overNext = over.nextSibling, iNext = rDrag.item.nextSibling;
@@ -257,16 +246,13 @@ var _srGlowStyle = document.createElement('style');
         grid.insertBefore(over, iNext || null);
       }
     }, { passive: false });
-    document.addEventListener('pointerup', () => {
+    grid.addEventListener('pointerup', () => {
       if (!rDrag) return;
       const wasActive = rDrag.active;
       rCancel();
       if (wasActive) saveOrder();
     });
-    document.addEventListener('pointercancel', () => {
-      if (!rDrag) return;
-      rCancel();
-    });
+    grid.addEventListener('pointercancel', rCancel);
     applyOrder();
   }
 
@@ -313,8 +299,9 @@ window.addEventListener('load', function() {
 
   function swCancel() {
     clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
-    const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
+    const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
     if (swDrag) {
+      try { swGrid.releasePointerCapture(swDrag.pointerId); } catch {}
       swDrag.item.style.boxShadow = '';
       swDrag.item.style.opacity = '';
       if (swDrag.ghost) { swDrag.ghost.remove(); swDrag.ghost = null; }
@@ -339,6 +326,7 @@ window.addEventListener('load', function() {
   }
 
   swGrid.addEventListener('pointerdown', e => {
+    if (e.target.closest('input, select, button, textarea')) return;
     const item = e.target.closest('[data-swatch-row]');
     if (!item || swDrag) return;
     const rect = item.getBoundingClientRect();
@@ -348,23 +336,27 @@ window.addEventListener('load', function() {
       w: rect.width, h: rect.height,
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
     };
-    e.preventDefault();
-    const _swSo = document.getElementById('settings-overlay'); if (_swSo) { _swSo.style.overflowY = 'hidden'; _swSo.style.touchAction = 'none'; }
+    swGrid.setPointerCapture(e.pointerId);
+    swReady = false;
     swHoldTimer = setTimeout(() => {
-    if (swDrag) { swReady = true; swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)'; }
-  }, 400);
+      if (swDrag) {
+        swReady = true;
+        swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+      }
+    }, 400);
   });
 
-  document.addEventListener('pointermove', e => {
+  swGrid.addEventListener('pointermove', e => {
     if (!swDrag) return;
-  const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
-  if (!swReady) { if (moved > 10) swCancel(); return; }
-  e.preventDefault();
-  if (!swDrag.active) {
+    const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
+    e.preventDefault();
+    if (!swReady) {
+      if (moved > 10) swCancel();
+      return;
+    }
+    if (!swDrag.active) {
       if (moved < 6) return;
       swDrag.active = true;
-      window._settingsRowDragging = true;
-      try { swDrag.item.setPointerCapture(swDrag.pointerId); } catch (_) {}
       const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
       const rect = swDrag.item.getBoundingClientRect();
       swDrag.offX = swDrag.startX - rect.left;
@@ -401,70 +393,16 @@ window.addEventListener('load', function() {
     }
   }, { passive: false });
 
-  document.addEventListener('pointerup', () => {
+  swGrid.addEventListener('pointerup', () => {
     if (!swDrag) return;
     const wasActive = swDrag.active;
     swCancel();
-    if (wasActive) {
-      saveSwatchOrder();
-      setTimeout(() => { window._settingsRowDragging = false; }, 100);
-    } else {
-      window._settingsRowDragging = false;
-    }
+    if (wasActive) saveSwatchOrder();
   });
-
-  document.addEventListener('pointercancel', () => {
-    if (!swDrag) return;
-    if (swDrag.active) {
-      swCancel();
-      setTimeout(() => { window._settingsRowDragging = false; }, 100);
-    } else {
-      clearTimeout(swHoldTimer); swHoldTimer = null;
-      if (swDrag) { swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)'; }
-      swDrag = null; swReady = false;
-      const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
-    }
-  });
+  swGrid.addEventListener('pointercancel', swCancel);
 
   applySwatchOrder();
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

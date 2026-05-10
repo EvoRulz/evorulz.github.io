@@ -1,4 +1,4 @@
-// @version 1339
+// @version 1302
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -37,11 +37,8 @@ function settingsExport() {
           setColorValue('s-bg',       btnStyle.bg);
           setColorValue('s-fg',       s.fg);
           if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null);
+          updateAlphaSliderBg('s-fg');
           setColorValue('s-fgstroke', s.fgStroke || btnStyle.fgStroke || '#00000000');
-          if (window._cpSetGradientStops) window._cpSetGradientStops('s-fgstroke', s.fgStrokeStops || null);
-          const _sfgsOv = document.getElementById('s-fgstroke-swatch-overlay');
-          const _sfgsGrad = window._cpGetGradient ? window._cpGetGradient('s-fgstroke') : null;
-          if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updateAlphaSliderBg('s-fgstroke'); }
           const _fgsWCEl = document.getElementById('s-fgstrokew'); if (_fgsWCEl) { _fgsWCEl.value = String(s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0); const _fgsWVCEl = document.getElementById('s-fgstrokew-val'); if (_fgsWVCEl) _fgsWVCEl.textContent = (s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0) + 'px'; }
           setColorValue('s-glow',     s.glow);
           setColorValue('s-activeglow', btnStyle.activeGlow || btnStyle.glow);
@@ -195,8 +192,7 @@ function settingsExport() {
           activeBg: getStyleValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
-          fgStroke: getStyleValue('s-fgstroke'),
-          fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+          fgStroke: getColorValue('s-fgstroke'),
           fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
         });
       }
@@ -211,10 +207,8 @@ else {
   if (_cfId === 'top-time') { const _ctrSEl = document.getElementById("s-clock-time-radius"); if (_ctrSEl) { _ctrSEl.value = document.getElementById("s-radius").value; const _ctrsVEl = document.getElementById("s-clock-time-radius-val"); if (_ctrsVEl) _ctrsVEl.textContent = document.getElementById("s-radius").value + "px"; } }
 }
     btnStyle.tap            = getColorValue('s-tap');
-    if (!_cfId) {
-      btnStyle.fgStroke = getStyleValue('s-fgstroke');
-      btnStyle.fgStrokeW = Number(document.getElementById('s-fgstrokew')?.value ?? 0);
-    }
+    btnStyle.fgStroke = getColorValue('s-fgstroke');
+    btnStyle.fgStrokeW = Number(document.getElementById('s-fgstrokew')?.value ?? 0);
     btnStyle.glow           = getColorValue('s-glow');
     btnStyle.activeGlow     = getColorValue('s-activeglow');
     btnStyle.tapHighlight   = getColorValue('s-taphighlight');
@@ -441,43 +435,6 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
