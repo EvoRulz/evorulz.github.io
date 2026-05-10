@@ -1,4 +1,4 @@
-// @version 1315
+// @version 1316
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -56,7 +56,6 @@ var _srGlowStyle = document.createElement('style');
         pointerId: e.pointerId,
       };
       srReady = false;
-      grid.setPointerCapture(e.pointerId);
       e.preventDefault();
       const _srSo = document.getElementById('settings-overlay'); if (_srSo) { _srSo.style.overflowY = 'hidden'; _srSo.style.touchAction = 'none'; }
       if (e.target.closest('.slider-row-handle')) {
@@ -189,7 +188,6 @@ var _srGlowStyle = document.createElement('style');
         pointerId: e.pointerId,
       };
       rReady = false;
-    grid.setPointerCapture(e.pointerId);
     e.preventDefault();
     const _rsoI = document.getElementById('settings-overlay'); if (_rsoI) { _rsoI.style.overflowY = 'hidden'; _rsoI.style.touchAction = 'none'; }
     if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
@@ -215,8 +213,8 @@ var _srGlowStyle = document.createElement('style');
       if (!rDrag.active) {
         if (moved < DRAG_THRESHOLD) return;
         rDrag.active = true;
-        rDrag.item.style.boxShadow = '';
-        window._settingsRowDragging = true;
+        grid.setPointerCapture(rDrag.pointerId);
+        e.preventDefault();
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
         grid.setPointerCapture(rDrag.pointerId);
         const rect = rDrag.item.getBoundingClientRect();
@@ -408,6 +406,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
