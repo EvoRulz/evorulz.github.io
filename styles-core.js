@@ -1,4 +1,4 @@
-// @version 1342
+// @version 1343
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -646,7 +646,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
       btn.style.setProperty("--btn-active-glow", hex8ToCss(s.activeGlow || s.glow));
       btn.style.setProperty("--btn-active-bg", _bgCss(s.activeBg));
       btn.style.setProperty("--btn-font",      s.font);
-      btn.style.cssText += `;font-family:${s.font} !important`;
+      btn.style.fontFamily = s.font;
       btn.style.borderRadius = (s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       btn.style.fontSize = (s.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
       const _tspan = btn.querySelector('.btn-text-label'); if (_tspan) _applyTextStyle(_tspan, s);
@@ -672,6 +672,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
