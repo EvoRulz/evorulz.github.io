@@ -1,4 +1,4 @@
-// @version 1343
+// @version 1339
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -285,8 +285,6 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     const _ctrOpenV = _btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6;
     const _ctrOpenEl = document.getElementById("s-clock-time-radius"); if (_ctrOpenEl) { _ctrOpenEl.value = String(_ctrOpenV); const _ctrvOpenEl = document.getElementById("s-clock-time-radius-val"); if (_ctrvOpenEl) _ctrvOpenEl.textContent = _ctrOpenV + "px"; }
     document.getElementById("s-font").value    = btnStyle.font;
-    const _fsREl = document.getElementById("s-fontsize"); if (_fsREl) { _fsREl.value = "16"; const _fsRvEl = document.getElementById("s-fontsize-val"); if (_fsRvEl) _fsRvEl.textContent = "16px"; }
-    const _fsEl = document.getElementById("s-fontsize"); if (_fsEl) { _fsEl.value = String(btnStyle.fontSize ?? 16); const _fsvEl = document.getElementById("s-fontsize-val"); if (_fsvEl) _fsvEl.textContent = (btnStyle.fontSize ?? 16) + "px"; }
     const _initRadius = (_initId && _btnStyles[_initId]?.btnRadius != null) ? _btnStyles[_initId].btnRadius : (btnStyle.btnRadius ?? 6);
 document.getElementById("s-radius").value  = String(_initRadius);
 const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textContent = _initRadius + "px";
@@ -444,10 +442,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
-
-
-
-
 
 
 

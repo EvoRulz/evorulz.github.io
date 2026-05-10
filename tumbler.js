@@ -1,4 +1,4 @@
-// @version 1343
+// @version 1339
 
 // ── Clock tumbler ──────────────────────────────────────────
   (function() {
@@ -505,10 +505,6 @@ window._verifyDeployedVersion = (function() {
     });
   };
 })();
-
-
-
-
 
 
 

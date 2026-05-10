@@ -1,4 +1,4 @@
-// @version 1343
+// @version 1339
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -437,7 +437,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         <button id="notif-save-schedule-btn" onclick="notifSaveSchedule()" style="padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;align-self:flex-start;">Save Schedule</button>
       </div>
     </div>
-    <div class="settings-group-content" id="sg-coverflow">
+    <div class="settings-group-content" id="sg-coverflow" style="display:none">
       <div class="settings-row">
         <label>Step spread <span id="cf-step-tx-val"></span></label>
         <input type="range" class="alpha-slider" id="cf-step-tx" min="10" max="100" oninput="cfApplyTuning()">
@@ -694,10 +694,6 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <input type="file" id="settings-import-file" accept=".json" style="display:none" onchange="settingsImport(this)">
     </div>
 `);
-
-
-
-
 
 
 

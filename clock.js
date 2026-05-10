@@ -1,4 +1,4 @@
-// @version 1343
+// @version 1339
 
 // ── Live clock ─────────────────────────────────────────────
   (function() {
@@ -206,10 +206,6 @@ dateEl.closest(".top-item").addEventListener("click", () => {
         });
     });
 }
-
-
-
-
 
 
 

@@ -1,4 +1,4 @@
-// @version 1343
+// @version 1339
 
   // ── Bootstrap ──────────────────────────────────────────────
   const buttonsEl  = document.getElementById("buttons");
@@ -153,10 +153,6 @@ btn.addEventListener('pointercancel', () => {
     _tg.style.gridAutoRows = maxH + 'px';
   }
   requestAnimationFrame(equalizeTopGrid);
-
-
-
-
 
 
 
