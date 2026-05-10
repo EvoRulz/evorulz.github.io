@@ -1,4 +1,4 @@
-// @version 1322
+// @version 1323
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -35,7 +35,7 @@ var _srGlowStyle = document.createElement('style');
 
     function srCancel() {
       clearTimeout(srHoldTimer); srHoldTimer = null; srReady = false;
-      grid.style.touchAction = '';
+      grid.style.touchAction = 'none';
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
       if (srDrag) {
         srDrag.item.style.boxShadow = '';
@@ -127,7 +127,7 @@ var _srGlowStyle = document.createElement('style');
     const srUp = () => {
       if (!srDrag) return;
       const wasActive = srDrag.active;
-      grid.style.touchAction = '';
+      grid.style.touchAction = 'none';
       srCancel();
       if (wasActive) saveSliderRowOrder();
     };
@@ -167,7 +167,7 @@ var _srGlowStyle = document.createElement('style');
     }
     function rCancel() {
       clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
-      grid.style.touchAction = '';
+      grid.style.touchAction = 'none';
       const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
       if (rDrag) {
         rDrag.item.style.opacity = '';
@@ -428,6 +428,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
