@@ -1,4 +1,4 @@
-// @version 1337
+// @version 1338
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -89,6 +89,10 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   setColorValue('s-bg',       s.bg);
   if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', s.bgStops || null);
   setColorValue('s-fg',       s.fg);
+  if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null);
+  const _sfgOv = document.getElementById('s-fg-swatch-overlay');
+  const _sfgGrad = window._cpGetGradient ? window._cpGetGradient('s-fg') : null;
+  if (_sfgOv && _sfgGrad) { _sfgOv.style.background = _sfgGrad; } else { updateAlphaSliderBg('s-fg'); }
   setColorValue('s-glow',     s.glow);
   setColorValue('s-activeglow', s.activeGlow || s.glow);
   setColorValue('s-activebg', s.activeBg);
@@ -506,6 +510,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 
