@@ -1,4 +1,4 @@
-// @version 1331
+// @version 1332
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -407,6 +407,8 @@ if (navigator.storage && navigator.storage.persist) {
   const strokeC = (typeof _fgSv === 'string' && (_fgSv.startsWith('linear-gradient') || _fgSv.startsWith('radial-gradient')))
     ? (s.fgStrokeStops && s.fgStrokeStops[0] ? hex8ToCss(s.fgStrokeStops[0].hex8) : 'transparent')
     : hex8ToCss(_fgSv);
+  el.classList.remove('has-stroke');
+  el.style.removeProperty('--_btn-fg');
   if (fgStops && fgStops.length >= 2) {
     const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
     el.style.background = grad;
@@ -414,28 +416,12 @@ if (navigator.storage && navigator.storage.persist) {
     el.style.backgroundClip = 'text';
     el.style.webkitTextFillColor = 'transparent';
     el.style.color = 'transparent';
-    el.classList.remove('has-stroke');
   } else {
     el.style.background = '';
     el.style.webkitBackgroundClip = '';
     el.style.backgroundClip = '';
-    if (strokeW > 0) {
-      el.style.webkitTextFillColor = 'transparent';
-      el.style.color = 'transparent';
-      el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
-      el.classList.add('has-stroke');
-    } else {
-      if (strokeW > 0) {
-      el.style.webkitTextFillColor = 'transparent';
-      el.style.color = 'transparent';
-      el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
-      el.classList.add('has-stroke');
-    } else {
-      el.style.webkitTextFillColor = hex8ToCss(s.fg);
-      el.style.color = hex8ToCss(s.fg);
-      el.style.removeProperty('--_btn-fg');
-      el.classList.remove('has-stroke');
-    }
+    el.style.webkitTextFillColor = hex8ToCss(s.fg);
+    el.style.color = hex8ToCss(s.fg);
   }
   if (strokeW > 0) {
     el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
@@ -443,9 +429,7 @@ if (navigator.storage && navigator.storage.persist) {
   } else {
     el.style.webkitTextStroke = '';
     el.style.paintOrder = '';
-    el.classList.remove('has-stroke');
   }
-}
 }
 window._applyTextStyle = _applyTextStyle;
   function applyBtnStyle(skipHabitsBtn) {
@@ -658,6 +642,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
