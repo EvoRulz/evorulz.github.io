@@ -1,4 +1,4 @@
-// @version 1333
+// @version 1334
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -400,13 +400,19 @@ if (navigator.storage && navigator.storage.persist) {
   }
   function _saveBtnStyles() { localStorage.setItem("_btnStyles", JSON.stringify(_btnStyles)); }
   function _applyTextStyle(el, s) {
-  if (!el) return;
+if (!el) return;
   const fgStops = s.fgStops;
   const strokeW = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0;
   const _fgSv = s.fgStroke ?? btnStyle.fgStroke ?? '#00000000';
-  const strokeC = (typeof _fgSv === 'string' && (_fgSv.startsWith('linear-gradient') || _fgSv.startsWith('radial-gradient')))
-    ? (s.fgStrokeStops && s.fgStrokeStops[0] ? hex8ToCss(s.fgStrokeStops[0].hex8) : 'transparent')
-    : hex8ToCss(_fgSv);
+  const _strokeIsGrad = s.fgStrokeStops && s.fgStrokeStops.length >= 2;
+  const strokeGrad = _strokeIsGrad
+    ? 'linear-gradient(to right,' + s.fgStrokeStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')'
+    : null;
+  const strokeC = _strokeIsGrad
+    ? 'transparent'
+    : (typeof _fgSv === 'string' && (_fgSv.startsWith('linear-gradient') || _fgSv.startsWith('radial-gradient')))
+      ? (s.fgStrokeStops && s.fgStrokeStops[0] ? hex8ToCss(s.fgStrokeStops[0].hex8) : 'transparent')
+      : hex8ToCss(_fgSv);
   el.classList.remove('has-stroke');
   el.style.removeProperty('--_btn-fg');
   if (fgStops && fgStops.length >= 2) {
@@ -428,7 +434,14 @@ if (navigator.storage && navigator.storage.persist) {
     el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
     el.style.webkitTextFillColor = 'transparent';
     el.style.color = 'transparent';
-    el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
+    if (_strokeIsGrad) {
+      el.style.webkitTextStroke = strokeW + 'px transparent';
+      el.style.background = strokeGrad;
+      el.style.webkitBackgroundClip = 'text';
+      el.style.backgroundClip = 'text';
+    } else {
+      el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
+    }
     el.style.paintOrder = 'stroke fill';
   } else {
     el.style.webkitTextStroke = '';
@@ -646,6 +659,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
