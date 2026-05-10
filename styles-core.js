@@ -1,4 +1,4 @@
-// @version 1325
+// @version 1326
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -384,7 +384,7 @@ if (navigator.storage && navigator.storage.persist) {
     if (_s && typeof _s === "object") _btnStyles = _s;
   } catch {}
   function _btnStyleFor(id) {
-    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6 };
+    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6, fgStroke: btnStyle.fgStroke || '#00000000', fgStrokeW: btnStyle.fgStrokeW ?? 0 };
     const _cachedVersionColor = localStorage.getItem('_versionColor');
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
@@ -647,6 +647,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
