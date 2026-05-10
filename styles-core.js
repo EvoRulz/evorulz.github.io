@@ -1,4 +1,4 @@
-// @version 1326
+// @version 1327
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -416,17 +416,10 @@ if (navigator.storage && navigator.storage.persist) {
     el.style.background = '';
     el.style.webkitBackgroundClip = '';
     el.style.backgroundClip = '';
-    if (strokeW > 0) {
-      el.style.webkitTextFillColor = 'transparent';
-      el.style.color = 'transparent';
-      el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
-      el.classList.add('has-stroke');
-    } else {
-      el.style.webkitTextFillColor = hex8ToCss(s.fg);
-      el.style.color = hex8ToCss(s.fg);
-      el.style.removeProperty('--_btn-fg');
-      el.classList.remove('has-stroke');
-    }
+    el.style.webkitTextFillColor = hex8ToCss(s.fg);
+    el.style.color = hex8ToCss(s.fg);
+    el.style.removeProperty('--_btn-fg');
+    el.classList.remove('has-stroke');
   }
   if (strokeW > 0) {
     el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
@@ -647,6 +640,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
