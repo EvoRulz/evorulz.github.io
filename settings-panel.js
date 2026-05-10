@@ -1,4 +1,4 @@
-// @version 1340
+// @version 1341
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -143,6 +143,7 @@
     if (_sbRow2) _sbRow2.style.display = (appStyle.statusBarMode === 'solid' || appStyle.statusBarMode === 'gradient') ? '' : 'none';
     if (appStyle.statusBarStops && window._cpSetGradientStops) window._cpSetGradientStops('s-app-statusbar-color', appStyle.statusBarStops);
     if (window._cpSyncUI) window._cpSyncUI();
+    const _fsSEl = document.getElementById('s-fontsize'); if (_fsSEl) { const _fsV = btnStyle.fontSize ?? 16; _fsSEl.value = String(_fsV); const _fsvSEl = document.getElementById('s-fontsize-val'); if (_fsvSEl) _fsvSEl.textContent = _fsV + 'px'; }
     const _fontSel = document.getElementById('s-font'); if (_fontSel) _fontSel.value = btnStyle.font;
     if (window.fontPickerSync) window.fontPickerSync();
     document.querySelectorAll('.alpha-slider').forEach(function(s) {
@@ -285,7 +286,8 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     const _ctrOpenV = _btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6;
     const _ctrOpenEl = document.getElementById("s-clock-time-radius"); if (_ctrOpenEl) { _ctrOpenEl.value = String(_ctrOpenV); const _ctrvOpenEl = document.getElementById("s-clock-time-radius-val"); if (_ctrvOpenEl) _ctrvOpenEl.textContent = _ctrOpenV + "px"; }
     document.getElementById("s-font").value    = btnStyle.font;
-    const _initRadius = (_initId && _btnStyles[_initId]?.btnRadius != null) ? _btnStyles[_initId].btnRadius : (btnStyle.btnRadius ?? 6);
+    const _initFontSize = (_initId && _btnStyles[_initId]?.fontSize != null) ? _btnStyles[_initId].fontSize : (btnStyle.fontSize ?? 16);
+const _fsOEl = document.getElementById("s-fontsize"); if (_fsOEl) { _fsOEl.value = String(_initFontSize); const _fsOvEl = document.getElementById("s-fontsize-val"); if (_fsOvEl) _fsOvEl.textContent = _initFontSize + "px"; }
 document.getElementById("s-radius").value  = String(_initRadius);
 const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textContent = _initRadius + "px";
     const _sliderW = btnStyle.sliderW ?? 100;
@@ -442,6 +444,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 

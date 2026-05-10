@@ -1,4 +1,4 @@
-// @version 1340
+// @version 1341
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -104,6 +104,7 @@ const _sfgsOv = document.getElementById('s-fgstroke-swatch-overlay');
 const _sfgsGrad = window._cpGetGradient ? window._cpGetGradient('s-fgstroke') : null;
 if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updateAlphaSliderBg('s-fgstroke'); }
   const _fgsWCfEl = document.getElementById('s-fgstrokew'); if (_fgsWCfEl) { const _fgsWVal = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0; _fgsWCfEl.value = String(_fgsWVal); const _fgsWVCfEl = document.getElementById('s-fgstrokew-val'); if (_fgsWVCfEl) _fgsWVCfEl.textContent = _fgsWVal + 'px'; }
+  const _fsLEl = document.getElementById("s-fontsize"); if (_fsLEl) { const _fsLV = s.fontSize ?? btnStyle.fontSize ?? 16; _fsLEl.value = String(_fsLV); const _fsLvEl = document.getElementById("s-fontsize-val"); if (_fsLvEl) _fsLvEl.textContent = _fsLV + "px"; }
   const _rVal = s.btnRadius ?? btnStyle.btnRadius ?? 6;
   const _rEl = document.getElementById("s-radius"); if (_rEl) _rEl.value = String(_rVal);
   const _rvEl = document.getElementById("s-radius-val"); if (_rvEl) _rvEl.textContent = _rVal + "px";
@@ -510,6 +511,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 

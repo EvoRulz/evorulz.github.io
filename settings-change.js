@@ -1,4 +1,4 @@
-// @version 1340
+// @version 1341
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -202,7 +202,13 @@ function settingsExport() {
       }
       _saveBtnStyles();
     }
-    if (!_cfId) btnStyle.btnRadius = Number(document.getElementById("s-radius").value);
+    if (!_cfId) btnStyle.fontSize = Number(document.getElementById("s-fontsize")?.value ?? 16);
+else {
+  _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, {
+    fontSize: Number(document.getElementById("s-fontsize")?.value ?? 16)
+  });
+}
+if (!_cfId) btnStyle.btnRadius = Number(document.getElementById("s-radius").value);
 else {
   _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, {
     btnRadius: Number(document.getElementById("s-radius").value)
@@ -391,6 +397,7 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-fgstroke', '#00000000');
     const _fgsWREl = document.getElementById('s-fgstrokew'); if (_fgsWREl) { _fgsWREl.value = '0'; const _fgsWVREl = document.getElementById('s-fgstrokew-val'); if (_fgsWVREl) _fgsWVREl.textContent = '0px'; }
     document.getElementById("s-radius").value  = String(BTN_STYLE_DEFAULTS.btnRadius ?? 6);
+    const _fsREl = document.getElementById("s-fontsize"); if (_fsREl) { _fsREl.value = String(BTN_STYLE_DEFAULTS.fontSize ?? 16); const _fsRvEl = document.getElementById("s-fontsize-val"); if (_fsRvEl) _fsRvEl.textContent = (BTN_STYLE_DEFAULTS.fontSize ?? 16) + "px"; }
 const _rvDef = document.getElementById("s-radius-val"); if (_rvDef) _rvDef.textContent = (BTN_STYLE_DEFAULTS.btnRadius ?? 6) + "px";
 _btnStyles = {};
     setColorValue('s-clock-date-color', _btnStyleFor('top-date').fg);
@@ -441,6 +448,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
