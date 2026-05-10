@@ -1,4 +1,4 @@
-// @version 1341
+// @version 1342
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -287,9 +287,11 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     const _ctrOpenEl = document.getElementById("s-clock-time-radius"); if (_ctrOpenEl) { _ctrOpenEl.value = String(_ctrOpenV); const _ctrvOpenEl = document.getElementById("s-clock-time-radius-val"); if (_ctrvOpenEl) _ctrvOpenEl.textContent = _ctrOpenV + "px"; }
     document.getElementById("s-font").value    = btnStyle.font;
     const _initFontSize = (_initId && _btnStyles[_initId]?.fontSize != null) ? _btnStyles[_initId].fontSize : (btnStyle.fontSize ?? 16);
-const _fsOEl = document.getElementById("s-fontsize"); if (_fsOEl) { _fsOEl.value = String(_initFontSize); const _fsOvEl = document.getElementById("s-fontsize-val"); if (_fsOvEl) _fsOvEl.textContent = _initFontSize + "px"; }
-document.getElementById("s-radius").value  = String(_initRadius);
-const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textContent = _initRadius + "px";
+    const _fsOEl = document.getElementById("s-fontsize"); if (_fsOEl) { _fsOEl.value = String(_initFontSize); const _fsOvEl = document.getElementById("s-fontsize-val"); if (_fsOvEl) _fsOvEl.textContent = _initFontSize + "px"; }
+    const _initRadius = (_initId && _btnStyles[_initId]?.btnRadius != null) ? _btnStyles[_initId].btnRadius : (btnStyle.btnRadius ?? 6);
+    document.getElementById("s-radius").value  = String(_initRadius);
+    document.getElementById("s-radius").value  = String(_initRadius);
+    const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textContent = _initRadius + "px";
     const _sliderW = btnStyle.sliderW ?? 100;
     const _sliderHW = btnStyle.sliderHandleW ?? 16;
     const _swEl = document.getElementById('s-sliderw'); if (_swEl) _swEl.value = String(_sliderW);
@@ -444,6 +446,7 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 
