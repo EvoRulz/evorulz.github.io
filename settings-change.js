@@ -1,4 +1,4 @@
-// @version 1348
+// @version 1349
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -172,7 +172,8 @@ function settingsExport() {
           fgStroke: getStyleValue('s-fgstroke'),
           fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
           fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
-        updateAlphaSliderBg('s-clock-date-color');
+    });
+    updateAlphaSliderBg('s-clock-date-color');
         setColorValue('s-clock-date-glow', getColorValue('s-glow'));
         updateAlphaSliderBg('s-clock-date-glow');
       } else if (_cfId === 'top-time') {
@@ -187,7 +188,8 @@ function settingsExport() {
           fgStroke: getStyleValue('s-fgstroke'),
           fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
           fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
-        updateAlphaSliderBg('s-clock-time-color');
+    });
+    updateAlphaSliderBg('s-clock-time-color');
         setColorValue('s-clock-time-glow', getColorValue('s-glow'));
         updateAlphaSliderBg('s-clock-time-glow');
       } else {
@@ -452,6 +454,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
