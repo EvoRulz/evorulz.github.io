@@ -1,4 +1,4 @@
-// @version 1319
+// @version 1320
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -165,12 +165,13 @@ var _srGlowStyle = document.createElement('style');
     }
     function rCancel() {
       clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
+      grid.style.touchAction = '';
       const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
       if (rDrag) {
         rDrag.item.style.opacity = '';
         rDrag.item.style.boxShadow = '';
         if (rDrag.ghost) { rDrag.ghost.remove(); rDrag.ghost = null; }
-        try { grid.releasePointerCapture(rDrag.pointerId); } catch {}
+        try { rDrag.item.releasePointerCapture(rDrag.pointerId); } catch {}
       }
       rDrag = null;
       if (_so) _so.style.overflowY = '';
@@ -192,11 +193,13 @@ var _srGlowStyle = document.createElement('style');
     const _rsoI = document.getElementById('settings-overlay'); if (_rsoI) { _rsoI.style.overflowY = 'hidden'; _rsoI.style.touchAction = 'none'; }
     if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
       rReady = true;
+      grid.style.touchAction = 'none';
       item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
     } else {
       rHoldTimer = setTimeout(() => {
         if (rDrag) {
           rReady = true;
+          grid.style.touchAction = 'none';
           rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         }
       }, 400);
@@ -213,6 +216,7 @@ var _srGlowStyle = document.createElement('style');
       if (!rDrag.active) {
         if (moved < DRAG_THRESHOLD) return;
         rDrag.active = true;
+        window._settingsRowDragging = true;
         try { rDrag.item.setPointerCapture(rDrag.pointerId); } catch (_) {}
         e.preventDefault();
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
@@ -250,13 +254,16 @@ var _srGlowStyle = document.createElement('style');
         grid.insertBefore(over, iNext || null);
       }
     }, { passive: false });
-    grid.addEventListener('pointerup', () => {
+    document.addEventListener('pointerup', () => {
       if (!rDrag) return;
       const wasActive = rDrag.active;
       rCancel();
       if (wasActive) saveOrder();
     });
-    grid.addEventListener('pointercancel', rCancel);
+    document.addEventListener('pointercancel', () => {
+      if (!rDrag) return;
+      rCancel();
+    });
     applyOrder();
   }
 
@@ -418,6 +425,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
