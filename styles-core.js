@@ -1,4 +1,4 @@
-// @version 1334
+// @version 1335
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -400,8 +400,9 @@ if (navigator.storage && navigator.storage.persist) {
   }
   function _saveBtnStyles() { localStorage.setItem("_btnStyles", JSON.stringify(_btnStyles)); }
   function _applyTextStyle(el, s) {
-if (!el) return;
+  if (!el) return;
   const fgStops = s.fgStops;
+  const hasFgGrad = fgStops && fgStops.length >= 2;
   const strokeW = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0;
   const _fgSv = s.fgStroke ?? btnStyle.fgStroke ?? '#00000000';
   const _strokeIsGrad = s.fgStrokeStops && s.fgStrokeStops.length >= 2;
@@ -415,25 +416,13 @@ if (!el) return;
       : hex8ToCss(_fgSv);
   el.classList.remove('has-stroke');
   el.style.removeProperty('--_btn-fg');
-  if (fgStops && fgStops.length >= 2) {
-    const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
-    el.style.background = grad;
-    el.style.webkitBackgroundClip = 'text';
-    el.style.backgroundClip = 'text';
-    el.style.webkitTextFillColor = 'transparent';
-    el.style.color = 'transparent';
-  } else {
-    el.style.background = '';
-    el.style.webkitBackgroundClip = '';
-    el.style.backgroundClip = '';
-    el.style.webkitTextFillColor = hex8ToCss(s.fg);
-    el.style.color = hex8ToCss(s.fg);
-  }
+  el.style.removeProperty('--_btn-fg-grad');
+  el.style.removeProperty('--_btn-fg-fill');
   if (strokeW > 0) {
     el.classList.add('has-stroke');
-    el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
     el.style.webkitTextFillColor = 'transparent';
     el.style.color = 'transparent';
+    el.style.paintOrder = 'stroke fill';
     if (_strokeIsGrad) {
       el.style.webkitTextStroke = strokeW + 'px transparent';
       el.style.background = strokeGrad;
@@ -441,11 +430,34 @@ if (!el) return;
       el.style.backgroundClip = 'text';
     } else {
       el.style.webkitTextStroke = strokeW + 'px ' + strokeC;
+      el.style.background = '';
+      el.style.webkitBackgroundClip = '';
+      el.style.backgroundClip = '';
     }
-    el.style.paintOrder = 'stroke fill';
+    if (hasFgGrad) {
+      const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
+      el.style.setProperty('--_btn-fg-grad', grad);
+      el.style.setProperty('--_btn-fg-fill', 'transparent');
+    } else {
+      el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
+    }
   } else {
     el.style.webkitTextStroke = '';
     el.style.paintOrder = '';
+    if (hasFgGrad) {
+      const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
+      el.style.background = grad;
+      el.style.webkitBackgroundClip = 'text';
+      el.style.backgroundClip = 'text';
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.color = 'transparent';
+    } else {
+      el.style.background = '';
+      el.style.webkitBackgroundClip = '';
+      el.style.backgroundClip = '';
+      el.style.webkitTextFillColor = hex8ToCss(s.fg);
+      el.style.color = hex8ToCss(s.fg);
+    }
   }
 }
 window._applyTextStyle = _applyTextStyle;
@@ -659,6 +671,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

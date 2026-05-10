@@ -1,4 +1,4 @@
-// @version 1334
+// @version 1335
 
 /// ── Drag-to-reorder — HABIT BUTTONS ──────────────────────
   const DRAG_THRESHOLD = 6;
@@ -316,6 +316,7 @@
     if (topDrag.ghost) topDrag.ghost.remove();
     topDrag = null;
   });
+
 
 
 
