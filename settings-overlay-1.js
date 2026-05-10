@@ -1,4 +1,4 @@
-// @version 1339
+// @version 1340
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -13,6 +13,7 @@ document.body.insertAdjacentHTML('beforeend', `
       <div class="settings-group-item" data-group="sg-notifications">Notifications</div>
       <div class="settings-group-item" data-group="sg-swatches">Swatches</div>
       <div class="settings-group-item" data-group="sg-toggles">Toggles</div>
+      <div class="settings-group-item" data-group="sg-coverflow">Coverflow</div>
     </div>
     <div class="settings-group-content" id="sg-buttons">
       <div id="cf-outer" style="margin-left:-20px;margin-right:-20px;">
@@ -328,6 +329,7 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
+
 
 
 
