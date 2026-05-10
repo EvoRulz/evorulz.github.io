@@ -1,4 +1,4 @@
-// @version 1340
+// @version 1341
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -163,6 +163,34 @@ document.body.insertAdjacentHTML('beforeend', `
           <option value="ui-monospace">UI Monospace</option>
         </select>
         <div id="font-tumbler-wrap" style="flex:1;max-width:180px;background:#1c1c1c;border:1px solid #444;border-radius:6px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;min-height:52px;"></div>
+      </div>
+      <div class="settings-row" data-btn-row="cf-step-tx">
+        <label>CF spread <span id="cf-step-tx-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-step-tx" min="10" max="100" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row" data-btn-row="cf-max-angle">
+        <label>CF max angle <span id="cf-max-angle-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-max-angle" min="0" max="89" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row" data-btn-row="cf-scale">
+        <label>CF scale falloff <span id="cf-scale-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-scale" min="0" max="100" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row" data-btn-row="cf-opacity">
+        <label>CF opacity falloff <span id="cf-opacity-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-opacity" min="0" max="100" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row" data-btn-row="cf-duration">
+        <label>CF anim speed <span id="cf-duration-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-duration" min="50" max="800" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row" data-btn-row="cf-card-w">
+        <label>CF card width <span id="cf-card-w-val"></span></label>
+        <input type="range" class="alpha-slider" id="cf-card-w" min="10" max="80" oninput="cfApplyTuning()">
+      </div>
+      <div class="settings-row" data-btn-row="cf-shape">
+        <label>CF corners <span id="cf-shape-val">6px</span></label>
+        <input type="range" class="alpha-slider" id="cf-shape" min="0" max="50" value="6" oninput="document.getElementById('cf-shape-val').textContent=this.value+'px';cfApplyTuning()">
       </div>
     </div>
     <div class="settings-group-content" id="sg-sliders">
@@ -329,6 +357,7 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
+
 
 
 
