@@ -1,4 +1,4 @@
-// @version 1312
+// @version 1313
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -355,7 +355,7 @@ window.addEventListener('load', function() {
     }
   });
 
-  swGrid.addEventListener('pointermove', e => {
+  document.addEventListener('pointermove', e => {
     if (!swDrag) return;
     const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
     e.preventDefault();
@@ -398,16 +398,17 @@ window.addEventListener('load', function() {
     }
   }, { passive: false });
 
-  swGrid.addEventListener('pointerup', () => {
+  document.addEventListener('pointerup', () => {
     if (!swDrag) return;
     const wasActive = swDrag.active;
     swCancel();
     if (wasActive) saveSwatchOrder();
   });
-  swGrid.addEventListener('pointercancel', swCancel);
+  document.addEventListener('pointercancel', swCancel);
 
   applySwatchOrder();
 })();
+
 
 
 
