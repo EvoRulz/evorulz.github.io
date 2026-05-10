@@ -1,5 +1,3 @@
-// @version 1232
-
 function settingsExport() {
     const clk = window._clockGet();
     const out = {
@@ -56,8 +54,6 @@ function settingsExport() {
           _sv('s-sliderhandlew', btnStyle.sliderHandleW  ?? 16);
           const _swIvEl = document.getElementById('s-sliderw-val'); if (_swIvEl) _swIvEl.textContent = (btnStyle.sliderW ?? 100) + '%';
           const _shwIvEl = document.getElementById('s-sliderhandlew-val'); if (_shwIvEl) _shwIvEl.textContent = (btnStyle.sliderHandleW ?? 16) + 'px';
-          const _shholeIvEl = document.getElementById('s-sliderhandlehole-val'); if (_shholeIvEl) _shholeIvEl.textContent = (btnStyle.sliderHandleHole ?? 0) + '%';
-          const _shholeEl = document.getElementById('s-sliderhandlehole'); if (_shholeEl) _shholeEl.value = String(btnStyle.sliderHandleHole ?? 0);
           const _shv2 = document.getElementById('s-sliderh-val');       if (_shv2) _shv2.textContent = btnStyle.sliderH + 'px';
           const _srv2 = document.getElementById('s-sliderr-val');       if (_srv2) _srv2.textContent = btnStyle.sliderR + '%';
           const _sspv2 = document.getElementById('s-sliderspread-val'); if (_sspv2) _sspv2.textContent = (btnStyle.sliderSpread ?? 4) + 'px';
@@ -146,9 +142,9 @@ function settingsExport() {
       if (_cfId === 'top-date') {
         const dateColor = getColorValue('s-fg');
         _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
-          bg: getStyleValue('s-bg'), fg: dateColor,
+          bg: getColorValue('s-bg'), fg: dateColor,
           glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
-          activeBg: getStyleValue('s-activebg'),
+          activeBg: getColorValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockDateSize: Number(document.getElementById("s-clock-date-size").value),
         });
@@ -159,9 +155,9 @@ function settingsExport() {
       } else if (_cfId === 'top-time') {
         const timeColor = getColorValue('s-fg');
         _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, {
-          bg: getStyleValue('s-bg'), fg: timeColor,
+          bg: getColorValue('s-bg'), fg: timeColor,
           glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
-          activeBg: getStyleValue('s-activebg'),
+          activeBg: getColorValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockTimeSize: Number(document.getElementById("s-clock-time-size").value),
         });
@@ -171,11 +167,9 @@ function settingsExport() {
         updateAlphaSliderBg('s-clock-time-glow');
       } else {
         _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, {
-          bg: getStyleValue('s-bg'),
-          bgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-bg') : null,
-          fg: getColorValue('s-fg'),
+          bg: getColorValue('s-bg'), fg: getColorValue('s-fg'),
           glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
-          activeBg: getStyleValue('s-activebg'),
+          activeBg: getColorValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
         });
       }
@@ -193,11 +187,11 @@ else {
     btnStyle.glow           = getColorValue('s-glow');
     btnStyle.activeGlow     = getColorValue('s-activeglow');
     btnStyle.tapHighlight   = getColorValue('s-taphighlight');
-    btnStyle.sliderBorder   = getStyleValue('s-sliderborder');
-    if (document.getElementById('s-sliderfill'))   btnStyle.sliderFill   = getStyleValue('s-sliderfill');
-    if (document.getElementById('s-slidertrack'))  btnStyle.sliderTrack  = getStyleValue('s-slidertrack');
-    if (document.getElementById('s-sliderhandle')) btnStyle.sliderHandle = getStyleValue('s-sliderhandle');
-    if (document.getElementById('s-sliderhandleborder')) btnStyle.sliderHandleBorder = getStyleValue('s-sliderhandleborder');
+    btnStyle.sliderBorder   = getColorValue('s-sliderborder');
+    if (document.getElementById('s-sliderfill'))   btnStyle.sliderFill   = getColorValue('s-sliderfill');
+if (document.getElementById('s-slidertrack'))  btnStyle.sliderTrack  = getColorValue('s-slidertrack');
+if (document.getElementById('s-sliderhandle')) btnStyle.sliderHandle = getColorValue('s-sliderhandle');
+    if (document.getElementById('s-sliderhandleborder')) btnStyle.sliderHandleBorder = getColorValue('s-sliderhandleborder');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
     btnStyle.sliderR        = Number(document.getElementById("s-sliderr").value);
     btnStyle.sliderSpread   = Number(document.getElementById("s-sliderspread").value);
@@ -205,7 +199,6 @@ else {
     btnStyle.sliderHandleR  = Number(document.getElementById("s-sliderhandler").value);
     btnStyle.sliderW        = Number(document.getElementById("s-sliderw").value);
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
-    btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     btnStyle.checkboxChecked = getColorValue('s-checkbox-checked');
     btnStyle.checkboxMark    = getColorValue('s-checkbox-mark');
     btnStyle.checkboxBorder  = getColorValue('s-checkbox-border');
@@ -213,7 +206,7 @@ else {
     btnStyle.clockBg         = getColorValue('s-clock-bg');
     if (_cfId !== 'top-date') {
       _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
-        bg: getStyleValue('s-clock-date-bg'),
+        bg: getColorValue('s-clock-date-bg'),
         fg: getColorValue('s-clock-date-color'),
         glow: getColorValue('s-clock-date-glow'),
         clockDateSize: Number(document.getElementById("s-clock-date-size").value),
@@ -221,7 +214,7 @@ else {
     }
     if (_cfId !== 'top-time') {
       _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, {
-        bg: getStyleValue('s-clock-time-bg'),
+        bg: getColorValue('s-clock-time-bg'),
         fg: getColorValue('s-clock-time-color'),
         glow: getColorValue('s-clock-time-glow'),
         clockTimeSize: Number(document.getElementById("s-clock-time-size").value),
@@ -230,7 +223,7 @@ else {
 if (_cfId !== 'top-date') {
 const cfDateColor = getColorValue('s-clock-date-color');
 _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
-  bg: getStyleValue('s-clock-date-bg'),
+  bg: getColorValue('s-clock-date-bg'),
   fg: cfDateColor,
   glow: getColorValue('s-clock-date-glow'),
   clockDateSize: Number(document.getElementById("s-clock-date-size").value),
@@ -262,7 +255,6 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     if (window._tumblerRenderPreviews) window._tumblerRenderPreviews();
     settingsUpdatePreview();
     document.querySelectorAll('.alpha-slider:not([id$="-alpha"])').forEach(s => updateSliderFill(s));
-    if (window._cpRebuild && !window._cpActiveDrag) window._cpRebuild();
   }
   async function settingsReset() {
     const ok = await confirmClear("This will reset all styles to their <strong>factory defaults</strong>.");
@@ -313,8 +305,6 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     const _swRvEl = document.getElementById("s-sliderw-val"); if (_swRvEl) _swRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderW ?? 100) + '%';
     const _shwREl = document.getElementById("s-sliderhandlew"); if (_shwREl) _shwREl.value = String(BTN_STYLE_DEFAULTS.sliderHandleW ?? 16);
     const _shwRvEl = document.getElementById("s-sliderhandlew-val"); if (_shwRvEl) _shwRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderHandleW ?? 16) + 'px';
-    const _shheREl = document.getElementById("s-sliderhandlehole"); if (_shheREl) _shheREl.value = String(BTN_STYLE_DEFAULTS.sliderHandleHole ?? 0);
-    const _shhevREl = document.getElementById("s-sliderhandlehole-val"); if (_shhevREl) _shhevREl.textContent = (BTN_STYLE_DEFAULTS.sliderHandleHole ?? 0) + '%';
     const _sspv = document.getElementById("s-sliderspread-val"); if (_sspv) _sspv.textContent = (btnStyle.sliderSpread ?? 4) + "px";
     const _sspEl = document.getElementById("s-sliderspread"); if (_sspEl) _sspEl.value = btnStyle.sliderSpread ?? 4;
     document.getElementById("s-font").value    = btnStyle.font;
@@ -369,7 +359,3 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
-
-
-
-

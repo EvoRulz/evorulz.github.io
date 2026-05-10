@@ -1,7 +1,4 @@
-// @version 1232
-
 document.querySelectorAll('.alpha-slider').forEach(function(s){
-  if (s.closest('.color-settings-row')) return;
   var overlay = document.createElement('div');
   overlay.style.cssText = 'position:absolute;inset:0;z-index:10;cursor:pointer;touch-action:pan-y;';
   var par = s.parentElement;
@@ -63,7 +60,3 @@ var dragging = false;
     s.classList.remove('handle-active');
   });
 });
-
-
-
-

@@ -1,5 +1,3 @@
-// @version 1232
-
 // ── Settings panel logic ───────────────────────────────────
   function onColorPickerChange(id) {
     const picker = document.getElementById(id);
@@ -46,7 +44,7 @@
       if (_tga) _tga.value = slider ? slider.value : 255;
     }
     if (window._cpSaveFromUI) window._cpSaveFromUI();
-    if (['s-cp-bg', 's-cp-border', 's-cp-label', 's-cp-text'].includes(id) && window._cpRebuild
+    if (['s-cp-bg', 's-cp-border', 's-cp-label'].includes(id) && window._cpRebuild
       && !window._cpActiveDrag) window._cpRebuild();
     settingsChange();
 }
@@ -95,7 +93,7 @@ function onAlphaChange(id) {
       if (_tga) _tga.value = slider.value;
     }
     if (window._cpSaveFromUI) window._cpSaveFromUI();
-    if (['s-cp-bg', 's-cp-border', 's-cp-label', 's-cp-text'].includes(id) && window._cpRebuild
+    if (['s-cp-bg', 's-cp-border', 's-cp-label'].includes(id) && window._cpRebuild
       && !window._cpActiveDrag) window._cpRebuild();
     settingsChange();
 }
@@ -188,17 +186,6 @@ function onHexInput(id) {
       setColorValue(pid, appStyle.stops[i] || "#111111FF");
       document.getElementById(pid).addEventListener("input", () => collectAppStops());
       document.getElementById(pid+"-alpha").addEventListener("input", () => collectAppStops());
-      const _spPicker = document.getElementById(pid);
-      if (_spPicker && !_spPicker.closest('.color-swatch-wrap')) {
-        const _spWrap = document.createElement('div');
-        _spWrap.className = 'color-swatch-wrap';
-        _spPicker.parentNode.insertBefore(_spWrap, _spPicker);
-        _spWrap.appendChild(_spPicker);
-        const _spOv = document.createElement('div');
-        _spOv.className = 'color-swatch-overlay';
-        _spOv.id = pid + '-swatch-overlay';
-        _spWrap.appendChild(_spOv);
-      }
     }
   }
   function collectAppStops() {
@@ -206,7 +193,7 @@ function onHexInput(id) {
     const numStops = t === "solid" ? 1 : t === "gradient2" ? 2 : t === "gradient3" ? 3 : t === "gradient4" ? 4 : 0;
     appStyle.stops = [];
     for (let i = 0; i < numStops; i++) {
-      appStyle.stops.push(t === 'solid' ? getStyleValue(`s-app-stop-${i}`) : getColorValue(`s-app-stop-${i}`));
+      appStyle.stops.push(getColorValue(`s-app-stop-${i}`));
     }
     buildAppBg();
   }
@@ -234,9 +221,9 @@ function onHexInput(id) {
     appStyle.imgAttach   = document.getElementById("s-app-img-attach").value;
     appStyle.imgTint     = getColorValue("s-app-img-tint");
     appStyle.textColor   = getColorValue("s-app-text");
-    appStyle.borderColor = getStyleValue("s-app-border");
-    appStyle.theadBg     = getStyleValue("s-app-thead");
-    appStyle.cellBg      = getStyleValue("s-app-cell-bg");
+    appStyle.borderColor = getColorValue("s-app-border");
+    appStyle.theadBg     = getColorValue("s-app-thead");
+    appStyle.cellBg      = getColorValue("s-app-cell-bg");
     if (document.getElementById("s-app-bar-set"))    appStyle.barSet    = getColorValue("s-app-bar-set");
     if (document.getElementById("s-app-bar-total"))  appStyle.barTotal  = getColorValue("s-app-bar-total");
     if (document.getElementById("s-app-bar-streak")) appStyle.barStreak = getColorValue("s-app-bar-streak");
@@ -272,7 +259,3 @@ function onHexInput(id) {
     if (thumb) { thumb.src = ""; prev.style.display = "none"; }
     buildAppBg();
   }
-
-
-
-

@@ -1,5 +1,3 @@
-// @version 1232
-
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().catch(() => {});
@@ -137,7 +135,7 @@ if (navigator.storage && navigator.storage.persist) {
     document.body.style.backgroundRepeat = "";
     document.body.style.backgroundAttachment = "";
     if (t === "solid") {
-      document.body.style.background = _bgCss(appStyle.stops[0]);
+      document.body.style.background = hex8ToCss(appStyle.stops[0]);
       return;
     }
     if (t.startsWith("gradient")) {
@@ -178,12 +176,9 @@ if (navigator.storage && navigator.storage.persist) {
     buildAppBg();
     document.body.style.color   = hex8ToCss(appStyle.textColor);
     document.body.style.padding = appStyle.padding + "px";
-    const _borderVal = _bgCss(appStyle.borderColor);
-    const _isBorderGrad = _borderVal.startsWith('linear-gradient') || _borderVal.startsWith('radial-gradient');
-    document.documentElement.style.setProperty("--app-border-color", _isBorderGrad ? 'transparent' : _borderVal);
-    document.documentElement.style.setProperty("--app-border-image", _isBorderGrad ? _borderVal + ' 1' : 'none');
-    document.documentElement.style.setProperty("--app-thead-bg",     _bgCss(appStyle.theadBg));
-    document.documentElement.style.setProperty("--app-cell-bg",      _bgCss(appStyle.cellBg || "#111111FF"));
+    document.documentElement.style.setProperty("--app-border-color", hex8ToCss(appStyle.borderColor));
+    document.documentElement.style.setProperty("--app-thead-bg",     hex8ToCss(appStyle.theadBg));
+    document.documentElement.style.setProperty("--app-cell-bg",      hex8ToCss(appStyle.cellBg || "#111111FF"));
     document.documentElement.style.setProperty("--app-table-bg",      hex8ToCss(appStyle.tableBg || "#111111FF"));
     document.documentElement.style.setProperty("--app-table-text",    hex8ToCss(appStyle.tableText || "#FFFFFFFF"));
     document.documentElement.style.setProperty("--bar-set-color",    hex8ToCss(appStyle.barSet));
@@ -192,7 +187,7 @@ if (navigator.storage && navigator.storage.persist) {
   }
   applyAppStyle();
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -232,17 +227,7 @@ if (navigator.storage && navigator.storage.persist) {
     const a = alpha ? parseInt(alpha.value).toString(16).padStart(2,'0').toUpperCase() : 'FF';
     return '#'+h+a;
   }
-  function getStyleValue(id) {
-  if (window._cpGetGradient) { const g = window._cpGetGradient(id); if (g) return g; }
-  return getColorValue(id);
-  }
-  function _bgCss(val) {
-    if (!val) return 'transparent';
-    if (typeof val === 'string' && (val.startsWith('linear-gradient') || val.startsWith('radial-gradient'))) return val;
-    return hex8ToCss(val);
-  }
   function setColorValue(id, hex) {
-    if (!hex || typeof hex !== 'string' || hex.startsWith('linear-gradient') || hex.startsWith('radial-gradient')) return;
     const {r,g,b,a} = hex8ToComponents(hex);
     const picker = document.getElementById(id);
     const slider = document.getElementById(id+'-alpha');
@@ -265,15 +250,10 @@ if (navigator.storage && navigator.storage.persist) {
     // Update swatch overlay to show color+alpha
     const overlay = document.getElementById(id+'-swatch-overlay');
     if (overlay) {
-      const gradCSS = window._cpGetGradient && window._cpGetGradient(id);
-      if (gradCSS) {
-        overlay.style.background = gradCSS;
-      } else {
-        const a = parseInt(slider.value) / 255;
-        const hex = picker.value;
-        const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-        overlay.style.background = `rgba(${r},${g},${b},${a})`;
-      }
+      const a = parseInt(slider.value) / 255;
+      const hex = picker.value;
+      const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+      overlay.style.background = `rgba(${r},${g},${b},${a})`;
     }
   }
 
@@ -300,12 +280,12 @@ if (navigator.storage && navigator.storage.persist) {
   function _saveBtnStyles() { localStorage.setItem("_btnStyles", JSON.stringify(_btnStyles)); }
 
   function applyBtnStyle(skipHabitsBtn) {
-    buttonsEl.style.setProperty("--btn-bg",        _bgCss(btnStyle.bg));
+    buttonsEl.style.setProperty("--btn-bg",        hex8ToCss(btnStyle.bg));
     buttonsEl.style.setProperty("--btn-fg",        hex8ToCss(btnStyle.fg));
     buttonsEl.style.setProperty("--btn-font",      btnStyle.font);
     buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-glow", hex8ToCss(btnStyle.activeGlow || btnStyle.glow));
-    buttonsEl.style.setProperty("--btn-active-bg", _bgCss(btnStyle.activeBg));
+    buttonsEl.style.setProperty("--btn-active-bg", hex8ToCss(btnStyle.activeBg));
     document.documentElement.style.setProperty("--btn-radius", (btnStyle.btnRadius ?? 6) + 'px');
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
@@ -315,11 +295,10 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--slider-handle-w",      (btnStyle.sliderHandleW ?? 16) + "px");
     document.documentElement.style.setProperty("--slider-w",             (btnStyle.sliderW ?? 100) + "%");
     document.documentElement.style.setProperty("--slider-handle-r",      (btnStyle.sliderHandleR ?? 3) + "%");
-    document.documentElement.style.setProperty("--slider-handle-hole",  (btnStyle.sliderHandleHole ?? 0));
-    document.documentElement.style.setProperty("--slider-fill-color",    _bgCss(btnStyle.sliderFill   || '#9659FFFF'));
-    document.documentElement.style.setProperty("--slider-track-bg",      _bgCss(btnStyle.sliderTrack  || '#333333FF'));
-    document.documentElement.style.setProperty("--slider-handle-color",  _bgCss(btnStyle.sliderHandle || '#FFFFFFFF'));
-    document.documentElement.style.setProperty("--slider-handle-border", _bgCss(btnStyle.sliderHandleBorder || '#00000000'));
+    document.documentElement.style.setProperty("--slider-fill-color",    hex8ToCss(btnStyle.sliderFill   || '#9659FFFF'));
+    document.documentElement.style.setProperty("--slider-track-bg",      hex8ToCss(btnStyle.sliderTrack  || '#333333FF'));
+    document.documentElement.style.setProperty("--slider-handle-color",  hex8ToCss(btnStyle.sliderHandle || '#FFFFFFFF'));
+    document.documentElement.style.setProperty("--slider-handle-border", hex8ToCss(btnStyle.sliderHandleBorder || '#00000000'));
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
@@ -333,8 +312,8 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--clock-date-size",      (_btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize) + "px");
     document.documentElement.style.setProperty("--clock-time-size",      (_btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize) + "px");
     document.documentElement.style.setProperty("--clock-bg",             hex8ToCss(btnStyle.clockBg));
-    document.documentElement.style.setProperty("--clock-date-bg",        _bgCss(_btnStyleFor('top-date').bg));
-    document.documentElement.style.setProperty("--clock-time-bg",        _bgCss(_btnStyleFor('top-time').bg));
+    document.documentElement.style.setProperty("--clock-date-bg",        hex8ToCss(_btnStyleFor('top-date').bg));
+    document.documentElement.style.setProperty("--clock-time-bg",        hex8ToCss(_btnStyleFor('top-time').bg));
     const topGridMap = [
       { id: 'top-export-all',    el: '.top-item[data-item="export-all"]',    prefix: '--export-all' },
       { id: 'top-import-all',    el: '.top-item[data-item="import-all"]',    prefix: '--import-all' },
@@ -342,7 +321,6 @@ if (navigator.storage && navigator.storage.persist) {
       { id: 'top-import-layout', el: '.top-item[data-item="import-layout"]', prefix: '--import-layout' },
       { id: 'top-clear-all',     el: '.top-item[data-item="clear-all"]',     prefix: '--clear-all' },
       { id: 'top-my-files',      el: '.top-item[data-item="my-files"]',      prefix: '--my-files' },
-      { id: 'top-hard-reload',   el: '.top-item[data-item="hard-reload"]',   prefix: '--hard-reload' },
       { id: 'top-manage-habits', el: '.top-item[data-item="manage-habits"]', prefix: '--manage-habits' },
       { id: 'top-orient-lock',    el: '.top-item[data-item="orient-lock"]',    prefix: '--orient-lock' },
       { id: 'top-settings',      el: '.top-item[data-item="settings"]',      prefix: '--settings' },
@@ -351,7 +329,7 @@ if (navigator.storage && navigator.storage.persist) {
       const el = document.querySelector(sel);
       if (!el) return;
       const _s = _btnStyleFor(id);
-      el.style.setProperty(prefix + '-bg',   _bgCss(_s.bg));
+      el.style.setProperty(prefix + '-bg',   hex8ToCss(_s.bg));
       el.style.setProperty(prefix + '-fg',   hex8ToCss(_s.fg));
       el.style.setProperty(prefix + '-font', _s.font);
       el.style.setProperty(prefix + '-glow', hex8ToCss(_s.glow));
@@ -362,7 +340,7 @@ if (navigator.storage && navigator.storage.persist) {
     if (_olBtn) {
       const _olId = (typeof _orientLocked !== 'undefined' && _orientLocked) ? 'top-orient-lock-locked' : 'top-orient-lock';
       const _ols = _btnStyleFor(_olId);
-      _olBtn.style.background = _bgCss(_ols.bg);
+      _olBtn.style.background = hex8ToCss(_ols.bg);
       _olBtn.style.color = hex8ToCss(_ols.fg);
       _olBtn.style.borderColor = hex8ToCss(_ols.fg);
       _olBtn.style.boxShadow = `0 0 16px 5px ${hex8ToCss(_ols.glow)}`;
@@ -370,7 +348,7 @@ if (navigator.storage && navigator.storage.persist) {
     const _cogEl = document.getElementById('settings-cog');
     if (_cogEl) {
       const _ss = _btnStyleFor('top-settings');
-      _cogEl.style.background   = _bgCss(_ss.bg);
+      _cogEl.style.background   = hex8ToCss(_ss.bg);
       _cogEl.style.color        = hex8ToCss(_ss.fg);
       _cogEl.style.borderColor  = hex8ToCss(_ss.fg);
       _cogEl.style.boxShadow    = `0 0 16px 5px ${hex8ToCss(_ss.glow)}`;
@@ -378,7 +356,7 @@ if (navigator.storage && navigator.storage.persist) {
     const _habEl = document.querySelector('.top-item[data-item="hide-habits"]');
     if (_habEl) {
       const _hs = _btnStyleFor(!skipHabitsBtn && habitsVisible ? 'top-hide-habits' : 'top-show-habits');
-      _habEl.style.setProperty('--hide-habits-bg',   _bgCss(_hs.bg));
+      _habEl.style.setProperty('--hide-habits-bg',   hex8ToCss(_hs.bg));
       _habEl.style.setProperty('--hide-habits-fg',   hex8ToCss(_hs.fg));
       _habEl.style.setProperty('--hide-habits-font', _hs.font);
       _habEl.style.setProperty('--hide-habits-glow', hex8ToCss(_hs.glow || '#00000000'));
@@ -404,35 +382,21 @@ if (navigator.storage && navigator.storage.persist) {
     if (_versionItem) {
       _versionItem.style.borderRadius = (_btnStyles['top-version']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       _versionItem.style.setProperty('--btn-glow', hex8ToCss(_btnStyleFor('top-version').glow));
-      _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
+      _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg);
       const _vBtn = _versionItem.querySelector('div');
       const _vNumSpan = document.getElementById('app-version');
       if (_vNumSpan) _vNumSpan.style.fontFamily = _btnStyleFor('top-version').font;
     if (_vBtn) {
-      _vBtn.onpointerdown = () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
-      _vBtn.onpointerup = () => {
-        _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
+      _vBtn.addEventListener('pointerdown', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); });
+      _vBtn.addEventListener('pointerup', () => {
+        _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg);
         if(localStorage.getItem('_versionUpdatePending')==='1'){
           const _prev=localStorage.getItem('_versionPrevFg');
           if(_prev){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:_prev});localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}
           localStorage.removeItem('_versionUpdatePending');
-      return;
-    }
-    if (window._versionCheckState === 'synced') {
-          const _statsEl = document.getElementById('app-stats');
-          if (_statsEl && _statsEl.dataset.swOrig) {
-            _statsEl.innerHTML = _statsEl.dataset.swOrig;
-            _statsEl.style.color = _statsEl.dataset.swOrigColor || '';
-            _statsEl.style.opacity = '0.4';
-            delete _statsEl.dataset.swOrig;
-            delete _statsEl.dataset.swOrigColor;
-          }
-          window._versionCheckState = 'idle';
-        } else {
-          if (window._verifyDeployedVersion) window._verifyDeployedVersion();
         }
-      };
-      _vBtn.onpointercancel = () => { _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
+      });
+      _vBtn.addEventListener('pointercancel', () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').bg); });
     }
     }
     const _versionNumSpan = document.getElementById('app-version');
@@ -442,11 +406,11 @@ if (navigator.storage && navigator.storage.persist) {
 
     buttonsEl.querySelectorAll(".tracker-btn[data-id]").forEach(btn => {
       const s = _btnStyleFor(btn.dataset.id);
-      btn.style.setProperty("--btn-bg",        _bgCss(s.bg));
+      btn.style.setProperty("--btn-bg",        hex8ToCss(s.bg));
       btn.style.setProperty("--btn-fg",        hex8ToCss(s.fg));
       btn.style.setProperty("--btn-glow",      hex8ToCss(s.glow));
       btn.style.setProperty("--btn-active-glow", hex8ToCss(s.activeGlow || s.glow));
-      btn.style.setProperty("--btn-active-bg", _bgCss(s.activeBg));
+      btn.style.setProperty("--btn-active-bg", hex8ToCss(s.activeBg));
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.cssText += `;font-family:${s.font} !important`;
       btn.style.borderRadius = (s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
@@ -462,17 +426,6 @@ if (navigator.storage && navigator.storage.persist) {
     const overlay = document.createElement('div');
     overlay.className = 'color-swatch-overlay';
     overlay.id = id + '-swatch-overlay';
-    const labelEl = wrap.closest('.color-settings-row') && wrap.closest('.color-settings-row').querySelector(':scope > label');
-    if (labelEl) {
-      const labelSpan = document.createElement('span');
-      labelSpan.className = 'color-swatch-label';
-      labelSpan.textContent = labelEl.textContent.trim();
-      overlay.appendChild(labelSpan);
-    }
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
-
-
-
-

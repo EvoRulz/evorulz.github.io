@@ -30,7 +30,7 @@
 
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v1232</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v1079</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -50,7 +50,6 @@
   </div>
   <div class="top-item" data-item="clear-all"><button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button></div>
   <div class="top-item" data-item="my-files"><button class="app-btn" onclick="openMyFiles()">My Files</button></div>
-  <div class="top-item" data-item="hard-reload"><button class="app-btn" onclick="hardReload()">Hard Reload</button></div>
   <div class="top-item" data-item="hide-habits"><button class="app-btn" id="hide-habits-btn" onclick="toggleHabits()">Hide Habits</button></div>
   <div class="top-item" data-item="manage-habits"><button class="app-btn" onclick="manageOpen()">Manage Habits</button></div>
   <div class="top-item" data-item="orient-lock">
@@ -99,7 +98,7 @@
         <div id="cf-stage"></div>
       </div>
       <div class="color-settings-row" data-btn-row="bg">
-        <label>Background color</label>
+        <label>Background colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-bg" oninput="onColorPickerChange('s-bg')">
           <input type="range" class="alpha-slider" id="s-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-bg')">
@@ -110,7 +109,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-btn-row="fg">
-        <label>Text color</label>
+        <label>Text colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-fg" oninput="onColorPickerChange('s-fg')">
           <input type="range" class="alpha-slider" id="s-fg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-fg')">
@@ -121,7 +120,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-btn-row="glow">
-        <label>Glow color</label>
+        <label>Glow colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-glow" oninput="onColorPickerChange('s-glow')">
           <input type="range" class="alpha-slider" id="s-glow-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-glow')">
@@ -132,7 +131,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-btn-row="activeglow">
-        <label>Active glow color</label>
+        <label>Active glow colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-activeglow" oninput="onColorPickerChange('s-activeglow')">
           <input type="range" class="alpha-slider" id="s-activeglow-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-activeglow')">
@@ -154,7 +153,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-btn-row="tap">
-        <label>Tap color</label>
+        <label>Tap colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-tap" oninput="onColorPickerChange('s-tap')">
           <input type="range" class="alpha-slider" id="s-tap-alpha" min="0" max="255" value="64" oninput="onAlphaChange('s-tap')">
@@ -227,7 +226,7 @@
     </div>
     <div class="settings-group-content" id="sg-sliders">
       <div class="color-settings-row" data-slider-row="sliderborder"><span class="slider-row-handle">⠿</span>
-        <label>Slider border color</label>
+        <label>Slider border colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-sliderborder" oninput="onColorPickerChange('s-sliderborder')">
           <input type="range" class="alpha-slider" id="s-sliderborder-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderborder')">
@@ -249,7 +248,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-slider-row="sliderfill"><span class="slider-row-handle">⠿</span>
-        <label>Slider fill color</label>
+        <label>Slider fill colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-sliderfill" oninput="onColorPickerChange('s-sliderfill')">
           <input type="range" class="alpha-slider" id="s-sliderfill-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderfill')">
@@ -260,7 +259,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-slider-row="sliderhandle"><span class="slider-row-handle">⠿</span>
-        <label>Slider handle color</label>
+        <label>Slider handle colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-sliderhandle" oninput="onColorPickerChange('s-sliderhandle')">
           <input type="range" class="alpha-slider" id="s-sliderhandle-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderhandle')">
@@ -271,7 +270,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-slider-row="sliderhandleborder"><span class="slider-row-handle">⠿</span>
-        <label>Handle border color</label>
+        <label>Handle border colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-sliderhandleborder" oninput="onColorPickerChange('s-sliderhandleborder')">
           <input type="range" class="alpha-slider" id="s-sliderhandleborder-alpha" min="0" max="255" value="0" oninput="onAlphaChange('s-sliderhandleborder')">
@@ -305,10 +304,6 @@
           <label>Slider width <span id="s-sliderw-val">100%</span></label>
           <input type="range" class="alpha-slider" id="s-sliderw" min="10" max="100" value="100" oninput="document.getElementById('s-sliderw-val').textContent=this.value+'%';settingsChange()">
         </div>
-        <div class="settings-row" data-slider-row="sliderhandlehole"><span class="slider-row-handle">⠿</span>
-          <label>Handle hole <span id="s-sliderhandlehole-val">0%</span></label>
-          <input type="range" class="alpha-slider" id="s-sliderhandlehole" min="0" max="50" value="0" oninput="document.getElementById('s-sliderhandlehole-val').textContent=this.value+'%';settingsChange()">
-        </div>
         <div class="settings-row" data-slider-row="sliderhandlew"><span class="slider-row-handle">⠿</span>
           <label>Handle width <span id="s-sliderhandlew-val">16px</span></label>
           <input type="range" class="alpha-slider" id="s-sliderhandlew" min="4" max="60" value="16" oninput="document.getElementById('s-sliderhandlew-val').textContent=this.value+'px';settingsChange()">
@@ -317,7 +312,7 @@
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
       <div class="color-settings-row"data-clock-row="datecolor">
-        <label>Date color</label>
+        <label>Date colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-date-color" oninput="onColorPickerChange('s-clock-date-color')">
           <input type="range" class="alpha-slider" id="s-clock-date-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-clock-date-color')" data-clock-picker="true">
@@ -342,7 +337,7 @@
         </select>
       </div>
       <div class="color-settings-row" data-clock-row="timecolor">
-        <label>Time color</label>
+        <label>Time colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-clock-time-color" oninput="onColorPickerChange('s-clock-time-color')">
           <input type="range" class="alpha-slider" id="s-clock-time-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-clock-time-color')">
@@ -432,7 +427,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-checkbox-row="mark">
-        <label>Checkmark color</label>
+        <label>Checkmark colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-checkbox-mark" oninput="onColorPickerChange('s-checkbox-mark')">
           <input type="range" class="alpha-slider" id="s-checkbox-mark-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-checkbox-mark')">
@@ -443,7 +438,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-checkbox-row="border">
-        <label>Border color</label>
+        <label>Border colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-checkbox-border" oninput="onColorPickerChange('s-checkbox-border')">
           <input type="range" class="alpha-slider" id="s-checkbox-border-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-checkbox-border')">
@@ -477,7 +472,7 @@
       <div class="settings-row">
         <label>Background type</label>
         <select id="s-app-bg-type" onchange="appBgTypeChange()">
-          <option value="solid">Solid color</option>
+          <option value="solid">Solid colour</option>
           <option value="gradient2">2-stop gradient</option>
           <option value="gradient3">3-stop gradient</option>
           <option value="gradient4">4-stop gradient</option>
@@ -501,12 +496,12 @@
           <option value="45deg">45°</option>
         </select>
       </div>
-      <!-- Solid / gradient color stops -->
+      <!-- Solid / gradient colour stops -->
       <div id="s-app-stops-wrap"></div>
-      <!-- Pattern color -->
+      <!-- Pattern colour -->
       <div id="s-app-pattern-wrap" style="display:none">
         <div class="color-settings-row">
-          <label>Pattern color</label>
+          <label>Pattern colour</label>
           <div class="color-picker-row">
             <input type="color" id="s-app-pat-color" oninput="onColorPickerChange('s-app-pat-color')">
             <input type="range" class="alpha-slider" id="s-app-pat-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-pat-color')">
@@ -597,9 +592,9 @@
           </div>
         </div>
       </div>
-      <!-- Text / UI colors -->
+      <!-- Text / UI colours -->
       <div class="color-settings-row" data-app-row="text" style="margin-top:8px">
-        <label>Page text color</label>
+        <label>Page text colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-app-text" oninput="onColorPickerChange('s-app-text')">
           <input type="range" class="alpha-slider" id="s-app-text-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-text')">
@@ -610,7 +605,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-app-row="border">
-        <label>Table border color</label>
+        <label>Table border colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-app-border" oninput="onColorPickerChange('s-app-border')">
           <input type="range" class="alpha-slider" id="s-app-border-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-border')">
@@ -755,7 +750,7 @@
       </div>
     </div>
     <div class="settings-group-content" id="sg-swatches">
-      <div class="color-settings-row" data-swatch-row="cp-bg">
+      <div class="color-settings-row">
         <label>Popup background</label>
         <div class="color-picker-row">
           <input type="color" id="s-cp-bg" oninput="onColorPickerChange('s-cp-bg')">
@@ -766,7 +761,7 @@
           <button class="copy-btn" onclick="copyHex('s-cp-bg',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row" data-swatch-row="cp-border">
+      <div class="color-settings-row">
         <label>Popup border</label>
         <div class="color-picker-row">
           <input type="color" id="s-cp-border" oninput="onColorPickerChange('s-cp-border')">
@@ -777,30 +772,8 @@
           <button class="copy-btn" onclick="copyHex('s-cp-border',this)">Copy</button>
         </div>
       </div>
-      <div class="color-settings-row" data-swatch-row="cp-text">
-        <label>Popup text</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-cp-text" oninput="onColorPickerChange('s-cp-text')">
-          <input type="range" class="alpha-slider" id="s-cp-text-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-cp-text')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-cp-text-hex" maxlength="9" oninput="onHexInput('s-cp-text')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-cp-text',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-swatch-row="cp-label-outline">
-        <label>Label outline</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-cp-label-outline" oninput="onColorPickerChange('s-cp-label-outline')">
-          <input type="range" class="alpha-slider" id="s-cp-label-outline-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-cp-label-outline')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-cp-label-outline-hex" maxlength="9" oninput="onHexInput('s-cp-label-outline')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-cp-label-outline',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-swatch-row="cp-label">
-        <label>Label</label>
+      <div class="color-settings-row">
+        <label>Label colour</label>
         <div class="color-picker-row">
           <input type="color" id="s-cp-label" oninput="onColorPickerChange('s-cp-label')">
           <input type="range" class="alpha-slider" id="s-cp-label-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-cp-label')">
@@ -809,14 +782,6 @@
           <input type="text" class="hex-input" id="s-cp-label-hex" maxlength="9" oninput="onHexInput('s-cp-label')" spellcheck="false" autocomplete="off">
           <button class="copy-btn" onclick="copyHex('s-cp-label',this)">Copy</button>
         </div>
-      </div>
-      <div class="settings-row" data-swatch-row="label-size">
-        <label>Label size <span id="s-cp-label-size-val">8px</span></label>
-        <input type="range" class="alpha-slider" id="s-cp-label-size" min="4" max="20" value="8" oninput="document.getElementById('s-cp-label-size-val').textContent=this.value+'px';if(window._cpSaveFromUI)window._cpSaveFromUI();if(window._applyLabelToSwatches)window._applyLabelToSwatches();">
-      </div>
-      <div class="settings-row" data-swatch-row="label-stroke">
-        <label>Label stroke <span id="s-cp-label-stroke-val">0.5px</span></label>
-        <input type="range" class="alpha-slider" id="s-cp-label-stroke" min="0" max="50" value="5" oninput="document.getElementById('s-cp-label-stroke-val').textContent=(this.value/10).toFixed(1)+'px';if(window._cpSaveFromUI)window._cpSaveFromUI();if(window._applyLabelToSwatches)window._applyLabelToSwatches();">
       </div>
     </div>
     <div id="settings-footer">
@@ -850,9 +815,9 @@
 <script src="styles-drag-rows.js"></script>
 <script src="drag.js"></script>
 <script src="app-data.js"></script>
-<script src="clock.js"></script>
 <script src="coverflow.js"></script>
 <script src="manage.js"></script>
+<script src="clock.js"></script>
 <script src="tumbler.js"></script>
 <script src="font.js"></script>
 <script src="notifications.js"></script>

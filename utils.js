@@ -1,5 +1,3 @@
- // @version 1232
-
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
   const MAX_DATE       = new Date("2111-04-19");
@@ -121,23 +119,9 @@ window._dragEnabled = true;
     const t = document.getElementById('drag-toggle');
     if (t) t.classList.toggle('on', window._dragEnabled);
   }
-  async function hardReload() {
-  if ('serviceWorker' in navigator) {
-    const regs = await navigator.serviceWorker.getRegistrations();
-    for (const r of regs) await r.unregister();
-  }
-  const keys = await caches.keys();
-  for (const k of keys) await caches.delete(k);
-  location.reload(true);
-}
-  
   function ctrlToggleInteract() {
     window._interactEnabled = !window._interactEnabled;
     const t = document.getElementById('interact-toggle');
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
-
-
-
-

@@ -1,5 +1,3 @@
-// @version 1232
-
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
   let _clockSnapshot    = null;
@@ -67,7 +65,7 @@
     const undoBtn   = document.getElementById('settings-undo');
     const redoBtn   = document.getElementById('settings-redo');
     const anyActivity = _settingsHasChanges || _history.length > 1;
-    if (saveBtn)   { saveBtn.disabled = !_settingsHasChanges; saveBtn.style.opacity = _settingsHasChanges ? '' : '0.35'; }
+    if (saveBtn)   { saveBtn.style.display = anyActivity ? '' : 'none'; saveBtn.disabled = !_settingsHasChanges; saveBtn.style.opacity = _settingsHasChanges ? '' : '0.35'; }
     if (cancelBtn) cancelBtn.textContent = _settingsHasChanges ? 'Cancel' : 'Close';
     if (undoBtn)   { undoBtn.style.display = anyActivity ? '' : 'none'; undoBtn.disabled = !_canUndo(); undoBtn.style.opacity = _canUndo() ? '' : '0.35'; }
     if (redoBtn)   { redoBtn.style.display = anyActivity ? '' : 'none'; redoBtn.disabled = !_canRedo(); redoBtn.style.opacity = _canRedo() ? '' : '0.35'; }
@@ -88,7 +86,6 @@
     _sv('s-sliderhandler', btnStyle.sliderHandleR?? 3);   _svl('s-sliderhandler-val', btnStyle.sliderHandleR?? 3,   '%');
     _sv('s-sliderw',       btnStyle.sliderW      ?? 100); _svl('s-sliderw-val',       btnStyle.sliderW      ?? 100, '%');
     _sv('s-sliderhandlew', btnStyle.sliderHandleW?? 16);  _svl('s-sliderhandlew-val', btnStyle.sliderHandleW?? 16,  'px');
-    _sv('s-sliderhandlehole', btnStyle.sliderHandleHole ?? 0); _svl('s-sliderhandlehole-val', btnStyle.sliderHandleHole ?? 0, '%');
     setColorValue('s-clock-date-color', _btnStyleFor('top-date').fg);
     setColorValue('s-clock-time-color', _btnStyleFor('top-time').fg);
     setColorValue('s-clock-date-bg',    _btnStyleFor('top-date').bg);
@@ -192,8 +189,8 @@
           }
           btn.dataset.debounced = 'true';
           setTimeout(() => { btn.dataset.debounced = 'false'; }, btn.id === 'hide-habits-btn' ? 2 : 500);
-        }, true);
-        btn.dataset.debounceListener = 'true';
+    }, true);
+    btn.dataset.debounceListener = 'true';
       }
     });
     const _wasSkipSnap = _skipCancelSnapshot;
@@ -209,7 +206,6 @@
     }
     const _initId = window._cfActiveId ? window._cfActiveId() : null;
     const _initS  = _initId ? _btnStyleFor(_initId) : btnStyle;
-    if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', _initS.bgStops || null);
     setColorValue('s-bg',           _initS.bg);
     setColorValue('s-fg',           _initS.fg);
     setColorValue('s-glow',         _initS.glow);
@@ -259,10 +255,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     const _shhvEl2 = document.getElementById('s-sliderhandleh-val'); if (_shhvEl2) _shhvEl2.textContent = (btnStyle.sliderHandleH ?? 16) + 'px';
     const _shrEl2 = document.getElementById('s-sliderhandler'); if (_shrEl2) _shrEl2.value = String(btnStyle.sliderHandleR ?? 3);
     const _shrvEl2 = document.getElementById('s-sliderhandler-val'); if (_shrvEl2) _shrvEl2.textContent = (btnStyle.sliderHandleR ?? 3) + '%';
-    const _shheEl2 = document.getElementById('s-sliderhandlehole'); if (_shheEl2) _shheEl2.value = String(btnStyle.sliderHandleHole ?? 0);
-    const _shhevEl2 = document.getElementById('s-sliderhandlehole-val'); if (_shhevEl2) _shhevEl2.textContent = (btnStyle.sliderHandleHole ?? 0) + '%';
-    btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
-    btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
     const _s = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
     _s("s-app-bg-type",    appStyle.bgType);
@@ -302,7 +294,6 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
       window._cfBuild();
     }
     if(window.fontPickerSync)fontPickerSync();
-    if (window._cpSyncUI) window._cpSyncUI();
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
@@ -330,10 +321,8 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
   }
   async function settingsSave() {
     _settingsHasChanges = false;
-    _updateSettingsBtns();
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderW        = Number(document.getElementById("s-sliderw").value);
-    btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
     localStorage.setItem("_btnStyle",   JSON.stringify(btnStyle));
     localStorage.setItem("_btnStyles",  JSON.stringify(_btnStyles));
     try {
@@ -352,6 +341,8 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     localStorage.setItem("_clockTumbler", JSON.stringify(window._clockGet().tumblerCfg));
     applyBtnStyle();
     applyAppStyle();
+    if (window._cpSaveFromUI) window._cpSaveFromUI();
+    settingsClose();
   }
   function settingsCancel() {
     if (!_settingsHasChanges) {
@@ -367,21 +358,3 @@ const _rvVal = document.getElementById("s-radius-val"); if (_rvVal) _rvVal.textC
     _settingsHasChanges = false;
     _updateUndoRedoBtns();
   }
-  (function() {
-    function dbounce(fn) {
-      var t = null;
-      return function() {
-        if (t) return;
-        t = setTimeout(function() { t = null; }, 100);
-        fn.apply(this, arguments);
-      };
-    }
-    settingsSave   = dbounce(settingsSave);
-    settingsUndo   = dbounce(settingsUndo);
-    settingsRedo   = dbounce(settingsRedo);
-    settingsCancel = dbounce(settingsCancel);
-    })();
-
-
-
-

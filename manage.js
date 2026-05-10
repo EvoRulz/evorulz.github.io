@@ -1,5 +1,3 @@
-// @version 1232
-
 // ── Manage Habits ──────────────────────────────────────────
   function manageOpen() {
     manageRenderList();
@@ -138,7 +136,3 @@
   document.getElementById("manage-overlay").addEventListener("click", e => {
   if (e.target === document.getElementById("manage-overlay")) manageClose();
 });
-
-
-
-

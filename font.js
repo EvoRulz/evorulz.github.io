@@ -1,5 +1,3 @@
-// @version 1232
-
 (function(){
   function getOpts() {
     var sel = document.getElementById('s-font');
@@ -94,7 +92,3 @@
     build();
   }
 })();
-
-
-
-

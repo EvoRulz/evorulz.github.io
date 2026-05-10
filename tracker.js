@@ -1,5 +1,3 @@
-// @version 1232
-
 // ── Tracker configs (dynamic) ──────────────────────────────
   const CONFIG_DEFAULTS = [
     { id: "pushups", label: "Pushups", type: "sets"   },
@@ -423,7 +421,3 @@
     return { init, reload, onSelectChange, onReasonInput, onInput,
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
-
-
-
-

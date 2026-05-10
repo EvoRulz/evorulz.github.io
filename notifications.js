@@ -1,5 +1,3 @@
-// @version 1232
-
 (function() {
   function todayStr() {
     const d = new Date();
@@ -315,7 +313,3 @@ window.notifSendTest = async function() {
     } catch(e) {}
   }
 };
-
-
-
-
