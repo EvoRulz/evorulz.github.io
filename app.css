@@ -1,4 +1,4 @@
-/* @version 1335 */
+/* @version 1336 */
 
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
     *::-webkit-scrollbar { display: none; width: 0; height: 0; }
@@ -90,6 +90,7 @@
       cursor: pointer;
       font-size: 16px;
       pointer-events: auto;
+      overflow: visible;
     }
     .app-btn.btn-clear-all {
       background: #5a1a1a;
@@ -118,6 +119,7 @@
       -webkit-user-select: none;
       position: relative;
       touch-action: none; /* required for pointer capture on mobile/TWA */
+      overflow: visible;
       transition: background 0.2s;
     }
     .top-item button { border-radius: 6px; }
@@ -286,6 +288,7 @@
       font-size: 13px; align-self: flex-start;
     }
     #confirm-cancel:hover { background: #444; }
+
 
 
 
