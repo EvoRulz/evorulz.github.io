@@ -1,5 +1,3 @@
-// @version 1284
-
 package io.github.evorulz.twa;
 
 import android.app.AlarmManager;
@@ -26,53 +24,3 @@ public class BootReceiver extends BroadcastReceiver {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

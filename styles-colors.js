@@ -1,4 +1,4 @@
-// @version 1284
+// @version 1231
 
 // ── Settings panel logic ───────────────────────────────────
   function onColorPickerChange(id) {
@@ -210,14 +210,7 @@ function onHexInput(id) {
     }
     buildAppBg();
   }
-  function statusBarModeChange() {
-    const mode = document.getElementById('s-app-statusbar-mode')?.value || 'auto';
-    appStyle.statusBarMode = mode;
-    const row = document.getElementById('s-app-statusbar-color-row');
-    if (row) row.style.display = (mode === 'solid' || mode === 'gradient') ? '' : 'none';
-    _applyStatusBarColor();
-    settingsChange();
-  }
+
   function appBgTypeChange() {
     appStyle.bgType = document.getElementById("s-app-bg-type").value;
     const isGrad    = appStyle.bgType.startsWith("gradient");
@@ -247,10 +240,6 @@ function onHexInput(id) {
     if (document.getElementById("s-app-bar-set"))    appStyle.barSet    = getColorValue("s-app-bar-set");
     if (document.getElementById("s-app-bar-total"))  appStyle.barTotal  = getColorValue("s-app-bar-total");
     if (document.getElementById("s-app-bar-streak")) appStyle.barStreak = getColorValue("s-app-bar-streak");
-    appStyle.statusBarMode   = document.getElementById('s-app-statusbar-mode')?.value || 'auto';
-    appStyle.statusBarColor  = getColorValue('s-app-statusbar-color');
-    appStyle.statusBarStops  = window._cpGetGradientStops ? window._cpGetGradientStops('s-app-statusbar-color') : null;
-    appStyle.statusBarIconStyle = document.getElementById('s-app-statusbar-icons')?.value || 'auto';
     const _padEl = document.getElementById("s-app-padding"); if (_padEl) appStyle.padding = Number(_padEl.value);
     collectAppStops();
     applyAppStyle();
@@ -260,7 +249,7 @@ function onHexInput(id) {
     const reader = new FileReader();
     reader.onload = e => {
       appStyle.imgData = e.target.result;
-      _sampleImgTopColor(e.target.result);
+      appStyle.bgType  = "image";
       appStyle.imgSize   = document.getElementById("s-app-img-size").value   || appStyle.imgSize;
       appStyle.imgPos    = document.getElementById("s-app-img-pos").value    || appStyle.imgPos;
       appStyle.imgRepeat = document.getElementById("s-app-img-repeat").value || appStyle.imgRepeat;
@@ -283,62 +272,6 @@ function onHexInput(id) {
     if (thumb) { thumb.src = ""; prev.style.display = "none"; }
     buildAppBg();
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,4 +1,4 @@
-// @version 1284
+// @version 1231
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -44,9 +44,7 @@ function settingsExport() {
           setColorValue('s-sliderfill',    btnStyle.sliderFill   || '#9659FFFF');
           setColorValue('s-slidertrack',   btnStyle.sliderTrack  || '#333333FF');
           setColorValue('s-sliderhandle',  btnStyle.sliderHandle || '#FFFFFFFF');
-          setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
-          setColorValue('s-sliderhandleglow',      btnStyle.sliderHandleGlow      || '#FFFFFF00');
-          setColorValue('s-sliderhandleactiveglow', btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
+          setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
 
           const _sv = (id, val) => { const el = document.getElementById(id); if (el) el.value = String(val); };
           _sv('s-sliderh',       btnStyle.sliderH);
@@ -60,14 +58,6 @@ function settingsExport() {
           const _shwIvEl = document.getElementById('s-sliderhandlew-val'); if (_shwIvEl) _shwIvEl.textContent = (btnStyle.sliderHandleW ?? 16) + 'px';
           const _shholeIvEl = document.getElementById('s-sliderhandlehole-val'); if (_shholeIvEl) _shholeIvEl.textContent = (btnStyle.sliderHandleHole ?? 0) + '%';
           const _shholeEl = document.getElementById('s-sliderhandlehole'); if (_shholeEl) _shholeEl.value = String(btnStyle.sliderHandleHole ?? 0);
-          const _sbgIEl = document.getElementById('s-sliderbtnspacing'); if (_sbgIEl) _sbgIEl.value = String(btnStyle.sliderBtnGap ?? 0);
-          const _sbgIvEl = document.getElementById('s-sliderbtnspacing-val'); if (_sbgIvEl) _sbgIvEl.textContent = (btnStyle.sliderBtnGap ?? 0) + 'px';
-          const _sbwIEl = document.getElementById('s-sliderbtnw'); if (_sbwIEl) _sbwIEl.value = String(btnStyle.sliderBtnW ?? 22);
-          const _sbwIvEl = document.getElementById('s-sliderbtnw-val'); if (_sbwIvEl) _sbwIvEl.textContent = (btnStyle.sliderBtnW ?? 22) + 'px';
-          const _sbhIEl = document.getElementById('s-sliderbtnh'); if (_sbhIEl) _sbhIEl.value = String(btnStyle.sliderBtnH ?? 22);
-          const _sbhIvEl = document.getElementById('s-sliderbtnh-val'); if (_sbhIvEl) _sbhIvEl.textContent = (btnStyle.sliderBtnH ?? 22) + 'px';
-          const _sbrIEl = document.getElementById('s-sliderbtnr'); if (_sbrIEl) _sbrIEl.value = String(btnStyle.sliderBtnR ?? 4);
-          const _sbrIvEl = document.getElementById('s-sliderbtnr-val'); if (_sbrIvEl) _sbrIvEl.textContent = (btnStyle.sliderBtnR ?? 4) + 'px';
           const _shv2 = document.getElementById('s-sliderh-val');       if (_shv2) _shv2.textContent = btnStyle.sliderH + 'px';
           const _srv2 = document.getElementById('s-sliderr-val');       if (_srv2) _srv2.textContent = btnStyle.sliderR + '%';
           const _sspv2 = document.getElementById('s-sliderspread-val'); if (_sspv2) _sspv2.textContent = (btnStyle.sliderSpread ?? 4) + 'px';
@@ -208,8 +198,6 @@ else {
     if (document.getElementById('s-slidertrack'))  btnStyle.sliderTrack  = getStyleValue('s-slidertrack');
     if (document.getElementById('s-sliderhandle')) btnStyle.sliderHandle = getStyleValue('s-sliderhandle');
     if (document.getElementById('s-sliderhandleborder')) btnStyle.sliderHandleBorder = getStyleValue('s-sliderhandleborder');
-    if (document.getElementById('s-sliderhandleglow')) btnStyle.sliderHandleGlow = getColorValue('s-sliderhandleglow');
-    if (document.getElementById('s-sliderhandleactiveglow')) btnStyle.sliderHandleActiveGlow = getColorValue('s-sliderhandleactiveglow');
     btnStyle.sliderH        = Number(document.getElementById("s-sliderh").value);
     btnStyle.sliderR        = Number(document.getElementById("s-sliderr").value);
     btnStyle.sliderSpread   = Number(document.getElementById("s-sliderspread").value);
@@ -218,26 +206,10 @@ else {
     btnStyle.sliderW        = Number(document.getElementById("s-sliderw").value);
     btnStyle.sliderHandleW  = Number(document.getElementById("s-sliderhandlew").value);
     btnStyle.sliderHandleHole = Number(document.getElementById("s-sliderhandlehole").value);
-    btnStyle.sliderBtnGap     = Number(document.getElementById("s-sliderbtnspacing").value);
-    btnStyle.sliderBtnW       = Number(document.getElementById("s-sliderbtnw")?.value ?? 22);
-    btnStyle.sliderBtnH       = Number(document.getElementById("s-sliderbtnh")?.value ?? 22);
-    btnStyle.sliderBtnR       = Number(document.getElementById("s-sliderbtnr")?.value ?? 4);
-    btnStyle.sliderBtnBg      = getColorValue('s-sliderbtnbg');
-    btnStyle.sliderBtnFg      = getColorValue('s-sliderbtnfg');
-    btnStyle.sliderBtnBorder  = getColorValue('s-sliderbtnborder');
     btnStyle.checkboxChecked = getColorValue('s-checkbox-checked');
     btnStyle.checkboxMark    = getColorValue('s-checkbox-mark');
     btnStyle.checkboxBorder  = getColorValue('s-checkbox-border');
     btnStyle.checkboxBg      = getColorValue('s-checkbox-bg');
-    btnStyle.toggleOffBg     = getColorValue('s-toggle-off-bg');
-    btnStyle.toggleOnBg      = getColorValue('s-toggle-on-bg');
-    btnStyle.toggleKnobOff   = getColorValue('s-toggle-knob-off');
-    btnStyle.toggleKnobOn    = getColorValue('s-toggle-knob-on');
-    btnStyle.toggleBorderOff = getColorValue('s-toggle-border-off');
-    btnStyle.toggleBorderOn  = getColorValue('s-toggle-border-on');
-    btnStyle.toggleW         = Number(document.getElementById('s-toggle-w')?.value       ?? 44);
-    btnStyle.toggleH         = Number(document.getElementById('s-toggle-h')?.value       ?? 24);
-    btnStyle.toggleKnobSize  = Number(document.getElementById('s-toggle-knob-size')?.value ?? 16);
     btnStyle.clockBg         = getColorValue('s-clock-bg');
     if (_cfId !== 'top-date') {
       _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
@@ -290,11 +262,6 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     if (window._tumblerRenderPreviews) window._tumblerRenderPreviews();
     settingsUpdatePreview();
     document.querySelectorAll('.alpha-slider:not([id$="-alpha"])').forEach(s => updateSliderFill(s));
-    appStyle.statusBarMode   = document.getElementById('s-app-statusbar-mode')?.value || 'auto';
-    appStyle.statusBarColor = getColorValue('s-app-statusbar-color');
-    appStyle.statusBarStops = window._cpGetGradientStops ? window._cpGetGradientStops('s-app-statusbar-color') : null;
-    appStyle.statusBarIconStyle = document.getElementById('s-app-statusbar-icons')?.value || 'auto';
-    _applyStatusBarColor();
     if (window._cpRebuild && !window._cpActiveDrag) window._cpRebuild();
   }
   async function settingsReset() {
@@ -327,24 +294,13 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
     setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
-    setColorValue('s-toggle-off-bg',     BTN_STYLE_DEFAULTS.toggleOffBg);
-    setColorValue('s-toggle-on-bg',      BTN_STYLE_DEFAULTS.toggleOnBg);
-    setColorValue('s-toggle-knob-off',   BTN_STYLE_DEFAULTS.toggleKnobOff);
-    setColorValue('s-toggle-knob-on',    BTN_STYLE_DEFAULTS.toggleKnobOn);
-    setColorValue('s-toggle-border-off', BTN_STYLE_DEFAULTS.toggleBorderOff);
-    setColorValue('s-toggle-border-on',  BTN_STYLE_DEFAULTS.toggleBorderOn);
-    const _twREl = document.getElementById('s-toggle-w'); if (_twREl) { _twREl.value = '44'; const _twvREl = document.getElementById('s-toggle-w-val'); if (_twvREl) _twvREl.textContent = '44px'; }
-    const _thREl = document.getElementById('s-toggle-h'); if (_thREl) { _thREl.value = '24'; const _thvREl = document.getElementById('s-toggle-h-val'); if (_thvREl) _thvREl.textContent = '24px'; }
-    const _tksREl = document.getElementById('s-toggle-knob-size'); if (_tksREl) { _tksREl.value = '16'; const _tksVREl = document.getElementById('s-toggle-knob-size-val'); if (_tksVREl) _tksVREl.textContent = '16px'; }
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     setColorValue('s-sliderborder',    btnStyle.sliderBorder);
     setColorValue('s-sliderfill',      btnStyle.sliderFill   || '#9659FFFF');
     setColorValue('s-slidertrack',     btnStyle.sliderTrack  || '#333333FF');
     setColorValue('s-sliderhandle',    btnStyle.sliderHandle || '#FFFFFFFF');
-    setColorValue('s-sliderhandleborder',    btnStyle.sliderHandleBorder    || '#00000000');
-    setColorValue('s-sliderhandleglow',      BTN_STYLE_DEFAULTS.sliderHandleGlow);
-    setColorValue('s-sliderhandleactiveglow', BTN_STYLE_DEFAULTS.sliderHandleActiveGlow);
+    setColorValue('s-sliderhandleborder', btnStyle.sliderHandleBorder || '#00000000');
     document.getElementById("s-sliderh").value = btnStyle.sliderH;
     document.getElementById("s-sliderr").value = btnStyle.sliderR;
     const _shv = document.getElementById("s-sliderh-val"); if (_shv) _shv.textContent = btnStyle.sliderH + "px";
@@ -358,17 +314,6 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     const _shwREl = document.getElementById("s-sliderhandlew"); if (_shwREl) _shwREl.value = String(BTN_STYLE_DEFAULTS.sliderHandleW ?? 16);
     const _shwRvEl = document.getElementById("s-sliderhandlew-val"); if (_shwRvEl) _shwRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderHandleW ?? 16) + 'px';
     const _shheREl = document.getElementById("s-sliderhandlehole"); if (_shheREl) _shheREl.value = String(BTN_STYLE_DEFAULTS.sliderHandleHole ?? 0);
-    const _sbgREl = document.getElementById("s-sliderbtnspacing"); if (_sbgREl) _sbgREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnGap ?? 0);
-    setColorValue('s-sliderbtnbg',     BTN_STYLE_DEFAULTS.sliderBtnBg);
-    setColorValue('s-sliderbtnfg',     BTN_STYLE_DEFAULTS.sliderBtnFg);
-    setColorValue('s-sliderbtnborder', BTN_STYLE_DEFAULTS.sliderBtnBorder);
-    const _sbgvREl = document.getElementById("s-sliderbtnspacing-val"); if (_sbgvREl) _sbgvREl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnGap ?? 0) + 'px';
-    const _sbwREl = document.getElementById("s-sliderbtnw"); if (_sbwREl) _sbwREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnW ?? 22);
-    const _sbwRvEl = document.getElementById("s-sliderbtnw-val"); if (_sbwRvEl) _sbwRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnW ?? 22) + 'px';
-    const _sbhREl = document.getElementById("s-sliderbtnh"); if (_sbhREl) _sbhREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnH ?? 22);
-    const _sbhRvEl = document.getElementById("s-sliderbtnh-val"); if (_sbhRvEl) _sbhRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnH ?? 22) + 'px';
-    const _sbrREl = document.getElementById("s-sliderbtnr"); if (_sbrREl) _sbrREl.value = String(BTN_STYLE_DEFAULTS.sliderBtnR ?? 4);
-    const _sbrRvEl = document.getElementById("s-sliderbtnr-val"); if (_sbrRvEl) _sbrRvEl.textContent = (BTN_STYLE_DEFAULTS.sliderBtnR ?? 4) + 'px';
     const _shhevREl = document.getElementById("s-sliderhandlehole-val"); if (_shhevREl) _shhevREl.textContent = (BTN_STYLE_DEFAULTS.sliderHandleHole ?? 0) + '%';
     const _sspv = document.getElementById("s-sliderspread-val"); if (_sspv) _sspv.textContent = (btnStyle.sliderSpread ?? 4) + "px";
     const _sspEl = document.getElementById("s-sliderspread"); if (_sspEl) _sspEl.value = btnStyle.sliderSpread ?? 4;
@@ -424,62 +369,6 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

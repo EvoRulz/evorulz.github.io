@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -28,11 +28,9 @@
   </div>
 </div>
 
-<div id="zoom-wrapper">
-<div id="zoom-content">
 <div id="top-grid">
   <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1284</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;">v1231</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
   <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
   <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
   <div class="top-item" data-item="settings">
@@ -63,9 +61,6 @@
 </div>
 <div id="buttons"></div>
 <div id="sections"></div>
-</div>
-</div>
-<div id="zoom-spacer"></div>
 <!-- Manage Habits overlay -->
 <div id="manage-overlay">
   <div id="manage-panel">
@@ -98,7 +93,6 @@
       <div class="settings-group-item" data-group="sg-app">App</div>
       <div class="settings-group-item" data-group="sg-notifications">Notifications</div>
       <div class="settings-group-item" data-group="sg-swatches">Swatches</div>
-      <div class="settings-group-item" data-group="sg-toggles">Toggles</div>
     </div>
     <div class="settings-group-content" id="sg-buttons">
       <div id="cf-outer" style="margin-left:-20px;margin-right:-20px;">
@@ -266,7 +260,7 @@
         </div>
       </div>
       <div class="color-settings-row" data-slider-row="sliderhandle"><span class="slider-row-handle">⠿</span>
-        <label>Handle color</label>
+        <label>Slider handle color</label>
         <div class="color-picker-row">
           <input type="color" id="s-sliderhandle" oninput="onColorPickerChange('s-sliderhandle')">
           <input type="range" class="alpha-slider" id="s-sliderhandle-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderhandle')">
@@ -285,28 +279,6 @@
         <div class="hex-copy-row">
           <input type="text" class="hex-input" id="s-sliderhandleborder-hex" maxlength="9" oninput="onHexInput('s-sliderhandleborder')" spellcheck="false" autocomplete="off">
           <button class="copy-btn" onclick="copyHex('s-sliderhandleborder',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-slider-row="sliderhandleglow"><span class="slider-row-handle">⠿</span>
-        <label>Handle glow</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-sliderhandleglow" oninput="onColorPickerChange('s-sliderhandleglow')">
-          <input type="range" class="alpha-slider" id="s-sliderhandleglow-alpha" min="0" max="255" value="0" oninput="onAlphaChange('s-sliderhandleglow')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-sliderhandleglow-hex" maxlength="9" oninput="onHexInput('s-sliderhandleglow')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-sliderhandleglow',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-slider-row="sliderhandleactiveglow"><span class="slider-row-handle">⠿</span>
-        <label>Handle active glow</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-sliderhandleactiveglow" oninput="onColorPickerChange('s-sliderhandleactiveglow')">
-          <input type="range" class="alpha-slider" id="s-sliderhandleactiveglow-alpha" min="0" max="255" value="217" oninput="onAlphaChange('s-sliderhandleactiveglow')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-sliderhandleactiveglow-hex" maxlength="9" oninput="onHexInput('s-sliderhandleactiveglow')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-sliderhandleactiveglow',this)">Copy</button>
         </div>
       </div>
       <div class="settings-row" data-slider-row="sliderh"><span class="slider-row-handle">⠿</span>
@@ -335,60 +307,11 @@
         </div>
         <div class="settings-row" data-slider-row="sliderhandlehole"><span class="slider-row-handle">⠿</span>
           <label>Handle hole <span id="s-sliderhandlehole-val">0%</span></label>
-          <input type="range" class="alpha-slider" id="s-sliderhandlehole" min="0" max="100" value="0" oninput="document.getElementById('s-sliderhandlehole-val').textContent=this.value+'%';settingsChange()">
+          <input type="range" class="alpha-slider" id="s-sliderhandlehole" min="0" max="50" value="0" oninput="document.getElementById('s-sliderhandlehole-val').textContent=this.value+'%';settingsChange()">
         </div>
         <div class="settings-row" data-slider-row="sliderhandlew"><span class="slider-row-handle">⠿</span>
           <label>Handle width <span id="s-sliderhandlew-val">16px</span></label>
           <input type="range" class="alpha-slider" id="s-sliderhandlew" min="4" max="60" value="16" oninput="document.getElementById('s-sliderhandlew-val').textContent=this.value+'px';settingsChange()">
-        </div>
-        <div class="color-settings-row" data-slider-row="sliderbtnbg"><span class="slider-row-handle">⠿</span>
-        <label>Button background</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-sliderbtnbg" oninput="onColorPickerChange('s-sliderbtnbg')">
-          <input type="range" class="alpha-slider" id="s-sliderbtnbg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderbtnbg')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-sliderbtnbg-hex" maxlength="9" oninput="onHexInput('s-sliderbtnbg')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-sliderbtnbg',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-slider-row="sliderbtnfg"><span class="slider-row-handle">⠿</span>
-        <label>Button text color</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-sliderbtnfg" oninput="onColorPickerChange('s-sliderbtnfg')">
-          <input type="range" class="alpha-slider" id="s-sliderbtnfg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderbtnfg')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-sliderbtnfg-hex" maxlength="9" oninput="onHexInput('s-sliderbtnfg')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-sliderbtnfg',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-slider-row="sliderbtnborder"><span class="slider-row-handle">⠿</span>
-        <label>Button border color</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-sliderbtnborder" oninput="onColorPickerChange('s-sliderbtnborder')">
-          <input type="range" class="alpha-slider" id="s-sliderbtnborder-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sliderbtnborder')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-sliderbtnborder-hex" maxlength="9" oninput="onHexInput('s-sliderbtnborder')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-sliderbtnborder',this)">Copy</button>
-        </div>
-      </div>
-      <div class="settings-row" data-slider-row="sliderbtnspacing"><span class="slider-row-handle">⠿</span>
-          <label>Button spacing <span id="s-sliderbtnspacing-val">0px</span></label>
-          <input type="range" class="alpha-slider" id="s-sliderbtnspacing" min="-15" max="20" value="0" oninput="document.getElementById('s-sliderbtnspacing-val').textContent=this.value+'px';settingsChange()">
-        </div>
-        <div class="settings-row" data-slider-row="sliderbtnw"><span class="slider-row-handle">⠿</span>
-          <label>Button width <span id="s-sliderbtnw-val">22px</span></label>
-          <input type="range" class="alpha-slider" id="s-sliderbtnw" min="4" max="60" value="22" oninput="document.getElementById('s-sliderbtnw-val').textContent=this.value+'px';settingsChange()">
-        </div>
-        <div class="settings-row" data-slider-row="sliderbtnh"><span class="slider-row-handle">⠿</span>
-          <label>Button height <span id="s-sliderbtnh-val">22px</span></label>
-          <input type="range" class="alpha-slider" id="s-sliderbtnh" min="4" max="60" value="22" oninput="document.getElementById('s-sliderbtnh-val').textContent=this.value+'px';settingsChange()">
-        </div>
-        <div class="settings-row" data-slider-row="sliderbtnr"><span class="slider-row-handle">⠿</span>
-          <label>Button corners <span id="s-sliderbtnr-val">4px</span></label>
-          <input type="range" class="alpha-slider" id="s-sliderbtnr" min="0" max="30" value="4" oninput="document.getElementById('s-sliderbtnr-val').textContent=this.value+'px';settingsChange()">
         </div>
       </div>
       <div class="settings-group-content" id="sg-clock">
@@ -673,33 +596,6 @@
             <button class="copy-btn" onclick="copyHex('s-app-img-tint',this)">Copy</button>
           </div>
         </div>
-        <div class="settings-row">
-          <label>Status bar color</label>
-          <select id="s-app-statusbar-mode" onchange="statusBarModeChange()">
-            <option value="auto">Auto (sample image)</option>
-            <option value="solid">Solid</option>
-            <option value="gradient">Gradient</option>
-          </select>
-        </div>
-        <div class="color-settings-row" id="s-app-statusbar-color-row" style="display:none">
-          <label>Status bar</label>
-          <div class="color-picker-row">
-            <input type="color" id="s-app-statusbar-color" oninput="onColorPickerChange('s-app-statusbar-color')">
-            <input type="range" class="alpha-slider" id="s-app-statusbar-color-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-statusbar-color')">
-          </div>
-          <div class="hex-copy-row">
-            <input type="text" class="hex-input" id="s-app-statusbar-color-hex" maxlength="9" oninput="onHexInput('s-app-statusbar-color')" spellcheck="false" autocomplete="off">
-            <button class="copy-btn" onclick="copyHex('s-app-statusbar-color',this)">Copy</button>
-          </div>
-        </div>
-      </div>
-      <div class="settings-row" data-app-row="statusbar-icons">
-        <label>Status bar icons</label>
-        <select id="s-app-statusbar-icons" onchange="settingsAppChange()">
-          <option value="auto">Auto (from color)</option>
-          <option value="light">Light (white icons)</option>
-          <option value="dark">Dark (black icons)</option>
-        </select>
       </div>
       <!-- Text / UI colors -->
       <div class="color-settings-row" data-app-row="text" style="margin-top:8px">
@@ -922,155 +818,6 @@
         <label>Label stroke <span id="s-cp-label-stroke-val">0.5px</span></label>
         <input type="range" class="alpha-slider" id="s-cp-label-stroke" min="0" max="50" value="5" oninput="document.getElementById('s-cp-label-stroke-val').textContent=(this.value/10).toFixed(1)+'px';if(window._cpSaveFromUI)window._cpSaveFromUI();if(window._applyLabelToSwatches)window._applyLabelToSwatches();">
       </div>
-      <div class="settings-row" data-swatch-row="label-font">
-        <label>Label font</label>
-        <select id="s-cp-label-font" onchange="if(window._cpSaveFromUI)window._cpSaveFromUI();if(window._applyLabelToSwatches)window._applyLabelToSwatches();" style="display:none">
-          <option value="sans-serif">Sans-serif</option>
-          <option value="serif">Serif</option>
-          <option value="monospace">Monospace</option>
-          <option value="cursive">Cursive</option>
-          <option value="fantasy">Fantasy</option>
-          <option value="system-ui">System UI</option>
-          <option value="'Roboto', sans-serif">Roboto</option>
-          <option value="'Open Sans', sans-serif">Open Sans</option>
-          <option value="'Noto Sans', sans-serif">Noto Sans</option>
-          <option value="'Montserrat', sans-serif">Montserrat</option>
-          <option value="'Poppins', sans-serif">Poppins</option>
-          <option value="'Raleway', sans-serif">Raleway</option>
-          <option value="'Oswald', sans-serif">Oswald</option>
-          <option value="'Jost', sans-serif">Jost</option>
-          <option value="'Josefin Sans', sans-serif">Josefin Sans</option>
-          <option value="'Rubik', sans-serif">Rubik</option>
-          <option value="'Work Sans', sans-serif">Work Sans</option>
-          <option value="'Nunito', sans-serif">Nunito</option>
-          <option value="'Exo 2', sans-serif">Exo 2</option>
-          <option value="'Titillium Web', sans-serif">Titillium Web</option>
-          <option value="'Teko', sans-serif">Teko</option>
-          <option value="'Roboto Condensed', sans-serif">Roboto Condensed</option>
-          <option value="'Arimo', sans-serif">Arimo</option>
-          <option value="'PT Sans', sans-serif">PT Sans</option>
-          <option value="'Ubuntu', sans-serif">Ubuntu</option>
-          <option value="'Comfortaa', sans-serif">Comfortaa</option>
-          <option value="'Philosopher', sans-serif">Philosopher</option>
-          <option value="'Libre Franklin', sans-serif">Libre Franklin</option>
-          <option value="'Noto Serif', serif">Noto Serif</option>
-          <option value="'Merriweather', serif">Merriweather</option>
-          <option value="'Playfair Display', serif">Playfair Display</option>
-          <option value="'Lora', serif">Lora</option>
-          <option value="'EB Garamond', serif">EB Garamond</option>
-          <option value="'Libre Baskerville', serif">Libre Baskerville</option>
-          <option value="'Roboto Slab', serif">Roboto Slab</option>
-          <option value="'PT Serif', serif">PT Serif</option>
-          <option value="'Gelasio', serif">Gelasio</option>
-          <option value="'Unna', serif">Unna</option>
-          <option value="'Cinzel', serif">Cinzel</option>
-          <option value="'Abril Fatface', cursive">Abril Fatface</option>
-          <option value="'Dancing Script', cursive">Dancing Script</option>
-          <option value="'Roboto Mono', monospace">Roboto Mono</option>
-          <option value="'Fira Code', monospace">Fira Code</option>
-          <option value="'Source Code Pro', monospace">Source Code Pro</option>
-          <option value="'Inconsolata', monospace">Inconsolata</option>
-          <option value="'IBM Plex Mono', monospace">IBM Plex Mono</option>
-          <option value="'Cousine', monospace">Cousine</option>
-          <option value="'PT Mono', monospace">PT Mono</option>
-          <option value="'Ubuntu Mono', monospace">Ubuntu Mono</option>
-          <option value="ui-monospace">UI Monospace</option>
-        </select>
-        <div id="font-tumbler-wrap-swatch" style="flex:1;max-width:180px;background:#1c1c1c;border:1px solid #444;border-radius:6px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;min-height:52px;"></div>
-      </div>
-    </div>
-    <div class="settings-group-content" id="sg-toggles">
-      <div class="color-settings-row" data-toggle-row="off-bg">
-        <label>Track off background</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-toggle-off-bg" oninput="onColorPickerChange('s-toggle-off-bg')">
-          <input type="range" class="alpha-slider" id="s-toggle-off-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-off-bg')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-off-bg-hex" maxlength="9" oninput="onHexInput('s-toggle-off-bg')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-off-bg',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-toggle-row="on-bg">
-        <label>Track on background</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-toggle-on-bg" oninput="onColorPickerChange('s-toggle-on-bg')">
-          <input type="range" class="alpha-slider" id="s-toggle-on-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-on-bg')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-on-bg-hex" maxlength="9" oninput="onHexInput('s-toggle-on-bg')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-on-bg',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-toggle-row="knob-off">
-        <label>Knob off color</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-toggle-knob-off" oninput="onColorPickerChange('s-toggle-knob-off')">
-          <input type="range" class="alpha-slider" id="s-toggle-knob-off-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-knob-off')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-knob-off-hex" maxlength="9" oninput="onHexInput('s-toggle-knob-off')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-knob-off',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-toggle-row="knob-on">
-        <label>Knob on color</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-toggle-knob-on" oninput="onColorPickerChange('s-toggle-knob-on')">
-          <input type="range" class="alpha-slider" id="s-toggle-knob-on-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-knob-on')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-knob-on-hex" maxlength="9" oninput="onHexInput('s-toggle-knob-on')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-knob-on',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-toggle-row="border-off">
-        <label>Border off color</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-toggle-border-off" oninput="onColorPickerChange('s-toggle-border-off')">
-          <input type="range" class="alpha-slider" id="s-toggle-border-off-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-border-off')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-border-off-hex" maxlength="9" oninput="onHexInput('s-toggle-border-off')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-border-off',this)">Copy</button>
-        </div>
-      </div>
-      <div class="color-settings-row" data-toggle-row="border-on">
-        <label>Border on color</label>
-        <div class="color-picker-row">
-          <input type="color" id="s-toggle-border-on" oninput="onColorPickerChange('s-toggle-border-on')">
-          <input type="range" class="alpha-slider" id="s-toggle-border-on-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-toggle-border-on')">
-        </div>
-        <div class="hex-copy-row">
-          <input type="text" class="hex-input" id="s-toggle-border-on-hex" maxlength="9" oninput="onHexInput('s-toggle-border-on')" spellcheck="false" autocomplete="off">
-          <button class="copy-btn" onclick="copyHex('s-toggle-border-on',this)">Copy</button>
-        </div>
-      </div>
-      <div class="settings-row" data-toggle-row="w">
-        <label>Toggle width <span id="s-toggle-w-val">44px</span></label>
-        <input type="range" class="alpha-slider" id="s-toggle-w" min="24" max="80" value="44" oninput="document.getElementById('s-toggle-w-val').textContent=this.value+'px';settingsChange()">
-      </div>
-      <div class="settings-row" data-toggle-row="h">
-        <label>Toggle height <span id="s-toggle-h-val">24px</span></label>
-        <input type="range" class="alpha-slider" id="s-toggle-h" min="14" max="48" value="24" oninput="document.getElementById('s-toggle-h-val').textContent=this.value+'px';settingsChange()">
-      </div>
-      <div class="settings-row" data-toggle-row="knob-size">
-        <label>Knob size <span id="s-toggle-knob-size-val">16px</span></label>
-        <input type="range" class="alpha-slider" id="s-toggle-knob-size" min="8" max="40" value="16" oninput="document.getElementById('s-toggle-knob-size-val').textContent=this.value+'px';settingsChange()">
-      </div>
-      <div data-toggle-row="demo" style="margin-top:12px;padding-top:12px;border-top:1px solid #444;width:100%">
-        <label style="font-size:13px;color:#bbb">Demo:</label>
-        <div style="display:flex;gap:16px;align-items:center;margin-top:8px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div class="ctrl-toggle"><div class="ctrl-knob"></div></div>
-            <span style="font-size:11px;color:#666">Off</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div class="ctrl-toggle on"><div class="ctrl-knob"></div></div>
-            <span style="font-size:11px;color:#666">On</span>
-          </div>
-        </div>
-      </div>
     </div>
     <div id="settings-footer">
       <button id="settings-save" onclick="settingsSave()">Save</button>
@@ -1087,20 +834,11 @@
   </div>
 </div>
 <div id="ctrl-bar">
-  <div class="ctrl-group">
-    <div class="ctrl-toggle on" id="drag-toggle" onclick="ctrlToggleDrag()"><div class="ctrl-knob"></div></div>
-    <span class="ctrl-label">Drag</span>
-  </div>
-  <div class="ctrl-group ctrl-zoom-group">
-    <button style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;" onclick="ctrlZoom(Math.max(50,+document.getElementById('zoom-slider').value-1),false)">&#8722;</button>
-<input type="range" id="zoom-slider" min="50" max="300" value="175" oninput="ctrlZoom(this.value)">
-<button style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;" onclick="ctrlZoom(Math.min(300,+document.getElementById('zoom-slider').value+1),false)">+</button>
-    <span class="ctrl-label" id="zoom-label">100%</span>
-  </div>
-  <div class="ctrl-group">
-    <div class="ctrl-toggle on" id="interact-toggle" onclick="ctrlToggleInteract()"><div class="ctrl-knob"></div></div>
-    <span class="ctrl-label">Controls</span>
-  </div>
+  <span class="ctrl-label">Drag</span>
+  <div class="ctrl-toggle on" id="drag-toggle" onclick="ctrlToggleDrag()"><div class="ctrl-knob"></div></div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-toggle on" id="interact-toggle" onclick="ctrlToggleInteract()"><div class="ctrl-knob"></div></div>
+  <span class="ctrl-label">Controls</span>
 </div>
 <script src="utils.js"></script>
 <script src="tracker.js"></script>

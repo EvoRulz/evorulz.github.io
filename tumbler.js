@@ -1,4 +1,4 @@
-// @version 1284
+// @version 1231
 
 // ── Clock tumbler ──────────────────────────────────────────
   (function() {
@@ -411,7 +411,6 @@
       localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));
       localStorage.setItem('_lastStyledVersion',String(vNum));
       localStorage.setItem('_versionUpdatePending','1');
-      localStorage.setItem('_versionColor', autoColor);
     } else {
       const _savedVer=localStorage.getItem('_btnStyles');
       if(_savedVer){try{const _parsed=JSON.parse(_savedVer);if(_parsed['top-version']?.fg)_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},_parsed['top-version']);}catch{}}
@@ -441,13 +440,11 @@ window._verifyDeployedVersion = (function() {
   const _verifyFiles = [
     './index.html',
     './service-worker.js',
-    './manifest.json',
     './utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
     './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
     './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
     './slider-init.js','./color-picker.js','./app-data.js','./clock.js',
     './app.css','./settings-ui.css',
-    './LauncherActivity.java','./NotificationReceiver.java','./BootReceiver.java','./AndroidManifest.xml',
   ];
   return function() {
     if (_pending) return;
@@ -474,17 +471,13 @@ window._verifyDeployedVersion = (function() {
           const m = t.match(/id="app-version"[^>]*>v(\d+)</);
           return { f, ver: m ? parseInt(m[1]) : 0 };
         }
-        if (f === './manifest.json') {
-          const m = t.match(/\?v=(\d+)/);
-          return { f, ver: m ? parseInt(m[1]) : 0 };
-        }
         const m = t.match(/@version (\d+)/);
         return { f, ver: m ? parseInt(m[1]) : 0 };
       });
       const stale = results.filter(r => r.ver !== localVer);
       if (!stale.length) {
         window._versionCheckState = 'synced';
-        statsEl.innerHTML = 'CDN synced v' + localVer + '<br>' + _verifyFiles.length + ' files ok';
+        statsEl.innerHTML = 'CDN synced v' + localVer;
         statsEl.style.color = '#99ff99';
         statsEl.style.opacity = '1';
         try { const _ac=new AudioContext(); const _o=_ac.createOscillator(); const _g=_ac.createGain(); _o.connect(_g); _g.connect(_ac.destination); _o.frequency.value=1500; _g.gain.setValueAtTime(0.3,_ac.currentTime); _g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.4); _o.start(); _o.stop(_ac.currentTime+0.4); } catch(e) {}
@@ -505,62 +498,6 @@ window._verifyDeployedVersion = (function() {
     });
   };
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

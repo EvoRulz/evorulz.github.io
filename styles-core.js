@@ -1,4 +1,4 @@
-// @version 1284
+// @version 1231
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -99,116 +99,18 @@ if (navigator.storage && navigator.storage.persist) {
     barSet: "#7030A0FF",
     barTotal: "#8000FFFF",
     barStreak: "#375623FF",
-    statusBarMode: 'auto',
-    statusBarColor: '#111111FF',
-    statusBarStops: null,
-    statusBarIconStyle: 'auto',
     padding: 20,
   };
-  function _blendHexStops(hexArr, gradDir) {
-    if (!hexArr || !hexArr.length) return '#111111';
-    if (hexArr.length === 1) return hexArr[0].slice(0, 7);
-    const weights = hexArr.map((_, i) =>
-      gradDir === 'to bottom' ? 1 - (i / hexArr.length) : 1
-    );
-    const tw = weights.reduce((a, b) => a + b, 0);
-    let r = 0, g = 0, b = 0;
-    hexArr.forEach((hex, i) => {
-      const c = hex8ToComponents(hex);
-      const w = weights[i] / tw;
-      r += c.r * w; g += c.g * w; b += c.b * w;
-    });
-    return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
-  }
-  function _blendStopObjects(stops) {
-    if (!stops || !stops.length) return '#111111';
-    if (stops.length === 1) return stops[0].hex8.slice(0, 7);
-    let r = 0, g = 0, b = 0;
-    stops.forEach(s => {
-      const c = hex8ToComponents(s.hex8);
-      r += c.r / stops.length; g += c.g / stops.length; b += c.b / stops.length;
-    });
-    return '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
-  }
-  function _statusBarLuminance(hex) {
-    const {r, g, b} = hex8ToComponents(hex.length < 8 ? hex + 'FF' : hex);
-    const toL = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
-    return 0.2126 * toL(r) + 0.7152 * toL(g) + 0.0722 * toL(b);
-  }
-  function _applyStatusBarIcons(hex) {
-    const style = appStyle.statusBarIconStyle || 'auto';
-    let lightIcons;
-    if (style === 'light') lightIcons = true;
-    else if (style === 'dark') lightIcons = false;
-    else lightIcons = _statusBarLuminance(hex) <= 0.179;
-    if (window.AndroidSettings && window.AndroidSettings.setStatusBarIconColor) {
-      window.AndroidSettings.setStatusBarIconColor(lightIcons);
-    }
-  }
-  let _imgSampledColor = '#111111';
-  function _applyStatusBarColor() {
-    const _m = document.querySelector('meta[name="theme-color"]');
-    if (!_m) return;
-    let _tc = '#111111';
-    if (appStyle.bgType === 'image') {
-      const mode = appStyle.statusBarMode || 'auto';
-      if (mode === 'solid') {
-        _tc = appStyle.statusBarColor?.slice(0, 7) || '#111111';
-      } else if (mode === 'gradient') {
-        const stops = appStyle.statusBarStops;
-        _tc = stops && stops.length > 1
-          ? _blendStopObjects(stops)
-          : (stops && stops[0] ? stops[0].hex8.slice(0, 7) : (appStyle.statusBarColor?.slice(0, 7) || '#111111'));
-      } else {
-        _tc = _imgSampledColor;
-      }
-    } else if (appStyle.bgType === 'solid') {
-      _tc = appStyle.stops[0]?.slice(0, 7) || '#111111';
-    } else if (appStyle.bgType.startsWith('gradient')) {
-      _tc = _blendHexStops(appStyle.stops, appStyle.gradDir);
-    } else if (appStyle.bgType.startsWith('pattern')) {
-      _tc = appStyle.patBg?.slice(0, 7) || '#111111';
-    }
-    _m.setAttribute('content', _tc);
-    _applyStatusBarIcons(_tc);
-  }
   let appStyle = Object.assign({}, APP_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_appStyle"));
     if (saved) appStyle = Object.assign({}, APP_STYLE_DEFAULTS, saved);
   } catch {}
-  function _sampleImgTopColor(imgData) {
-    if (!imgData) { _imgSampledColor = '#111111'; return; }
-    const img = new Image();
-    img.onload = function() {
-      try {
-        const c = document.createElement('canvas');
-        c.width = 50; c.height = 10;
-        const ctx = c.getContext('2d');
-        const posMap = { top: 0, center: 0.5, bottom: 1, left: 0, right: 0.5 };
-        const yFrac = posMap[appStyle.imgPos] ?? 0;
-        const srcY = Math.floor((img.height - 10) * yFrac);
-        ctx.drawImage(img, 0, srcY, img.width, 10, 0, 0, 50, 10);
-        const px = ctx.getImageData(0, 0, 50, 10).data;
-        let r = 0, g = 0, b = 0, n = 0;
-        for (let i = 0; i < px.length; i += 4) { r += px[i]; g += px[i+1]; b += px[i+2]; n++; }
-        r = Math.round(r/n); g = Math.round(g/n); b = Math.round(b/n);
-        const {r: tr, g: tg, b: tb, a: ta} = hex8ToComponents(appStyle.imgTint || '#00000000');
-        const tA = ta / 255;
-        r = Math.round(r * (1 - tA) + tr * tA);
-        g = Math.round(g * (1 - tA) + tg * tA);
-        b = Math.round(b * (1 - tA) + tb * tA);
-        _imgSampledColor = '#' + [r, g, b].map(v => v.toString(16).padStart(2,'0')).join('');
-        _applyStatusBarColor();
-      } catch(e) { _imgSampledColor = '#111111'; }
-    };
-    img.src = imgData;
-  }
   (async function loadBgImage() {
     for (let attempt = 0; attempt < 4; attempt++) {
       try {
         const img = await ImgDB.get("bgImage");
-        if (img) { appStyle.imgData = img; _sampleImgTopColor(img); applyAppStyle(); }
+        if (img) { appStyle.imgData = img; applyAppStyle(); }
         return;
       } catch (e) {
         if (attempt < 3) await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
@@ -276,7 +178,6 @@ if (navigator.storage && navigator.storage.persist) {
     buildAppBg();
     document.body.style.color   = hex8ToCss(appStyle.textColor);
     document.body.style.padding = appStyle.padding + "px";
-    document.body.style.paddingTop = `calc(${appStyle.padding}px + env(safe-area-inset-top, 0px))`;
     const _borderVal = _bgCss(appStyle.borderColor);
     const _isBorderGrad = _borderVal.startsWith('linear-gradient') || _borderVal.startsWith('radial-gradient');
     document.documentElement.style.setProperty("--app-border-color", _isBorderGrad ? 'transparent' : _borderVal);
@@ -288,11 +189,10 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--bar-set-color",    hex8ToCss(appStyle.barSet));
     document.documentElement.style.setProperty("--bar-total-color",  hex8ToCss(appStyle.barTotal));
     document.documentElement.style.setProperty("--bar-streak-color", hex8ToCss(appStyle.barStreak));
-    _applyStatusBarColor();
   }
   applyAppStyle();
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16 };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000" };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -385,7 +285,6 @@ if (navigator.storage && navigator.storage.persist) {
   } catch {}
   function _btnStyleFor(id) {
     const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6 };
-    const _cachedVersionColor = localStorage.getItem('_versionColor');
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
       'top-settings':      { bg: '#2a2a2aFF', fg: '#999999FF' },
@@ -394,7 +293,7 @@ if (navigator.storage && navigator.storage.persist) {
       'top-manage-habits': { bg: '#444444FF', fg: '#FFFFFFFF' },
       'top-orient-lock':        { bg: '#2a2a2aFF', fg: '#999999FF', glow: '#00000000' },
       'top-orient-lock-locked': { bg: '#2a2a2aFF', fg: '#99ff99FF', glow: '#00000000' },
-      'top-version':       { bg: '#444444FF', fg: _cachedVersionColor || '#FFFFFFFF' },
+      'top-version':       { bg: '#444444FF', fg: '#FFFFFFFF' },
       };
     return Object.assign({}, base, TOP_GRID_DEFAULTS[id] || {}, _btnStyles[id] || {});
   }
@@ -417,34 +316,10 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--slider-w",             (btnStyle.sliderW ?? 100) + "%");
     document.documentElement.style.setProperty("--slider-handle-r",      (btnStyle.sliderHandleR ?? 3) + "%");
     document.documentElement.style.setProperty("--slider-handle-hole",  (btnStyle.sliderHandleHole ?? 0));
-    document.documentElement.style.setProperty("--slider-btn-gap",      (btnStyle.sliderBtnGap ?? 0) + "px");
-    const _sbGap = (btnStyle.sliderBtnGap ?? 0) + 'px';
-    document.querySelectorAll('.slider-step-minus').forEach(b => b.style.marginRight = _sbGap);
-    document.querySelectorAll('.slider-step-plus').forEach(b => b.style.marginLeft = _sbGap);
-    document.documentElement.style.setProperty("--slider-btn-bg",     hex8ToCss(btnStyle.sliderBtnBg     || '#2a2a2aFF'));
-    document.documentElement.style.setProperty("--slider-btn-fg",     hex8ToCss(btnStyle.sliderBtnFg     || '#aaaaaaFF'));
-    document.documentElement.style.setProperty("--slider-btn-border", hex8ToCss(btnStyle.sliderBtnBorder || '#555555FF'));
-    document.documentElement.style.setProperty("--slider-btn-w",      (btnStyle.sliderBtnW ?? 22) + "px");
-    document.documentElement.style.setProperty("--slider-btn-h",      (btnStyle.sliderBtnH ?? 22) + "px");
-    document.documentElement.style.setProperty("--slider-btn-r",      (btnStyle.sliderBtnR ?? 4)  + "px");
-    document.querySelectorAll('.slider-step-minus, .slider-step-plus').forEach(b => {
-      b.style.width        = (btnStyle.sliderBtnW ?? 22) + 'px';
-      b.style.height       = (btnStyle.sliderBtnH ?? 22) + 'px';
-      b.style.borderRadius = (btnStyle.sliderBtnR ?? 4)  + 'px';
-    });
     document.documentElement.style.setProperty("--slider-fill-color",    _bgCss(btnStyle.sliderFill   || '#9659FFFF'));
     document.documentElement.style.setProperty("--slider-track-bg",      _bgCss(btnStyle.sliderTrack  || '#333333FF'));
     document.documentElement.style.setProperty("--slider-handle-color",  _bgCss(btnStyle.sliderHandle || '#FFFFFFFF'));
     document.documentElement.style.setProperty("--slider-handle-border", _bgCss(btnStyle.sliderHandleBorder || '#00000000'));
-    let _sliderGlowStyle = document.getElementById('_slider-glow-style');
-    if (!_sliderGlowStyle) { _sliderGlowStyle = document.createElement('style'); _sliderGlowStyle.id = '_slider-glow-style'; document.head.appendChild(_sliderGlowStyle); }
-    const _hGlow = hex8ToCss(btnStyle.sliderHandleGlow || '#FFFFFF00');
-    const _haGlow = hex8ToCss(btnStyle.sliderHandleActiveGlow || '#FFFFFFD9');
-    _sliderGlowStyle.textContent =
-      '.alpha-slider::-webkit-slider-thumb, #zoom-slider::-webkit-slider-thumb, #cp-popup input[type=range]::-webkit-slider-thumb { box-shadow: 0 0 8px 4px ' + _hGlow + ' !important; }\n' +
-      '.alpha-slider::-moz-range-thumb, #zoom-slider::-moz-range-thumb, #cp-popup input[type=range]::-moz-range-thumb { box-shadow: 0 0 8px 4px ' + _hGlow + ' !important; }\n' +
-      '.alpha-slider.handle-active::-webkit-slider-thumb, #zoom-slider.handle-active::-webkit-slider-thumb { box-shadow: 0 0 8px 4px ' + _haGlow + ' !important; }\n' +
-      '.alpha-slider.handle-active::-moz-range-thumb, #zoom-slider.handle-active::-moz-range-thumb { box-shadow: 0 0 8px 4px ' + _haGlow + ' !important; }';
     document.querySelectorAll('.alpha-slider').forEach(s => {
       if (s.id && s.id.endsWith('-alpha')) updateAlphaSliderBg(s.id.slice(0, -6));
       else updateSliderFill(s);
@@ -460,15 +335,6 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--clock-bg",             hex8ToCss(btnStyle.clockBg));
     document.documentElement.style.setProperty("--clock-date-bg",        _bgCss(_btnStyleFor('top-date').bg));
     document.documentElement.style.setProperty("--clock-time-bg",        _bgCss(_btnStyleFor('top-time').bg));
-    document.documentElement.style.setProperty("--toggle-off-bg",     hex8ToCss(btnStyle.toggleOffBg    || '#333333FF'));
-    document.documentElement.style.setProperty("--toggle-on-bg",      hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF'));
-    document.documentElement.style.setProperty("--toggle-switch-off",   hex8ToCss(btnStyle.toggleSwitchOff  || '#666666FF'));
-    document.documentElement.style.setProperty("--toggle-switch-on",    hex8ToCss(btnStyle.toggleSwitchOn   || '#99ff99FF'));
-    document.documentElement.style.setProperty("--toggle-border-off", hex8ToCss(btnStyle.toggleBorderOff|| '#555555FF'));
-    document.documentElement.style.setProperty("--toggle-border-on",  hex8ToCss(btnStyle.toggleBorderOn || '#2a7a2aFF'));
-    document.documentElement.style.setProperty("--toggle-w",          (btnStyle.toggleW        ?? 44) + 'px');
-    document.documentElement.style.setProperty("--toggle-h",          (btnStyle.toggleH        ?? 24) + 'px');
-    document.documentElement.style.setProperty("--toggle-switch-size",  (btnStyle.toggleSwitchSize ?? 16) + 'px');
     const topGridMap = [
       { id: 'top-export-all',    el: '.top-item[data-item="export-all"]',    prefix: '--export-all' },
       { id: 'top-import-all',    el: '.top-item[data-item="import-all"]',    prefix: '--import-all' },
@@ -543,10 +409,7 @@ if (navigator.storage && navigator.storage.persist) {
       const _vNumSpan = document.getElementById('app-version');
       if (_vNumSpan) _vNumSpan.style.fontFamily = _btnStyleFor('top-version').font;
     if (_vBtn) {
-      let _vTapX = 0, _vTapY = 0;
-_vBtn.onpointerdown = (e) => { _vTapX = e.clientX; _vTapY = e.clientY; _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
-_vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _vTapY) > 6) _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
-      _vBtn.onpointerleave = () => { _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg); };
+      _vBtn.onpointerdown = () => { _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
       _vBtn.onpointerup = () => {
         _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
         if(localStorage.getItem('_versionUpdatePending')==='1'){
@@ -574,7 +437,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     }
     const _versionNumSpan = document.getElementById('app-version');
     const _versionStatsSpan = document.getElementById('app-stats');
-    if (_versionNumSpan) { _versionNumSpan.style.color = _versionColor; _versionNumSpan.style.visibility = ''; }
+    if (_versionNumSpan) _versionNumSpan.style.color = _versionColor;
     if (_versionStatsSpan) { _versionStatsSpan.style.color = _versionColor; _versionStatsSpan.style.opacity = '0.4'; }
 
     buttonsEl.querySelectorAll(".tracker-btn[data-id]").forEach(btn => {
@@ -609,62 +472,6 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

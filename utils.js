@@ -1,4 +1,4 @@
- // @version 1284
+ // @version 1231
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -114,64 +114,7 @@ async function toggleOrientLock() {
   _updateOrientBtn();
   if (window._cfRender) window._cfRender();
 }
-(function() {
-  const saved = localStorage.getItem('_zoom');
-  if (saved) {
-    const zoom = parseInt(saved);
-    const sliderVal = Math.round(zoomToSlider(zoom));
-    const content = document.getElementById('zoom-content');
-    if (content) {
-      if (zoom === 100) {
-        content.style.transform = '';
-        content.style.transformOrigin = '';
-        content.style.height = '';
-      } else {
-        const scale = zoom / 100;
-        content.style.transformOrigin = 'top center';
-        content.style.transform = 'scale(' + scale + ')';
-        content.style.height = (content.scrollHeight * scale) + 'px';
-      }
-    }
-    const sl = document.getElementById('zoom-slider');
-    const lb = document.getElementById('zoom-label');
-    if (sl) sl.value = sliderVal;
-    if (lb) lb.textContent = zoom + '%';
-  }
-})();
-  function sliderToZoom(s) {
-    s = Number(s);
-    if (s <= 175) return 50 + (s - 50) * 50 / 125;
-    return 100 + (s - 175) * 200 / 125;
-  }
-  function zoomToSlider(z) {
-    z = Number(z);
-    if (z <= 100) return 50 + (z - 50) * 125 / 50;
-    return 175 + (z - 100) * 125 / 200;
-  }
-  function ctrlZoom(sliderVal, snap = true) {
-    sliderVal = Number(sliderVal);
-    if (snap && Math.abs(sliderVal - 175) <= 8) sliderVal = 175;
-    const zoom = Math.round(sliderToZoom(sliderVal));
-    const sl = document.getElementById('zoom-slider');
-    if (sl) sl.value = sliderVal;
-    const content = document.getElementById('zoom-content');
-    if (content) {
-      if (zoom === 100) {
-        content.style.transform = '';
-        content.style.transformOrigin = '';
-        content.style.height = '';
-      } else {
-        const scale = zoom / 100;
-        content.style.transformOrigin = 'top center';
-        content.style.transform = 'scale(' + scale + ')';
-        content.style.height = (content.scrollHeight * scale) + 'px';
-      }
-    }
-    const lb = document.getElementById('zoom-label');
-    if (lb) lb.textContent = zoom + '%';
-    localStorage.setItem('_zoom', zoom);
-  }
-  window._dragEnabled = true;
+window._dragEnabled = true;
   window._interactEnabled = true;
   function ctrlToggleDrag() {
     window._dragEnabled = !window._dragEnabled;
@@ -185,77 +128,15 @@ async function toggleOrientLock() {
   }
   const keys = await caches.keys();
   for (const k of keys) await caches.delete(k);
-  window.location.replace(location.href.replace(/[?#].*$/, '') + '?t=' + Date.now());
-  }
-  (function() {
-    const _zs = document.getElementById('zoom-slider');
-    if (!_zs) return;
-    _zs.addEventListener('pointerdown', () => _zs.classList.add('handle-active'));
-    _zs.addEventListener('pointerup',   () => _zs.classList.remove('handle-active'));
-    _zs.addEventListener('pointercancel', () => _zs.classList.remove('handle-active'));
-  })();
+  location.reload(true);
+}
+  
   function ctrlToggleInteract() {
     window._interactEnabled = !window._interactEnabled;
     const t = document.getElementById('interact-toggle');
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
