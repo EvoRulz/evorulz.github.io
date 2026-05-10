@@ -1,4 +1,4 @@
-// @version 1318
+// @version 1319
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -202,7 +202,7 @@ var _srGlowStyle = document.createElement('style');
       }, 400);
     }
     });
-    grid.addEventListener('pointermove', e => {
+    document.addEventListener('pointermove', e => {
       if (!rDrag) return;
       const moved = Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY);
       if (!rReady) {
@@ -213,10 +213,9 @@ var _srGlowStyle = document.createElement('style');
       if (!rDrag.active) {
         if (moved < DRAG_THRESHOLD) return;
         rDrag.active = true;
-        grid.setPointerCapture(rDrag.pointerId);
+        try { rDrag.item.setPointerCapture(rDrag.pointerId); } catch (_) {}
         e.preventDefault();
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
-        grid.setPointerCapture(rDrag.pointerId);
         const rect = rDrag.item.getBoundingClientRect();
         rDrag.offX = rDrag.startX - rect.left;
         rDrag.offY = rDrag.startY - rect.top;
@@ -250,7 +249,7 @@ var _srGlowStyle = document.createElement('style');
         grid.insertBefore(rDrag.item, overNext || null);
         grid.insertBefore(over, iNext || null);
       }
-    }, { passive: false }, { passive: false });
+    }, { passive: false });
     grid.addEventListener('pointerup', () => {
       if (!rDrag) return;
       const wasActive = rDrag.active;
@@ -419,6 +418,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
