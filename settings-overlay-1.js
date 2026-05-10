@@ -1,4 +1,4 @@
-// @version 1345
+// @version 1346
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -10,6 +10,7 @@ document.body.insertAdjacentHTML('beforeend', `
       <div class="settings-group-item" data-group="sg-clock">Clock</div>
       <div class="settings-group-item" data-group="sg-checkboxes">Checkboxes</div>
       <div class="settings-group-item" data-group="sg-app">App</div>
+      <div class="settings-group-item" data-group="sg-tables">Tables</div>
       <div class="settings-group-item" data-group="sg-notifications">Notifications</div>
       <div class="settings-group-item" data-group="sg-swatches">Swatches</div>
       <div class="settings-group-item" data-group="sg-toggles">Toggles</div>
@@ -328,6 +329,7 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
+
 
 
 

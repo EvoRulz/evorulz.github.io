@@ -1,4 +1,4 @@
-// @version 1345
+// @version 1346
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -322,6 +322,8 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
           <button class="copy-btn" onclick="copyHex('s-app-text',this)">Copy</button>
         </div>
       </div>
+      </div>
+    <div class="settings-group-content" id="sg-tables">
       <div class="color-settings-row" data-app-row="border">
         <label>Table border color</label>
         <div class="color-picker-row">
@@ -353,6 +355,39 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         <div class="hex-copy-row">
           <input type="text" class="hex-input" id="s-app-cell-bg-hex" maxlength="9" oninput="onHexInput('s-app-cell-bg')" spellcheck="false" autocomplete="off">
           <button class="copy-btn" onclick="copyHex('s-app-cell-bg',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-app-row="barset">
+        <label>Set bar color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-bar-set" oninput="onColorPickerChange('s-app-bar-set')">
+          <input type="range" class="alpha-slider" id="s-app-bar-set-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-bar-set')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-bar-set-hex" maxlength="9" oninput="onHexInput('s-app-bar-set')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-bar-set',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-app-row="bartotal">
+        <label>Total bar color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-bar-total" oninput="onColorPickerChange('s-app-bar-total')">
+          <input type="range" class="alpha-slider" id="s-app-bar-total-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-bar-total')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-bar-total-hex" maxlength="9" oninput="onHexInput('s-app-bar-total')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-bar-total',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-app-row="barstreak">
+        <label>Streak bar color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-bar-streak" oninput="onColorPickerChange('s-app-bar-streak')">
+          <input type="range" class="alpha-slider" id="s-app-bar-streak-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-bar-streak')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-bar-streak-hex" maxlength="9" oninput="onHexInput('s-app-bar-streak')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-bar-streak',this)">Copy</button>
         </div>
       </div>
       </div>
@@ -694,6 +729,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <input type="file" id="settings-import-file" accept=".json" style="display:none" onchange="settingsImport(this)">
     </div>
 `);
+
 
 
 
