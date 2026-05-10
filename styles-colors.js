@@ -1,4 +1,4 @@
-// @version 1351
+// @version 1352
 
 // ── Settings panel logic ───────────────────────────────────
   function onColorPickerChange(id) {
@@ -150,7 +150,11 @@ function onHexInput(id) {
     commitHexInput(id);
     hexEl.blur();
   });
-
+  document.addEventListener('blur', function(e) {
+    if (!e.target.classList.contains('hex-input')) return;
+    const id = e.target.id.replace('-hex', '');
+    commitHexInput(id);
+  }, true);
   function copyHex(id, btn) {
     const val = getColorValue(id);
     navigator.clipboard.writeText(val).then(() => {
@@ -283,6 +287,7 @@ function onHexInput(id) {
     if (thumb) { thumb.src = ""; prev.style.display = "none"; }
     buildAppBg();
   }
+
 
 
 

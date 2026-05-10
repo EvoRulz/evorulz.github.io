@@ -1,4 +1,4 @@
-// @version 1351
+// @version 1352
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -539,7 +539,19 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     }
   });
   el.querySelector('#cp-hex').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      let val = this.value.trim().replace(/[^0-9a-fA-F#]/g, '');
+      if (val && !val.startsWith('#')) val = '#' + val;
+      const h = val.replace('#', '');
+      let expanded = null;
+      if      (h.length === 3) expanded = '#' + (h[0]+h[0]+h[1]+h[1]+h[2]+h[2]).toUpperCase() + 'FF';
+      else if (h.length === 4) expanded = '#' + (h[0]+h[0]+h[1]+h[1]+h[2]+h[2]+h[3]+h[3]).toUpperCase();
+      else if (h.length === 6) expanded = '#' + h.toUpperCase() + 'FF';
+      else if (h.length === 8) expanded = '#' + h.toUpperCase();
+      if (expanded) { this.value = expanded; this.dispatchEvent(new Event('input', {bubbles:true})); }
+      this.blur();
+    }
   });
   el.querySelector('#cp-hex').addEventListener('focus', function() { window._cpHexEditing = true; });
   el.querySelector('#cp-hex').addEventListener('blur',  function() { window._cpHexEditing = false; });
@@ -825,6 +837,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
