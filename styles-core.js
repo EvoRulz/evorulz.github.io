@@ -1,4 +1,4 @@
-// @version 1344
+// @version 1345
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -551,10 +551,20 @@ window._applyTextStyle = _applyTextStyle;
       el.style.setProperty(prefix + '-font', _s.font);
       el.style.setProperty(prefix + '-glow', hex8ToCss(_s.glow));
       const _btn = el.querySelector('button');
-      if (_btn) {
-        _btn.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
-        _btn.style.fontSize = (_s.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
-      }
+  if (_btn) {
+    _btn.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+    _btn.style.fontSize = (_s.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
+    let _tspan = _btn.querySelector('.btn-text-label');
+    if (!_tspan && _btn.textContent.trim() && !_btn.querySelector('svg')) {
+      _tspan = document.createElement('span');
+      _tspan.className = 'btn-text-label';
+      _tspan.dataset.text = _btn.textContent.trim();
+      _tspan.textContent = _btn.textContent.trim();
+      _btn.textContent = '';
+      _btn.appendChild(_tspan);
+    }
+    if (_tspan) _applyTextStyle(_tspan, _s);
+  }
     });
     const _olBtn = document.getElementById('orient-lock-btn');
     if (_olBtn) {
@@ -675,6 +685,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
