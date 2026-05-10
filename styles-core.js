@@ -1,4 +1,4 @@
-// @version 1328
+// @version 1329
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -403,7 +403,10 @@ if (navigator.storage && navigator.storage.persist) {
   if (!el) return;
   const fgStops = s.fgStops;
   const strokeW = s.fgStrokeW ?? btnStyle.fgStrokeW ?? 0;
-  const strokeC = hex8ToCss(s.fgStroke ?? btnStyle.fgStroke ?? '#00000000');
+  const _fgSv = s.fgStroke ?? btnStyle.fgStroke ?? '#00000000';
+  const strokeC = (typeof _fgSv === 'string' && (_fgSv.startsWith('linear-gradient') || _fgSv.startsWith('radial-gradient')))
+    ? (s.fgStrokeStops && s.fgStrokeStops[0] ? hex8ToCss(s.fgStrokeStops[0].hex8) : 'transparent')
+    : hex8ToCss(_fgSv);
   if (fgStops && fgStops.length >= 2) {
     const grad = 'linear-gradient(to right,' + fgStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')';
     el.style.background = grad;
@@ -422,6 +425,12 @@ if (navigator.storage && navigator.storage.persist) {
       el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
       el.classList.add('has-stroke');
     } else {
+      if (strokeW > 0) {
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.color = 'transparent';
+      el.style.setProperty('--_btn-fg', hex8ToCss(s.fg));
+      el.classList.add('has-stroke');
+    } else {
       el.style.webkitTextFillColor = hex8ToCss(s.fg);
       el.style.color = hex8ToCss(s.fg);
       el.style.removeProperty('--_btn-fg');
@@ -434,6 +443,7 @@ if (navigator.storage && navigator.storage.persist) {
   } else {
     el.style.webkitTextStroke = '';
     el.style.paintOrder = '';
+    el.classList.remove('has-stroke');
   }
 }
 window._applyTextStyle = _applyTextStyle;
@@ -647,6 +657,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
