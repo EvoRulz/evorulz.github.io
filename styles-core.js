@@ -1,4 +1,4 @@
-// @version 1347
+// @version 1348
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -593,12 +593,30 @@ window._applyTextStyle = _applyTextStyle;
       const _habBtn = _habEl.querySelector('button');
       const _habStyleId = !skipHabitsBtn && habitsVisible ? 'top-hide-habits' : 'top-show-habits';
       const _habRadius = _btnStyles[_habStyleId]?.btnRadius ?? btnStyle.btnRadius ?? 6;
-      if (_habBtn) _habBtn.style.borderRadius = _habRadius + 'px';
+      if (_habBtn) {
+  _habBtn.style.borderRadius = _habRadius + 'px';
+  _habBtn.style.fontSize = (_hs.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
+  let _htspan = _habBtn.querySelector('.btn-text-label');
+  if (!_htspan) {
+    const _htxt = _habBtn.textContent.trim();
+    if (_htxt) {
+      _htspan = document.createElement('span');
+      _htspan.className = 'btn-text-label';
+      _htspan.dataset.text = _htxt;
+      _htspan.textContent = _htxt;
+      _habBtn.textContent = '';
+      _habBtn.appendChild(_htspan);
+    }
+  } else {
+    _htspan.dataset.text = _htspan.textContent.trim();
+  }
+  if (_htspan) _applyTextStyle(_htspan, _hs);
+}
     }
     const _dateSpan = document.querySelector('.top-item[data-item="date"] span');
     const _timeSpan = document.querySelector('.top-item[data-item="time"] span');
-    if (_dateSpan) { _dateSpan.style.color = hex8ToCss(_btnStyleFor('top-date').fg); _dateSpan.style.fontFamily = _btnStyleFor('top-date').font; }
-    if (_timeSpan) { _timeSpan.style.color = hex8ToCss(_btnStyleFor('top-time').fg); _timeSpan.style.fontFamily = _btnStyleFor('top-time').font; }
+    if (_dateSpan) { _dateSpan.style.fontFamily = _btnStyleFor('top-date').font; _applyTextStyle(_dateSpan, _btnStyleFor('top-date')); }
+    if (_timeSpan) { _timeSpan.style.fontFamily = _btnStyleFor('top-time').font; _applyTextStyle(_timeSpan, _btnStyleFor('top-time')); }
     const _dateTopItem = document.querySelector('.top-item[data-item="date"]');
     const _timeTopItem = document.querySelector('.top-item[data-item="time"]');
     if (_dateTopItem) _dateTopItem.style.borderRadius = (_btnStyles['top-date']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
@@ -685,6 +703,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

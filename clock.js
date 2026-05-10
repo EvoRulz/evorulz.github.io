@@ -1,4 +1,4 @@
-// @version 1347
+// @version 1348
 
 // ── Live clock ─────────────────────────────────────────────
   (function() {
@@ -108,7 +108,9 @@
       const now = new Date();
       const { dateLine, timeLine } = buildDateTime(now, tumblerCfg);
       dateEl.innerHTML = dateLine.replace(/\s/g,"<br>");
+      dateEl.dataset.text = dateLine;
       timeEl.textContent = timeLine;
+      timeEl.dataset.text = timeLine;
     }
 
     let _dateCycleStep = 0;
@@ -206,6 +208,7 @@ dateEl.closest(".top-item").addEventListener("click", () => {
         });
     });
 }
+
 
 
 

@@ -1,4 +1,4 @@
-// @version 1347
+// @version 1348
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -168,8 +168,10 @@ function settingsExport() {
           activeBg: getStyleValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockDateSize: Number(document.getElementById("s-clock-date-size").value),
-        });
-        setColorValue('s-clock-date-color', dateColor);
+          fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+          fgStroke: getStyleValue('s-fgstroke'),
+          fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+          fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
         updateAlphaSliderBg('s-clock-date-color');
         setColorValue('s-clock-date-glow', getColorValue('s-glow'));
         updateAlphaSliderBg('s-clock-date-glow');
@@ -181,8 +183,10 @@ function settingsExport() {
           activeBg: getStyleValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockTimeSize: Number(document.getElementById("s-clock-time-size").value),
-        });
-        setColorValue('s-clock-time-color', timeColor);
+          fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+          fgStroke: getStyleValue('s-fgstroke'),
+          fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+          fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
         updateAlphaSliderBg('s-clock-time-color');
         setColorValue('s-clock-time-glow', getColorValue('s-glow'));
         updateAlphaSliderBg('s-clock-time-glow');
@@ -448,6 +452,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
