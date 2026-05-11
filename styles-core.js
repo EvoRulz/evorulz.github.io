@@ -1,4 +1,4 @@
-// @version 1353
+// @version 1354
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -100,6 +100,9 @@ if (navigator.storage && navigator.storage.persist) {
     barTotal: "#8000FFFF",
     barStreak: "#375623FF",
     barAntiStreak: "#8B0000FF",
+    streakText: "#FFFFFFFF",
+    antiStreakText: "#8B0000FF",
+    setValueText: "#FFFFFFFF",
     statusBarMode: 'auto',
     statusBarColor: '#111111FF',
     statusBarStops: null,
@@ -290,6 +293,9 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--bar-total-color",  hex8ToCss(appStyle.barTotal));
     document.documentElement.style.setProperty("--bar-streak-color", hex8ToCss(appStyle.barStreak));
     document.documentElement.style.setProperty("--bar-anti-streak-color", hex8ToCss(appStyle.barAntiStreak || "#8B0000FF"));
+    document.documentElement.style.setProperty("--streak-text-color",     hex8ToCss(appStyle.streakText    || "#FFFFFFFF"));
+    document.documentElement.style.setProperty("--anti-streak-text-color", hex8ToCss(appStyle.antiStreakText || "#8B0000FF"));
+    document.documentElement.style.setProperty("--set-value-text-color",  hex8ToCss(appStyle.setValueText  || "#FFFFFFFF"));
     _applyStatusBarColor();
   }
   applyAppStyle();
@@ -705,6 +711,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

@@ -1,4 +1,4 @@
-// @version 1353
+// @version 1354
 
 // ── Tracker configs (dynamic) ──────────────────────────────
   const CONFIG_DEFAULTS = [
@@ -168,7 +168,7 @@
         const total=sum(saved.sets);
         const totalPct=Math.min(total,TOTAL_BAR_MAX)/TOTAL_BAR_MAX*100;
         html+=`<td class="set-cell">
-          <div style="text-align:center;font-size:12px;line-height:18px">${total||""}</div>
+          <div style="text-align:center;font-size:12px;line-height:18px;color:var(--set-value-text-color,#fff)">${total||""}</div>
           <div class="bar-container"><div class="bar-total" style="width:${totalPct}%"></div></div>
         </td>`;
         for (let s=0;s<NUM_SETS;s++) {
@@ -442,6 +442,7 @@
     return { init, reload, onSelectChange, onReasonInput, onInput,
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
+
 
 
 

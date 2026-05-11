@@ -1,4 +1,4 @@
-// @version 1353
+// @version 1354
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -401,6 +401,39 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
           <button class="copy-btn" onclick="copyHex('s-app-bar-anti-streak',this)">Copy</button>
         </div>
       </div>
+      <div class="color-settings-row" data-app-row="streaktext">
+        <label>Streak text color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-streak-text" oninput="onColorPickerChange('s-app-streak-text')">
+          <input type="range" class="alpha-slider" id="s-app-streak-text-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-streak-text')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-streak-text-hex" maxlength="9" oninput="onHexInput('s-app-streak-text')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-streak-text',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-app-row="antistreaktext">
+        <label>Anti-streak text color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-anti-streak-text" oninput="onColorPickerChange('s-app-anti-streak-text')">
+          <input type="range" class="alpha-slider" id="s-app-anti-streak-text-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-anti-streak-text')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-anti-streak-text-hex" maxlength="9" oninput="onHexInput('s-app-anti-streak-text')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-anti-streak-text',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-app-row="settext">
+        <label>Set text color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-set-text" oninput="onColorPickerChange('s-app-set-text')">
+          <input type="range" class="alpha-slider" id="s-app-set-text-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-set-text')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-set-text-hex" maxlength="9" oninput="onHexInput('s-app-set-text')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-set-text',this)">Copy</button>
+        </div>
+      </div>
       </div>
     <div class="settings-group-content" id="sg-notifications">
         <div class="settings-row" style="justify-content:space-between;gap:12px;">
@@ -740,6 +773,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <input type="file" id="settings-import-file" accept=".json" style="display:none" onchange="settingsImport(this)">
     </div>
 `);
+
 
 
 

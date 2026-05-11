@@ -1,4 +1,4 @@
-// @version 1353
+// @version 1354
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -328,6 +328,9 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     if (document.getElementById('s-app-bar-total'))  appStyle.barTotal    = getColorValue('s-app-bar-total');
     if (document.getElementById('s-app-bar-streak')) appStyle.barStreak   = getColorValue('s-app-bar-streak');
     if (document.getElementById('s-app-bar-anti-streak')) appStyle.barAntiStreak = getColorValue('s-app-bar-anti-streak');
+    if (document.getElementById('s-app-streak-text'))      appStyle.streakText     = getColorValue('s-app-streak-text');
+    if (document.getElementById('s-app-anti-streak-text')) appStyle.antiStreakText  = getColorValue('s-app-anti-streak-text');
+    if (document.getElementById('s-app-set-text'))         appStyle.setValueText   = getColorValue('s-app-set-text');
     if (document.getElementById('s-app-text'))       appStyle.textColor   = getColorValue('s-app-text');
     applyAppStyle();
     _applyStatusBarColor();
@@ -430,6 +433,9 @@ _btnStyles = {};
     const _cdrOpenEl = document.getElementById("s-clock-date-radius"); if (_cdrOpenEl) { _cdrOpenEl.value = String(_cdrOpenV); const _cdrvOpenEl = document.getElementById("s-clock-date-radius-val"); if (_cdrvOpenEl) _cdrvOpenEl.textContent = _cdrOpenV + "px"; }
     const _ctrOpenV = _btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6;
     const _ctrOpenEl = document.getElementById("s-clock-time-radius"); if (_ctrOpenEl) { _ctrOpenEl.value = String(_ctrOpenV); const _ctrvOpenEl = document.getElementById("s-clock-time-radius-val"); if (_ctrvOpenEl) _ctrvOpenEl.textContent = _ctrOpenV + "px"; }
+    setColorValue('s-app-streak-text',      appStyle.streakText    || "#FFFFFFFF");
+    setColorValue('s-app-anti-streak-text', appStyle.antiStreakText || "#8B0000FF");
+    setColorValue('s-app-set-text',         appStyle.setValueText  || "#FFFFFFFF");
     applyBtnStyle();
     window._clockSet([6, 1, 1, 1, 2, 1, 1, 0]);
     settingsUpdatePreview();
@@ -463,6 +469,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
