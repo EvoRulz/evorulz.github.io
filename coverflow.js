@@ -1,4 +1,4 @@
-// @version 1367
+// @version 1368
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -210,7 +210,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
           const _cs = _btnStyleFor(items[i].id);
           el.style.background = hex8ToCss(_cs.bg);
           el.style.color      = hex8ToCss(_cs.fg);
-          el.style.fontSize   = (items[i].id === 'top-date' ? btnStyle.clockDateSize : btnStyle.clockTimeSize) + 'px';
+          el.style.fontSize   = (items[i].id === 'top-date' ? (_btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize) : (_btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize)) + 'px';
           el.style.fontFamily = _btnStyleFor(items[i].id).font || 'sans-serif';
           const now = new Date();
           const cfg = window._clockGet().tumblerCfg;
@@ -298,7 +298,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
           el.style.flexDirection = 'column';
           el.style.alignItems = 'center';
           el.style.gap = '2px';
-          el.innerHTML = '<span style="font-size:14px;color:' + hex8ToCss(s2.fg) + '">' + (vNum ? vNum.textContent : '') + '</span><span style="font-size:9px;color:' + hex8ToCss(s2.fg) + ';line-height:1.4;text-align:center;opacity:0.4">' + (vStats ? vStats.innerHTML : '') + '</span>';
+          el.innerHTML = '<span style="font-size:' + (s2.fontSize ?? btnStyle.fontSize ?? 16) + 'px;color:' + hex8ToCss(s2.fg) + '">' + (vNum ? vNum.textContent : '') + '</span><span style="font-size:9px;color:' + hex8ToCss(s2.fg) + ';line-height:1.4;text-align:center;opacity:0.4">' + (vStats ? vStats.innerHTML : '') + '</span>';
         } else {
           el.style.display = '';
           el.style.flexDirection = '';
@@ -520,6 +520,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 
