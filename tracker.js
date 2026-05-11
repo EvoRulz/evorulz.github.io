@@ -1,4 +1,4 @@
-// @version 1357
+// @version 1358
 
 // ── Tracker configs (dynamic) ──────────────────────────────
   const CONFIG_DEFAULTS = [
@@ -77,6 +77,14 @@
     const { id, label, hasSets, hasStreak, autoStatus } = config;
     const prefix = id + ":";
     const store = {};
+    let _maxStreak = 1, _maxAntiStreak = 1;
+    function computeMaxStreaks() {
+      _maxStreak = 1; _maxAntiStreak = 1;
+      for (const ds of Object.keys(store)) {
+        const s = computeStreak(ds); if (s > _maxStreak) _maxStreak = s;
+        const a = computeAntiStreak(ds); if (a > _maxAntiStreak) _maxAntiStreak = a;
+      }
+    }
     let sortKey="date", sortDir=1, filterStatus="", viewDates=null, topDate, bottomDate;
 
     function sel(q)    { return document.querySelector(`#section-${id} ${q}`); }
@@ -146,9 +154,9 @@
     function makeRow(ds) {
       const saved=getRow(ds);
       const streak=computeStreak(ds);
-      const streakPct=Math.min(streak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+      const streakPct=Math.min(streak,_maxStreak)/_maxStreak*100;
       const antiStreak=computeAntiStreak(ds);
-      const antiStreakPct=Math.min(antiStreak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+      const antiStreakPct=Math.min(antiStreak,_maxAntiStreak)/_maxAntiStreak*100;
       const statusOpts=`<option value=""></option>`+
         STATUSES.map(s=>`<option value="${s}"${saved.status===s?" selected":""}>${s}</option>`).join("");
 
@@ -207,11 +215,11 @@
         const ds=row.dataset.date;
         const cells=row.querySelectorAll("td");
         const streak=computeStreak(ds);
-        const sp=Math.min(streak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+        const sp=Math.min(streak,_maxStreak)/_maxStreak*100;
         cells[3].querySelector(".streak-count").textContent=streak||"";
         cells[3].querySelector(".bar-streak").style.width=sp+"%";
         const _as=computeAntiStreak(ds);
-        const _asp=Math.min(_as,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+        const _asp=Math.min(_as,_maxAntiStreak)/_maxAntiStreak*100;
         const _asCnt=cells[3].querySelector(".anti-streak-count");
         if(_asCnt) _asCnt.textContent=_as||"";
         const _asBar=cells[3].querySelector(".bar-anti-streak");
@@ -238,6 +246,7 @@
       if (!store[ds]) store[ds]=getRow(ds);
       store[ds].status=el.value; save(ds);
       applyStatusColor(el);
+      computeMaxStreaks();
       updateStreakAndTotal(); updateStats();
       if (window.notifMarkDone) window.notifMarkDone(ds, el.value === 'yes');
     }
@@ -405,7 +414,7 @@
     }
 
     function init() {
-      loadAll(); buildView();
+      loadAll(); computeMaxStreaks(); buildView();
       const today=new Date(); today.setHours(0,0,0,0);
       topDate=clamp(offsetDate(today,-CHUNK)); bottomDate=clamp(offsetDate(today,CHUNK));
       const section=document.getElementById(`section-${id}`);
@@ -437,11 +446,12 @@
       scrollToDate(dateStr(today));
     }
 
-    function reload() { loadAll(); buildView(); rerenderTable(); updateStats(); }
+    function reload() { loadAll(); computeMaxStreaks(); buildView(); rerenderTable(); updateStats(); }
 
     return { init, reload, onSelectChange, onReasonInput, onInput,
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
+
 
 
 
