@@ -1,4 +1,4 @@
- // @version 1362
+ // @version 1363
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -115,7 +115,7 @@ async function toggleOrientLock() {
   if (window._cfRender) window._cfRender();
 }
 (function() {
-  const saved = localStorage.getItem('_zoom');
+  const saved = localStorage.getItem('_zoomMain') || localStorage.getItem('_zoom');
   if (saved) {
     const zoom = parseInt(saved);
     const sliderVal = Math.round(zoomToSlider(zoom));
@@ -148,6 +148,43 @@ async function toggleOrientLock() {
     if (z <= 100) return 50 + (z - 50) * 125 / 50;
     return 175 + (z - 100) * 125 / 200;
   }
+  function _getActiveZoomCtx() {
+    if (document.getElementById('cp-popup')) return 'popup';
+    const _so = document.getElementById('settings-overlay');
+    if (_so && _so.classList.contains('active')) return 'settings';
+    return 'main';
+  }
+  function _zoomKey(ctx) {
+    return ctx === 'popup' ? '_zoomPopup' : ctx === 'settings' ? '_zoomSettings' : '_zoomMain';
+  }
+  function _applyZoom(ctx, zoom) {
+    const scale = zoom / 100;
+    if (ctx === 'popup') {
+      const p = document.getElementById('cp-popup');
+      if (!p) return;
+      if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; }
+      else { p.style.transformOrigin = 'top left'; p.style.transform = 'scale(' + scale + ')'; }
+    } else if (ctx === 'settings') {
+      const p = document.getElementById('settings-panel');
+      if (!p) return;
+      if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; }
+      else { p.style.transformOrigin = 'top center'; p.style.transform = 'scale(' + scale + ')'; }
+    } else {
+      const c = document.getElementById('zoom-content');
+      if (!c) return;
+      if (zoom === 100) { c.style.transform = ''; c.style.transformOrigin = ''; c.style.height = ''; }
+      else { c.style.transformOrigin = 'top center'; c.style.transform = 'scale(' + scale + ')'; c.style.height = (c.scrollHeight * scale) + 'px'; }
+    }
+  }
+  function _syncSlider(ctx) {
+    const saved = parseInt(localStorage.getItem(_zoomKey(ctx))) || 100;
+    const sliderVal = Math.round(zoomToSlider(saved));
+    const sl = document.getElementById('zoom-slider');
+    const lb = document.getElementById('zoom-label');
+    if (sl) sl.value = sliderVal;
+    if (lb) lb.textContent = saved + '%';
+    _applyZoom(ctx, saved);
+  }
   function ctrlZoom(sliderVal, snap = true) {
     sliderVal = Number(sliderVal);
     if (snap && Math.abs(sliderVal - 175) <= 8) sliderVal = 175;
@@ -156,36 +193,36 @@ async function toggleOrientLock() {
     if (sl) sl.value = sliderVal;
     const lb = document.getElementById('zoom-label');
     if (lb) lb.textContent = zoom + '%';
-    const settingsOpen = document.getElementById('settings-overlay')?.classList.contains('active');
-    if (settingsOpen) {
-      const panel = document.getElementById('settings-panel');
-      if (panel) {
-        if (zoom === 100) {
-          panel.style.transform = '';
-          panel.style.transformOrigin = '';
-        } else {
-          const scale = zoom / 100;
-          panel.style.transformOrigin = 'top center';
-          panel.style.transform = 'scale(' + scale + ')';
-        }
-      }
-      return;
-    }
-    const content = document.getElementById('zoom-content');
-    if (content) {
-      if (zoom === 100) {
-        content.style.transform = '';
-        content.style.transformOrigin = '';
-        content.style.height = '';
-      } else {
-        const scale = zoom / 100;
-        content.style.transformOrigin = 'top center';
-        content.style.transform = 'scale(' + scale + ')';
-        content.style.height = (content.scrollHeight * scale) + 'px';
-      }
-    }
-    localStorage.setItem('_zoom', zoom);
+    const ctx = _getActiveZoomCtx();
+    localStorage.setItem(_zoomKey(ctx), zoom);
+    if (ctx === 'main') localStorage.setItem('_zoom', zoom);
+    _applyZoom(ctx, zoom);
   }
+  new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      if (m.type !== 'attributes') return;
+      const overlay = document.getElementById('settings-overlay');
+      if (!overlay) return;
+      if (overlay.classList.contains('active')) {
+        _syncSlider('settings');
+      } else if (!document.getElementById('cp-popup')) {
+        _syncSlider('main');
+      }
+    });
+  }).observe(document.getElementById('settings-overlay'), { attributes: true, attributeFilter: ['class'] });
+  new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (node.nodeType === 1 && node.id === 'cp-popup') _syncSlider('popup');
+      });
+      m.removedNodes.forEach(function(node) {
+        if (node.nodeType === 1 && node.id === 'cp-popup') {
+          const _so = document.getElementById('settings-overlay');
+          _syncSlider(_so && _so.classList.contains('active') ? 'settings' : 'main');
+        }
+      });
+    });
+  }).observe(document.body, { childList: true });
   window._dragEnabled = true;
   window._interactEnabled = true;
   function ctrlToggleDrag() {
@@ -249,6 +286,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
