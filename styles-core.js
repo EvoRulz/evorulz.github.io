@@ -1,4 +1,4 @@
-// @version 1361
+// @version 1362
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -278,6 +278,14 @@ if (navigator.storage && navigator.storage.persist) {
 
   function applyAppStyle() {
     buildAppBg();
+    document.body.style.color   = hex8ToCss(appStyle.textColor);
+    buildAppBg();
+    document.documentElement.style.background = document.body.style.background;
+    document.documentElement.style.backgroundImage = document.body.style.backgroundImage;
+    document.documentElement.style.backgroundSize = document.body.style.backgroundSize;
+    document.documentElement.style.backgroundPosition = document.body.style.backgroundPosition;
+    document.documentElement.style.backgroundRepeat = document.body.style.backgroundRepeat;
+    document.documentElement.style.backgroundAttachment = document.body.style.backgroundAttachment;
     document.body.style.color   = hex8ToCss(appStyle.textColor);
     document.body.style.padding = appStyle.padding + "px";
     document.body.style.paddingTop = `calc(${appStyle.padding}px + env(safe-area-inset-top, 0px))`;
@@ -711,6 +719,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
