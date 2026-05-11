@@ -1,4 +1,4 @@
-// @version 1358
+// @version 1359
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -837,6 +837,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
