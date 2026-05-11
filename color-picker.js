@@ -1,4 +1,4 @@
-// @version 1370
+// @version 1371
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -43,6 +43,7 @@
     if (typeof settingsChange === 'function') settingsChange();
   }
   const _gd   = {};   // stored gradient per swatch: { [inputId]: stops[] | null }
+  let   _gdeg  = {};   // stored gradient degree per swatch
   let   _ga   = null; // active stops for open popup (null = solid)
   let   _gSel = 0;    // selected handle index
   let   _gRenderTime = 0; // timestamp of last _gRender call
@@ -65,20 +66,26 @@
     const a = p(ha), b = p(hb);
     return '#' + a.map((v,i) => Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0').toUpperCase()).join('');
   }
-  function _gBuildCSS(stops) {
+  function _gBuildCSS(stops, deg) {
     if (!stops || stops.length < 2) return null;
-    return 'linear-gradient(to right,' + stops.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')';
+    const dir = (deg != null) ? deg + 'deg' : 'to right';
+    return 'linear-gradient(' + dir + ',' + stops.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')';
   }
   function _gLoad() {
     if (!activeSwatch) { _ga = null; _gSel = 0; return; }
     const inp = activeSwatch.querySelector('input[type="color"]');
     _ga   = inp && _gd[inp.id] ? _gd[inp.id].map(s => ({...s})) : null;
     _gSel = 0;
+    const _degLoadEl = popup && popup.querySelector('#cp-grad-deg');
+    const _storedDeg = inp ? (_gdeg[inp.id] ?? 90) : 90;
+    if (_degLoadEl) { _degLoadEl.value = _storedDeg; const _dv = popup && popup.querySelector('#cp-grad-deg-val'); if (_dv) _dv.textContent = _storedDeg + '\u00b0'; }
   }
   function _gSave() {
     if (!activeSwatch) return;
     const inp = activeSwatch.querySelector('input[type="color"]');
     if (inp) _gd[inp.id] = _ga ? _ga.map(s => ({...s})) : null;
+    const _degSaveEl = popup && popup.querySelector('#cp-grad-deg');
+    if (inp && _degSaveEl) _gdeg[inp.id] = parseInt(_degSaveEl.value) || 90;
   }
   function _gLoadHandle(i) {
     if (!_ga || !_ga[i] || _ga[i].isPercent) return;
@@ -447,6 +454,12 @@
     `</div>` +
     `<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
   `</div>` +
+  `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:var(--slider-btn-gap,0px);">` +
+    `<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
+    `<input id="cp-grad-deg" type="range" min="0" max="360" value="90" style="${ss}">` +
+    `<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
+    `<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">90\u00b0</span>` +
+  `</div>` +
   `<div><div class="cp-field-label" style="${ls}">Hue</div>` +
     `<input id="cp-hue" type="range" min="0" max="360" value="${H}" style="${ss}"></div>` +
   `<div><div class="cp-field-label" style="${ls}">Saturation</div>` +
@@ -570,6 +583,29 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   el.querySelector('#cp-grad-minus').addEventListener('click',       e => { e.stopPropagation(); _gMinus(); });
   el.querySelector('#cp-grad-plus').addEventListener('pointerdown',  e => e.stopPropagation());
   el.querySelector('#cp-grad-plus').addEventListener('click',        e => { e.stopPropagation(); _gPlus(); });
+  makeDragger(el.querySelector('#cp-grad-deg'), v => {
+    const _dv = popup && popup.querySelector('#cp-grad-deg-val');
+    if (_dv) _dv.textContent = v + '\u00b0';
+    _gSave(); _cpRefreshSwatch();
+  });
+  el.querySelector('#cp-grad-deg-minus').addEventListener('pointerdown', e => e.stopPropagation());
+  el.querySelector('#cp-grad-deg-minus').addEventListener('click', e => {
+    e.stopPropagation();
+    const _dd = el.querySelector('#cp-grad-deg');
+    _dd.value = Math.max(0, parseInt(_dd.value) - 1);
+    const _dv = popup && popup.querySelector('#cp-grad-deg-val');
+    if (_dv) _dv.textContent = _dd.value + '\u00b0';
+    _gSave(); _cpRefreshSwatch();
+  });
+  el.querySelector('#cp-grad-deg-plus').addEventListener('pointerdown', e => e.stopPropagation());
+  el.querySelector('#cp-grad-deg-plus').addEventListener('click', e => {
+    e.stopPropagation();
+    const _dd = el.querySelector('#cp-grad-deg');
+    _dd.value = Math.min(360, parseInt(_dd.value) + 1);
+    const _dv = popup && popup.querySelector('#cp-grad-deg-val');
+    if (_dv) _dv.textContent = _dd.value + '\u00b0';
+    _gSave(); _cpRefreshSwatch();
+  });
   _gRender();
 
   return el;
@@ -813,7 +849,9 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   window._cpRebuild = function () {
     if (popup && activeSwatch) { const sw = activeSwatch; const savedSel = _gSel; close(); openFor(sw); _gSel = savedSel; _gRender(); }
   };
-  window._cpGetGradient      = id => { const s = _gd[id]; return s ? _gBuildCSS(s) : null; };
+  window._cpGetGradient      = id => { const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id]) : null; };
+  window._cpGetGradientDeg   = id => _gdeg[id] ?? 90;
+  window._cpSetGradientDeg   = (id, deg) => { _gdeg[id] = deg; };
   window._cpGetGradientStops = id => { const s = _gd[id]; return s ? s.map(x => ({...x})) : null; };
   window._cpSetGradientStops = function(id, stops) { _gd[id] = stops ? stops.map(s => ({...s})) : null; };
   window._cpRefresh = function () {
@@ -837,6 +875,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
