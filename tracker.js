@@ -1,4 +1,4 @@
-// @version 1356
+// @version 1357
 
 // ── Tracker configs (dynamic) ──────────────────────────────
   const CONFIG_DEFAULTS = [
@@ -161,7 +161,7 @@
         <td class="set-cell">
           <div class="streak-count" style="text-align:center;font-size:12px;line-height:18px">${streak||""}</div>
           <div class="bar-container"><div class="bar-streak" style="width:${streakPct}%"></div></div>
-          <div class="anti-streak-count" style="text-align:center;font-size:12px;line-height:18px;color:var(--bar-anti-streak-color,#8B0000)">${antiStreak||""}</div>
+          <div class="anti-streak-count" style="text-align:center;font-size:12px;line-height:18px;color:var(--anti-streak-text-color,#8B0000)">${antiStreak||""}</div>
           <div class="bar-container"><div class="bar-anti-streak" style="width:${antiStreakPct}%"></div></div>
         </td>`;
       if (hasSets) {
@@ -442,6 +442,7 @@
     return { init, reload, onSelectChange, onReasonInput, onInput,
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
+
 
 
 
