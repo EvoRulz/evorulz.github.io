@@ -1,4 +1,4 @@
-// @version 1369
+// @version 1370
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -691,7 +691,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     }
     const _versionNumSpan = document.getElementById('app-version');
     const _versionStatsSpan = document.getElementById('app-stats');
-    if (_versionNumSpan) { _versionNumSpan.style.color = _versionColor; _versionNumSpan.style.visibility = ''; }
+    if (_versionNumSpan) { _versionNumSpan.style.visibility = ''; _versionNumSpan.classList.add('btn-text-label'); _versionNumSpan.dataset.text = _versionNumSpan.textContent.trim(); _applyTextStyle(_versionNumSpan, _btnStyleFor('top-version')); }
     if (_versionStatsSpan) { _versionStatsSpan.style.color = _versionColor; _versionStatsSpan.style.opacity = '0.4'; }
 
     ['sg-buttons','sg-sliders','sg-clock','sg-checkboxes','sg-app','sg-tables','sg-notifications','sg-swatches','sg-toggles'].forEach(id => {
@@ -740,6 +740,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
