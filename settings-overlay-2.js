@@ -1,4 +1,4 @@
-// @version 1352
+// @version 1353
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -390,8 +390,19 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
           <button class="copy-btn" onclick="copyHex('s-app-bar-streak',this)">Copy</button>
         </div>
       </div>
+      <div class="color-settings-row" data-app-row="baranti">
+        <label>Anti-streak bar color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-bar-anti-streak" oninput="onColorPickerChange('s-app-bar-anti-streak')">
+          <input type="range" class="alpha-slider" id="s-app-bar-anti-streak-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-bar-anti-streak')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-bar-anti-streak-hex" maxlength="9" oninput="onHexInput('s-app-bar-anti-streak')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-bar-anti-streak',this)">Copy</button>
+        </div>
       </div>
-      <div class="settings-group-content" id="sg-notifications">
+      </div>
+    <div class="settings-group-content" id="sg-notifications">
         <div class="settings-row" style="justify-content:space-between;gap:12px;">
         <label style="font-size:13px;color:#bbb;">Notifications enabled</label>
         <div id="notif-toggle-wrap" onclick="notifToggle()" style="width:48px;height:26px;border-radius:13px;background:#333;border:1px solid #555;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;touch-action:manipulation;">
@@ -729,6 +740,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <input type="file" id="settings-import-file" accept=".json" style="display:none" onchange="settingsImport(this)">
     </div>
 `);
+
 
 
 

@@ -1,4 +1,4 @@
-/* @version 1352 */
+/* @version 1353 */
 
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
     *::-webkit-scrollbar { display: none; width: 0; height: 0; }
@@ -225,6 +225,7 @@
     .bar        { height: 100%; background: var(--bar-set-color,    #7030A0); transition: width 0.2s; }
     .bar-total  { height: 100%; background: var(--bar-total-color,  #8000ff); transition: width 0.2s; }
     .bar-streak { height: 100%; background: var(--bar-streak-color, #375623); transition: width 0.2s; }
+    .bar-anti-streak { height: 100%; background: var(--bar-anti-streak-color, #8B0000); transition: width 0.2s; }
 
     td.set-cell { padding: 0; }
 
@@ -288,6 +289,7 @@
       font-size: 13px; align-self: flex-start;
     }
     #confirm-cancel:hover { background: #444; }
+
 
 
 

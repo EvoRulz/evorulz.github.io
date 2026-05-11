@@ -1,4 +1,4 @@
-// @version 1352
+// @version 1353
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -99,6 +99,7 @@ if (navigator.storage && navigator.storage.persist) {
     barSet: "#7030A0FF",
     barTotal: "#8000FFFF",
     barStreak: "#375623FF",
+    barAntiStreak: "#8B0000FF",
     statusBarMode: 'auto',
     statusBarColor: '#111111FF',
     statusBarStops: null,
@@ -288,6 +289,7 @@ if (navigator.storage && navigator.storage.persist) {
     document.documentElement.style.setProperty("--bar-set-color",    hex8ToCss(appStyle.barSet));
     document.documentElement.style.setProperty("--bar-total-color",  hex8ToCss(appStyle.barTotal));
     document.documentElement.style.setProperty("--bar-streak-color", hex8ToCss(appStyle.barStreak));
+    document.documentElement.style.setProperty("--bar-anti-streak-color", hex8ToCss(appStyle.barAntiStreak || "#8B0000FF"));
     _applyStatusBarColor();
   }
   applyAppStyle();
@@ -703,6 +705,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

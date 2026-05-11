@@ -1,4 +1,4 @@
-// @version 1352
+// @version 1353
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -348,6 +348,7 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     setColorValue("s-app-bar-set",    appStyle.barSet);
     setColorValue("s-app-bar-total",  appStyle.barTotal);
     setColorValue("s-app-bar-streak", appStyle.barStreak);
+    setColorValue("s-app-bar-anti-streak", appStyle.barAntiStreak || "#8B0000FF");
     const isGrad = appStyle.bgType.startsWith("gradient");
     const isPat  = appStyle.bgType.startsWith("pattern");
     const isImg  = appStyle.bgType === "image";
@@ -446,6 +447,7 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 

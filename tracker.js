@@ -1,4 +1,4 @@
-// @version 1352
+// @version 1353
 
 // ── Tracker configs (dynamic) ──────────────────────────────
   const CONFIG_DEFAULTS = [
@@ -122,6 +122,15 @@
       return n;
     }
 
+    function computeAntiStreak(ds) {
+      let n=0, curr=new Date(ds);
+      while (curr>=MIN_DATE) {
+        const data=store[dateStr(curr)];
+        if (data && data.status==="no") { n++; curr.setDate(curr.getDate()-1); } else break;
+      }
+      return n;
+    }
+
     function buildView() {
       if (filterStatus==="") { viewDates=null; return; }
       viewDates=Object.entries(store).filter(([,v])=>v.status===filterStatus).map(([k])=>k);
@@ -138,6 +147,8 @@
       const saved=getRow(ds);
       const streak=computeStreak(ds);
       const streakPct=Math.min(streak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+      const antiStreak=computeAntiStreak(ds);
+      const antiStreakPct=Math.min(antiStreak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
       const statusOpts=`<option value=""></option>`+
         STATUSES.map(s=>`<option value="${s}"${saved.status===s?" selected":""}>${s}</option>`).join("");
 
@@ -148,8 +159,10 @@
         <td style="padding:0"><select onchange="onSelectChange('${id}','${ds}',this)">${statusOpts}</select></td>
         <td style="padding:0"><textarea oninput="onReasonInput('${id}','${ds}',this)">${saved.reason||""}</textarea></td>
         <td class="set-cell">
-          <div style="text-align:center;font-size:12px;line-height:18px">${streak||""}</div>
+          <div class="streak-count" style="text-align:center;font-size:12px;line-height:18px">${streak||""}</div>
           <div class="bar-container"><div class="bar-streak" style="width:${streakPct}%"></div></div>
+          <div class="anti-streak-count" style="text-align:center;font-size:12px;line-height:18px;color:var(--bar-anti-streak-color,#8B0000)">${antiStreak||""}</div>
+          <div class="bar-container"><div class="bar-anti-streak" style="width:${antiStreakPct}%"></div></div>
         </td>`;
       if (hasSets) {
         const total=sum(saved.sets);
@@ -195,8 +208,14 @@
         const cells=row.querySelectorAll("td");
         const streak=computeStreak(ds);
         const sp=Math.min(streak,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
-        cells[3].querySelector("div").textContent=streak||"";
+        cells[3].querySelector(".streak-count").textContent=streak||"";
         cells[3].querySelector(".bar-streak").style.width=sp+"%";
+        const _as=computeAntiStreak(ds);
+        const _asp=Math.min(_as,STREAK_BAR_MAX)/STREAK_BAR_MAX*100;
+        const _asCnt=cells[3].querySelector(".anti-streak-count");
+        if(_asCnt) _asCnt.textContent=_as||"";
+        const _asBar=cells[3].querySelector(".bar-anti-streak");
+        if(_asBar) _asBar.style.width=_asp+"%";
         if (hasSets) {
           const total=sum(store[ds]?.sets||[]);
           const tp=Math.min(total,TOTAL_BAR_MAX)/TOTAL_BAR_MAX*100;
@@ -423,6 +442,7 @@
     return { init, reload, onSelectChange, onReasonInput, onInput,
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
+
 
 
 

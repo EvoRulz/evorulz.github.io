@@ -1,4 +1,4 @@
-// @version 1352
+// @version 1353
 
 // ── Settings panel logic ───────────────────────────────────
   function onColorPickerChange(id) {
@@ -251,6 +251,7 @@ function onHexInput(id) {
     if (document.getElementById("s-app-bar-set"))    appStyle.barSet    = getColorValue("s-app-bar-set");
     if (document.getElementById("s-app-bar-total"))  appStyle.barTotal  = getColorValue("s-app-bar-total");
     if (document.getElementById("s-app-bar-streak")) appStyle.barStreak = getColorValue("s-app-bar-streak");
+    if (document.getElementById("s-app-bar-anti-streak")) appStyle.barAntiStreak = getColorValue("s-app-bar-anti-streak");
     appStyle.statusBarMode   = document.getElementById('s-app-statusbar-mode')?.value || 'auto';
     appStyle.statusBarColor  = getColorValue('s-app-statusbar-color');
     appStyle.statusBarStops  = window._cpGetGradientStops ? window._cpGetGradientStops('s-app-statusbar-color') : null;
@@ -287,6 +288,7 @@ function onHexInput(id) {
     if (thumb) { thumb.src = ""; prev.style.display = "none"; }
     buildAppBg();
   }
+
 
 
 
