@@ -1,4 +1,4 @@
-// @version 1359
+// @version 1361
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -396,6 +396,8 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
   function settingsClose() {
     if (window._cpClose) window._cpClose();
     document.getElementById("settings-overlay").classList.remove("active");
+    const panel = document.getElementById('settings-panel');
+    if (panel) { panel.style.transform = ''; panel.style.transformOrigin = ''; }
   }
   async function settingsSave() {
     _settingsHasChanges = false;
@@ -450,6 +452,8 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
+
 
 
 

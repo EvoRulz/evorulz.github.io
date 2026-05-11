@@ -1,4 +1,4 @@
- // @version 1359
+ // @version 1361
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -154,6 +154,23 @@ async function toggleOrientLock() {
     const zoom = Math.round(sliderToZoom(sliderVal));
     const sl = document.getElementById('zoom-slider');
     if (sl) sl.value = sliderVal;
+    const lb = document.getElementById('zoom-label');
+    if (lb) lb.textContent = zoom + '%';
+    const settingsOpen = document.getElementById('settings-overlay')?.classList.contains('active');
+    if (settingsOpen) {
+      const panel = document.getElementById('settings-panel');
+      if (panel) {
+        if (zoom === 100) {
+          panel.style.transform = '';
+          panel.style.transformOrigin = '';
+        } else {
+          const scale = zoom / 100;
+          panel.style.transformOrigin = 'top center';
+          panel.style.transform = 'scale(' + scale + ')';
+        }
+      }
+      return;
+    }
     const content = document.getElementById('zoom-content');
     if (content) {
       if (zoom === 100) {
@@ -167,8 +184,6 @@ async function toggleOrientLock() {
         content.style.height = (content.scrollHeight * scale) + 'px';
       }
     }
-    const lb = document.getElementById('zoom-label');
-    if (lb) lb.textContent = zoom + '%';
     localStorage.setItem('_zoom', zoom);
   }
   window._dragEnabled = true;
@@ -234,6 +249,8 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
+
 
 
 
