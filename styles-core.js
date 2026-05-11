@@ -1,4 +1,4 @@
-// @version 1366
+// @version 1367
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -640,8 +640,8 @@ window._applyTextStyle = _applyTextStyle;
     }
     const _dateSpan = document.querySelector('.top-item[data-item="date"] span');
     const _timeSpan = document.querySelector('.top-item[data-item="time"] span');
-    if (_dateSpan) { _dateSpan.style.fontFamily = _btnStyleFor('top-date').font; _applyTextStyle(_dateSpan, _btnStyleFor('top-date')); }
-    if (_timeSpan) { _timeSpan.style.fontFamily = _btnStyleFor('top-time').font; _applyTextStyle(_timeSpan, _btnStyleFor('top-time')); }
+    if (_dateSpan) { _dateSpan.style.fontFamily = _btnStyleFor('top-date').font; _dateSpan.style.fontSize = (_btnStyles['top-date']?.fontSize ?? btnStyle.fontSize ?? 16) + 'px'; _applyTextStyle(_dateSpan, _btnStyleFor('top-date')); }
+    if (_timeSpan) { _timeSpan.style.fontFamily = _btnStyleFor('top-time').font; _timeSpan.style.fontSize = (_btnStyles['top-time']?.fontSize ?? btnStyle.fontSize ?? 16) + 'px'; _applyTextStyle(_timeSpan, _btnStyleFor('top-time')); }
     const _dateTopItem = document.querySelector('.top-item[data-item="date"]');
     const _timeTopItem = document.querySelector('.top-item[data-item="time"]');
     if (_dateTopItem) _dateTopItem.style.borderRadius = (_btnStyles['top-date']?.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
@@ -658,7 +658,7 @@ window._applyTextStyle = _applyTextStyle;
       _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
       const _vBtn = _versionItem.querySelector('div');
       const _vNumSpan = document.getElementById('app-version');
-      if (_vNumSpan) _vNumSpan.style.fontFamily = _btnStyleFor('top-version').font;
+      if (_vNumSpan) { _vNumSpan.style.fontFamily = _btnStyleFor('top-version').font; _vNumSpan.style.fontSize = (_btnStyleFor('top-version').fontSize ?? btnStyle.fontSize ?? 16) + 'px'; }
     if (_vBtn) {
       let _vTapX = 0, _vTapY = 0;
 _vBtn.onpointerdown = (e) => { _vTapX = e.clientX; _vTapY = e.clientY; _versionItem.style.background = hex8ToCss(_btnStyleFor('top-version').tap); };
@@ -739,6 +739,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
