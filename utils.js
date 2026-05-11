@@ -1,4 +1,4 @@
- // @version 1363
+ // @version 1364
 
   // ── Constants ──────────────────────────────────────────────
   const MIN_DATE       = new Date("2026-03-14");
@@ -163,7 +163,7 @@ async function toggleOrientLock() {
       const p = document.getElementById('cp-popup');
       if (!p) return;
       if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; }
-      else { p.style.transformOrigin = 'top left'; p.style.transform = 'scale(' + scale + ')'; }
+      else { p.style.transformOrigin = 'top center'; p.style.transform = 'scale(' + scale + ')'; }
     } else if (ctx === 'settings') {
       const p = document.getElementById('settings-panel');
       if (!p) return;
@@ -286,6 +286,7 @@ async function toggleOrientLock() {
     if (t) t.classList.toggle('on', window._interactEnabled);
     document.body.classList.toggle('interact-locked', !window._interactEnabled);
   }
+
 
 
 
