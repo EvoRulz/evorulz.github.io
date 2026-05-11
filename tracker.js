@@ -1,4 +1,4 @@
-// @version 1364
+// @version 1365
 
 // ── Tracker configs (dynamic) ──────────────────────────────
   const CONFIG_DEFAULTS = [
@@ -169,6 +169,8 @@
         <td class="set-cell">
           <div class="streak-count" style="text-align:center;font-size:12px;line-height:18px">${streak||""}</div>
           <div class="bar-container"><div class="bar-streak" style="width:${streakPct}%"></div></div>
+        </td>
+        <td class="set-cell">
           <div class="anti-streak-count" style="text-align:center;font-size:12px;line-height:18px;color:var(--anti-streak-text-color,#8B0000)">${antiStreak||""}</div>
           <div class="bar-container"><div class="bar-anti-streak" style="width:${antiStreakPct}%"></div></div>
         </td>`;
@@ -220,15 +222,15 @@
         cells[3].querySelector(".bar-streak").style.width=sp+"%";
         const _as=computeAntiStreak(ds);
         const _asp=Math.min(_as,_maxAntiStreak)/_maxAntiStreak*100;
-        const _asCnt=cells[3].querySelector(".anti-streak-count");
+        const _asCnt=cells[4].querySelector(".anti-streak-count");
         if(_asCnt) _asCnt.textContent=_as||"";
-        const _asBar=cells[3].querySelector(".bar-anti-streak");
+        const _asBar=cells[4].querySelector(".bar-anti-streak");
         if(_asBar) _asBar.style.width=_asp+"%";
         if (hasSets) {
           const total=sum(store[ds]?.sets||[]);
           const tp=Math.min(total,TOTAL_BAR_MAX)/TOTAL_BAR_MAX*100;
-          cells[4].querySelector("div").textContent=total||"";
-          cells[4].querySelector(".bar-total").style.width=tp+"%";
+          cells[5].querySelector("div").textContent=total||"";
+          cells[5].querySelector(".bar-total").style.width=tp+"%";
         }
       });
     }
@@ -318,7 +320,7 @@
       return `<thead><tr>
         <th data-sort="date"   onclick="onHeaderClick('${id}','date')">Date</th>
         <th data-sort="status" onclick="onHeaderClick('${id}','status')">Status</th>
-        <th>Reason</th><th>Streak</th>${sh}
+        <th>Reason</th><th>Streak</th><th>Anti</th>${sh}
       </tr></thead>`;
     }
     function rerenderTable() {
@@ -451,6 +453,7 @@
     return { init, reload, onSelectChange, onReasonInput, onInput,
              onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
   }
+
 
 
 
