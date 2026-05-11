@@ -1,4 +1,4 @@
-// @version 1355
+// @version 1356
 
 var _srGlowStyle = document.createElement('style');
   _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
@@ -275,6 +275,7 @@ makeRowsDraggable('sg-app', 'data-app-row', '_appRowOrder');
 makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 makeRowsDraggable('sg-toggles', 'data-toggle-row', '_toggleRowOrder');
+makeRowsDraggable('sg-tables', 'data-app-row', '_tablesRowOrder');
 
 window.addEventListener('load', function() {
   history.pushState({panel:'base'}, '');
@@ -428,6 +429,7 @@ window.addEventListener('load', function() {
 
   applySwatchOrder();
 })();
+
 
 
 
