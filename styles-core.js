@@ -1,4 +1,4 @@
-// @version 1365
+// @version 1366
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -410,6 +410,15 @@ if (navigator.storage && navigator.storage.persist) {
       'top-manage-habits': { bg: '#444444FF', fg: '#FFFFFFFF' },
       'top-orient-lock':        { bg: '#2a2a2aFF', fg: '#999999FF', glow: '#00000000' },
       'top-orient-lock-locked': { bg: '#2a2a2aFF', fg: '#99ff99FF', glow: '#00000000' },
+      'sg-buttons':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-sliders':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-clock':         { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-checkboxes':    { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-app':           { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-tables':        { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-notifications': { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-swatches':      { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-toggles':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
       'top-version':       { bg: '#444444FF', fg: _cachedVersionColor || '#FFFFFFFF' },
       };
     return Object.assign({}, base, TOP_GRID_DEFAULTS[id] || {}, _btnStyles[id] || {});
@@ -685,6 +694,17 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     if (_versionNumSpan) { _versionNumSpan.style.color = _versionColor; _versionNumSpan.style.visibility = ''; }
     if (_versionStatsSpan) { _versionStatsSpan.style.color = _versionColor; _versionStatsSpan.style.opacity = '0.4'; }
 
+    ['sg-buttons','sg-sliders','sg-clock','sg-checkboxes','sg-app','sg-tables','sg-notifications','sg-swatches','sg-toggles'].forEach(id => {
+      const el = document.querySelector(`.settings-group-item[data-group="${id}"]`);
+      if (!el) return;
+      const _s = _btnStyleFor(id);
+      el.style.background = _bgCss(_s.bg);
+      el.style.color = hex8ToCss(_s.fg);
+      el.style.fontFamily = _s.font;
+      el.style.fontSize = (_s.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
+      el.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
+      el.style.boxShadow = `0 0 8px 3px ${hex8ToCss(_s.glow)}`;
+    });
     buttonsEl.querySelectorAll(".tracker-btn[data-id]").forEach(btn => {
       const s = _btnStyleFor(btn.dataset.id);
       btn.style.setProperty("--btn-bg",        _bgCss(s.bg));
@@ -719,6 +739,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
