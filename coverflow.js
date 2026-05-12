@@ -1,4 +1,4 @@
-// @version 1383
+// @version 1384
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -304,7 +304,9 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
           el.style.flexDirection = 'column';
           el.style.alignItems = 'center';
           el.style.gap = '2px';
-          el.innerHTML = '<span style="font-size:' + (s2.fontSize ?? btnStyle.fontSize ?? 16) + 'px;color:' + hex8ToCss(s2.fg) + '">' + (vNum ? vNum.textContent : '') + '</span><span style="font-size:9px;color:' + hex8ToCss(s2.fg) + ';line-height:1.4;text-align:center;opacity:0.4">' + (vStats ? vStats.innerHTML : '') + '</span>';
+          el.innerHTML = '<span class="btn-text-label" data-text="' + (vNum ? vNum.textContent : '') + '" style="font-size:' + (s2.fontSize ?? btnStyle.fontSize ?? 16) + 'px;">' + (vNum ? vNum.textContent : '') + '</span><span style="font-size:9px;color:' + hex8ToCss(s2.fg) + ';line-height:1.4;text-align:center;opacity:0.4">' + (vStats ? vStats.innerHTML : '') + '</span>';
+          const _vCfSpan = el.querySelector('.btn-text-label');
+          if (_vCfSpan && window._applyTextStyle) window._applyTextStyle(_vCfSpan, s2); + ';line-height:1.4;text-align:center;opacity:0.4">' + (vStats ? vStats.innerHTML : '') + '</span>';
         } else {
           el.style.display = '';
           el.style.flexDirection = '';
@@ -526,6 +528,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 

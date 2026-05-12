@@ -1,4 +1,4 @@
-// @version 1383
+// @version 1384
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -96,7 +96,7 @@
     }
     _gSel = 0;
     const _degLoadEl = popup && popup.querySelector('#cp-grad-deg');
-    const _storedDeg = inp ? (_gdeg[inp.id] ?? 90) : 90;
+    const _storedDeg = inp ? (_gdeg[inp.id] ?? 360) : 360;
     if (_degLoadEl) { _degLoadEl.value = _storedDeg; const _dv = popup && popup.querySelector('#cp-grad-deg-val'); if (_dv) _dv.textContent = _storedDeg + '\u00b0'; }
   }
   function _gSave() {
@@ -506,12 +506,12 @@
       `<div id="cp-grad-hw"    style="position:absolute;inset:0;overflow:visible;pointer-events:none;"></div>` +
     `</div>` +
     `<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
-  `</div>` +
-  `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:4px;flex-wrap:nowrap;">` +
+    `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:4px;flex-wrap:nowrap;flex-shrink:0;">` +
     `<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
-    `<input id="cp-grad-deg" type="range" min="0" max="360" value="90" style="flex:1;min-width:0;max-width:none;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;">` +
+    `<input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:50px;min-width:30px;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;">` +
     `<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
-    `<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">90\u00b0</span>` +
+    `<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">360\u00b0</span>` +
+    `</div>` +
   `</div>` +
   `<div><div class="cp-field-label" style="${ls}">Hue</div>` +
     `<input id="cp-hue" type="range" min="0" max="360" value="${H}" style="${ss}"></div>` +
@@ -923,7 +923,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     if (popup && activeSwatch) { const sw = activeSwatch; const savedSel = _gSel; close(); openFor(sw); _gSel = savedSel; _gRender(); }
   };
   window._cpGetGradient      = id => { const mode = _gMode[id]; if (mode === 'solid') return null; if (mode === 'radial') { const s = _gdRadial[id]; return s ? _gBuildCSS(s, null, 'radial') : null; } if (mode === 'conic') { const s = _gdConic[id]; return s ? _gBuildCSS(s, null, 'conic') : null; } const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id] ?? 90, 'linear') : null; };
-  window._cpGetGradientDeg   = id => _gdeg[id] ?? 90;
+  window._cpGetGradientDeg   = id => _gdeg[id] ?? 360;
   window._cpSetGradientDeg   = (id, deg) => { _gdeg[id] = deg; };
   window._cpGetGradientStops = id => { const mode = _gMode[id]; if (mode === 'solid') return null; const s = mode === 'radial' ? _gdRadial[id] : mode === 'conic' ? _gdConic[id] : _gd[id]; return s ? s.map(x => ({...x})) : null; };
   window._cpSetGradientStops = function(id, stops, mode) {
@@ -962,6 +962,7 @@ window._cpSetGradientMode = (id, mode) => { _gMode[id] = mode; };
   refreshAlphaTrack();
   };
 })();
+
 
 
 
