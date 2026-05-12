@@ -1,4 +1,4 @@
-// @version 1380
+// @version 1381
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -45,6 +45,7 @@
   const _gd   = {};   // stored gradient per swatch: { [inputId]: stops[] | null }
   let   _gdeg  = {};   // stored gradient degree per swatch
   let   _gdRadial = {};
+  let   _gdConic  = {};
   let   _gMode    = {};
   let   _ga   = null; // active stops for open popup (null = solid)
   let   _gSel = 0;    // selected handle index
@@ -73,6 +74,9 @@
     if (mode === 'radial') {
       return 'radial-gradient(circle,' + stops.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')';
     }
+    if (mode === 'conic') {
+      return 'conic-gradient(from 0deg,' + stops.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')';
+    }
     const dir = (deg != null) ? deg + 'deg' : 'to right';
     return 'linear-gradient(' + dir + ',' + stops.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')';
   }
@@ -83,6 +87,8 @@
     const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
     if (mode === 'radial') {
       _ga = inp && _gdRadial[inp.id] ? _gdRadial[inp.id].map(s => ({...s})) : null;
+    } else if (mode === 'conic') {
+      _ga = inp && _gdConic[inp.id] ? _gdConic[inp.id].map(s => ({...s})) : null;
     } else if (mode === 'linear') {
       _ga = inp && _gd[inp.id] ? _gd[inp.id].map(s => ({...s})) : null;
     } else {
@@ -100,6 +106,8 @@
     if (inp) {
       if (mode === 'radial') {
         _gdRadial[inp.id] = _ga ? _ga.map(s => ({...s})) : null;
+      } else if (mode === 'conic') {
+        _gdConic[inp.id] = _ga ? _ga.map(s => ({...s})) : null;
       } else if (mode === 'linear') {
         _gd[inp.id] = _ga ? _ga.map(s => ({...s})) : null;
       }
@@ -440,7 +448,7 @@
     if (!popup || !activeSwatch) return;
     const inp = activeSwatch.querySelector('input[type="color"]');
     const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
-    ['solid','linear','radial'].forEach(m => {
+    ['solid','linear','radial','conic'].forEach(m => {
       const btn = popup.querySelector('#cp-mode-' + m);
       if (!btn) return;
       btn.style.background = m === mode ? '#555' : '#2a2a2a';
@@ -454,7 +462,7 @@
     const gradRow = popup.querySelector('#cp-grad-row');
     const degRow  = popup.querySelector('#cp-grad-deg-row');
     if (gradRow) gradRow.style.display = mode === 'solid' ? 'none' : '';
-    if (degRow)  degRow.style.display  = mode === 'linear' ? '' : 'none';
+    if (degRow)  degRow.style.display  = (mode === 'linear') ? '' : 'none';
   }
   function buildPopup() {
     const v = cssVars(), c = cpCfg();
@@ -488,7 +496,8 @@
   `<div id="cp-mode-row" style="display:flex;gap:0;margin-bottom:6px;border-radius:4px;overflow:hidden;border:1px solid ${sb};">` +
   `<button id="cp-mode-solid"  style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Solid</button>` +
   `<button id="cp-mode-linear" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Linear</button>` +
-  `<button id="cp-mode-radial" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;background:#2a2a2a;color:#aaa;touch-action:manipulation;">Radial</button>` +
+  `<button id="cp-mode-radial" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Radial</button>` +
+`<button id="cp-mode-conic"  style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;background:#2a2a2a;color:#aaa;touch-action:manipulation;">Conic</button>` +
 `</div>` +
 `<div id="cp-grad-row" style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap;">` +
     `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
@@ -650,7 +659,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     if (_dv) _dv.textContent = _dd.value + '\u00b0';
     _gSave(); _cpRefreshSwatch();
   });
-  ['solid','linear','radial'].forEach(m => {
+  ['solid','linear','radial','conic'].forEach(m => {
     const mBtn = el.querySelector('#cp-mode-' + m);
     if (!mBtn) return;
     mBtn.addEventListener('pointerdown', e => e.stopPropagation());
@@ -913,11 +922,11 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   window._cpRebuild = function () {
     if (popup && activeSwatch) { const sw = activeSwatch; const savedSel = _gSel; close(); openFor(sw); _gSel = savedSel; _gRender(); }
   };
-  window._cpGetGradient      = id => { const mode = _gMode[id]; if (mode === 'solid') return null; if (mode === 'radial') { const s = _gdRadial[id]; return s ? _gBuildCSS(s, null, 'radial') : null; } const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id] ?? 90, 'linear') : null; };
+  window._cpGetGradient      = id => { const mode = _gMode[id]; if (mode === 'solid') return null; if (mode === 'radial') { const s = _gdRadial[id]; return s ? _gBuildCSS(s, null, 'radial') : null; } if (mode === 'conic') { const s = _gdConic[id]; return s ? _gBuildCSS(s, null, 'conic') : null; } const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id] ?? 90, 'linear') : null; };
   window._cpGetGradientDeg   = id => _gdeg[id] ?? 90;
   window._cpSetGradientDeg   = (id, deg) => { _gdeg[id] = deg; };
-  window._cpGetGradientStops = id => { const mode = _gMode[id]; if (mode === 'solid') return null; const s = mode === 'radial' ? _gdRadial[id] : _gd[id]; return s ? s.map(x => ({...x})) : null; };
-  window._cpSetGradientStops = function(id, stops) { _gd[id] = stops ? stops.map(s => ({...s})) : null; if (stops && stops.length >= 2 && _gMode[id] !== 'radial') { _gMode[id] = 'linear'; } else if (!stops && _gMode[id] !== 'radial') { _gMode[id] = 'solid'; } };
+  window._cpGetGradientStops = id => { const mode = _gMode[id]; if (mode === 'solid') return null; const s = mode === 'radial' ? _gdRadial[id] : mode === 'conic' ? _gdConic[id] : _gd[id]; return s ? s.map(x => ({...x})) : null; };
+  window._cpSetGradientStops = function(id, stops) { _gd[id] = stops ? stops.map(s => ({...s})) : null; if (stops && stops.length >= 2 && _gMode[id] !== 'radial' && _gMode[id] !== 'conic') { _gMode[id] = 'linear'; } else if (!stops && _gMode[id] !== 'radial' && _gMode[id] !== 'conic') { _gMode[id] = 'solid'; } };
   window._cpRefresh = function () {
   if (!popup || !activeSwatch) return;
   const inp = activeSwatch.querySelector('input[type="color"]');
@@ -939,6 +948,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
