@@ -1,4 +1,4 @@
-// @version 1376
+// @version 1377
 
 // ── Clock tumbler ──────────────────────────────────────────
   (function() {
@@ -406,8 +406,8 @@
     const autoColor=vColors[vNum%3];
     const _lastStyledVer=parseInt(localStorage.getItem('_lastStyledVersion')||'0');
     if(vNum!==_lastStyledVer){
-      try{const _rawSaved=JSON.parse(localStorage.getItem('_btnStyles'));const _oldFg=_rawSaved?.['top-version']?.fg||null;if(_oldFg)localStorage.setItem('_versionPrevFg',_oldFg);}catch{}
-      _btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:autoColor});
+      try{const _rawSaved=JSON.parse(localStorage.getItem('_btnStyles'));const _oldStyle=_rawSaved?.['top-version']||null;if(_oldStyle)localStorage.setItem('_versionPrevStyle',JSON.stringify(_oldStyle));const _oldFg=_oldStyle?.fg||null;if(_oldFg)localStorage.setItem('_versionPrevFg',_oldFg);}catch{}
+      _btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:autoColor,fgStops:null});
       localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));
       localStorage.setItem('_lastStyledVersion',String(vNum));
       localStorage.setItem('_versionUpdatePending','1');
@@ -505,6 +505,7 @@ window._verifyDeployedVersion = (function() {
     });
   };
 })();
+
 
 
 

@@ -1,4 +1,4 @@
-// @version 1376
+// @version 1377
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -667,9 +667,11 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
       _vBtn.onpointerup = () => {
         _versionItem.style.background = _bgCss(_btnStyleFor('top-version').bg);
         if(localStorage.getItem('_versionUpdatePending')==='1'){
-          const _prev=localStorage.getItem('_versionPrevFg');
-          if(_prev){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:_prev});localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}
+          const _prevStyle=localStorage.getItem('_versionPrevStyle');
+          if(_prevStyle){try{const _ps=JSON.parse(_prevStyle);_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},_ps);localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}catch{}}
+          else{const _prev=localStorage.getItem('_versionPrevFg');if(_prev){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:_prev});localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}}
           localStorage.removeItem('_versionUpdatePending');
+          localStorage.removeItem('_versionPrevStyle');
       return;
     }
     if (window._versionCheckState === 'synced') {
@@ -740,6 +742,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

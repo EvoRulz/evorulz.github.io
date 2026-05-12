@@ -1,4 +1,4 @@
-// @version 1376
+// @version 1377
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -90,9 +90,11 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
 
     function cfLoadPickersForId(id) {
   if(id==='top-version'&&localStorage.getItem('_versionUpdatePending')==='1'){
-    const _prev=localStorage.getItem('_versionPrevFg');
-    if(_prev){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:_prev});localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}
+    const _prevStyle=localStorage.getItem('_versionPrevStyle');
+    if(_prevStyle){try{const _ps=JSON.parse(_prevStyle);_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},_ps);localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}catch{}}
+    else{const _prev=localStorage.getItem('_versionPrevFg');if(_prev){_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:_prev});localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));applyBtnStyle();}}
     localStorage.removeItem('_versionUpdatePending');
+    localStorage.removeItem('_versionPrevStyle');
   }
   const s = _btnStyleFor(id);
   setColorValue('s-bg',       s.bg);
@@ -521,6 +523,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 
