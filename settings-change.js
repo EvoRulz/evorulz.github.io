@@ -1,4 +1,4 @@
-// @version 1371
+// @version 1372
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -196,6 +196,7 @@ function settingsExport() {
         _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, {
           bg: getStyleValue('s-bg'),
           bgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-bg') : null,
+          bgDeg: window._cpGetGradientDeg ? window._cpGetGradientDeg('s-bg') : 90,
           fg: getColorValue('s-fg'),
           glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
           activeBg: getStyleValue('s-activebg'),
@@ -469,6 +470,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 

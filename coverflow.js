@@ -1,4 +1,4 @@
-// @version 1371
+// @version 1372
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -97,6 +97,7 @@ items.push({ id: 'top-date',           label: 'Date',           isTopGrid: true 
   const s = _btnStyleFor(id);
   setColorValue('s-bg',       s.bg);
   if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', s.bgStops || null);
+  if (window._cpSetGradientDeg) window._cpSetGradientDeg('s-bg', s.bgDeg ?? 90);
   setColorValue('s-fg',       s.fg);
   if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null);
   const _sfgOv = document.getElementById('s-fg-swatch-overlay');
@@ -520,6 +521,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 

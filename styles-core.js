@@ -1,4 +1,4 @@
-// @version 1371
+// @version 1372
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -740,6 +740,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
