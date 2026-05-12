@@ -1,4 +1,4 @@
-// @version 1387
+// @version 1388
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -461,8 +461,8 @@
     const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
     const gradRow = popup.querySelector('#cp-grad-row');
     const degRow  = popup.querySelector('#cp-grad-deg-row');
-    if (gradRow) gradRow.style.display = mode === 'solid' ? 'none' : '';
-    if (degRow)  degRow.style.display  = (mode === 'linear') ? '' : 'none';
+    if (gradRow) gradRow.style.display = mode === 'solid' ? 'none' : 'flex';
+    if (degRow)  degRow.style.display  = (mode === 'linear') ? 'flex' : 'none';
   }
   function buildPopup() {
     const v = cssVars(), c = cpCfg();
@@ -509,7 +509,7 @@
   `</div>` +
   `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:4px;">` +
     `<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
-    `<input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="flex:1;min-width:0;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;">` +
+    `<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +
     `<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
     `<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">360\u00b0</span>` +
   `</div>` +
@@ -962,6 +962,7 @@ window._cpSetGradientMode = (id, mode) => { _gMode[id] = mode; };
   refreshAlphaTrack();
   };
 })();
+
 
 
 

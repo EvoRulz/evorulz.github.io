@@ -1,4 +1,4 @@
-// @version 1387
+// @version 1388
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -764,6 +764,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <input type="file" id="settings-import-file" accept=".json" style="display:none" onchange="settingsImport(this)">
     </div>
 `);
+
 
 
 
