@@ -1,4 +1,4 @@
-// @version 1386
+// @version 1387
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -114,7 +114,7 @@ document.body.insertAdjacentHTML('beforeend', `
       </div>
       <div class="settings-row" data-btn-row="fontweight">
         <label>Text thickness <span id="s-fontweight-val">400</span></label>
-        <input type="range" class="alpha-slider" id="s-fontweight" min="100" max="900" value="400" oninput="document.getElementById('s-fontweight-val').textContent=this.value;settingsChange()">
+        <input type="range" class="alpha-slider" id="s-fontweight" min="1" max="2000" value="400" oninput="document.getElementById('s-fontweight-val').textContent=this.value;settingsChange()">
       </div>
         <div class="settings-row" data-btn-row="font">
         <label>Font</label>
@@ -337,6 +337,7 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
+
 
 
 

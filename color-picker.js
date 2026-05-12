@@ -1,4 +1,4 @@
-// @version 1386
+// @version 1387
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -962,6 +962,7 @@ window._cpSetGradientMode = (id, mode) => { _gMode[id] = mode; };
   refreshAlphaTrack();
   };
 })();
+
 
 
 
