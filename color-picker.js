@@ -1,4 +1,4 @@
-// @version 1374
+// @version 1375
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -44,6 +44,8 @@
   }
   const _gd   = {};   // stored gradient per swatch: { [inputId]: stops[] | null }
   let   _gdeg  = {};   // stored gradient degree per swatch
+  let   _gdRadial = {};
+  let   _gMode    = {};
   let   _ga   = null; // active stops for open popup (null = solid)
   let   _gSel = 0;    // selected handle index
   let   _gRenderTime = 0; // timestamp of last _gRender call
@@ -66,15 +68,26 @@
     const a = p(ha), b = p(hb);
     return '#' + a.map((v,i) => Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0').toUpperCase()).join('');
   }
-  function _gBuildCSS(stops, deg) {
+  function _gBuildCSS(stops, deg, mode) {
     if (!stops || stops.length < 2) return null;
+    if (mode === 'radial') {
+      return 'radial-gradient(circle,' + stops.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')';
+    }
     const dir = (deg != null) ? deg + 'deg' : 'to right';
     return 'linear-gradient(' + dir + ',' + stops.map(s => h8css(s.hex8)+' '+(s.pos*100).toFixed(1)+'%').join(',') + ')';
   }
   function _gLoad() {
     if (!activeSwatch) { _ga = null; _gSel = 0; return; }
     const inp = activeSwatch.querySelector('input[type="color"]');
-    _ga   = inp && _gd[inp.id] ? _gd[inp.id].map(s => ({...s})) : null;
+    if (inp && !_gMode[inp.id] && _gd[inp.id]) _gMode[inp.id] = 'linear';
+    const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
+    if (mode === 'radial') {
+      _ga = inp && _gdRadial[inp.id] ? _gdRadial[inp.id].map(s => ({...s})) : null;
+    } else if (mode === 'linear') {
+      _ga = inp && _gd[inp.id] ? _gd[inp.id].map(s => ({...s})) : null;
+    } else {
+      _ga = null;
+    }
     _gSel = 0;
     const _degLoadEl = popup && popup.querySelector('#cp-grad-deg');
     const _storedDeg = inp ? (_gdeg[inp.id] ?? 90) : 90;
@@ -83,7 +96,14 @@
   function _gSave() {
     if (!activeSwatch) return;
     const inp = activeSwatch.querySelector('input[type="color"]');
-    if (inp) _gd[inp.id] = _ga ? _ga.map(s => ({...s})) : null;
+    const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
+    if (inp) {
+      if (mode === 'radial') {
+        _gdRadial[inp.id] = _ga ? _ga.map(s => ({...s})) : null;
+      } else if (mode === 'linear') {
+        _gd[inp.id] = _ga ? _ga.map(s => ({...s})) : null;
+      }
+    }
     const _degSaveEl = popup && popup.querySelector('#cp-grad-deg');
     if (inp && _degSaveEl) _gdeg[inp.id] = parseInt(_degSaveEl.value) || 90;
   }
@@ -416,7 +436,26 @@
     overlay.addEventListener('pointerup',     () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
     overlay.addEventListener('pointercancel', () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
   }
-
+  function _updateModeToggle() {
+    if (!popup || !activeSwatch) return;
+    const inp = activeSwatch.querySelector('input[type="color"]');
+    const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
+    ['solid','linear','radial'].forEach(m => {
+      const btn = popup.querySelector('#cp-mode-' + m);
+      if (!btn) return;
+      btn.style.background = m === mode ? '#555' : '#2a2a2a';
+      btn.style.color = m === mode ? '#fff' : '#aaa';
+    });
+  }
+  function _updateGradVisibility() {
+    if (!popup) return;
+    const inp = activeSwatch ? activeSwatch.querySelector('input[type="color"]') : null;
+    const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
+    const gradRow = popup.querySelector('#cp-grad-row');
+    const degRow  = popup.querySelector('#cp-grad-deg-row');
+    if (gradRow) gradRow.style.display = mode === 'solid' ? 'none' : '';
+    if (degRow)  degRow.style.display  = mode === 'linear' ? '' : 'none';
+  }
   function buildPopup() {
     const v = cssVars(), c = cpCfg();
     const bgIsGrad = c.bg && typeof c.bg === 'string' && (c.bg.startsWith('linear-gradient') || c.bg.startsWith('radial-gradient'));
@@ -446,7 +485,12 @@
       ? `font-size:11px;background:${_lblGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;margin-bottom:2px;`
       : `font-size:11px;color:${txt};margin-bottom:2px;`;
     el.innerHTML =
-  `<div style="display:flex;gap:var(--slider-btn-gap,0px);align-items:center;">` +
+  `<div id="cp-mode-row" style="display:flex;gap:0;margin-bottom:6px;border-radius:4px;overflow:hidden;border:1px solid ${sb};">` +
+  `<button id="cp-mode-solid"  style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Solid</button>` +
+  `<button id="cp-mode-linear" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Linear</button>` +
+  `<button id="cp-mode-radial" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;background:#2a2a2a;color:#aaa;touch-action:manipulation;">Radial</button>` +
+`</div>` +
+`<div id="cp-grad-row" style="display:flex;gap:var(--slider-btn-gap,0px);align-items:center;">` +
     `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
     `<div style="position:relative;height:${v.height};flex:1;max-width:${v.w};">` +
   `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
@@ -606,6 +650,24 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     if (_dv) _dv.textContent = _dd.value + '\u00b0';
     _gSave(); _cpRefreshSwatch();
   });
+  ['solid','linear','radial'].forEach(m => {
+    const mBtn = el.querySelector('#cp-mode-' + m);
+    if (!mBtn) return;
+    mBtn.addEventListener('pointerdown', e => e.stopPropagation());
+    mBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (!activeSwatch) return;
+      const inp = activeSwatch.querySelector('input[type="color"]');
+      if (!inp) return;
+      _gSave();
+      _gMode[inp.id] = m;
+      _gLoad();
+      _updateModeToggle();
+      _updateGradVisibility();
+      _gRender();
+      _cpRefreshSwatch();
+    });
+  });
   _gRender();
 
   return el;
@@ -659,6 +721,8 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     refreshTracks();
     refreshAlphaTrack();
     _gRender();
+    _updateModeToggle();
+    _updateGradVisibility();
     setTimeout(() => document.addEventListener('pointerdown', tapOut), 80);
   }
 
@@ -849,10 +913,10 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   window._cpRebuild = function () {
     if (popup && activeSwatch) { const sw = activeSwatch; const savedSel = _gSel; close(); openFor(sw); _gSel = savedSel; _gRender(); }
   };
-  window._cpGetGradient      = id => { const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id]) : null; };
+  window._cpGetGradient      = id => { const mode = _gMode[id]; if (mode === 'solid') return null; if (mode === 'radial') { const s = _gdRadial[id]; return s ? _gBuildCSS(s, null, 'radial') : null; } const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id] ?? 90, 'linear') : null; };
   window._cpGetGradientDeg   = id => _gdeg[id] ?? 90;
   window._cpSetGradientDeg   = (id, deg) => { _gdeg[id] = deg; };
-  window._cpGetGradientStops = id => { const s = _gd[id]; return s ? s.map(x => ({...x})) : null; };
+  window._cpGetGradientStops = id => { const mode = _gMode[id]; if (mode === 'solid') return null; const s = mode === 'radial' ? _gdRadial[id] : _gd[id]; return s ? s.map(x => ({...x})) : null; };
   window._cpSetGradientStops = function(id, stops) { _gd[id] = stops ? stops.map(s => ({...s})) : null; };
   window._cpRefresh = function () {
   if (!popup || !activeSwatch) return;
@@ -875,6 +939,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
