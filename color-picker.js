@@ -1,4 +1,4 @@
-// @version 1382
+// @version 1383
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -926,7 +926,21 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   window._cpGetGradientDeg   = id => _gdeg[id] ?? 90;
   window._cpSetGradientDeg   = (id, deg) => { _gdeg[id] = deg; };
   window._cpGetGradientStops = id => { const mode = _gMode[id]; if (mode === 'solid') return null; const s = mode === 'radial' ? _gdRadial[id] : mode === 'conic' ? _gdConic[id] : _gd[id]; return s ? s.map(x => ({...x})) : null; };
-  window._cpSetGradientStops = function(id, stops) { _gd[id] = stops ? stops.map(s => ({...s})) : null; if (stops && stops.length >= 2 && _gMode[id] !== 'radial' && _gMode[id] !== 'conic') { _gMode[id] = 'linear'; } else if (!stops && _gMode[id] !== 'radial' && _gMode[id] !== 'conic') { _gMode[id] = 'solid'; } };
+  window._cpSetGradientStops = function(id, stops, mode) {
+  if (mode !== undefined) _gMode[id] = mode;
+  const m = _gMode[id] || (stops ? 'linear' : 'solid');
+  if (m === 'radial') {
+    _gdRadial[id] = stops ? stops.map(s => ({...s})) : null;
+  } else if (m === 'conic') {
+    _gdConic[id] = stops ? stops.map(s => ({...s})) : null;
+  } else {
+    _gd[id] = stops ? stops.map(s => ({...s})) : null;
+    if (stops && stops.length >= 2) { if (_gMode[id] !== 'radial' && _gMode[id] !== 'conic') _gMode[id] = 'linear'; }
+    else if (!stops) { if (_gMode[id] !== 'radial' && _gMode[id] !== 'conic') _gMode[id] = 'solid'; }
+  }
+};
+window._cpGetGradientMode = id => _gMode[id] || 'solid';
+window._cpSetGradientMode = (id, mode) => { _gMode[id] = mode; };
   window._cpRefresh = function () {
   if (!popup || !activeSwatch) return;
   const inp = activeSwatch.querySelector('input[type="color"]');
@@ -948,6 +962,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 

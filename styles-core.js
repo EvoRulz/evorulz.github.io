@@ -1,4 +1,4 @@
-// @version 1382
+// @version 1383
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -354,11 +354,11 @@ if (navigator.storage && navigator.storage.persist) {
   }
   function _bgCss(val) {
     if (!val) return 'transparent';
-    if (typeof val === 'string' && (val.startsWith('linear-gradient') || val.startsWith('radial-gradient'))) return val;
+    if (typeof val === 'string' && (val.startsWith('linear-gradient') || val.startsWith('radial-gradient') || val.startsWith('conic-gradient'))) return val;
     return hex8ToCss(val);
   }
   function setColorValue(id, hex) {
-    if (!hex || typeof hex !== 'string' || hex.startsWith('linear-gradient') || hex.startsWith('radial-gradient')) return;
+    if (!hex || typeof hex !== 'string' || hex.startsWith('linear-gradient') || hex.startsWith('radial-gradient') || hex.startsWith('conic-gradient')) return;
     const {r,g,b,a} = hex8ToComponents(hex);
     const picker = document.getElementById(id);
     const slider = document.getElementById(id+'-alpha');
@@ -744,6 +744,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
