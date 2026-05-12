@@ -1,4 +1,4 @@
-// @version 1381
+// @version 1382
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -144,6 +144,8 @@
     if (appStyle.statusBarStops && window._cpSetGradientStops) window._cpSetGradientStops('s-app-statusbar-color', appStyle.statusBarStops);
     if (window._cpSyncUI) window._cpSyncUI();
     const _fsSEl = document.getElementById('s-fontsize'); if (_fsSEl) { const _fsV = btnStyle.fontSize ?? 16; _fsSEl.value = String(_fsV); const _fsvSEl = document.getElementById('s-fontsize-val'); if (_fsvSEl) _fsvSEl.textContent = _fsV + 'px'; }
+    const _fwSEl = document.getElementById('s-fontweight'); if (_fwSEl) { const _fwV = btnStyle.fontWeight ?? 400; _fwSEl.value = String(_fwV); const _fwvSEl = document.getElementById('s-fontweight-val'); if (_fwvSEl) _fwvSEl.textContent = String(_fwV); }
+    const _fxSEl = document.getElementById('s-fontscalex'); if (_fxSEl) { const _fxV = btnStyle.fontScaleX ?? 100; _fxSEl.value = String(_fxV); const _fxvSEl = document.getElementById('s-fontscalex-val'); if (_fxvSEl) _fxvSEl.textContent = _fxV + '%'; }
     const _fontSel = document.getElementById('s-font'); if (_fontSel) _fontSel.value = btnStyle.font;
     if (window.fontPickerSync) window.fontPickerSync();
     document.querySelectorAll('.alpha-slider').forEach(function(s) {
@@ -288,6 +290,10 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     document.getElementById("s-font").value    = btnStyle.font;
     const _initFontSize = (_initId && _btnStyles[_initId]?.fontSize != null) ? _btnStyles[_initId].fontSize : (btnStyle.fontSize ?? 16);
     const _fsOEl = document.getElementById("s-fontsize"); if (_fsOEl) { _fsOEl.value = String(_initFontSize); const _fsOvEl = document.getElementById("s-fontsize-val"); if (_fsOvEl) _fsOvEl.textContent = _initFontSize + "px"; }
+    const _initFontWeight = (_initId && _btnStyles[_initId]?.fontWeight != null) ? _btnStyles[_initId].fontWeight : (btnStyle.fontWeight ?? 400);
+    const _fwOEl = document.getElementById("s-fontweight"); if (_fwOEl) { _fwOEl.value = String(_initFontWeight); const _fwOvEl = document.getElementById("s-fontweight-val"); if (_fwOvEl) _fwOvEl.textContent = String(_initFontWeight); }
+    const _initFontScaleX = (_initId && _btnStyles[_initId]?.fontScaleX != null) ? _btnStyles[_initId].fontScaleX : (btnStyle.fontScaleX ?? 100);
+    const _fxOEl = document.getElementById("s-fontscalex"); if (_fxOEl) { _fxOEl.value = String(_initFontScaleX); const _fxOvEl = document.getElementById("s-fontscalex-val"); if (_fxOvEl) _fxOvEl.textContent = _initFontScaleX + "%"; }
     const _initRadius = (_initId && _btnStyles[_initId]?.btnRadius != null) ? _btnStyles[_initId].btnRadius : (btnStyle.btnRadius ?? 6);
     document.getElementById("s-radius").value  = String(_initRadius);
     document.getElementById("s-radius").value  = String(_initRadius);
@@ -452,6 +458,7 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 

@@ -1,4 +1,4 @@
-// @version 1381
+// @version 1382
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -213,8 +213,13 @@ function settingsExport() {
 else {
   _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, {
     fontSize: Number(document.getElementById("s-fontsize")?.value ?? 16)
-  });
+  }
+  );
 }
+if (!_cfId) btnStyle.fontWeight = Number(document.getElementById("s-fontweight")?.value ?? 400);
+else { _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, { fontWeight: Number(document.getElementById("s-fontweight")?.value ?? 400) }); }
+if (!_cfId) btnStyle.fontScaleX = Number(document.getElementById("s-fontscalex")?.value ?? 100);
+else { _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, { fontScaleX: Number(document.getElementById("s-fontscalex")?.value ?? 100) }); }
 if (!_cfId) btnStyle.btnRadius = Number(document.getElementById("s-radius").value);
 else {
   _btnStyles[_cfId] = Object.assign(_btnStyles[_cfId] || {}, {
@@ -417,7 +422,9 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
     const _fgsWREl = document.getElementById('s-fgstrokew'); if (_fgsWREl) { _fgsWREl.value = '0'; const _fgsWVREl = document.getElementById('s-fgstrokew-val'); if (_fgsWVREl) _fgsWVREl.textContent = '0px'; }
     document.getElementById("s-radius").value  = String(BTN_STYLE_DEFAULTS.btnRadius ?? 6);
     const _fsREl = document.getElementById("s-fontsize"); if (_fsREl) { _fsREl.value = String(BTN_STYLE_DEFAULTS.fontSize ?? 16); const _fsRvEl = document.getElementById("s-fontsize-val"); if (_fsRvEl) _fsRvEl.textContent = (BTN_STYLE_DEFAULTS.fontSize ?? 16) + "px"; }
-const _rvDef = document.getElementById("s-radius-val"); if (_rvDef) _rvDef.textContent = (BTN_STYLE_DEFAULTS.btnRadius ?? 6) + "px";
+    const _fwREl = document.getElementById("s-fontweight"); if (_fwREl) { _fwREl.value = "400"; const _fwRvEl = document.getElementById("s-fontweight-val"); if (_fwRvEl) _fwRvEl.textContent = "400"; }
+    const _fxREl = document.getElementById("s-fontscalex"); if (_fxREl) { _fxREl.value = "100"; const _fxRvEl = document.getElementById("s-fontscalex-val"); if (_fxRvEl) _fxRvEl.textContent = "100%"; }
+    const _rvDef = document.getElementById("s-radius-val"); if (_rvDef) _rvDef.textContent = (BTN_STYLE_DEFAULTS.btnRadius ?? 6) + "px";
 _btnStyles = {};
     setColorValue('s-clock-date-color', _btnStyleFor('top-date').fg);
     setColorValue('s-clock-time-color', _btnStyleFor('top-time').fg);
@@ -470,6 +477,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 
