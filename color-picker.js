@@ -1,4 +1,4 @@
-// @version 1375
+// @version 1376
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -492,7 +492,7 @@
 `</div>` +
 `<div id="cp-grad-row" style="display:flex;gap:var(--slider-btn-gap,0px);align-items:center;">` +
     `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
-    `<div style="position:relative;height:${v.height};flex:1;max-width:${v.w};">` +
+    `<div style="position:relative;height:${v.height};flex:1;min-width:0;">` +
   `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
       `<div id="cp-grad-hw"    style="position:absolute;inset:0;overflow:visible;pointer-events:none;"></div>` +
     `</div>` +
@@ -500,7 +500,7 @@
   `</div>` +
   `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:var(--slider-btn-gap,0px);">` +
     `<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
-    `<input id="cp-grad-deg" type="range" min="0" max="360" value="90" style="${ss}">` +
+    `<input id="cp-grad-deg" type="range" min="0" max="360" value="90" style="${ss}width:auto;flex:1;min-width:0;">` +
     `<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
     `<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">90\u00b0</span>` +
   `</div>` +
@@ -939,6 +939,7 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   refreshAlphaTrack();
   };
 })();
+
 
 
 
