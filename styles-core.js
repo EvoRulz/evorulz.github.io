@@ -1,4 +1,4 @@
-// @version 1389
+// @version 1390
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -334,7 +334,7 @@ if (navigator.storage && navigator.storage.persist) {
     } else {
       fill = hex8ToCss(btnStyle.sliderFill || '#9659FFFF');
     }
-    slider.style.background = `linear-gradient(to right, ${fill} ${adjPct}, ${track} ${adjPct}), repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 8px 8px`;
+    slider.style.background = `linear-gradient(to right, ${fill} ${adjPct}, ${track} ${adjPct})`;
   }
   function hex8ToCss(hex) {
     const {r,g,b,a} = hex8ToComponents(hex);
@@ -377,7 +377,7 @@ if (navigator.storage && navigator.storage.persist) {
     const a = (parseInt(slider.value) / 255).toFixed(3);
     const r2 = parseInt(picker.value.slice(1,3),16), g2 = parseInt(picker.value.slice(3,5),16), b2 = parseInt(picker.value.slice(5,7),16);
     const fill = `rgba(${r2},${g2},${b2},${a})`;
-    slider.style.background = `linear-gradient(to right, ${fill} ${adjPct}, ${track} ${adjPct}), repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 8px 8px`;
+    slider.style.background = `linear-gradient(to right, rgb(${r2},${g2},${b2}) ${adjPct}, transparent ${adjPct}), repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 8px 8px`;
     // Update swatch overlay to show color+alpha
     const overlay = document.getElementById(id+'-swatch-overlay');
     if (overlay) {
@@ -744,6 +744,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 

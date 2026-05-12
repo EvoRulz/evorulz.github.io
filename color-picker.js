@@ -1,4 +1,4 @@
-// @version 1389
+// @version 1390
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -371,7 +371,7 @@
     const pct = parseInt(alphaEl.value) / 255 * 100;
     const adjPct = `calc(${pct/100} * (100% - var(--slider-handle-w,16px)) + var(--slider-handle-w,16px) / 2)`;
     const a = (parseInt(alphaEl.value) / 255).toFixed(3);
-    alphaEl.style.background = `linear-gradient(to right, rgba(${r},${g},${b},0), rgba(${r},${g},${b},1))`;
+    alphaEl.style.background = `linear-gradient(to right, rgba(${r},${g},${b},0), rgba(${r},${g},${b},1)), repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 8px 8px`;
   }
 
   function commitAlpha(v) {
@@ -969,6 +969,7 @@ window._cpSetGradientMode = (id, mode) => { _gMode[id] = mode; };
   refreshAlphaTrack();
   };
 })();
+
 
 
 
