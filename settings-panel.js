@@ -1,4 +1,4 @@
-// @version 1388
+// @version 1389
 
 // ── Settings open/close/save/cancel/reset/export/import ───
   let _appStyleSnapshot = null;
@@ -105,7 +105,17 @@
     setColorValue('s-clock-date-glow',  _btnStyleFor('top-date').glow || '#00000000');
     setColorValue('s-clock-time-glow',  _btnStyleFor('top-time').glow || '#00000000');
     _sv('s-clock-date-size', _btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize);
+    _svl('s-clock-date-size-val', _btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize, 'px');
+    _sv('s-clock-date-scalex', _btnStyles['top-date']?.fontScaleX ?? btnStyle.fontScaleX ?? 100);
+    _svl('s-clock-date-scalex-val', _btnStyles['top-date']?.fontScaleX ?? btnStyle.fontScaleX ?? 100, '%');
+    _sv('s-clock-date-weight', _btnStyles['top-date']?.fontWeight ?? btnStyle.fontWeight ?? 400);
+    _svl('s-clock-date-weight-val', _btnStyles['top-date']?.fontWeight ?? btnStyle.fontWeight ?? 400, '');
     _sv('s-clock-time-size', _btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize);
+    _svl('s-clock-time-size-val', _btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize, 'px');
+    _sv('s-clock-time-scalex', _btnStyles['top-time']?.fontScaleX ?? btnStyle.fontScaleX ?? 100);
+    _svl('s-clock-time-scalex-val', _btnStyles['top-time']?.fontScaleX ?? btnStyle.fontScaleX ?? 100, '%');
+    _sv('s-clock-time-weight', _btnStyles['top-time']?.fontWeight ?? btnStyle.fontWeight ?? 400);
+    _svl('s-clock-time-weight-val', _btnStyles['top-time']?.fontWeight ?? btnStyle.fontWeight ?? 400, '');
     if (window._tumblerRefresh) window._tumblerRefresh();
     setColorValue('s-checkbox-checked', btnStyle.checkboxChecked);
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
@@ -282,7 +292,13 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     setColorValue('s-clock-date-glow',  _btnStyleFor('top-date').glow || '#00000000');
     setColorValue('s-clock-time-glow',  _btnStyleFor('top-time').glow || '#00000000');
     document.getElementById("s-clock-date-size").value = _btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize;
+    const _sopDsV = document.getElementById('s-clock-date-size-val'); if (_sopDsV) _sopDsV.textContent = (_btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize) + 'px';
+    const _sopDSxEl = document.getElementById('s-clock-date-scalex'); if (_sopDSxEl) { const _v = _btnStyles['top-date']?.fontScaleX ?? btnStyle.fontScaleX ?? 100; _sopDSxEl.value = String(_v); const _vEl = document.getElementById('s-clock-date-scalex-val'); if (_vEl) _vEl.textContent = _v + '%'; }
+    const _sopDWtEl = document.getElementById('s-clock-date-weight'); if (_sopDWtEl) { const _v = _btnStyles['top-date']?.fontWeight ?? btnStyle.fontWeight ?? 400; _sopDWtEl.value = String(_v); const _vEl = document.getElementById('s-clock-date-weight-val'); if (_vEl) _vEl.textContent = String(_v); }
     document.getElementById("s-clock-time-size").value = _btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize;
+    const _sopTsV = document.getElementById('s-clock-time-size-val'); if (_sopTsV) _sopTsV.textContent = (_btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize) + 'px';
+    const _sopTSxEl = document.getElementById('s-clock-time-scalex'); if (_sopTSxEl) { const _v = _btnStyles['top-time']?.fontScaleX ?? btnStyle.fontScaleX ?? 100; _sopTSxEl.value = String(_v); const _vEl = document.getElementById('s-clock-time-scalex-val'); if (_vEl) _vEl.textContent = _v + '%'; }
+    const _sopTWtEl = document.getElementById('s-clock-time-weight'); if (_sopTWtEl) { const _v = _btnStyles['top-time']?.fontWeight ?? btnStyle.fontWeight ?? 400; _sopTWtEl.value = String(_v); const _vEl = document.getElementById('s-clock-time-weight-val'); if (_vEl) _vEl.textContent = String(_v); }
     const _cdrOpenV = _btnStyles['top-date']?.btnRadius ?? btnStyle.btnRadius ?? 6;
     const _cdrOpenEl = document.getElementById("s-clock-date-radius"); if (_cdrOpenEl) { _cdrOpenEl.value = String(_cdrOpenV); const _cdrvOpenEl = document.getElementById("s-clock-date-radius-val"); if (_cdrvOpenEl) _cdrvOpenEl.textContent = _cdrOpenV + "px"; }
     const _ctrOpenV = _btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6;
@@ -458,6 +474,7 @@ if (_sfgsOv2 && _sfgsGrad2) { _sfgsOv2.style.background = _sfgsGrad2; } else { u
     settingsRedo   = dbounce(settingsRedo);
     settingsCancel = dbounce(settingsCancel);
     })();
+
 
 
 

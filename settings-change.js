@@ -1,4 +1,4 @@
-// @version 1388
+// @version 1389
 
 function settingsExport() {
     const clk = window._clockGet();
@@ -168,10 +168,12 @@ function settingsExport() {
           activeBg: getStyleValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockDateSize: Number(document.getElementById("s-clock-date-size").value),
-          fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
-          fgStroke: getStyleValue('s-fgstroke'),
-          fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
-          fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
+        fontScaleX: Number(document.getElementById('s-clock-date-scalex')?.value ?? 100),
+        fontWeight: Number(document.getElementById('s-clock-date-weight')?.value ?? 400),
+        fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+        fgStroke: getStyleValue('s-fgstroke'),
+        fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+        fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
     });
     updateAlphaSliderBg('s-clock-date-color');
         setColorValue('s-clock-date-glow', getColorValue('s-glow'));
@@ -184,10 +186,12 @@ function settingsExport() {
           activeBg: getStyleValue('s-activebg'),
           tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
           clockTimeSize: Number(document.getElementById("s-clock-time-size").value),
-          fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
-          fgStroke: getStyleValue('s-fgstroke'),
-          fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
-          fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
+        fontScaleX: Number(document.getElementById('s-clock-time-scalex')?.value ?? 100),
+        fontWeight: Number(document.getElementById('s-clock-time-weight')?.value ?? 400),
+        fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+        fgStroke: getStyleValue('s-fgstroke'),
+        fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+        fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
     });
     updateAlphaSliderBg('s-clock-time-color');
         setColorValue('s-clock-time-glow', getColorValue('s-glow'));
@@ -279,6 +283,8 @@ else {
         fg: getColorValue('s-clock-date-color'),
         glow: getColorValue('s-clock-date-glow'),
         clockDateSize: Number(document.getElementById("s-clock-date-size").value),
+        fontScaleX: Number(document.getElementById('s-clock-date-scalex')?.value ?? 100),
+        fontWeight: Number(document.getElementById('s-clock-date-weight')?.value ?? 400),
       });
     }
     if (_cfId !== 'top-time') {
@@ -287,6 +293,8 @@ else {
         fg: getColorValue('s-clock-time-color'),
         glow: getColorValue('s-clock-time-glow'),
         clockTimeSize: Number(document.getElementById("s-clock-time-size").value),
+        fontScaleX: Number(document.getElementById('s-clock-time-scalex')?.value ?? 100),
+        fontWeight: Number(document.getElementById('s-clock-time-weight')?.value ?? 400),
       });
     }
 if (_cfId !== 'top-date') {
@@ -296,6 +304,8 @@ _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
   fg: cfDateColor,
   glow: getColorValue('s-clock-date-glow'),
   clockDateSize: Number(document.getElementById("s-clock-date-size").value),
+  fontScaleX: Number(document.getElementById('s-clock-date-scalex')?.value ?? 100),
+  fontWeight: Number(document.getElementById('s-clock-date-weight')?.value ?? 400),
 });
 }
     if (_cfId === 'top-date') {
@@ -435,7 +445,13 @@ _btnStyles = {};
     setColorValue('s-clock-date-glow',  _btnStyleFor('top-date').glow || '#00000000');
     setColorValue('s-clock-time-glow',  _btnStyleFor('top-time').glow || '#00000000');
     document.getElementById("s-clock-date-size").value = _btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize;
+    const _rstDsV = document.getElementById('s-clock-date-size-val'); if (_rstDsV) _rstDsV.textContent = (_btnStyles['top-date']?.clockDateSize ?? btnStyle.clockDateSize) + 'px';
+    const _rstDSxEl = document.getElementById('s-clock-date-scalex'); if (_rstDSxEl) { _rstDSxEl.value = '100'; const _rstDSxV = document.getElementById('s-clock-date-scalex-val'); if (_rstDSxV) _rstDSxV.textContent = '100%'; }
+    const _rstDWtEl = document.getElementById('s-clock-date-weight'); if (_rstDWtEl) { _rstDWtEl.value = '400'; const _rstDWtV = document.getElementById('s-clock-date-weight-val'); if (_rstDWtV) _rstDWtV.textContent = '400'; }
     document.getElementById("s-clock-time-size").value = _btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize;
+    const _rstTsV = document.getElementById('s-clock-time-size-val'); if (_rstTsV) _rstTsV.textContent = (_btnStyles['top-time']?.clockTimeSize ?? btnStyle.clockTimeSize) + 'px';
+    const _rstTSxEl = document.getElementById('s-clock-time-scalex'); if (_rstTSxEl) { _rstTSxEl.value = '100'; const _rstTSxV = document.getElementById('s-clock-time-scalex-val'); if (_rstTSxV) _rstTSxV.textContent = '100%'; }
+    const _rstTWtEl = document.getElementById('s-clock-time-weight'); if (_rstTWtEl) { _rstTWtEl.value = '400'; const _rstTWtV = document.getElementById('s-clock-time-weight-val'); if (_rstTWtV) _rstTWtV.textContent = '400'; }
     const _cdrREl = document.getElementById("s-clock-date-radius"); if (_cdrREl) { _cdrREl.value = "6"; const _cdrRVEl = document.getElementById("s-clock-date-radius-val"); if (_cdrRVEl) _cdrRVEl.textContent = "6px"; }
     const _ctrREl = document.getElementById("s-clock-time-radius"); if (_ctrREl) { _ctrREl.value = "6"; const _ctrRVEl = document.getElementById("s-clock-time-radius-val"); if (_ctrRVEl) _ctrRVEl.textContent = "6px"; }
     const _cdrOpenV = _btnStyles['top-date']?.btnRadius ?? btnStyle.btnRadius ?? 6;
@@ -478,6 +494,7 @@ _btnStyles = {};
       _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
     }
   }
+
 
 
 

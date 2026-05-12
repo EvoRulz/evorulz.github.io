@@ -1,4 +1,4 @@
-// @version 1388
+// @version 1389
 
 package io.github.evorulz.twa;
 
@@ -52,6 +52,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 }
+
 
 
 

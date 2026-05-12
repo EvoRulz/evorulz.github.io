@@ -1,4 +1,4 @@
-// @version 1388
+// @version 1389
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -14,18 +14,16 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         </div>
       </div>
       <div class="settings-row" data-clock-row="datesize">
-        <label>Date size</label>
-        <select id="s-clock-date-size" onchange="settingsChange()">
-          <option value="10">10px</option>
-          <option value="11">11px</option>
-          <option value="12">12px</option>
-          <option value="13">13px (default)</option>
-          <option value="14">14px</option>
-          <option value="16">16px</option>
-          <option value="18">18px</option>
-          <option value="20">20px</option>
-          <option value="24">24px</option>
-        </select>
+        <label>Date text height <span id="s-clock-date-size-val">13px</span></label>
+        <input type="range" class="alpha-slider" id="s-clock-date-size" min="8" max="60" value="13" oninput="document.getElementById('s-clock-date-size-val').textContent=this.value+'px';settingsChange()">
+      </div>
+      <div class="settings-row" data-clock-row="datescalex">
+        <label>Date text width <span id="s-clock-date-scalex-val">100%</span></label>
+        <input type="range" class="alpha-slider" id="s-clock-date-scalex" min="50" max="200" value="100" oninput="document.getElementById('s-clock-date-scalex-val').textContent=this.value+'%';settingsChange()">
+      </div>
+      <div class="settings-row" data-clock-row="dateweight">
+        <label>Date text thickness <span id="s-clock-date-weight-val">400</span></label>
+        <input type="range" class="alpha-slider" id="s-clock-date-weight" min="1" max="2000" value="400" oninput="document.getElementById('s-clock-date-weight-val').textContent=this.value;settingsChange()">
       </div>
       <div class="color-settings-row" data-clock-row="timecolor">
         <label>Time color</label>
@@ -39,18 +37,16 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         </div>
       </div>
       <div class="settings-row" data-clock-row="timesize">
-        <label>Time size</label>
-        <select id="s-clock-time-size" onchange="settingsChange()">
-          <option value="10">10px</option>
-          <option value="11">11px</option>
-          <option value="12">12px</option>
-          <option value="13">13px (default)</option>
-          <option value="14">14px</option>
-          <option value="16">16px</option>
-          <option value="18">18px</option>
-          <option value="20">20px</option>
-          <option value="24">24px</option>
-        </select>
+        <label>Time text height <span id="s-clock-time-size-val">13px</span></label>
+        <input type="range" class="alpha-slider" id="s-clock-time-size" min="8" max="60" value="13" oninput="document.getElementById('s-clock-time-size-val').textContent=this.value+'px';settingsChange()">
+      </div>
+      <div class="settings-row" data-clock-row="timescalex">
+        <label>Time text width <span id="s-clock-time-scalex-val">100%</span></label>
+        <input type="range" class="alpha-slider" id="s-clock-time-scalex" min="50" max="200" value="100" oninput="document.getElementById('s-clock-time-scalex-val').textContent=this.value+'%';settingsChange()">
+      </div>
+      <div class="settings-row" data-clock-row="timeweight">
+        <label>Time text thickness <span id="s-clock-time-weight-val">400</span></label>
+        <input type="range" class="alpha-slider" id="s-clock-time-weight" min="1" max="2000" value="400" oninput="document.getElementById('s-clock-time-weight-val').textContent=this.value;settingsChange()">
       </div>
       <div class="color-settings-row" data-clock-row="datebg">
         <label>Date background</label>
@@ -764,6 +760,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <input type="file" id="settings-import-file" accept=".json" style="display:none" onchange="settingsImport(this)">
     </div>
 `);
+
 
 
 
