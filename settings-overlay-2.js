@@ -1,4 +1,4 @@
-// @version 1384
+// @version 1385
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -746,18 +746,9 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         <label>Switch size <span id="s-toggle-switch-size-val">16px</span></label>
         <input type="range" class="alpha-slider" id="s-toggle-switch-size" min="8" max="40" value="16" oninput="document.getElementById('s-toggle-switch-size-val').textContent=this.value+'px';settingsChange()">
       </div>
-      <div data-toggle-row="demo" style="margin-top:12px;padding-top:12px;border-top:1px solid #444;width:100%">
+      <div data-toggle-row="demo" style="margin-top:12px;padding-top:12px;border-top:1px solid #444;width:100%;display:flex;align-items:center;gap:12px;">
         <label style="font-size:13px;color:#bbb">Demo:</label>
-        <div style="display:flex;gap:16px;align-items:center;margin-top:8px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div class="ctrl-toggle"><div class="ctrl-switch"></div></div>
-            <span style="font-size:11px;color:#666">Off</span>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div class="ctrl-toggle on"><div class="ctrl-switch"></div></div>
-            <span style="font-size:11px;color:#666">On</span>
-          </div>
-        </div>
+        <div class="ctrl-toggle" onclick="this.classList.toggle('on')"><div class="ctrl-switch"></div></div>
       </div>
     </div>
     <div id="settings-footer">
@@ -773,6 +764,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <input type="file" id="settings-import-file" accept=".json" style="display:none" onchange="settingsImport(this)">
     </div>
 `);
+
 
 
 

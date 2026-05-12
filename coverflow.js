@@ -1,4 +1,4 @@
-// @version 1384
+// @version 1385
 
 // ── Coverflow tuning params ────────────────────────────────
   const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -528,6 +528,7 @@ if (_sfgsOv && _sfgsGrad) { _sfgsOv.style.background = _sfgsGrad; } else { updat
   document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
   });
+
 
 
 
