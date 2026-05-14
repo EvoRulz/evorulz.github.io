@@ -1,4 +1,4 @@
-// @version 1403
+// @version 1404
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -23,7 +23,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       </div>
       <div class="settings-row" data-clock-row="dateweight">
         <label>Date text thickness <span id="s-clock-date-weight-val">400</span></label>
-        <input type="range" class="alpha-slider" id="s-clock-date-weight" min="1" max="2000" value="400" oninput="document.getElementById('s-clock-date-weight-val').textContent=this.value;settingsChange()">
+        <input type="range" class="alpha-slider" id="s-clock-date-weight" min="1" max="900" value="400" oninput="document.getElementById('s-clock-date-weight-val').textContent=this.value;settingsChange()">
       </div>
       <div class="color-settings-row" data-clock-row="timecolor">
         <label>Time color</label>
@@ -46,7 +46,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       </div>
       <div class="settings-row" data-clock-row="timeweight">
         <label>Time text thickness <span id="s-clock-time-weight-val">400</span></label>
-        <input type="range" class="alpha-slider" id="s-clock-time-weight" min="1" max="2000" value="400" oninput="document.getElementById('s-clock-time-weight-val').textContent=this.value;settingsChange()">
+        <input type="range" class="alpha-slider" id="s-clock-time-weight" min="1" max="900" value="400" oninput="document.getElementById('s-clock-time-weight-val').textContent=this.value;settingsChange()">
       </div>
       <div class="color-settings-row" data-clock-row="datebg">
         <label>Date background</label>
