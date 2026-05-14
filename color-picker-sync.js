@@ -1,4 +1,4 @@
-// @version 1404
+// @version 1405
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -603,6 +603,7 @@ function tapOut(e) {
   if (!mo.popup) return;
   if (!mo.popup.contains(e.target) && !e.target.closest('.color-swatch-wrap') && !e.target.closest('#settings-footer')) close();
 }
+window._cpCssVars = cssVars;
 window._cpClose   = close;
 window._cpOpenFor = openFor;
 window._cpRebuild = function () {

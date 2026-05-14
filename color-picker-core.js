@@ -1,4 +1,4 @@
-// @version 1404
+// @version 1405
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -163,7 +163,7 @@
       const h = document.createElement('div');
       h.dataset.gi = i;
       if (s.isPercent) h.dataset.isPercent = '1';
-      const _cv = cssVars();
+      const _cv = window._cpCssVars ? window._cpCssVars() : {hW:'16px',hH:'16px',hR:'3%',hColor:'rgba(255,255,255,1)',hBorder:'transparent',w:'100%',height:'8px',radius:'4%',spread:'4px',border:'#555'};
       const _hw = Math.round(parseFloat(_cv.hW || '16') * 1) + 'px';
       const _hh = Math.round(parseFloat(_cv.hH || '16') * 1) + 'px';
       const _bw = Math.max(1, Math.round(parseFloat(_hw) * 0.10)) + 'px';
