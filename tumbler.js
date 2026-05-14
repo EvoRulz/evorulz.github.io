@@ -1,4 +1,4 @@
-// @version 1401
+// @version 1402
 // ── Clock tumbler ──────────────────────────────────────────
 (function(){
   const COLS = window._CLOCK_COLS;
@@ -366,12 +366,37 @@
     }).observe(_settingsOverlayEl, { attributes: true, attributeFilter: ["class"] });
     (function(){
       const _files = [
-        './index.html','./utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
-        './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
-        './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
-        './slider-init.js','./color-picker.js','./app-data.js','./clock.js','./app.css','./settings-ui.css',
-        './service-worker.js','./manifest.json','./LauncherActivity.java','./NotificationReceiver.java',
-        './BootReceiver.java','./AndroidManifest.xml'
+        './index.html',
+        './utils.js',
+        './tracker.js',
+        './bootstrap.js',
+        './styles-app.js',
+        './styles-btn.js',
+        './settings-overlay-1.js',
+        './settings-overlay-2.js',
+        './styles-colors.js',
+        './settings-panel.js',
+        './settings-change.js',
+        './styles-drag-rows.js',
+        './coverflow.js',
+        './drag.js',
+        './manage.js',
+        './tumbler.js',
+        './font.js',
+        './notifications.js',
+        './slider-init.js',
+        './color-picker-core.js',
+        './color-picker-sync.js',
+        './app-data.js',
+        './clock.js',
+        './app.css',
+        './settings-ui.css',
+        './service-worker.js',
+        './manifest.json',
+        './LauncherActivity.java',
+        './NotificationReceiver.java',
+        './BootReceiver.java',
+        './AndroidManifest.xml'
       ];
       Promise.all(_files.map(f=>fetch(f+'?nocache='+Date.now(),{cache:'no-store'}).then(r=>r.text()).catch(()=>'')))
       .then(texts=>{
@@ -385,8 +410,11 @@
         }
         const vEl=document.getElementById('app-version');
         if(vEl){
-          const vNum=parseInt(vEl.textContent.replace('v',''))||0;
-          const vColors=['#00FFFFFF','#FF00FFFF','#FFFF00FF'];
+          const vNum=parseInt(vEl.textContent.replace('v',
+            ''))||0;
+          const vColors=['#00FFFFFF',
+            '#FF00FFFF',
+          '#FFFF00FF'];
           const autoColor=vColors[vNum%3];
           const _lastStyledVer=parseInt(localStorage.getItem('_lastStyledVersion')||'0');
           if(vNum!==_lastStyledVer){
@@ -394,7 +422,8 @@
             _btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:autoColor,fgStops:null});
             localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));
             localStorage.setItem('_lastStyledVersion',String(vNum));
-            localStorage.setItem('_versionUpdatePending','1');
+            localStorage.setItem('_versionUpdatePending',
+              '1');
             localStorage.setItem('_versionColor', autoColor);
           } else {
             const _savedVer=localStorage.getItem('_btnStyles');
@@ -424,12 +453,34 @@
       './index.html',
       './service-worker.js',
       './manifest.json',
-      './utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
-      './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
-      './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
-      './slider-init.js','./color-picker.js','./app-data.js','./clock.js',
-      './app.css','./settings-ui.css',
-      './LauncherActivity.java','./NotificationReceiver.java','./BootReceiver.java','./AndroidManifest.xml',
+      './utils.js',
+      './tracker.js',
+      './bootstrap.js',
+      './settings-overlay-1.js',
+      './settings-overlay-2.js',
+      './settings-overlay-1.js',
+      './settings-overlay-2.js',
+      './styles-colors.js',
+      './settings-panel.js',
+      './settings-change.js',
+      './styles-drag-rows.js',
+      './coverflow.js',
+      './drag.js',
+      './manage.js',
+      './tumbler.js',
+      './font.js',
+      './notifications.js',
+      './slider-init.js',
+      './color-picker-core.js',
+      './color-picker-sync.js',
+      './app-data.js',
+      './clock.js',
+      './app.css',
+      './settings-ui.css',
+      './LauncherActivity.java',
+      './NotificationReceiver.java',
+      './BootReceiver.java',
+      './AndroidManifest.xml',
     ];
     return function() {
       if (_pending) return;
@@ -437,7 +488,8 @@
       const vEl = document.getElementById('app-version');
       const statsEl = document.getElementById('app-stats');
       if (!vEl || !statsEl) { _pending = false; return; }
-      const localVer = parseInt(vEl.textContent.replace('v','')) || 0;
+      const localVer = parseInt(vEl.textContent.replace('v',
+        '')) || 0;
       if (!statsEl.dataset.swOrig) {
         statsEl.dataset.swOrig = statsEl.innerHTML;
         statsEl.dataset.swOrigColor = statsEl.style.color;
@@ -472,7 +524,8 @@
             try { const _ac=new AudioContext(); const _o=_ac.createOscillator(); const _g=_ac.createGain(); _o.connect(_g); _g.connect(_ac.destination); _o.frequency.value=1500; _g.gain.setValueAtTime(0.3,_ac.currentTime); _g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.4); _o.start(); _o.stop(_ac.currentTime+0.4); } catch(e) {}
             _pending = false;
           } else {
-            const minVer = Math.min(...stale.map(r => r.ver).filter(Boolean));
+            const vers = stale.map(r => r.ver).filter(v => v > 0);
+const minVer = vers.length ? Math.min(...vers) : 0;
             statsEl.innerHTML = 'CDN: v' + (minVer || '?') + '<br>' + stale.length + ' file' + (stale.length > 1 ? 's' : '') + ' stale';
             statsEl.style.color = '#ffaa00';
             statsEl.style.opacity = '1';
