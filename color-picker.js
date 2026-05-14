@@ -1,4 +1,4 @@
-// @version 1391
+// @version 1393
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -509,14 +509,7 @@
   `</div>` +
   `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:4px;">` +
     `<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
-    `<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +`<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}margin-bottom:0;min-width:72px;flex-shrink:0;">Hue</div>` +
-    `<input id="cp-hue" type="range" min="0" max="360" value="${H}" style="${ss}flex:1;min-width:0;"></div>` +
-  `<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}margin-bottom:0;min-width:72px;flex-shrink:0;">Saturation</div>` +
-    `<input id="cp-sat" type="range" min="0" max="100" value="${S}" style="${ss}flex:1;min-width:0;"></div>` +
-  `<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}margin-bottom:0;min-width:72px;flex-shrink:0;">Brightness</div>` +
-    `<input id="cp-bri" type="range" min="0" max="100" value="${B}" style="${ss}flex:1;min-width:0;"></div>` +
-`<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}margin-bottom:0;min-width:72px;flex-shrink:0;">Alpha</div>` +
-  `<input id="cp-alpha" type="range" min="0" max="255" value="255" style="${ss}flex:1;min-width:0;"></div>` +
+    `<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +
     `<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
     `<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">360\u00b0</span>` +
   `</div>` +
@@ -969,6 +962,8 @@ window._cpSetGradientMode = (id, mode) => { _gMode[id] = mode; };
   refreshAlphaTrack();
   };
 })();
+
+
 
 
 
