@@ -1,4 +1,4 @@
-// @version 1399
+// @version 1400
 
 /// ── Drag-to-reorder — HABIT BUTTONS ──────────────────────
 const DRAG_THRESHOLD = 6;
@@ -316,6 +316,7 @@ document.addEventListener('pointercancel', () => {
   if (topDrag.ghost) topDrag.ghost.remove();
   topDrag = null;
 });
+
 
 
 

@@ -1,4 +1,4 @@
- // @version 1399
+ // @version 1400
 
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
@@ -285,6 +285,7 @@ function ctrlToggleInteract() {
   if (t) t.classList.toggle('on', window._interactEnabled);
   document.body.classList.toggle('interact-locked', !window._interactEnabled);
 }
+
 
 
 

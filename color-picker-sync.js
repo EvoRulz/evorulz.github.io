@@ -1,4 +1,4 @@
-// @version 1399
+// @version 1400
 
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
@@ -170,3 +170,505 @@ document.addEventListener('pointercancel', function() {
   if (_swatchDownEl) _swatchDownEl.style.boxShadow = '';
   _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null;
 }, true);
+
+// ── Popup render & management (moved from color-picker-core.js) ─────────────
+
+(function () {
+  function _m() { return window._cpMod; }
+
+  function cssVars() {
+    const g = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+    return {
+      border:  g('--slider-border-color') || '#555',
+      height:  g('--slider-h')            || '8px',
+      radius:  g('--slider-r')            || '4%',
+      spread:  g('--slider-spread')       || '4px',
+      hColor:  g('--slider-handle-color') || '#fff',
+      hW:      g('--slider-handle-w')     || '16px',
+      hH:      g('--slider-handle-h')     || '16px',
+      hR:      g('--slider-handle-r')     || '3%',
+      hBorder: g('--slider-handle-border')|| 'transparent',
+      w:       g('--slider-w')            || '100%',
+    };
+  }
+
+  function injectThumbCSS(v) {
+    const mo = _m();
+    if (mo.styleTag) mo.styleTag.remove();
+    const st = document.createElement('style');
+    st.id = 'cp-thumb-style';
+    const _holeInject = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--slider-handle-hole').trim()) || 0;
+    st.textContent = `
+      #cp-popup input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance:none; width:${v.hW}; height:${v.hH};
+        border-radius:${v.hR}; background:radial-gradient(circle, transparent calc(${_holeInject} * 1%), ${v.hColor} calc(${_holeInject} * 1%));
+        border:1px solid ${v.hBorder}; cursor:pointer; box-sizing:border-box; box-shadow:0 0 8px 4px ${(typeof btnStyle !== 'undefined' ? hex8ToCss(btnStyle.sliderHandleGlow || '#FFFFFF00') : 'rgba(0,0,0,0)')};
+      }
+      #cp-popup input[type=range]::-moz-range-thumb {
+        width:${v.hW}; height:${v.hH}; border-radius:${v.hR};
+        background:radial-gradient(circle, transparent calc(${_holeInject} * 1%), ${v.hColor} calc(${_holeInject} * 1%));
+        border:1px solid ${v.hBorder};
+        cursor:pointer; box-sizing:border-box; box-shadow:0 0 8px 4px ${(typeof btnStyle !== 'undefined' ? hex8ToCss(btnStyle.sliderHandleGlow || '#FFFFFF00') : 'rgba(0,0,0,0)')};
+    }`;
+    document.head.appendChild(st);
+    mo.styleTag = st;
+  }
+
+  function sliderCSS(v) {
+    return `width:${v.w};height:${v.height};border-radius:${v.spread}/${v.radius};` +
+  `border:1px solid ${v.border};outline:none;appearance:none;-webkit-appearance:none;` +
+`cursor:pointer;touch-action:none;display:block;box-sizing:border-box;`;
+}
+
+function refreshTracks() {
+  const mo = _m();
+  if (!mo.popup) return;
+  const [hr,hg,hb] = mo.hsbToRgb(mo.H, 100, 100);
+  const [cr,cg,cb] = mo.hsbToRgb(mo.H, mo.S, 100);
+  const [pr,pg,pb] = mo.hsbToRgb(mo.H, mo.S, mo.B);
+  mo.popup.querySelector('#cp-hue').style.background =
+  'linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)';
+  mo.popup.querySelector('#cp-sat').style.background =
+`linear-gradient(to right,#808080,rgb(${hr},${hg},${hb}))`;
+mo.popup.querySelector('#cp-bri').style.background =
+`linear-gradient(to right,#000,rgb(${cr},${cg},${cb}))`;
+const _sw = mo.popup.querySelector('#cp-swatch');
+if (_sw) _sw.style.background = `rgb(${pr},${pg},${pb})`;
+}
+
+function refreshAlphaTrack() {
+  const mo = _m();
+  if (!mo.popup) return;
+  const alphaEl = mo.popup.querySelector('#cp-alpha');
+  if (!alphaEl) return;
+  const [r,g,b] = mo.hsbToRgb(mo.H, mo.S, mo.B);
+  const pct = parseInt(alphaEl.value) / 255 * 100;
+  alphaEl.style.background = `linear-gradient(to right, rgba(${r},${g},${b},0), rgba(${r},${g},${b},1)), repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 8px 8px`;
+}
+
+function commitAlpha(v) {
+  const mo = _m();
+  if (!mo.activeSwatch) return;
+  const inp = mo.activeSwatch.querySelector('input[type="color"]');
+  if (!inp) return;
+  if (mo._ga && mo._ga[mo._gSel] && !mo._ga[mo._gSel].isPercent) {
+    const [rc,gc,bc] = mo.hsbToRgb(mo.H, mo.S, mo.B);
+    const a = Math.round(Number(v));
+    mo._ga[mo._gSel].hex8 = '#' + [rc,gc,bc,a].map(x => x.toString(16).padStart(2,'0').toUpperCase()).join('');
+    mo._gSave();
+  }
+  const realAlpha = document.getElementById(inp.id + '-alpha');
+  if (realAlpha) { realAlpha.value = v; realAlpha.dispatchEvent(new Event('input', {bubbles:true})); }
+  const [r,g,b] = mo.hsbToRgb(mo.H, mo.S, mo.B);
+  const hex = mo.rgbToHex(r,g,b);
+  const aHex = Math.round(Number(v)).toString(16).padStart(2,'0').toUpperCase();
+  const _hexEl = mo.popup && mo.popup.querySelector('#cp-hex');
+  if (_hexEl) _hexEl.value = '#' + hex.replace('#','') + aHex;
+  refreshAlphaTrack();
+  mo._gRender();
+}
+
+function commitColor() {
+  const mo = _m();
+  const [r,g,b] = mo.hsbToRgb(mo.H, mo.S, mo.B);
+  const hex = mo.rgbToHex(r,g,b);
+  const _hexEl = mo.popup ? mo.popup.querySelector('#cp-hex') : null;
+  if (_hexEl) {
+    const alphaEl = mo.popup.querySelector('#cp-alpha');
+    const aVal = alphaEl ? parseInt(alphaEl.value) : 255;
+    const aHex = aVal.toString(16).padStart(2,'0').toUpperCase();
+    _hexEl.value = '#' + hex.replace('#','') + aHex;
+  }
+  refreshTracks();
+  refreshAlphaTrack();
+  if (!mo.activeSwatch) return;
+  const inp = mo.activeSwatch.querySelector('input[type="color"]');
+  if (mo._ga && mo._ga[mo._gSel] && !mo._ga[mo._gSel].isPercent) {
+    const aEl = mo.popup && mo.popup.querySelector('#cp-alpha');
+    const a   = aEl ? parseInt(aEl.value) : 255;
+    const [rc,gc,bc] = mo.hsbToRgb(mo.H, mo.S, mo.B);
+    mo._ga[mo._gSel].hex8 = '#' + [rc,gc,bc,a].map(nv => nv.toString(16).padStart(2,'0').toUpperCase()).join('');
+    mo._gSave();
+  }
+  if (inp) { inp.value = hex.toLowerCase(); inp.dispatchEvent(new Event('input', {bubbles:true})); }
+  mo._gRender();
+}
+
+function makeDragger(slider, onVal) {
+  const min = +slider.min, max = +slider.max;
+  let active = false;
+  let cachedRect = null;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:absolute;inset:0;z-index:1;cursor:pointer;touch-action:none;';
+  const par = slider.parentElement;
+  if (getComputedStyle(par).position === 'static') par.style.position = 'relative';
+  par.appendChild(overlay);
+  slider.style.pointerEvents = 'none';
+  function update(cx) {
+    const r = cachedRect;
+    const v = Math.round(min + Math.max(0, Math.min(1, (cx - r.left) / r.width)) * (max - min));
+    slider.value = v; onVal(v);
+  }
+  overlay.addEventListener('pointerdown', e => {
+    active = true; cachedRect = slider.getBoundingClientRect(); overlay.setPointerCapture(e.pointerId);
+    window._cpActiveDrag = true;
+    update(e.clientX); e.preventDefault(); e.stopPropagation();
+  });
+  overlay.addEventListener('pointermove', e => { if (active) { update(e.clientX); e.preventDefault(); } });
+  overlay.addEventListener('pointerup',     () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
+  overlay.addEventListener('pointercancel', () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
+}
+
+function _updateModeToggle() {
+  const mo = _m();
+  if (!mo.popup || !mo.activeSwatch) return;
+  const inp = mo.activeSwatch.querySelector('input[type="color"]');
+  const mode = inp ? (mo._gMode[inp.id] || 'solid') : 'solid';
+  ['solid','linear','radial','conic'].forEach(gm => {
+    const btn = mo.popup.querySelector('#cp-mode-' + gm);
+    if (!btn) return;
+    btn.style.background = gm === mode ? '#555' : '#2a2a2a';
+    btn.style.color = gm === mode ? '#fff' : '#aaa';
+  });
+}
+
+function _updateGradVisibility() {
+  const mo = _m();
+  if (!mo.popup) return;
+  const inp = mo.activeSwatch ? mo.activeSwatch.querySelector('input[type="color"]') : null;
+  const mode = inp ? (mo._gMode[inp.id] || 'solid') : 'solid';
+  const gradRow = mo.popup.querySelector('#cp-grad-row');
+  const degRow  = mo.popup.querySelector('#cp-grad-deg-row');
+  if (gradRow) gradRow.style.display = mode === 'solid' ? 'none' : 'flex';
+  if (degRow)  degRow.style.display  = (mode === 'linear') ? 'flex' : 'none';
+}
+
+function buildPopup() {
+  const mo = _m();
+  const v = cssVars(), c = mo.cpCfg();
+  const bgIsGrad = c.bg && typeof c.bg === 'string' && (c.bg.startsWith('linear-gradient') || c.bg.startsWith('radial-gradient'));
+  const bg  = bgIsGrad ? c.bg : mo.h8css(c.bg);
+  const brIsGrad = c.border && typeof c.border === 'string' && (c.border.startsWith('linear-gradient') || c.border.startsWith('radial-gradient'));
+  const br = brIsGrad ? c.border : mo.h8css(c.border);
+  const bgLayer = brIsGrad ? (bgIsGrad ? bg : `linear-gradient(${bg}, ${bg})`) : bg;
+  const _lblGrad = c.labelStops ? mo._gBuildCSS(c.labelStops) : (typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
+  const lbl = _lblGrad || mo.h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
+  const _txtGrad = c.textStops ? mo._gBuildCSS(c.textStops) : (typeof c.text === 'string' && (c.text.startsWith('linear-gradient') || c.text.startsWith('radial-gradient'))) ? c.text : null;
+  const txt = _txtGrad || mo.h8css(typeof c.text === 'string' ? c.text : '#FFFFFFFF');
+  const sb = mo.h8css((typeof btnStyle !== 'undefined' && btnStyle.sliderBorder) || '#555555FF');
+  injectThumbCSS(v);
+  const el = document.createElement('div');
+  el.id = 'cp-popup';
+  el.style.cssText =
+  (brIsGrad
+    ? `position:fixed;z-index:99999;background:${bgLayer} padding-box, ${br} border-box;border:1px solid transparent;border-radius:8px;`
+    : `position:fixed;z-index:99999;background:${bg};border:1px solid ${br};border-radius:8px;`) +
+`padding:14px 16px;width:268px;box-shadow:0 4px 24px rgba(0,0,0,0.65);` +
+`display:flex;flex-direction:column;gap:10px;touch-action:none;` +
+`user-select:none;-webkit-user-select:none;`;
+const ss = sliderCSS(v);
+const ls = _txtGrad
+? `font-size:11px;background:${_txtGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;margin-bottom:2px;`
+: _lblGrad
+? `font-size:11px;background:${_lblGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;margin-bottom:2px;`
+: `font-size:11px;color:${txt};margin-bottom:2px;`;
+el.innerHTML =
+`<div id="cp-mode-row" style="display:flex;gap:0;margin-bottom:6px;border-radius:4px;overflow:hidden;border:1px solid ${sb};">` +
+`<button id="cp-mode-solid"  style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Solid</button>` +
+`<button id="cp-mode-linear" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Linear</button>` +
+`<button id="cp-mode-radial" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Radial</button>` +
+`<button id="cp-mode-conic"  style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;background:#2a2a2a;color:#aaa;touch-action:manipulation;">Conic</button>` +
+`</div>` +
+`<div id="cp-grad-row" style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap;">` +
+`<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
+`<div style="position:relative;height:${v.height};flex:1;min-width:0;">` +
+`<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
+`<div id="cp-grad-hw"    style="position:absolute;inset:0;overflow:visible;pointer-events:none;"></div>` +
+`</div>` +
+`<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
+`</div>` +
+`<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:4px;">` +
+`<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
+`<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +
+`<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
+`<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">360\u00b0</span>` +
+`</div>` +
+`<div><div class="cp-field-label" style="${ls}">Hue</div>` +
+`<input id="cp-hue" type="range" min="0" max="360" value="${mo.H}" style="${ss}"></div>` +
+`<div><div class="cp-field-label" style="${ls}">Saturation</div>` +
+`<input id="cp-sat" type="range" min="0" max="100" value="${mo.S}" style="${ss}"></div>` +
+`<div><div class="cp-field-label" style="${ls}">Brightness</div>` +
+`<input id="cp-bri" type="range" min="0" max="100" value="${mo.B}" style="${ss}"></div>` +
+`<div><div class="cp-field-label" style="${ls}">Alpha</div>` +
+`<input id="cp-alpha" type="range" min="0" max="255" value="255" style="${ss}"></div>` +
+`<div style="display:flex;gap:6px;align-items:center;margin-top:2px;">` +
+`<input id="cp-hex" type="text" maxlength="9" ` +
+`style="flex:1;min-width:0;background:#111;border:1px solid ${sb};border-radius:4px;padding:4px 6px;font-size:12px;font-family:monospace;outline:none;text-transform:uppercase;letter-spacing:0.04em;${_txtGrad ? `background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-image:${_txtGrad};color:transparent;` : `color:${txt};`}" ` +
+`spellcheck="false" autocomplete="off">` +
+`<button id="cp-copy" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;padding:4px 8px;font-size:12px;flex-shrink:0;">Copy</button>` +
+`</div>`;
+el.querySelectorAll('.cp-field-label').forEach(function(label) {
+  const grad = c.textStops ? mo._gBuildCSS(c.textStops) : null;
+  if (grad) {
+    label.style.background = grad;
+    label.style.webkitBackgroundClip = 'text';
+    label.style.webkitTextFillColor = 'transparent';
+    label.style.backgroundClip = 'text';
+    label.style.color = 'transparent';
+    label.style.fontSize = '11px';
+    label.style.marginBottom = '2px';
+    label.style.display = 'inline-block';
+  } else {
+    label.style.cssText = 'font-size:11px;color:' + (txt || 'rgba(255,255,255,1)') + ';margin-bottom:2px;';
+  }
+});
+document.body.appendChild(el);
+
+(function() {
+  let ox = 0, oy = 0, active = false, holdTimer = null, holdReady = false;
+  el.addEventListener('pointerdown', function(e) {
+    if (e.target.closest('input, button, .alpha-slider, #cp-grad-hw')) return;
+    const r = el.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    holdReady = false;
+    holdTimer = setTimeout(() => {
+      holdReady = true;
+      el.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.85), 0 4px 24px rgba(0,0,0,0.65)';
+      el.style.cursor = 'grab';
+    }, 1000);
+    el.setPointerCapture(e.pointerId);
+    e.stopPropagation(); e.preventDefault();
+  });
+  el.addEventListener('pointermove', function(e) {
+    if (!holdReady) return;
+    if (!active) { active = true; el.style.cursor = 'grabbing'; }
+    el.style.left = Math.max(0, Math.min(window.innerWidth - el.offsetWidth, e.clientX - ox)) + 'px';
+    el.style.top  = Math.max(0, Math.min(window.innerHeight - el.offsetHeight, e.clientY - oy)) + 'px';
+    e.preventDefault();
+  });
+  el.addEventListener('pointerup', () => {
+    clearTimeout(holdTimer); holdTimer = null;
+    active = false; holdReady = false;
+    el.style.cursor = ''; el.style.boxShadow = '';
+  });
+  el.addEventListener('pointercancel', () => {
+    clearTimeout(holdTimer); holdTimer = null;
+    active = false; holdReady = false;
+    el.style.cursor = ''; el.style.boxShadow = '';
+  });
+})();
+
+makeDragger(el.querySelector('#cp-hue'),   nv => { mo.H = nv; commitColor(); });
+makeDragger(el.querySelector('#cp-sat'),   nv => { mo.S = nv; commitColor(); });
+makeDragger(el.querySelector('#cp-bri'),   nv => { mo.B = nv; commitColor(); });
+makeDragger(el.querySelector('#cp-alpha'), nv => { commitAlpha(nv); });
+
+el.querySelector('#cp-hex').addEventListener('input', function() {
+  let val = this.value.replace(/[^0-9a-fA-F#]/g,'');
+  if (val && !val.startsWith('#')) val = '#' + val;
+  const h = val.replace('#','');
+  if ((h.length === 6 || h.length === 8) && /^[0-9a-fA-F]+$/.test(h)) {
+    const r2 = parseInt(h.slice(0,2),16), g2 = parseInt(h.slice(2,4),16), b2 = parseInt(h.slice(4,6),16);
+    const [_h,_s,_b] = mo.rgbToHsb(r2,g2,b2);
+    mo.H = _h; mo.S = _s; mo.B = _b;
+    if (mo.activeSwatch) {
+      const inp = mo.activeSwatch.querySelector('input[type="color"]');
+      if (inp) { inp.value = '#'+h.slice(0,6).toLowerCase(); inp.dispatchEvent(new Event('input',{bubbles:true})); }
+      if (h.length === 8) {
+        const aVal = parseInt(h.slice(6,8),16);
+        const realAlpha = document.getElementById(inp.id + '-alpha');
+        if (realAlpha) { realAlpha.value = aVal; realAlpha.dispatchEvent(new Event('input',{bubbles:true})); }
+        const alphaEl = mo.popup.querySelector('#cp-alpha');
+        if (alphaEl) { alphaEl.value = aVal; refreshAlphaTrack(); }
+      }
+    }
+    refreshTracks();
+  }
+});
+el.querySelector('#cp-hex').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    let val = this.value.trim().replace(/[^0-9a-fA-F#]/g, '');
+    if (val && !val.startsWith('#')) val = '#' + val;
+    const h = val.replace('#', '');
+    let expanded = null;
+    if      (h.length === 3) expanded = '#' + (h[0]+h[0]+h[1]+h[1]+h[2]+h[2]).toUpperCase() + 'FF';
+    else if (h.length === 4) expanded = '#' + (h[0]+h[0]+h[1]+h[1]+h[2]+h[2]+h[3]+h[3]).toUpperCase();
+    else if (h.length === 6) expanded = '#' + h.toUpperCase() + 'FF';
+    else if (h.length === 8) expanded = '#' + h.toUpperCase();
+    if (expanded) { this.value = expanded; this.dispatchEvent(new Event('input', {bubbles:true})); }
+    this.blur();
+  }
+});
+el.querySelector('#cp-hex').addEventListener('focus', function() { window._cpHexEditing = true; });
+el.querySelector('#cp-hex').addEventListener('blur',  function() { window._cpHexEditing = false; });
+const _cpCopyBtn = el.querySelector('#cp-copy');
+_cpCopyBtn.addEventListener('pointerdown', e => e.stopPropagation());
+_cpCopyBtn.addEventListener('click', function() {
+  const hexEl = mo.popup ? mo.popup.querySelector('#cp-hex') : null;
+  if (!hexEl) return;
+  navigator.clipboard.writeText(hexEl.value).then(() => {
+    this.textContent = 'Copied'; this.style.color = '#99ff99';
+    setTimeout(() => { this.textContent = 'Copy'; this.style.color = '#aaa'; }, 1200);
+  }).catch(() => {});
+});
+
+el.querySelector('#cp-grad-minus').addEventListener('pointerdown', e => e.stopPropagation());
+el.querySelector('#cp-grad-minus').addEventListener('click',       e => { e.stopPropagation(); mo._gMinus(); });
+el.querySelector('#cp-grad-plus').addEventListener('pointerdown',  e => e.stopPropagation());
+el.querySelector('#cp-grad-plus').addEventListener('click',        e => { e.stopPropagation(); mo._gPlus(); });
+makeDragger(el.querySelector('#cp-grad-deg'), nv => {
+  const _dv = mo.popup && mo.popup.querySelector('#cp-grad-deg-val');
+  if (_dv) _dv.textContent = nv + '\u00b0';
+  mo._gSave(); mo._cpRefreshSwatch();
+});
+el.querySelector('#cp-grad-deg-minus').addEventListener('pointerdown', e => e.stopPropagation());
+el.querySelector('#cp-grad-deg-minus').addEventListener('click', e => {
+  e.stopPropagation();
+  const _dd = el.querySelector('#cp-grad-deg');
+  _dd.value = Math.max(0, parseInt(_dd.value) - 1);
+  const _dv = mo.popup && mo.popup.querySelector('#cp-grad-deg-val');
+  if (_dv) _dv.textContent = _dd.value + '\u00b0';
+  mo._gSave(); mo._cpRefreshSwatch();
+});
+el.querySelector('#cp-grad-deg-plus').addEventListener('pointerdown', e => e.stopPropagation());
+el.querySelector('#cp-grad-deg-plus').addEventListener('click', e => {
+  e.stopPropagation();
+  const _dd = el.querySelector('#cp-grad-deg');
+  _dd.value = Math.min(360, parseInt(_dd.value) + 1);
+  const _dv = mo.popup && mo.popup.querySelector('#cp-grad-deg-val');
+  if (_dv) _dv.textContent = _dd.value + '\u00b0';
+  mo._gSave(); mo._cpRefreshSwatch();
+});
+['solid','linear','radial','conic'].forEach(gm => {
+  const mBtn = el.querySelector('#cp-mode-' + gm);
+  if (!mBtn) return;
+  mBtn.addEventListener('pointerdown', e => e.stopPropagation());
+  mBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (!mo.activeSwatch) return;
+    const inp = mo.activeSwatch.querySelector('input[type="color"]');
+    if (!inp) return;
+    mo._gSave();
+    mo._gMode[inp.id] = gm;
+    mo._gLoad();
+    _updateModeToggle();
+    _updateGradVisibility();
+    mo._gRender();
+    mo._cpRefreshSwatch();
+  });
+});
+mo._gRender();
+
+return el;
+}
+
+function position(swatch) {
+  const mo = _m();
+  const r = swatch.getBoundingClientRect();
+  const ph = mo.popup.offsetHeight || 220;
+  const pw = mo.popup.offsetWidth  || 228;
+  let l = r.left;
+  if (l + pw + 8 > window.innerWidth - 8) l = window.innerWidth - pw - 8;
+  const _undoBtn = document.getElementById('settings-undo');
+  const undoTop = _undoBtn ? _undoBtn.getBoundingClientRect().top : window.innerHeight;
+  const below = r.bottom + 8;
+  const above = r.top - ph - 8;
+  const t = (below + ph <= undoTop - 8) ? below : above;
+  mo.popup.style.left = Math.max(8, l) + 'px';
+  mo.popup.style.top  = Math.max(8, t) + 'px';
+}
+
+function openFor(swatch) {
+  const mo = _m();
+  const wasOpen = !!mo.popup;
+  const savedLeft = mo.popup ? mo.popup.style.left : null;
+  const savedTop  = mo.popup ? mo.popup.style.top  : null;
+  close();
+  const inp = swatch.querySelector('input[type="color"]');
+  if (!inp) return;
+  const [r,g,b] = mo.hexToRgb(inp.value);
+  const [_h,_s,_b] = mo.rgbToHsb(r,g,b);
+  mo.H = _h; mo.S = _s; mo.B = _b;
+  mo.activeSwatch = swatch;
+  mo._gLoad();
+  mo.popup = buildPopup();
+  if (wasOpen && savedLeft && savedTop) {
+    mo.popup.style.left = savedLeft;
+    mo.popup.style.top  = savedTop;
+  } else {
+    position(swatch);
+  }
+  const _realAlpha = document.getElementById(inp.id + '-alpha');
+  const _popupAlpha = mo.popup.querySelector('#cp-alpha');
+  if (_realAlpha && _popupAlpha) _popupAlpha.value = _realAlpha.value;
+  const _realHex = document.getElementById(inp.id + '-hex');
+  const _hexInit = mo.popup.querySelector('#cp-hex');
+  if (_hexInit) {
+    if (_realHex && _realHex.value) {
+      _hexInit.value = _realHex.value;
+    } else {
+      const _aVal = _realAlpha ? parseInt(_realAlpha.value) : 255;
+      _hexInit.value = '#' + inp.value.replace('#','').toUpperCase() + _aVal.toString(16).padStart(2,'0').toUpperCase();
+    }
+  }
+  refreshTracks();
+  refreshAlphaTrack();
+  mo._gRender();
+  _updateModeToggle();
+  _updateGradVisibility();
+  setTimeout(() => document.addEventListener('pointerdown', tapOut), 80);
+}
+
+function close() {
+  const mo = _m();
+  if (mo.popup)    { mo.popup.remove();    mo.popup    = null; }
+  if (mo.styleTag) { mo.styleTag.remove(); mo.styleTag = null; }
+  mo._gSave();
+  mo.activeSwatch = null;
+  document.removeEventListener('pointerdown', tapOut);
+}
+
+function tapOut(e) {
+  const mo = _m();
+  if (!mo.popup) return;
+  if (!mo.popup.contains(e.target) && !e.target.closest('.color-swatch-wrap') && !e.target.closest('#settings-footer')) close();
+}
+
+window._cpClose   = close;
+window._cpOpenFor = openFor;
+window._cpRebuild = function () {
+  const mo = _m();
+  if (mo.popup && mo.activeSwatch) {
+    const sw = mo.activeSwatch;
+    const savedSel = mo._gSel;
+    close();
+    openFor(sw);
+    mo._gSel = savedSel;
+    mo._gRender();
+  }
+};
+window._cpRefresh = function () {
+  const mo = _m();
+  if (!mo.popup || !mo.activeSwatch) return;
+  const inp = mo.activeSwatch.querySelector('input[type="color"]');
+  if (!inp) return;
+  const [r,g,b] = mo.hexToRgb(inp.value);
+  const [_h,_s,_b] = mo.rgbToHsb(r,g,b);
+  mo.H = _h; mo.S = _s; mo.B = _b;
+  const hueEl = mo.popup.querySelector('#cp-hue');
+  const satEl = mo.popup.querySelector('#cp-sat');
+  const briEl = mo.popup.querySelector('#cp-bri');
+  if (hueEl) hueEl.value = mo.H;
+  if (satEl) satEl.value = mo.S;
+  if (briEl) briEl.value = mo.B;
+  const _realAlpha = document.getElementById(inp.id + '-alpha');
+  const _alphaEl = mo.popup.querySelector('#cp-alpha');
+  if (_realAlpha && _alphaEl) _alphaEl.value = _realAlpha.value;
+  const _realHex = document.getElementById(inp.id + '-hex');
+  const _hexEl2 = mo.popup.querySelector('#cp-hex');
+  if (_realHex && _hexEl2) _hexEl2.value = _realHex.value;
+  refreshTracks();
+  refreshAlphaTrack();
+};
+})();

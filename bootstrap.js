@@ -1,4 +1,4 @@
-// @version 1399
+// @version 1400
 
   // ── Bootstrap ──────────────────────────────────────────────
 const buttonsEl  = document.getElementById("buttons");
@@ -149,6 +149,7 @@ function setActiveSection(targetId) {
     _tg.style.gridAutoRows = maxH + 'px';
   }
   requestAnimationFrame(equalizeTopGrid);
+
 
 
 
