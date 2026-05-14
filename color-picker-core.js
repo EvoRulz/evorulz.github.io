@@ -1,4 +1,4 @@
-// @version 1402
+// @version 1403
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {

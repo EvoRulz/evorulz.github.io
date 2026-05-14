@@ -1,4 +1,4 @@
-// @version 1402
+// @version 1403
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -155,7 +155,11 @@ document.addEventListener('pointerup', function(e) {
   sw.style.boxShadow = '';
   if (moved > 8) return;
   if (window._settingsRowDragging) return;
-  window._cpOpenFor(sw);
+  if (window._cpMod && window._cpMod.activeSwatch === sw) {
+    window._cpClose();
+  } else {
+    window._cpOpenFor(sw);
+  }
 }, true);
 document.addEventListener('pointercancel', function() {
   if (_swatchGlowTimer) { clearTimeout(_swatchGlowTimer); _swatchGlowTimer = null; }
@@ -565,12 +569,7 @@ function openFor(swatch) {
   mo.activeSwatch = swatch;
   mo._gLoad();
   mo.popup = buildPopup();
-  if (wasOpen && savedLeft && savedTop) {
-    mo.popup.style.left = savedLeft;
-    mo.popup.style.top  = savedTop;
-  } else {
-    position(swatch);
-  }
+  position(swatch);
   const _realAlpha = document.getElementById(inp.id + '-alpha');
   const _popupAlpha = mo.popup.querySelector('#cp-alpha');
   if (_realAlpha && _popupAlpha) _popupAlpha.value = _realAlpha.value;
