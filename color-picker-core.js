@@ -1,4 +1,4 @@
-// @version 1405
+// @version 1406
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -81,12 +81,19 @@
     const inp = activeSwatch.querySelector('input[type="color"]');
     if (inp && !_gMode[inp.id] && _gd[inp.id]) _gMode[inp.id] = 'linear';
     const mode = inp ? (_gMode[inp.id] || 'solid') : 'solid';
+    function _fallbackStops(skip) {
+      if (!inp) return null;
+      if (skip !== 'linear' && _gd[inp.id] && _gd[inp.id].length >= 2) return _gd[inp.id].map(s => ({...s}));
+      if (skip !== 'radial' && _gdRadial[inp.id] && _gdRadial[inp.id].length >= 2) return _gdRadial[inp.id].map(s => ({...s}));
+      if (skip !== 'conic' && _gdConic[inp.id] && _gdConic[inp.id].length >= 2) return _gdConic[inp.id].map(s => ({...s}));
+      return null;
+    }
     if (mode === 'radial') {
-      _ga = inp && _gdRadial[inp.id] ? _gdRadial[inp.id].map(s => ({...s})) : null;
+      _ga = inp && _gdRadial[inp.id] ? _gdRadial[inp.id].map(s => ({...s})) : _fallbackStops('radial');
     } else if (mode === 'conic') {
-      _ga = inp && _gdConic[inp.id] ? _gdConic[inp.id].map(s => ({...s})) : null;
+      _ga = inp && _gdConic[inp.id] ? _gdConic[inp.id].map(s => ({...s})) : _fallbackStops('conic');
     } else if (mode === 'linear') {
-      _ga = inp && _gd[inp.id] ? _gd[inp.id].map(s => ({...s})) : null;
+      _ga = inp && _gd[inp.id] ? _gd[inp.id].map(s => ({...s})) : _fallbackStops('linear');
     } else {
       _ga = null;
     }

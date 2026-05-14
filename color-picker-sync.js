@@ -1,4 +1,4 @@
-// @version 1405
+// @version 1406
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -300,9 +300,28 @@ function makeDragger(slider, onVal) {
     window._cpActiveDrag = true;
     update(e.clientX); e.preventDefault(); e.stopPropagation();
   });
-  overlay.addEventListener('pointermove', e => { if (active) { update(e.clientX); e.preventDefault(); } });
-  overlay.addEventListener('pointerup',     () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
-  overlay.addEventListener('pointercancel', () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
+  let _rafId = null, _pendingCx = null;
+  overlay.addEventListener('pointermove', e => {
+    if (!active) return;
+    e.preventDefault();
+    _pendingCx = e.clientX;
+    if (!_rafId) {
+      _rafId = requestAnimationFrame(() => {
+        _rafId = null;
+        if (_pendingCx !== null) { update(_pendingCx); _pendingCx = null; }
+      });
+    }
+  });
+  overlay.addEventListener('pointerup', () => {
+    active = false; cachedRect = null; window._cpActiveDrag = false;
+    if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+    if (_pendingCx !== null) { update(_pendingCx); _pendingCx = null; }
+  });
+  overlay.addEventListener('pointercancel', () => {
+    active = false; cachedRect = null; window._cpActiveDrag = false;
+    if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+    _pendingCx = null;
+  });
 }
 function _updateModeToggle() {
   const mo = _m();
@@ -531,6 +550,7 @@ el.querySelector('#cp-grad-deg-plus').addEventListener('click', e => {
     mo._gSave();
     mo._gMode[inp.id] = gm;
     mo._gLoad();
+    mo._gSave();
     _updateModeToggle();
     _updateGradVisibility();
     mo._gRender();
