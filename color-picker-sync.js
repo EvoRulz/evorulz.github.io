@@ -1,4 +1,4 @@
-// @version 1408
+// @version 1409
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -386,17 +386,17 @@ el.innerHTML =
 `<button id="cp-mode-conic"  style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;background:#2a2a2a;color:#aaa;touch-action:manipulation;">Conic</button>` +
 `</div>` +
 `<div id="cp-grad-row" style="display:flex;gap:${v.btnGap};align-items:center;flex-wrap:nowrap;">` +
-`<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
+`<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:${v.btnR};color:#aaa;cursor:pointer;width:${v.btnW};height:${v.btnH};font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
 `<div style="position:relative;height:${v.height};flex:1;min-width:0;">` +
 `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
 `<div id="cp-grad-hw"    style="position:absolute;inset:0;overflow:visible;pointer-events:none;"></div>` +
 `</div>` +
-`<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
+`<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:${v.btnR};color:#aaa;cursor:pointer;width:${v.btnW};height:${v.btnH};font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
 `</div>` +
 `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:${v.btnGap};">` +
-`<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
+`<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:${v.btnR};color:#aaa;cursor:pointer;width:${v.btnW};height:${v.btnH};font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
 `<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +
-`<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
+`<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:${v.btnR};color:#aaa;cursor:pointer;width:${v.btnW};height:${v.btnH};font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
 `<span id="cp-grad-deg-val" style="font-size:11px;color:${txt};min-width:32px;text-align:right;flex-shrink:0;">360\u00b0</span>` +
 `</div>` +
 `<div><div class="cp-field-label" style="${ls}">Hue</div>` +
@@ -518,7 +518,7 @@ _cpCopyBtn.addEventListener('click', function() {
 el.querySelector('#cp-grad-minus').addEventListener('pointerdown', e => e.stopPropagation());
 el.querySelector('#cp-grad-minus').addEventListener('click',       e => { e.stopPropagation(); mo._gMinus(); });
 el.querySelector('#cp-grad-plus').addEventListener('pointerdown',  e => e.stopPropagation());
-el.querySelector('#cp-grad-plus').addEventListener('click',        e => { e.stopPropagation(); mo._gPlus(); });
+el.querySelector('#cp-grad-plus').addEventListener('click',        e => { e.stopPropagation(); mo._gPlus(); _updateModeToggle(); _updateGradVisibility(); });
 makeDragger(el.querySelector('#cp-grad-deg'), nv => {
   const _dv = mo.popup && mo.popup.querySelector('#cp-grad-deg-val');
   if (_dv) _dv.textContent = nv + '\u00b0';
