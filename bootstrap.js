@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
   // ── Bootstrap ──────────────────────────────────────────────
 const buttonsEl  = document.getElementById("buttons");
@@ -79,7 +79,6 @@ function setActiveSection(targetId) {
     let _tapX = null, _tapY = null;
     btn.addEventListener('pointerdown', (e) => {
       _tapX = e.clientX; _tapY = e.clientY;
-      console.log('[btn] pointerdown', config.id, 'drag:', window._dragEnabled, 'interact:', window._interactEnabled);
       const _s = _btnStyleFor(config.id);
       btn.style.background = hex8ToCss(_s.tap || btnStyle.tap);
     });
@@ -87,17 +86,14 @@ function setActiveSection(targetId) {
       const _s = _btnStyleFor(config.id);
       btn.style.background = hex8ToCss(_s.bg);
       const dist = (_tapX !== null) ? Math.hypot(e.clientX - _tapX, e.clientY - _tapY) : 999;
-      console.log('[btn] pointerup', config.id, 'dist:', dist.toFixed(1), 'dragOccurred:', window._habitDragOccurred, 'interact:', window._interactEnabled);
       _tapX = null; _tapY = null;
-      if (dist > 10) { console.log('[btn] suppressed: moved too far'); return; }
-      if (window._habitDragOccurred) { console.log('[btn] suppressed: drag occurred'); return; }
-      if (window._interactEnabled === false) { console.log('[btn] suppressed: interact disabled'); return; }
-      console.log('[btn] opening section', config.id);
+      if (dist > 10) {return;}
+      if (window._habitDragOccurred) {return;}
+      if (window._interactEnabled === false) {return;}
       const currentlyOpen = getActiveSectionId();
       setActiveSection(currentlyOpen === config.id ? null : config.id);
     });
     btn.addEventListener('pointercancel', () => {
-      console.log('[btn] pointercancel', config.id);
       const _s = _btnStyleFor(config.id);
       btn.style.background = hex8ToCss(_s.bg);
       _tapX = null; _tapY = null;
@@ -153,3 +149,4 @@ function setActiveSection(targetId) {
     _tg.style.gridAutoRows = maxH + 'px';
   }
   requestAnimationFrame(equalizeTopGrid);
+

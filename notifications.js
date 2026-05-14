@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
 (function() {
   function todayStr() {
@@ -170,7 +170,7 @@ window.notifLoadScheduleUI = function() {
 function _notifUpdateToggleUI() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';
   const wrap  = document.getElementById('notif-toggle-wrap');
-  const switch  = document.getElementById('notif-toggle-switch');
+  const switchEl  = document.getElementById('notif-toggle-switch');
   const offWrap = document.getElementById('notif-off-wrap');
   const _onBg      = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF') : '#1a5a1a';
   const _offBg     = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOffBg    || '#333333FF') : '#333';
@@ -179,7 +179,7 @@ function _notifUpdateToggleUI() {
   const _borderOn  = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOn || '#2a7a2aFF') : '#2a7a2a';
   const _borderOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOff|| '#555555FF') : '#555';
   if (wrap)    { wrap.style.background = enabled ? _onBg : _offBg; wrap.style.borderColor = enabled ? _borderOn : _borderOff; }
-  if (switch)    { switch.style.left = enabled ? '27px' : '3px'; switch.style.background = enabled ? _switchOn : _switchOff; }
+  if (switchEl)    { switchEl.style.left = enabled ? '27px' : '3px'; switchEl.style.background = enabled ? _switchOn : _switchOff; }
   if (offWrap) { offWrap.style.display = enabled ? 'none' : 'flex'; }
 }
 
@@ -321,3 +321,4 @@ window.notifSendTest = async function() {
     } catch(e) {}
   }
 };
+

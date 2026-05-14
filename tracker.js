@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
@@ -453,3 +453,4 @@ function reload() { loadAll(); computeMaxStreaks(); buildView(); rerenderTable()
 return { init, reload, onSelectChange, onReasonInput, onInput,
  onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
 }
+

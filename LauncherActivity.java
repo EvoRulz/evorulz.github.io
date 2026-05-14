@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
 /*
  * Copyright 2020 Google Inc.
@@ -300,3 +300,4 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         return uri;
     }
 }
+

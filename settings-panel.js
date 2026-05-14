@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
 // ── Settings open/close/save/cancel/reset/export/import ───
 let _appStyleSnapshot = null;
@@ -260,8 +260,6 @@ function settingsOpen() {
     setColorValue('s-activeglow',   _initS.activeGlow || _initS.glow);
     setColorValue('s-activebg',     _initS.activeBg);
     setColorValue('s-tap',          _initS.tap || btnStyle.tap);
-    setColorValue('s-border',       s.border || '#00000000');
-    setColorValue('s-activeborder', s.activeBorder || s.border || '#00000000');
     setColorValue('s-border',       _initS.border || '#00000000');
     setColorValue('s-activeborder', _initS.activeBorder || '#00000000');
     setColorValue('s-taphighlight', btnStyle.tapHighlight);
@@ -478,3 +476,4 @@ function settingsCancel() {
   settingsRedo   = dbounce(settingsRedo);
   settingsCancel = dbounce(settingsCancel);
 })();
+

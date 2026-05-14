@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
 // ── Manage Habits ──────────────────────────────────────────
 function manageOpen() {
@@ -138,3 +138,4 @@ function manageAddHabit() {
 document.getElementById("manage-overlay").addEventListener("click", e => {
   if (e.target === document.getElementById("manage-overlay")) manageClose();
 });
+

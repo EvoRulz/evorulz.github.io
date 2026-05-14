@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
 // ── color-picker.js ────────────────────────────────────────
 (function () {
@@ -962,3 +962,4 @@ window._cpRefresh = function () {
   refreshAlphaTrack();
 };
 })();
+

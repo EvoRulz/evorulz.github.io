@@ -1,4 +1,4 @@
-// @version 1396
+// @version 1397
 
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -319,8 +319,10 @@ function cfSyncTuningUI() {
           el.style.alignItems = '';
           el.style.gap = '';
           const _cfRInner = el.querySelector('.btn-text-label');
-          if (_cfRInner) { _cfRInner.textContent = items[i].label; _cfRInner.dataset.text = items[i].label; if (window._applyTextStyle) window._applyTextStyle(_cfRInner, s2); }
+          if (_cfRInner) { _cfRInner.textContent = items[i].label; _cfRInner.dataset.text = items[i].label; if (window._applyTextStyle) window._applyTextStyle(_cfRInner, s2); _cfRInner.style.transform = ''; }
           else el.textContent = items[i].label;
+          const _cfFsx = (s2.fontScaleX ?? btnStyle.fontScaleX ?? 100) / 100;
+          el.style.width = Math.round(iW * _cfFsx) + 'px';
         }
       }
       el.style.left      = kf.tx + 'px';
@@ -534,3 +536,4 @@ document.getElementById("settings-cancel").addEventListener("click", e => {
 document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
 });
+
