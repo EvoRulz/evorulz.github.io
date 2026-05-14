@@ -1,4 +1,4 @@
-// @version 1397
+// @version 1398
 
 // ── Settings panel logic ───────────────────────────────────
 function onColorPickerChange(id) {
@@ -291,4 +291,5 @@ function appClearImage() {
   if (thumb) { thumb.src = ""; prev.style.display = "none"; }
   buildAppBg();
 }
+
 

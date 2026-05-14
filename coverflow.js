@@ -1,4 +1,4 @@
-// @version 1397
+// @version 1398
 
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
@@ -536,4 +536,5 @@ document.getElementById("settings-cancel").addEventListener("click", e => {
 document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
 });
+
 
