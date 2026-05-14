@@ -1,4 +1,4 @@
-// @version 1398
+// @version 1399
 
 // ── Settings open/close/save/cancel/reset/export/import ───
 let _appStyleSnapshot = null;
@@ -476,5 +476,6 @@ function settingsCancel() {
   settingsRedo   = dbounce(settingsRedo);
   settingsCancel = dbounce(settingsCancel);
 })();
+
 
 

@@ -1,4 +1,4 @@
-// @version 1398
+// @version 1399
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -359,5 +359,6 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
+
 
 

@@ -1,4 +1,4 @@
-// @version 1398
+// @version 1399
 
 // ── Live clock ─────────────────────────────────────────────
 (function() {
@@ -208,5 +208,6 @@ if ('serviceWorker' in navigator && !location.hostname.includes('claudeuserconte
     });
   });
 }
+
 
 
