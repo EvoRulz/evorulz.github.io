@@ -1,4 +1,4 @@
-// @version 1407
+// @version 1408
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -255,6 +255,7 @@ if (plsBtn) { plsBtn.disabled = !!(_ga&&_ga.length>=10); plsBtn.style.opacity = 
 function _gPlus() {
   const solid = _gHex8();
   if (!_ga) {
+    if (activeSwatch) { const _inp = activeSwatch.querySelector('input[type="color"]'); if (_inp && (!_gMode[_inp.id] || _gMode[_inp.id] === 'solid')) _gMode[_inp.id] = 'linear'; }
     _ga = [
       {pos:0,   hex8:solid, isEnd:true,  isPercent:false},
       {pos:0.5, hex8:solid, isEnd:false, isPercent:true },

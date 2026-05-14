@@ -1,4 +1,4 @@
-// @version 1407
+// @version 1408
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -182,6 +182,10 @@ document.addEventListener('pointercancel', function() {
       hR:      g('--slider-handle-r')     || '3%',
       hBorder: g('--slider-handle-border')|| 'transparent',
       w:       g('--slider-w')            || '100%',
+      btnGap:  g('--slider-btn-gap')      || '0px',
+      btnW:    g('--slider-btn-w')        || '22px',
+      btnH:    g('--slider-btn-h')        || '22px',
+      btnR:    g('--slider-btn-r')        || '4px',
     };
   }
   function injectThumbCSS(v) {
@@ -381,7 +385,7 @@ el.innerHTML =
 `<button id="cp-mode-radial" style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;border-right:1px solid ${sb};background:#2a2a2a;color:#aaa;touch-action:manipulation;">Radial</button>` +
 `<button id="cp-mode-conic"  style="flex:1;padding:5px 0;font-size:11px;cursor:pointer;border:none;background:#2a2a2a;color:#aaa;touch-action:manipulation;">Conic</button>` +
 `</div>` +
-`<div id="cp-grad-row" style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap;">` +
+`<div id="cp-grad-row" style="display:flex;gap:${v.btnGap};align-items:center;flex-wrap:nowrap;">` +
 `<button id="cp-grad-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">&#8722;</button>` +
 `<div style="position:relative;height:${v.height};flex:1;min-width:0;">` +
 `<div id="cp-grad-strip" style="position:absolute;inset:0;border-radius:${v.spread}/${v.radius};border:1px solid ${sb};background:#333;"></div>` +
@@ -389,7 +393,7 @@ el.innerHTML =
 `</div>` +
 `<button id="cp-grad-plus"  style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
 `</div>` +
-`<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:4px;">` +
+`<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:${v.btnGap};">` +
 `<button id="cp-grad-deg-minus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
 `<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +
 `<button id="cp-grad-deg-plus" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;width:22px;height:22px;font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
