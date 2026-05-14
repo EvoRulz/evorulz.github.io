@@ -1,4 +1,4 @@
-// @version 1393
+// @version 1394
 
 (function() {
   function todayStr() {
@@ -170,16 +170,16 @@ window.notifLoadScheduleUI = function() {
 function _notifUpdateToggleUI() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';
   const wrap  = document.getElementById('notif-toggle-wrap');
-  const knob  = document.getElementById('notif-toggle-knob');
+  const switch  = document.getElementById('notif-toggle-switch');
   const offWrap = document.getElementById('notif-off-wrap');
   const _onBg      = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF') : '#1a5a1a';
   const _offBg     = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOffBg    || '#333333FF') : '#333';
-  const _knobOn    = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleKnobOn   || '#99ff99FF') : '#99ff99';
-  const _knobOff   = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleKnobOff  || '#666666FF') : '#666';
+  const _switchOn    = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOn   || '#99ff99FF') : '#99ff99';
+  const _switchOff   = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOff  || '#666666FF') : '#666';
   const _borderOn  = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOn || '#2a7a2aFF') : '#2a7a2a';
   const _borderOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOff|| '#555555FF') : '#555';
   if (wrap)    { wrap.style.background = enabled ? _onBg : _offBg; wrap.style.borderColor = enabled ? _borderOn : _borderOff; }
-  if (knob)    { knob.style.left = enabled ? '27px' : '3px'; knob.style.background = enabled ? _knobOn : _knobOff; }
+  if (switch)    { switch.style.left = enabled ? '27px' : '3px'; switch.style.background = enabled ? _switchOn : _switchOff; }
   if (offWrap) { offWrap.style.display = enabled ? 'none' : 'flex'; }
 }
 
@@ -321,6 +321,7 @@ window.notifSendTest = async function() {
     } catch(e) {}
   }
 };
+
 
 
 
