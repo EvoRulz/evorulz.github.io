@@ -1,4 +1,4 @@
-// @version 1394
+// @version 1395
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -709,6 +709,19 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
       el.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       el.style.boxShadow = `0 0 8px 3px ${hex8ToCss(_s.glow)}`;
       el.style.setProperty('--sg-active-glow', hex8ToCss(_s.activeGlow || _s.glow));
+      let _sgspan = el.querySelector('.btn-text-label');
+      if (!_sgspan) {
+        const _sgtxt = el.textContent.trim();
+        _sgspan = document.createElement('span');
+        _sgspan.className = 'btn-text-label';
+        _sgspan.dataset.text = _sgtxt;
+        _sgspan.textContent = _sgtxt;
+        el.textContent = '';
+        el.appendChild(_sgspan);
+      } else {
+        _sgspan.dataset.text = _sgspan.textContent.trim();
+      }
+      if (_sgspan) _applyTextStyle(_sgspan, _s);
     });
     buttonsEl.querySelectorAll(".tracker-btn[data-id]").forEach(btn => {
       const s = _btnStyleFor(btn.dataset.id);
@@ -744,6 +757,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
+
 
 
 
