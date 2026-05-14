@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 // ── Clock tumbler ──────────────────────────────────────────
 (function(){
   const COLS = window._CLOCK_COLS;
@@ -47,7 +46,6 @@
     if (previewTimeEl) previewTimeEl.textContent = timeLine || "(time)";
     COLS.forEach((col, ci) => renderCol(ci));
   }
-
   function liveVal(ci, optIdx, now) {
     if (optIdx === 0) return "—";
     const DOW_LONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -73,7 +71,6 @@
       if (ci === 7) return ampm;
       return "—";
     }
-
     function renderCol(ci) {
       const cfg  = getCfg();
       const col  = wrap.querySelector(`.tumb-col[data-ci="${ci}"]`);
@@ -100,12 +97,10 @@
       aDown.className = "tumb-arrow"; aDown.textContent = "▼";
       win.append(aUp, elPrev, elSel, elNext, aDown);
     }
-
     function buildTumbler() {
       wrap.innerHTML = "";
       const previewRow = document.createElement("div");
       previewRow.style.cssText = "display:flex;justify-content:center;gap:8px;margin-bottom:8px;";
-
       // ── preview date button ──
       const previewDate = document.createElement("div");
       previewDate.className = "top-item";
@@ -115,7 +110,6 @@
       previewDateSpan.id = "tumb-preview-date";
       previewDateSpan.style.cssText = "font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;line-height:1.3;text-align:center;pointer-events:none;";
       previewDate.appendChild(previewDateSpan);
-
       // ── preview time button ──
       const previewTime = document.createElement("div");
       previewTime.className = "top-item";
@@ -125,11 +119,9 @@
       previewTimeSpan.id = "tumb-preview-time";
       previewTimeSpan.style.cssText = "font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;line-height:1.3;text-align:center;pointer-events:none;";
       previewTime.appendChild(previewTimeSpan);
-
       previewRow.appendChild(previewDate);
       previewRow.appendChild(previewTime);
       wrap.appendChild(previewRow);
-
       // ── preview grid drag-to-reorder ──
       const PREVIEW_DRAG_THRESHOLD = 6;
       let pdrag = null;
@@ -273,7 +265,6 @@
       wrap.appendChild(grid);
       renderPreviews();
     }
-
     let activeCol = 0;
     function setActiveCol(ci) {
       activeCol = ci;
@@ -282,13 +273,11 @@
         c.style.borderRadius = i === ci ? '4px' : '';
       });
     }
-
     function setupDrag(win, ci) {
       let startX = null, startY = null, lastY = null;
       let accumY = 0, accumX = 0;
       let axis = null; // 'x' or 'y', locked after threshold
       const STEP_Y = 28, STEP_X = 40, AXIS_LOCK = 8;
-
       function stepY(dir) {
         const cfg = getCfg().slice();
         cfg[ci] = (cfg[ci] + dir + COLS[ci].opts.length) % COLS[ci].opts.length;
@@ -298,7 +287,6 @@
         const next = ci + dir;
         if (next >= 0 && next < COLS.length) setActiveCol(next);
       }
-
       win.addEventListener("pointerdown", e => {
         e.preventDefault();
         e.stopPropagation();
@@ -344,13 +332,11 @@
         accumY = 0; accumX = 0; axis = null;
       });
     }
-
     let _previewTimeCycleStep = 0;
     let _previewDateCycleStep = 0;
     function resetPreviewCycle() { _previewTimeCycleStep = 0; _previewDateCycleStep = 0; }
     // Hook into setCfg so any tumbler change resets the preview cycle
     const _origSetCfg = setCfg;
-
     function syncPreviewSizes() {
       const liveDateItem = document.getElementById("live-date")?.closest(".top-item");
       const liveTimeItem = document.getElementById("live-time")?.closest(".top-item");
@@ -428,12 +414,10 @@
       }
     }, 1000);
   })();
-
   if (localStorage.getItem('_swJustUpdated') === '1') {
     localStorage.removeItem('_swJustUpdated');
     setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 2500);
   }
-
   window._verifyDeployedVersion = (function() {
     let _pending = false;
     const _verifyFiles = [
@@ -503,7 +487,4 @@
         });
       };
     })();
-
-
-
 

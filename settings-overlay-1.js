@@ -1,6 +1,5 @@
-// @version 1400
+// @version 1401
 document.body.insertAdjacentHTML('beforeend', `
-
 <!-- Settings overlay -->
 <div id="settings-overlay">
   <div id="settings-panel">
@@ -357,9 +356,5 @@ document.body.insertAdjacentHTML('beforeend', `
       </div>
   </div>
 </div>
-
 `);
-
-
-
 

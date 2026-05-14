@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 // ── Manage Habits ──────────────────────────────────────────
 function manageOpen() {
   manageRenderList();
@@ -65,7 +64,6 @@ function manageBulkDelete() {
   if (!selected.length) return;
   const selectedIds = selected.map(c => c.dataset.id);
   const selectedNames = selectedIds.map(id => TRACKER_CONFIGS.find(c => c.id === id)?.label).filter(Boolean);
-  
     // Check if any selected habits have data
   const hasData = selectedIds.some(id => {
     const prefix = id + ":";
@@ -75,12 +73,9 @@ function manageBulkDelete() {
     }
     return false;
   });
-  
   const msg = `This will permanently delete ${selectedNames.length} habit${selectedNames.length === 1 ? '' : 's'}:<br><strong>${selectedNames.join(', ')}</strong>`;
-  
     // If no data, use simple confirm; if data exists, use confirmClear with password
   const confirmPromise = hasData ? confirmClear(msg) : Promise.resolve(window.confirm(`Delete ${selectedNames.length} habit${selectedNames.length === 1 ? '' : 's'}?\n\n${selectedNames.join(', ')}`));
-  
   confirmPromise.then(ok => {
     if (!ok) return;
     selectedIds.forEach(id => performHabitDelete(id));
@@ -138,7 +133,4 @@ function manageAddHabit() {
 document.getElementById("manage-overlay").addEventListener("click", e => {
   if (e.target === document.getElementById("manage-overlay")) manageClose();
 });
-
-
-
 

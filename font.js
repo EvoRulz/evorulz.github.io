@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 function _makeFontTumbler(selectId, wrapId, onChangeCb) {
   function getOpts() {
     var sel = document.getElementById(selectId);
@@ -85,7 +84,6 @@ function _makeFontTumbler(selectId, wrapId, onChangeCb) {
     win.addEventListener('pointercancel', function() {
       startY = null; lastY = null; accumY = 0; moved = false;
     });
-    
   }
   return { build: build, render: render };
 }
@@ -110,7 +108,4 @@ function _makeFontTumbler(selectId, wrapId, onChangeCb) {
     _buildSwatch();
   }
 })();
-
-
-
 

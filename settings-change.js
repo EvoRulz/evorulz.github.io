@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -515,7 +514,4 @@ function settingsUpdatePreview() {
     _cogEl2.style.boxShadow   = `0 0 16px 5px ${hex8ToCss(s.glow)}`;
   }
 }
-
-
-
 

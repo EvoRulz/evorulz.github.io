@@ -1,5 +1,4 @@
- // @version 1400
-
+ // @version 1401
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -278,14 +277,10 @@ for (const k of keys) await caches.delete(k);
   _zsOverlay.addEventListener('pointerup', function() { _zsActive = false; _zs.classList.remove('handle-active'); });
   _zsOverlay.addEventListener('pointercancel', function() { _zsActive = false; _zs.classList.remove('handle-active'); });
 })();
-
 function ctrlToggleInteract() {
   window._interactEnabled = !window._interactEnabled;
   const t = document.getElementById('interact-toggle');
   if (t) t.classList.toggle('on', window._interactEnabled);
   document.body.classList.toggle('interact-locked', !window._interactEnabled);
 }
-
-
-
 

@@ -1,9 +1,7 @@
-// @version 1400
-
+// @version 1401
 /// ── Drag-to-reorder — HABIT BUTTONS ──────────────────────
 const DRAG_THRESHOLD = 6;
 var drag = null;
-
 buttonsEl.addEventListener("pointerdown", e => {
   const btn = e.target.closest(".tracker-btn[data-id]");
   if (!btn) return;
@@ -19,7 +17,6 @@ buttonsEl.addEventListener("pointerdown", e => {
   };
   e.preventDefault();
 });
-
 document.addEventListener("pointermove", e => {
   if (!drag) return;
   if (!drag.active) {
@@ -61,7 +58,6 @@ document.addEventListener("pointermove", e => {
     buttonsEl.insertBefore(over, btnNext || null);
   }
 });
-
 document.addEventListener("pointerup", () => {
   if (!drag) return;
   if (drag.active) {
@@ -75,7 +71,6 @@ document.addEventListener("pointerup", () => {
   }
   drag = null;
 });
-
 document.addEventListener("pointercancel", () => {
   if (!drag) return;
   if (drag.active) {
@@ -85,7 +80,6 @@ document.addEventListener("pointercancel", () => {
   }
   drag = null;
 });
-
   // ── Show / Hide Habits ─────────────────────────────────────
 let habitsVisible = localStorage.getItem("_habitsVisible") !== "false";
 buttonsEl.style.display = habitsVisible ? "" : "none";
@@ -110,7 +104,6 @@ function toggleHabits() {
 }
 const sgGrid = document.getElementById('settings-groups-grid');
 let sgDrag = null;
-
 sgGrid.addEventListener('pointerdown', e => {
   const item = e.target.closest('.settings-group-item');
   if (!item) return;
@@ -131,7 +124,6 @@ sgGrid.addEventListener('pointerdown', e => {
   };
   item.setPointerCapture(e.pointerId);
 });
-
 sgGrid.addEventListener('pointermove', e => {
   if (!sgDrag) return;
   if (!sgDrag.active) {
@@ -176,7 +168,6 @@ sgGrid.addEventListener('pointermove', e => {
     sgGrid.insertBefore(over, iNext || null);
   }
 }, { passive: false });
-
 document.addEventListener('pointerup', e => {
   if (!sgDrag) return;
   e.stopPropagation();
@@ -191,7 +182,6 @@ document.addEventListener('pointerup', e => {
   }
   sgDrag = null;
 });
-
 document.addEventListener('pointercancel', e => {
   if (!sgDrag) return;
   const _so = document.getElementById('settings-overlay');
@@ -200,7 +190,6 @@ document.addEventListener('pointercancel', e => {
   if (sgDrag.ghost) sgDrag.ghost.remove();
   sgDrag = null;
 });
-
 function applySettingsGroupOrder() {
   try {
     const saved = JSON.parse(localStorage.getItem('_settingsGroupOrder'));
@@ -215,11 +204,9 @@ function applySettingsGroupOrder() {
   } catch {}
 }
 applySettingsGroupOrder();
-
   // ── Top-grid drag-to-reorder ─────────────────────────────
 const topGrid = document.getElementById('top-grid');
 let topDrag = null;
-
 function applyTopGridOrder() {
   try {
     const saved = JSON.parse(localStorage.getItem('_topGridOrder'));
@@ -231,14 +218,11 @@ function applyTopGridOrder() {
     });
   } catch {}
 }
-
 function saveTopGridOrder() {
   const order = [...topGrid.children].map(el => el.dataset.item || null).filter(Boolean);
   localStorage.setItem('_topGridOrder', JSON.stringify(order));
 }
-
 applyTopGridOrder();
-
 topGrid.addEventListener('pointerdown', e => {
   const item = e.target.closest('.top-item[data-item]');
   if (!item) return;
@@ -258,7 +242,6 @@ topGrid.addEventListener('pointerdown', e => {
     ghost: null, lastOver: null, active: false,
   };
 });
-
 document.addEventListener('pointermove', e => {
   if (!topDrag) return;
   if (!topDrag.active) {
@@ -299,7 +282,6 @@ document.addEventListener('pointermove', e => {
     topGrid.insertBefore(over, iNext || null);
   }
 });
-
 document.addEventListener('pointerup', () => {
   if (!topDrag) return;
   if (topDrag.active) {
@@ -309,14 +291,10 @@ document.addEventListener('pointerup', () => {
   }
   topDrag = null;
 });
-
 document.addEventListener('pointercancel', () => {
   if (!topDrag) return;
   topDrag.item.style.visibility = '';
   if (topDrag.ghost) topDrag.ghost.remove();
   topDrag = null;
 });
-
-
-
 

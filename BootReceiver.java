@@ -1,14 +1,11 @@
-// @version 1400
-
+// @version 1401
 package io.github.evorulz.twa;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -26,7 +23,4 @@ public class BootReceiver extends BroadcastReceiver {
         }
     }
 }
-
-
-
 

@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 /*
  * Copyright 2020 Google Inc.
  *
@@ -143,7 +142,6 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             nm.notify((int) System.currentTimeMillis(), n);
         }
     }
-
     public class OrientationBridge {
         @JavascriptInterface
         public void lock(String orientation) {
@@ -156,7 +154,6 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             }
         }
     }
-
     @Override
     protected void onStart() {
         long savedInterval = getSharedPreferences("notif", Context.MODE_PRIVATE)
@@ -187,7 +184,6 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             wv.addJavascriptInterface(new SettingsBridge(), "AndroidSettings");
         }
     }
-
     private WebView findWebView(android.view.View v) {
         if (v instanceof WebView) return (WebView) v;
         if (v instanceof android.view.ViewGroup) {
@@ -199,7 +195,6 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         }
         return null;
     }
-
     @Override
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
@@ -210,13 +205,11 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             startActivity(settingsIntent);
             return;
         }
-
         if (data != null && "habitnotify".equals(data.getScheme()) && "myfiles".equals(data.getHost())) {
             Intent myFilesIntent = new Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS);
             myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try { startActivity(myFilesIntent); } catch (Exception ignored) {}
         }
-
         if (data != null && "myfiles".equals(data.getScheme())) {
             Intent myFilesIntent = new Intent(Intent.ACTION_VIEW);
             myFilesIntent.setPackage("com.sec.android.app.myfiles");
@@ -225,7 +218,6 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             try { startActivity(myFilesIntent); } catch (Exception ignored) {}
             return;
         }
-
         if (data != null && "habitnotify".equals(data.getScheme())) {
             String host = data.getHost();
             if ("schedule".equals(host)) {
@@ -267,7 +259,6 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 .build();
                 nm.notify((int) System.currentTimeMillis(), n);
                 return;
-
             } else if ("myfiles".equals(host)) {
                 Intent myFilesIntent = new Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS);
                 myFilesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -300,7 +291,4 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         return uri;
     }
 }
-
-
-
 

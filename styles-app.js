@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().catch(() => {});
@@ -42,7 +41,6 @@ if (navigator.storage && navigator.storage.persist) {
     }
     return { set, get, del };
   })();
-
   // ── Custom alert with copy button ─────────────────────────
   function showAlert(msg) {
     return new Promise(res => {
@@ -75,7 +73,6 @@ if (navigator.storage && navigator.storage.persist) {
       document.body.appendChild(overlay);
     });
   }
-
   // ── App style ──────────────────────────────────────────────
   const APP_STYLE_DEFAULTS = {
     bgType: "solid",
@@ -219,7 +216,6 @@ if (navigator.storage && navigator.storage.persist) {
       }
     }
   })();
-
   function buildAppBg() {
     const t = appStyle.bgType;
     if (t === "image") {
@@ -275,7 +271,6 @@ if (navigator.storage && navigator.storage.persist) {
       document.body.style.backgroundSize = `${sz}px ${sz}px`;
     }
   }
-
   function applyAppStyle() {
     buildAppBg();
     document.body.style.color   = hex8ToCss(appStyle.textColor);
@@ -307,3 +302,4 @@ if (navigator.storage && navigator.storage.persist) {
     _applyStatusBarColor();
   }
   applyAppStyle();
+

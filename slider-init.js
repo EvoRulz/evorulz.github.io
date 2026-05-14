@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
   var overlay = document.createElement('div');
@@ -7,7 +6,6 @@ document.querySelectorAll('.alpha-slider').forEach(function(s){
   var par = s.parentElement;
   if(getComputedStyle(par).position === 'static') par.style.position = 'relative';
   par.appendChild(overlay);
-
 var dragging = false;
   var grabOffsetX = 0;
   var initialValue = 0;
@@ -16,7 +14,6 @@ var dragging = false;
   var cachedHandleW = 16;
   var cachedMin = 0;
   var cachedMax = 255;
-
   overlay.addEventListener('pointerdown', function(e){
     cachedRect = s.getBoundingClientRect();
     cachedMin = parseFloat(s.min)||0;
@@ -36,7 +33,6 @@ var dragging = false;
     grabClientX = e.clientX;
     overlay.setPointerCapture(e.pointerId);
   });
-
   overlay.addEventListener('pointermove', function(e){
     if(!dragging) return;
     e.preventDefault();
@@ -48,7 +44,6 @@ var dragging = false;
     s.value = Math.max(cachedMin, Math.min(cachedMax, newVal));
     s.dispatchEvent(new InputEvent('input', {bubbles:true}));
   });
-
   overlay.addEventListener('pointerup', function(e){
     if(dragging){ e.stopPropagation(); }
     dragging = false;
@@ -85,7 +80,4 @@ document.querySelectorAll('.alpha-slider').forEach(function(s) {
   minus.addEventListener('click', function(e){e.stopPropagation();step(-1);});
   plus.addEventListener('click', function(e){e.stopPropagation();step(1);});
 });
-
-
-
 

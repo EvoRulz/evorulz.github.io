@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 // ── Settings panel logic ───────────────────────────────────
 function onColorPickerChange(id) {
   const picker = document.getElementById(id);
@@ -117,7 +116,6 @@ function onHexInput(id) {
 document.addEventListener('focus', e => {
   if (e.target.classList.contains('hex-input')) e.target.select();
 }, true);
-
 function _expandHex(raw) {
   let val = raw.trim().replace(/[^0-9a-fA-F#]/g, '');
   if (val && !val.startsWith('#')) val = '#' + val;
@@ -163,7 +161,6 @@ function copyHex(id, btn) {
     setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1200);
   }).catch(() => {});
 }
-
   // ── App background builders ────────────────────────────────
 function buildStopPickers() {
   const wrap = document.getElementById("s-app-stops-wrap");
@@ -291,7 +288,4 @@ function appClearImage() {
   if (thumb) { thumb.src = ""; prev.style.display = "none"; }
   buildAppBg();
 }
-
-
-
 

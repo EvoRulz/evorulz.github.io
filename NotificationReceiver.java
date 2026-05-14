@@ -1,7 +1,5 @@
-// @version 1400
-
+// @version 1401
 package io.github.evorulz.twa;
-
 import android.app.AlarmManager;
 import android.os.Build;
 import android.app.Notification;
@@ -13,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
-
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -37,7 +34,6 @@ public class NotificationReceiver extends BroadcastReceiver {
         .setAutoCancel(true)
         .build();
         nm.notify((int) System.currentTimeMillis(), n);
-
         long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
         .getLong("intervalMs", 0);
         if (intervalMs > 0) {
@@ -52,7 +48,4 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 }
-
-
-
 

@@ -1,28 +1,23 @@
-// @version 1400
-
+// @version 1401
 // ── Live clock ─────────────────────────────────────────────
 (function() {
   const dateEl = document.getElementById("live-date");
   const timeEl = document.getElementById("live-time");
   const DOW_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   const DOW_LONG  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-
     // Clock config: 9 tumbler indices
     // [dayName, day, month, year, hour, minute, second, ms, ampm]
     // Stored as JSON array in _clockTumbler
   const TUMBLER_DEFAULTS = [6, 1, 1, 1, 2, 1, 1, 0];
     // dayName options: 0=blank,1="",2="",3="",4="",5="Mon",6="Monday"  (indices map to DAY_OPTS below)
     // We encode choices per-column as indices into the column's options array.
-
   let tumblerCfg = TUMBLER_DEFAULTS.slice();
   try {
     const s = JSON.parse(localStorage.getItem("_clockTumbler"));
     if (Array.isArray(s) && s.length === 8) tumblerCfg = s;
   } catch {}
-
   window._clockGet = () => ({ tumblerCfg: tumblerCfg.slice() });
   window._clockSet = (cfg) => { tumblerCfg = cfg.slice(); tick(); };
-
     // Col definitions: [label, options[]]
     // Each option is a display string (empty string = blank/off)
   const COLS = [
@@ -36,7 +31,6 @@
     { label:"am/pm",     opts:["—","am/pm"] },
   ];
   window._CLOCK_COLS = COLS;
-
   function buildDateTime(now, cfg) {
     const d   = now.getDate();
     const mo  = now.getMonth() + 1;
@@ -57,24 +51,19 @@
     const se   = String(now.getSeconds()).padStart(2,"0");
     const ms   = String(now.getMilliseconds()).padStart(3,"0");
     const ampm = h24 >= 12 ? "pm" : "am";
-
       // Day name part
     const dayNameIdx = cfg[0];
     const dayNameMap = ["",dowL.slice(0,1),dowL.slice(0,2),dow3,dow4,dow5,dowL];
     const dayNameStr = dayNameIdx === 0 ? "" : (dayNameMap[dayNameIdx] || "");
-
       // Day number
     const dayNumIdx = cfg[1];
     const dayNumStr = dayNumIdx === 0 ? "" : dayNumIdx === 1 ? String(d) : dd;
-
       // Month
     const moIdx = cfg[2];
     const moStr = moIdx === 0 ? "" : moIdx === 1 ? String(mo) : mm;
-
       // Year
     const yrIdx = cfg[3];
     const yrStr = yrIdx === 0 ? "" : yrIdx === 1 ? yy : yyyy;
-
       // Hour
     const hrIdx = cfg[4];
     let hrStr = "";
@@ -82,28 +71,23 @@
     else if (hrIdx === 2) hrStr = String(h12).padStart(2,"0");
     else if (hrIdx === 3) hrStr = String(h24);
     else if (hrIdx === 4) hrStr = String(h24).padStart(2,"0");
-
       // Minutes
     const minStr = cfg[5] === 0 ? "" : mi;
       // Seconds
     const secStr = cfg[6] === 0 ? "" : se;
       // Millis
     const amStr  = cfg[7] === 0 ? "" : ampm;
-
       // Build date line
     const dateParts = [dayNameStr, [dayNumStr, moStr, yrStr].filter(Boolean).join("/")].filter(Boolean);
     const dateLine = dateParts.join(" ");
-
       // Build time line
     let timeParts = [hrStr];
     if (minStr) timeParts.push(minStr);
     if (secStr) timeParts.push(secStr);
     const timeBase = timeParts.filter(Boolean).join(":");
     const timeLine = [timeBase, amStr ? " "+amStr : ""].join("").trim();
-
     return { dateLine, timeLine };
   }
-
   function tick() {
     const now = new Date();
     const { dateLine, timeLine } = buildDateTime(now, tumblerCfg);
@@ -112,7 +96,6 @@
     timeEl.textContent = timeLine;
     timeEl.dataset.text = timeLine;
   }
-
   let _dateCycleStep = 0;
   dateEl.closest(".top-item").addEventListener("click", () => {
     const saved = window._clockGet().tumblerCfg;
@@ -174,11 +157,9 @@
       }
       window._clockSet(cfg);
     });
-
   tick();
   setInterval(tick, 1000);
 })();
-
   // ── My Files ───────────────────────────────────────────────
 function openMyFiles() { if (window.AndroidSettings && window.AndroidSettings.openMyFiles) { window.AndroidSettings.openMyFiles(); } else { window.location.href = 'habitnotify://myfiles'; } }
   // ── Service Worker ─────────────────────────────────────────
@@ -208,7 +189,4 @@ if ('serviceWorker' in navigator && !location.hostname.includes('claudeuserconte
     });
   });
 }
-
-
-
 

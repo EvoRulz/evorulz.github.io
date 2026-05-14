@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -32,7 +31,6 @@
     const a = h.length === 8 ? parseInt(h.slice(6,8),16) : 255;
     return `rgba(${r},${g},${b},${(a/255).toFixed(3)})`;
   }
-
   let popup = null, styleTag = null, activeSwatch = null;
   function _cpRefreshSwatch() {
     if (!activeSwatch) return;
@@ -51,13 +49,11 @@
   let   _gSel = 0;    // selected handle index
   let   _gRenderTime = 0; // timestamp of last _gRender call
   let H = 0, S = 100, B = 100;
-
   const CP_DEFAULTS = { bg: '#1c1c1cFF', border: '#555555FF', label: '#bbbbbbFF', text: '#FFFFFFFF', labelOutline: '#000000FF' }
   function cpCfg() {
     try { const s = JSON.parse(localStorage.getItem('_cpSettings')); if (s) return Object.assign({}, CP_DEFAULTS, s); } catch {}
     return Object.assign({}, CP_DEFAULTS);
   }
-
   function _gHex8() {
     const [r,g,b] = hsbToRgb(H,S,B);
     const aEl = popup && popup.querySelector('#cp-alpha');
@@ -305,7 +301,6 @@ function _gMinus() {
   _gRender();
   _gSave(); _cpRefreshSwatch();
 }
-
 window._cpMod = {
     get H()           { return H; },           set H(v)           { H = v; },
     get S()           { return S; },           set S(v)           { S = v; },
@@ -358,3 +353,4 @@ window._cpMod = {
   window._cpGetGradientMode  = id => _gMode[id] || 'solid';
   window._cpSetGradientMode  = (id, mode) => { _gMode[id] = mode; };
 })();
+

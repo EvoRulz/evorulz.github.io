@@ -1,12 +1,10 @@
-// @version 1400
-
+// @version 1401
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
   { id: "teeth",   label: "Teeth",   type: "simple" },
   { id: "appdev",  label: "App Dev", type: "simple" },
 ];
-
 function buildTrackerConfig(raw) {
   const cfg = { id: raw.id, label: raw.label, hasSets: raw.type === "sets" };
   if (raw.type === "sets") {
@@ -21,7 +19,6 @@ function buildTrackerConfig(raw) {
   }
   return cfg;
 }
-
 function loadRawConfigs() {
   try {
     const s = JSON.parse(localStorage.getItem("_trackerConfigs"));
@@ -29,15 +26,12 @@ function loadRawConfigs() {
   } catch {}
   return CONFIG_DEFAULTS.slice();
 }
-
 function saveRawConfigs() {
   const raw = TRACKER_CONFIGS.map(c => ({ id: c.id, label: c.label, type: c.hasSets ? "sets" : "simple" }));
   localStorage.setItem("_trackerConfigs", JSON.stringify(raw));
   APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id + ":");
 }
-
 let TRACKER_CONFIGS = loadRawConfigs().map(buildTrackerConfig);
-
   // ── Utils ──────────────────────────────────────────────────
 function dateStr(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -59,7 +53,6 @@ function clamp(d) {
   return d;
 }
 function sum(sets) { return (sets||[]).reduce((a,b) => a + (b??0), 0); }
-
   // ── Global dispatch ────────────────────────────────────────
 const trackers = {};
 function onSelectChange(id,ds,el) { trackers[id].onSelectChange(ds,el); }
@@ -71,7 +64,6 @@ function jumpToToday(id)           { trackers[id].jumpToToday(); }
 function exportData(id)             { trackers[id].exportData(); }
 function importData(id,el)          { trackers[id].importData(el); }
 function clearData(id)              { trackers[id].clearData(); }
-
     // ── Tracker factory ────────────────────────────────────────
 function createTracker(config) {
   const { id, label, hasSets, hasStreak, autoStatus } = config;
@@ -86,10 +78,8 @@ function createTracker(config) {
     }
   }
   let sortKey="date", sortDir=1, filterStatus="", viewDates=null, topDate, bottomDate;
-
   function sel(q)    { return document.querySelector(`#section-${id} ${q}`); }
   function selAll(q) { return document.querySelectorAll(`#section-${id} ${q}`); }
-
   function loadAll() {
     for (let i=0;i<localStorage.length;i++) {
       const key=localStorage.key(i);
@@ -120,7 +110,6 @@ function createTracker(config) {
     }
     save(ds);
   }
-
   function computeStreak(ds) {
     let n=0, curr=new Date(ds);
     while (curr>=MIN_DATE) {
@@ -129,7 +118,6 @@ function createTracker(config) {
     }
     return n;
   }
-
   function computeAntiStreak(ds) {
     let n=0, curr=new Date(ds);
     while (curr>=MIN_DATE) {
@@ -138,7 +126,6 @@ function createTracker(config) {
     }
     return n;
   }
-
   function buildView() {
     if (filterStatus==="") { viewDates=null; return; }
     viewDates=Object.entries(store).filter(([,v])=>v.status===filterStatus).map(([k])=>k);
@@ -150,7 +137,6 @@ function createTracker(config) {
       viewDates.sort((a,b)=>sortDir*((store[a]?.sets?.[idx]??0)-(store[b]?.sets?.[idx]??0)));
     }
   }
-
   function makeRow(ds) {
     const saved=getRow(ds);
     const streak=computeStreak(ds);
@@ -159,7 +145,6 @@ function createTracker(config) {
     const antiStreakPct=Math.min(antiStreak,_maxAntiStreak)/_maxAntiStreak*100;
     const statusOpts=`<option value=""></option>`+
     STATUSES.map(s=>`<option value="${s}"${saved.status===s?" selected":""}>${s}</option>`).join("");
-
     const tr=document.createElement("tr");
     tr.dataset.date=ds;
     let html=`
@@ -198,7 +183,6 @@ const ss=tr.querySelector("select");
 if (ss) applyStatusColor(ss);
 return tr;
 }
-
 function updateBars() {
   const tbody=sel("tbody"); if (!tbody) return;
   if (hasSets) {
@@ -243,7 +227,6 @@ function updateStats() {
     el.textContent=`${entries.length} days logged`;
   }
 }
-
 function onSelectChange(ds,el) {
   if (!store[ds]) store[ds]=getRow(ds);
   store[ds].status=el.value; save(ds);
@@ -282,7 +265,6 @@ function updateHeaderClasses() {
   });
 }
 function onFilterChange(val) { filterStatus=val; buildView(); rerenderTable(); }
-
 async function clearData() {
   const ok=await confirmClear(`This will permanently delete all saved data for <strong>${label}</strong>.`);
   if (!ok) return;
@@ -294,7 +276,6 @@ async function clearData() {
   for (const ds in store) delete store[ds];
     buildView(); rerenderTable(); updateStats();
 }
-
 function scrollToDate(ds) {
   const container=sel(".scroll-container");
   const row=sel(`tr[data-date="${ds}"]`);
@@ -309,7 +290,6 @@ function jumpToToday() {
   buildView(); rerenderTable();
   setTimeout(()=>scrollToDate(dateStr(new Date())),50);
 }
-
 function buildHeader() {
   const sh=hasSets
   ?`<th data-sort="total" onclick="onHeaderClick('${id}','total')">Total</th>`+
@@ -373,7 +353,6 @@ function setupObservers() {
     updateBars();
   },opts).observe(sel(".sentinel-bottom"));
 }
-
 function exportData() {
   const out={};
   for (let i=0;i<localStorage.length;i++) {
@@ -414,7 +393,6 @@ function importData(input) {
   };
   reader.readAsText(file);
 }
-
 function init() {
   loadAll(); computeMaxStreaks(); buildView();
   const today=new Date(); today.setHours(0,0,0,0);
@@ -447,13 +425,8 @@ function init() {
   updateBars(); updateStats(); updateHeaderClasses(); setupObservers();
   scrollToDate(dateStr(today));
 }
-
 function reload() { loadAll(); computeMaxStreaks(); buildView(); rerenderTable(); updateStats(); }
-
 return { init, reload, onSelectChange, onReasonInput, onInput,
  onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
 }
-
-
-
 

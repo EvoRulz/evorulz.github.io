@@ -1,9 +1,7 @@
-// @version 1400
-
+// @version 1401
   // ── Bootstrap ──────────────────────────────────────────────
 const buttonsEl  = document.getElementById("buttons");
 const sectionsEl = document.getElementById("sections");
-
   // Pre-create all section divs (always present in DOM so open state survives reorder)
 const sectionEls = {};
 TRACKER_CONFIGS.forEach(config => {
@@ -13,16 +11,13 @@ TRACKER_CONFIGS.forEach(config => {
   sectionsEl.appendChild(section);
   sectionEls[config.id] = section;
 });
-
   // Track which trackers have been lazy-initialised
 const initializedSet = new Set();
-
   // ── Active section management ──────────────────────────────
   // Only one section open at a time; button glows when its section is open.
 function getActiveSectionId() {
   return TRACKER_CONFIGS.map(c=>c.id).find(id => sectionEls[id].style.display === "block") || null;
 }
-
 function setActiveSection(targetId) {
     // Close all sections and unglow all buttons
   TRACKER_CONFIGS.forEach(c => {
@@ -30,15 +25,12 @@ function setActiveSection(targetId) {
     const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${c.id}"]`);
     if (btn) btn.classList.remove("active");
   });
-
     if (!targetId) return; // just close everything
-
     // Open target and glow its button
     sectionEls[targetId].style.display = "block";
     history.pushState({panel:'section'}, '');
     const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${targetId}"]`);
     if (btn) btn.classList.add("active");
-
     // Lazy-init tracker
     if (!initializedSet.has(targetId)) {
       const config = TRACKER_CONFIGS.find(c => c.id === targetId);
@@ -47,7 +39,6 @@ function setActiveSection(targetId) {
       initializedSet.add(targetId);
     }
   }
-
   // ── Button order persistence ───────────────────────────────
   function loadButtonOrder() {
     try {
@@ -69,7 +60,6 @@ function setActiveSection(targetId) {
     const order = [...buttonsEl.children].map(el => el.dataset.id || null);
     localStorage.setItem("_buttonOrder", JSON.stringify(order));
   }
-
   // ── Create a tracker toggle button element ─────────────────
   function makeTrackerBtn(config) {
     const btn = document.createElement("button");
@@ -100,10 +90,8 @@ function setActiveSection(targetId) {
     });
     return btn;
   }
-
   // Total grid slots: 3 cols × 3 rows = 9, giving 3 buttons room to spread out
   const TOTAL_SLOTS = 9;
-
   function padEmptySlots() {
     const total = buttonsEl.children.length;
     for (let i = total; i < TOTAL_SLOTS; i++) {
@@ -112,7 +100,6 @@ function setActiveSection(targetId) {
       buttonsEl.appendChild(slot);
     }
   }
-
   // Initial button render in saved order (supports id or null for empty slots)
   loadButtonOrder().forEach(id => {
     if (!id) {
@@ -125,7 +112,6 @@ function setActiveSection(targetId) {
     }
   });
   padEmptySlots(); // fill any remaining slots up to TOTAL_SLOTS
-
   var _eqFrame = null;
   function equalizeButtonSizes() {
     if (_eqFrame) cancelAnimationFrame(_eqFrame);
@@ -149,7 +135,4 @@ function setActiveSection(targetId) {
     _tg.style.gridAutoRows = maxH + 'px';
   }
   requestAnimationFrame(equalizeTopGrid);
-
-
-
 

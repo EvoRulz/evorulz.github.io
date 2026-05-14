@@ -1,5 +1,4 @@
-/* @version 1400 */
-
+/* @version 1401 */
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .color-settings-row { display:inline-flex; flex-direction:column; gap:4px; width:auto; vertical-align:top; }
@@ -78,9 +77,7 @@ html { scrollbar-width: none; -ms-overflow-style: none; }
 html::-webkit-scrollbar { display: none; }
 *::-webkit-scrollbar { display: none !important; }
 * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
-
 h1 { margin-top: 0; }
-
 /* ── App-level buttons (Export All etc) ── */
 .app-btn {
   padding: 12px 20px;
@@ -97,7 +94,6 @@ h1 { margin-top: 0; }
   background: #5a1a1a;
   color: #ff9999;
 }
-
 /* ── Tracker toggle buttons in the drag grid ── */
 #buttons {
   position: relative;
@@ -156,7 +152,6 @@ h1 { margin-top: 0; }
   display: none;
   margin-top: 20px;
 }
-
 .controls {
   margin-bottom: 8px;
   display: flex;
@@ -186,13 +181,11 @@ h1 { margin-top: 0; }
   color: #ff9999;
 }
 .controls button.btn-clear:hover { background: #7a2020; }
-
 .stats {
   font-size: 12px;
   color: #888;
   margin-bottom: 6px;
 }
-
 .scroll-container {
   overflow-y: auto;
   max-height: 80vh;
@@ -202,7 +195,6 @@ h1 { margin-top: 0; }
   -ms-overflow-style: none;
 }
 .scroll-container::-webkit-scrollbar { display: none; }
-
 table { border-collapse: collapse; width: 100%; }
 th, td {
   border: 1px solid var(--app-border-color, #333);
@@ -222,16 +214,13 @@ td {
 th:hover { background: #1a1a1a; }
 th.sorted-asc::after  { content: " ▲"; }
 th.sorted-desc::after { content: " ▼"; }
-
 .bar-container { width: 100%; height: 18px; background: #222; }
 .bar        { height: 100%; background: var(--bar-set-color,    #7030A0); transition: width 0.2s; }
 .bar-total  { height: 100%; background: var(--bar-total-color,  #8000ff); transition: width 0.2s; }
 .bar-streak { height: 100%; background: var(--bar-streak-color, #375623); transition: width 0.2s; }
 .bar-anti-streak { height: 100%; background: var(--bar-anti-streak-color, #8B0000); transition: width 0.2s; }
-
 td.set-cell { padding: 0; }
 td.set-cell input[type="number"] { height: 18px; padding: 0; }
-
 input[type="number"] {
   width: 100%; height: 100%; box-sizing: border-box;
   background: transparent; color: white;
@@ -240,7 +229,6 @@ input[type="number"] {
 }
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-
 td select {
   background: transparent; color: white; border: none;
   font-size: 12px; width: 100%; padding: 4px 2px;
@@ -248,7 +236,6 @@ td select {
   cursor: pointer; text-align: center;
 }
 td select option { background: #111; color: white; }
-
 td textarea {
   width: 100%; height: 100%; min-height: 36px;
   box-sizing: border-box; background: transparent;
@@ -256,9 +243,7 @@ td textarea {
   resize: none; outline: none; padding: 4px;
   font-family: sans-serif;
 }
-
 .sentinel { height: 1px; }
-
 /* ── Confirmation overlay ── */
 #confirm-overlay {
   display: none; position: fixed; inset: 0;
@@ -292,178 +277,4 @@ td textarea {
   font-size: 13px; align-self: flex-start;
 }
 #confirm-cancel:hover { background: #444; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

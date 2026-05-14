@@ -1,9 +1,7 @@
-// @version 1400
-
+// @version 1401
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
-
 function saveSliderRowOrder() {
   const grid = document.getElementById('sg-sliders');
   if (!grid) return;
@@ -32,7 +30,6 @@ function applySliderRowOrder() {
   let srReady = false;
   const grid = document.getElementById('sg-sliders');
   if (!grid) return;
-
   function srCancel() {
     clearTimeout(srHoldTimer); srHoldTimer = null; srReady = false;
     grid.style.touchAction = 'none';
@@ -44,7 +41,6 @@ function applySliderRowOrder() {
     }
     srDrag = null;
   }
-
   grid.addEventListener('pointerdown', e => {
     const item = e.target.closest('[data-slider-row]');
     if (!item || srDrag) return;
@@ -74,7 +70,6 @@ function applySliderRowOrder() {
       }
     }, 500);
   });
-
   grid.addEventListener('pointermove', e => {
     if (!srDrag) return;
     const moved = Math.hypot(e.clientX - srDrag.startX, e.clientY - srDrag.startY);
@@ -123,7 +118,6 @@ function applySliderRowOrder() {
       grid.insertBefore(over, iNext || null);
     }
   }, { passive: false });
-
   const srUp = () => {
     if (!srDrag) return;
     const wasActive = srDrag.active;
@@ -133,11 +127,9 @@ function applySliderRowOrder() {
   };
   grid.addEventListener('pointerup', srUp);
   grid.addEventListener('pointercancel', srCancel);
-
   document.addEventListener('touchmove', function(e) {
     if (srReady) e.preventDefault();
   }, { passive: false });
-
   applySliderRowOrder();
 })();
 function makeRowsDraggable(containerId, itemAttr, saveKey) {
@@ -269,14 +261,12 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   });
   applyOrder();
 }
-
 makeRowsDraggable('sg-buttons', 'data-btn-row', '_btnRowOrder');
 makeRowsDraggable('sg-app', 'data-app-row', '_appRowOrder');
 makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 makeRowsDraggable('sg-toggles', 'data-toggle-row', '_toggleRowOrder');
 makeRowsDraggable('sg-tables', 'data-app-row', '_tablesRowOrder');
-
 window.addEventListener('load', function() {
   history.pushState({panel:'base'}, '');
   var _goingForward = false;
@@ -311,7 +301,6 @@ window.addEventListener('load', function() {
   const swGrid = document.getElementById('sg-swatches');
   if (!swGrid) return;
   swGrid.style.touchAction = 'none';
-
   function swCancel() {
     clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
@@ -322,12 +311,10 @@ window.addEventListener('load', function() {
     }
     swDrag = null;
   }
-
   function saveSwatchOrder() {
     const order = [...swGrid.querySelectorAll('[data-swatch-row]')].map(el => el.dataset.swatchRow);
     localStorage.setItem('_swatchRowOrder', JSON.stringify(order));
   }
-
   function applySwatchOrder() {
     try {
       const saved = JSON.parse(localStorage.getItem('_swatchRowOrder'));
@@ -338,7 +325,6 @@ window.addEventListener('load', function() {
       });
     } catch {}
   }
-
   swGrid.addEventListener('pointerdown', e => {
     const item = e.target.closest('[data-swatch-row]');
     if (!item || swDrag) return;
@@ -355,7 +341,6 @@ window.addEventListener('load', function() {
       if (swDrag) { swReady = true; swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)'; }
     }, 400);
   });
-
   document.addEventListener('pointermove', e => {
     if (!swDrag) return;
     const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
@@ -401,7 +386,6 @@ window.addEventListener('load', function() {
       swGrid.insertBefore(over, iNext || null);
     }
   }, { passive: false });
-
   document.addEventListener('pointerup', () => {
     if (!swDrag) return;
     const wasActive = swDrag.active;
@@ -413,7 +397,6 @@ window.addEventListener('load', function() {
       window._settingsRowDragging = false;
     }
   });
-
   document.addEventListener('pointercancel', () => {
     if (!swDrag) return;
     if (swDrag.active) {
@@ -426,10 +409,6 @@ window.addEventListener('load', function() {
       const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     }
   });
-
   applySwatchOrder();
 })();
-
-
-
 

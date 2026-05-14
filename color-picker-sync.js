@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -56,7 +55,6 @@ window._cpSyncUI = function () {
   if (window.fontPickerSwatchSync) window.fontPickerSwatchSync();
   window._applyLabelToSwatches();
 };
-
 window._cpSaveFromUI = function () {
   if (typeof getColorValue !== 'function') return;
   localStorage.setItem('_cpSettings', JSON.stringify({
@@ -77,7 +75,6 @@ window._cpSaveFromUI = function () {
   }));
   window._applyLabelToSwatches();
 };
-
 window._applyLabelToSwatches = function _applyLabelToSwatches() {
   const c = window._cpCfg();
   const fillGrad = c.labelStops ? window._cpBuildCSS(c.labelStops) : (c.label && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
@@ -125,10 +122,8 @@ window._applyLabelToSwatches = function _applyLabelToSwatches() {
     }
   });
 };
-
   // ── Intercept all swatch pointerdowns ──────────────────────
 let _swatchDownX = null, _swatchDownY = null, _swatchDownEl = null, _swatchGlowTimer = null;
-
 function _resolveSwatchEl(e) {
   let sw = e.target.closest('.color-swatch-wrap');
   if (!sw) {
@@ -145,14 +140,12 @@ function _resolveSwatchEl(e) {
   }
   return sw;
 }
-
 document.addEventListener('pointerdown', function(e) {
   const sw = _resolveSwatchEl(e);
   if (!sw) return;
   e.preventDefault();
   _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw; _swatchGlowTimer = setTimeout(() => { if (_swatchDownEl === sw) sw.style.boxShadow = '0 0 10px 4px rgba(255,255,255,0.75)'; }, 380);
 }, true);
-
 document.addEventListener('pointerup', function(e) {
   if (_swatchGlowTimer) { clearTimeout(_swatchGlowTimer); _swatchGlowTimer = null; }
   if (!_swatchDownEl) return;
@@ -164,18 +157,14 @@ document.addEventListener('pointerup', function(e) {
   if (window._settingsRowDragging) return;
   window._cpOpenFor(sw);
 }, true);
-
 document.addEventListener('pointercancel', function() {
   if (_swatchGlowTimer) { clearTimeout(_swatchGlowTimer); _swatchGlowTimer = null; }
   if (_swatchDownEl) _swatchDownEl.style.boxShadow = '';
   _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null;
 }, true);
-
 // ── Popup render & management (moved from color-picker-core.js) ─────────────
-
 (function () {
   function _m() { return window._cpMod; }
-
   function cssVars() {
     const g = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
     return {
@@ -191,7 +180,6 @@ document.addEventListener('pointercancel', function() {
       w:       g('--slider-w')            || '100%',
     };
   }
-
   function injectThumbCSS(v) {
     const mo = _m();
     if (mo.styleTag) mo.styleTag.remove();
@@ -213,13 +201,11 @@ document.addEventListener('pointercancel', function() {
     document.head.appendChild(st);
     mo.styleTag = st;
   }
-
   function sliderCSS(v) {
     return `width:${v.w};height:${v.height};border-radius:${v.spread}/${v.radius};` +
   `border:1px solid ${v.border};outline:none;appearance:none;-webkit-appearance:none;` +
 `cursor:pointer;touch-action:none;display:block;box-sizing:border-box;`;
 }
-
 function refreshTracks() {
   const mo = _m();
   if (!mo.popup) return;
@@ -235,7 +221,6 @@ mo.popup.querySelector('#cp-bri').style.background =
 const _sw = mo.popup.querySelector('#cp-swatch');
 if (_sw) _sw.style.background = `rgb(${pr},${pg},${pb})`;
 }
-
 function refreshAlphaTrack() {
   const mo = _m();
   if (!mo.popup) return;
@@ -245,7 +230,6 @@ function refreshAlphaTrack() {
   const pct = parseInt(alphaEl.value) / 255 * 100;
   alphaEl.style.background = `linear-gradient(to right, rgba(${r},${g},${b},0), rgba(${r},${g},${b},1)), repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 8px 8px`;
 }
-
 function commitAlpha(v) {
   const mo = _m();
   if (!mo.activeSwatch) return;
@@ -267,7 +251,6 @@ function commitAlpha(v) {
   refreshAlphaTrack();
   mo._gRender();
 }
-
 function commitColor() {
   const mo = _m();
   const [r,g,b] = mo.hsbToRgb(mo.H, mo.S, mo.B);
@@ -293,7 +276,6 @@ function commitColor() {
   if (inp) { inp.value = hex.toLowerCase(); inp.dispatchEvent(new Event('input', {bubbles:true})); }
   mo._gRender();
 }
-
 function makeDragger(slider, onVal) {
   const min = +slider.min, max = +slider.max;
   let active = false;
@@ -318,7 +300,6 @@ function makeDragger(slider, onVal) {
   overlay.addEventListener('pointerup',     () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
   overlay.addEventListener('pointercancel', () => { active = false; cachedRect = null; window._cpActiveDrag = false; });
 }
-
 function _updateModeToggle() {
   const mo = _m();
   if (!mo.popup || !mo.activeSwatch) return;
@@ -331,7 +312,6 @@ function _updateModeToggle() {
     btn.style.color = gm === mode ? '#fff' : '#aaa';
   });
 }
-
 function _updateGradVisibility() {
   const mo = _m();
   if (!mo.popup) return;
@@ -342,7 +322,6 @@ function _updateGradVisibility() {
   if (gradRow) gradRow.style.display = mode === 'solid' ? 'none' : 'flex';
   if (degRow)  degRow.style.display  = (mode === 'linear') ? 'flex' : 'none';
 }
-
 function buildPopup() {
   const mo = _m();
   const v = cssVars(), c = mo.cpCfg();
@@ -423,7 +402,6 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
   }
 });
 document.body.appendChild(el);
-
 (function() {
   let ox = 0, oy = 0, active = false, holdTimer = null, holdReady = false;
   el.addEventListener('pointerdown', function(e) {
@@ -457,12 +435,10 @@ document.body.appendChild(el);
     el.style.cursor = ''; el.style.boxShadow = '';
   });
 })();
-
 makeDragger(el.querySelector('#cp-hue'),   nv => { mo.H = nv; commitColor(); });
 makeDragger(el.querySelector('#cp-sat'),   nv => { mo.S = nv; commitColor(); });
 makeDragger(el.querySelector('#cp-bri'),   nv => { mo.B = nv; commitColor(); });
 makeDragger(el.querySelector('#cp-alpha'), nv => { commitAlpha(nv); });
-
 el.querySelector('#cp-hex').addEventListener('input', function() {
   let val = this.value.replace(/[^0-9a-fA-F#]/g,'');
   if (val && !val.startsWith('#')) val = '#' + val;
@@ -512,7 +488,6 @@ _cpCopyBtn.addEventListener('click', function() {
     setTimeout(() => { this.textContent = 'Copy'; this.style.color = '#aaa'; }, 1200);
   }).catch(() => {});
 });
-
 el.querySelector('#cp-grad-minus').addEventListener('pointerdown', e => e.stopPropagation());
 el.querySelector('#cp-grad-minus').addEventListener('click',       e => { e.stopPropagation(); mo._gMinus(); });
 el.querySelector('#cp-grad-plus').addEventListener('pointerdown',  e => e.stopPropagation());
@@ -559,10 +534,8 @@ el.querySelector('#cp-grad-deg-plus').addEventListener('click', e => {
   });
 });
 mo._gRender();
-
 return el;
 }
-
 function position(swatch) {
   const mo = _m();
   const r = swatch.getBoundingClientRect();
@@ -578,7 +551,6 @@ function position(swatch) {
   mo.popup.style.left = Math.max(8, l) + 'px';
   mo.popup.style.top  = Math.max(8, t) + 'px';
 }
-
 function openFor(swatch) {
   const mo = _m();
   const wasOpen = !!mo.popup;
@@ -619,7 +591,6 @@ function openFor(swatch) {
   _updateGradVisibility();
   setTimeout(() => document.addEventListener('pointerdown', tapOut), 80);
 }
-
 function close() {
   const mo = _m();
   if (mo.popup)    { mo.popup.remove();    mo.popup    = null; }
@@ -628,13 +599,11 @@ function close() {
   mo.activeSwatch = null;
   document.removeEventListener('pointerdown', tapOut);
 }
-
 function tapOut(e) {
   const mo = _m();
   if (!mo.popup) return;
   if (!mo.popup.contains(e.target) && !e.target.closest('.color-swatch-wrap') && !e.target.closest('#settings-footer')) close();
 }
-
 window._cpClose   = close;
 window._cpOpenFor = openFor;
 window._cpRebuild = function () {
@@ -672,3 +641,4 @@ window._cpRefresh = function () {
   refreshAlphaTrack();
 };
 })();
+

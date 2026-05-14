@@ -1,5 +1,4 @@
-// @version 1400
-
+// @version 1401
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -35,7 +34,6 @@ function cfSyncTuningUI() {
   const _csVal = document.getElementById("cf-shape-val"); if (_csVal) _csVal.textContent = (cfTuning.shape ?? 6) + "px";
   cfApplyTuning();
 }
-
   // ── Coverflow button selector ──────────────────────────────
 (function() {
   let cfIdx = 0;
@@ -58,11 +56,9 @@ function cfSyncTuningUI() {
     items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
     items.push({ id: 'top-version',        label: 'Version',        isTopGrid: true });
     items.push({ id: 'top-settings',       label: 'Settings',       isTopGrid: true });
-
     if (!habitsVisible) {
       return [{ id: 'top-show-habits', label: 'Show Habits', isTopGrid: true }];
     }
-
     items.push({ id: 'top-hide-habits', label: 'Hide Habits', isTopGrid: true });
     items.push({ id: 'top-manage-habits', label: 'Manage Habits', isTopGrid: true });
     items.push({ id: _orientLocked ? 'top-orient-lock-locked' : 'top-orient-lock', label: _orientLocked ? 'Unlock Orient' : 'Lock Orient', isTopGrid: true });
@@ -79,7 +75,6 @@ function cfSyncTuningUI() {
     items.push({ id: 'sg-notifications', label: 'Notifications', isSg: true });
     items.push({ id: 'sg-swatches',      label: 'Swatches',      isSg: true });
     items.push({ id: 'sg-toggles',       label: 'Toggles',       isSg: true });
-    
     return items;
   }
   function cfActiveId() {
@@ -87,7 +82,6 @@ function cfSyncTuningUI() {
     return items[cfIdx]?.id || null;
   }
   window._cfActiveId = cfActiveId;
-
   function cfLoadPickersForId(id) {
     if(id==='top-version'&&localStorage.getItem('_versionUpdatePending')==='1'){
       const _prevStyle=localStorage.getItem('_versionPrevStyle');
@@ -164,12 +158,10 @@ function cfSyncTuningUI() {
       const _ctrV = _btnStyles['top-time']?.btnRadius ?? btnStyle.btnRadius ?? 6;
       const _ctrEl = document.getElementById("s-clock-time-radius"); if (_ctrEl) { _ctrEl.value = String(_ctrV); const _ctrvEl = document.getElementById("s-clock-time-radius-val"); if (_ctrvEl) _ctrvEl.textContent = _ctrV + "px"; }
     }
-    
     document.querySelectorAll('.alpha-slider:not([id$="-alpha"])').forEach(s => updateSliderFill(s));
     if (window.fontPickerSync) fontPickerSync();
     settingsUpdatePreview();
   }
-
   function cfRenderAt(idx) {
     const _saved = cfIdx;
     cfIdx = idx;
@@ -188,7 +180,6 @@ function cfSyncTuningUI() {
     const iW = Math.min(150, Math.max(70, Math.floor(W * cfTuning.cardW)));
     const cx = W / 2;
     const STEP_TX = (W / 2) * cfTuning.stepTx * 0.38;
-
     function cfKeyframe(d) {
       const sign = d < 0 ? -1 : 1;
       const abs  = Math.abs(d);
@@ -200,7 +191,6 @@ function cfSyncTuningUI() {
       const tx  = cx + sign * (1 - Math.exp(-abs * 0.9)) * (W * 0.46) - iW * 0.5;
       return { tx, ry, sc, op, zi };
     }
-
     function cfInterp(a, b, t) {
       return {
         tx: a.tx + (b.tx - a.tx) * t,
@@ -210,7 +200,6 @@ function cfSyncTuningUI() {
         zi: Math.round(a.zi + (b.zi - a.zi) * t),
       };
     }
-
     els.forEach((el, i) => {
       const d  = i - cfIdx;
       const d0 = Math.floor(d), d1 = Math.ceil(d);
@@ -379,20 +368,16 @@ function cfBuild(){
     };
     stage.appendChild(el);
   });
-
   cfRender();
   stage.style.touchAction = 'none';
-
   if (_cfAnimId) { cancelAnimationFrame(_cfAnimId); _cfAnimId = null; }
   if (_cfPointerAC) _cfPointerAC.abort();
   _cfPointerAC = new AbortController();
   const sig = _cfPointerAC.signal;
-
   let dragStartX = null;
   let dragStartIdx = null;
   let displayIdx = cfIdx;
   let didDrag = false;
-
   function springTo(target) {
     if (_cfAnimId) cancelAnimationFrame(_cfAnimId);
     const startIdx = displayIdx;
@@ -415,7 +400,6 @@ function cfBuild(){
     }
     _cfAnimId = requestAnimationFrame(step);
   }
-
   stage.addEventListener('pointerdown', e => {
     dragStartX = e.clientX;
     dragStartIdx = displayIdx;
@@ -439,7 +423,6 @@ function cfBuild(){
       if (_id) { const _s = _btnStyleFor(_id); closest.style.background = hex8ToCss(_s.tap || btnStyle.tap); }
     }
   }, { signal: sig });
-
   stage.addEventListener('pointermove', e => {
     if (dragStartX === null) return;
     const dx = e.clientX - dragStartX;
@@ -451,7 +434,6 @@ function cfBuild(){
     cfIdx = displayIdx;
     cfRenderAt(displayIdx);
   }, { signal: sig });
-
   stage.addEventListener('pointerup', e => {
     if (dragStartX === null) return;
         // reset any tapped card background
@@ -501,7 +483,6 @@ function cfBuild(){
       dragStartIdx = null;
     }
   }, { signal: sig });
-
   stage.addEventListener('pointercancel', () => {
     if (dragStartX === null) return;
     const n = window._cfItems().length;
@@ -514,11 +495,9 @@ function cfBuild(){
 window._cfBuild = function() { cfBuild(); cfLoadPickersForId(cfActiveId()); };
 window._cfSetIdx = function(i) { cfIdx = i; };
 new ResizeObserver(() => { if (window._cfBuild) { const saved = cfIdx; window._cfBuild(); cfIdx = saved; cfRender(); cfLoadPickersForId(cfActiveId()); } }).observe(document.getElementById('cf-stage'));
-
 function cfPrev() { if (cfIdx > 0) { cfIdx--; cfRender(); cfLoadPickersForId(cfActiveId()); } }
 function cfNext() { const n = cfItems().length; if (cfIdx < n-1) { cfIdx++; cfRender(); cfLoadPickersForId(cfActiveId()); } }
 })();
-
 let _settingsJustOpened = false;
 document.getElementById("settings-overlay").addEventListener("click", e => {
   if (_settingsJustOpened) { _settingsJustOpened = false; return; }
@@ -536,7 +515,4 @@ document.getElementById("settings-cancel").addEventListener("click", e => {
 document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
 });
-
-
-
 

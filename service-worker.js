@@ -1,39 +1,36 @@
-// @version 1400
-
-const CACHE = "habit-tracker-v1400";
-
+// @version 1401
+const CACHE = "habit-tracker-v1401";
 const ASSETS = [
   "./",
-  "./index.html?v=1400",
-  "./manifest.json?v=1400",
-  "./icon-192.png?v=1400",
-  "./icon-512.png?v=1400",
-  "./settings-overlay-1.js?v=1400",
-  "./settings-overlay-2.js?v=1400",
-  "./utils.js?v=1400",
-  "./clock.js?v=1400",
-  "./tracker.js?v=1400",
-  "./app-data.js?v=1400",
-  "./styles-app.js?v=1400",
-  "./styles-btn.js?v=1400",
-  "./styles-colors.js?v=1400",
-  "./settings-panel.js?v=1400",
-  "./settings-change.js?v=1400",
-  "./styles-drag-rows.js?v=1400",
-  "./coverflow.js?v=1400",
-  "./drag.js?v=1400",
-  "./manage.js?v=1400",
-  "./tumbler.js?v=1400",
-  "./bootstrap.js?v=1400",
-  "./font.js?v=1400",
-  "./notifications.js?v=1400",
-  "./slider-init.js?v=1400",
-  "./color-picker-core.js?v=1400",
-  "./color-picker-sync.js?v=1400",
-  "./app.css?v=1400",
-  "./settings-ui.css?v=1400"
+  "./index.html?v=1401",
+  "./manifest.json?v=1401",
+  "./icon-192.png?v=1401",
+  "./icon-512.png?v=1401",
+  "./settings-overlay-1.js?v=1401",
+  "./settings-overlay-2.js?v=1401",
+  "./utils.js?v=1401",
+  "./clock.js?v=1401",
+  "./tracker.js?v=1401",
+  "./app-data.js?v=1401",
+  "./styles-app.js?v=1401",
+  "./styles-btn.js?v=1401",
+  "./styles-colors.js?v=1401",
+  "./settings-panel.js?v=1401",
+  "./settings-change.js?v=1401",
+  "./styles-drag-rows.js?v=1401",
+  "./coverflow.js?v=1401",
+  "./drag.js?v=1401",
+  "./manage.js?v=1401",
+  "./tumbler.js?v=1401",
+  "./bootstrap.js?v=1401",
+  "./font.js?v=1401",
+  "./notifications.js?v=1401",
+  "./slider-init.js?v=1401",
+  "./color-picker-core.js?v=1401",
+  "./color-picker-sync.js?v=1401",
+  "./app.css?v=1401",
+  "./settings-ui.css?v=1401"
 ];
-
 self.addEventListener("notificationclick", e => {
   e.notification.close();
   e.waitUntil(
@@ -45,7 +42,6 @@ self.addEventListener("notificationclick", e => {
     })
     );
 });
-
 self.addEventListener("push", e => {
   const data = e.data ? e.data.json() : { title: "Habit Tracker", body: "Reminder" };
   e.waitUntil(
@@ -57,7 +53,6 @@ self.addEventListener("push", e => {
     })
     );
 });
-
 self.addEventListener("install", e => {
   e.waitUntil(
     caches.open(CACHE).then(c => {
@@ -70,7 +65,6 @@ self.addEventListener("install", e => {
     );
   self.skipWaiting();
 });
-
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys().then(keys =>
