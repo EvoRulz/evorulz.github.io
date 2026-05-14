@@ -1,4 +1,4 @@
-// @version 1395
+// @version 1396
 document.body.insertAdjacentHTML('beforeend', `
 
 <!-- Settings overlay -->
@@ -99,6 +99,28 @@ document.body.insertAdjacentHTML('beforeend', `
       <div class="settings-row" data-btn-row="fgstrokew">
         <label>Text outline width <span id="s-fgstrokew-val">0px</span></label>
         <input type="range" class="alpha-slider" id="s-fgstrokew" min="0" max="20" value="0" oninput="document.getElementById('s-fgstrokew-val').textContent=this.value+'px';settingsChange()">
+      </div>
+      <div class="color-settings-row" data-btn-row="border">
+        <label>Border color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-border" oninput="onColorPickerChange('s-border')">
+          <input type="range" class="alpha-slider" id="s-border-alpha" min="0" max="255" value="0" oninput="onAlphaChange('s-border')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-border-hex" maxlength="9" oninput="onHexInput('s-border')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-border',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-btn-row="activeborder">
+        <label>Active border color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-activeborder" oninput="onColorPickerChange('s-activeborder')">
+          <input type="range" class="alpha-slider" id="s-activeborder-alpha" min="0" max="255" value="0" oninput="onAlphaChange('s-activeborder')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-activeborder-hex" maxlength="9" oninput="onHexInput('s-activeborder')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-activeborder',this)">Copy</button>
+        </div>
       </div>
       <div class="settings-row" data-btn-row="radius">
         <label>Corner radius <span id="s-radius-val">6px</span></label>
@@ -337,97 +359,3 @@ document.body.insertAdjacentHTML('beforeend', `
 </div>
 
 `);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

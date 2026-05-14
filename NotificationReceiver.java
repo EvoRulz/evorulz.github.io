@@ -1,4 +1,4 @@
-// @version 1395
+// @version 1396
 
 package io.github.evorulz.twa;
 
@@ -30,16 +30,16 @@ public class NotificationReceiver extends BroadcastReceiver {
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
         PendingIntent launchPi = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Notification n = new NotificationCompat.Builder(context, "habit_reminders")
-            .setSmallIcon(R.drawable.ic_notification_icon)
-            .setContentTitle("Habit Tracker")
-            .setContentText("Pushups not done yet today.")
-            .setContentIntent(launchPi)
-            .setAutoCancel(true)
-            .build();
+        .setSmallIcon(R.drawable.ic_notification_icon)
+        .setContentTitle("Habit Tracker")
+        .setContentText("Pushups not done yet today.")
+        .setContentIntent(launchPi)
+        .setAutoCancel(true)
+        .build();
         nm.notify((int) System.currentTimeMillis(), n);
 
         long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
-            .getLong("intervalMs", 0);
+        .getLong("intervalMs", 0);
         if (intervalMs > 0) {
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent i = new Intent(context, NotificationReceiver.class);
@@ -52,164 +52,3 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

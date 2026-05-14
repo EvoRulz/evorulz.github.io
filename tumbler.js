@@ -1,65 +1,63 @@
-// @version 1395
+// @version 1396
 
 // ── Clock tumbler ──────────────────────────────────────────
-  (function() {
-    const COLS = window._CLOCK_COLS;
-    const wrap = document.getElementById("clock-tumbler-wrap");
+(function(){
+  const COLS = window._CLOCK_COLS;
+  const wrap = document.getElementById("clock-tumbler-wrap");
+  function getCfg() { return window._clockGet().tumblerCfg; }
+  function setCfg(cfg) { window._clockSet(cfg); resetPreviewCycle(); renderPreviews(); }
+  function renderPreviews() {
+    const cfg = getCfg();
+    const previewDateEl = wrap.querySelector("#tumb-preview-date");
+    const previewTimeEl = wrap.querySelector("#tumb-preview-time");
+    const now = new Date();
+    const DOW_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const DOW_LONG  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const d = now.getDate(), mo = now.getMonth()+1, y = now.getFullYear();
+    const dd = String(d).padStart(2,"0"), mm = String(mo).padStart(2,"0");
+    const yy = String(y).slice(-2);
+    const dowL = DOW_LONG[now.getDay()];
+    const dayNameMap = ["",dowL.slice(0,1),dowL.slice(0,2),dowL.slice(0,3),dowL.slice(0,4),dowL.slice(0,5),dowL];
+    const dayNameStr = cfg[0] === 0 ? "" : (dayNameMap[cfg[0]] || "");
+    const dayNumStr  = cfg[1] === 0 ? "" : cfg[1] === 1 ? String(d) : dd;
+    const moStr      = cfg[2] === 0 ? "" : cfg[2] === 1 ? String(mo) : mm;
+    const yrStr      = cfg[3] === 0 ? "" : cfg[3] === 1 ? yy : String(y);
+    const h24 = now.getHours(), h12 = h24 % 12 || 12;
+    const mi = String(now.getMinutes()).padStart(2,"0");
+    const se = String(now.getSeconds()).padStart(2,"0");
+    const ms = String(now.getMilliseconds()).padStart(3,"0");
+    const ampm = h24 >= 12 ? "pm" : "am";
+    let hrStr = "";
+    if      (cfg[4]===1) hrStr = String(h12);
+    else if (cfg[4]===2) hrStr = String(h12).padStart(2,"0");
+    else if (cfg[4]===3) hrStr = String(h24);
+    else if (cfg[4]===4) hrStr = String(h24).padStart(2,"0");
+    const minStr = cfg[5] === 0 ? "" : mi;
+    const secStr = cfg[6] === 0 ? "" : se;
+    const amStr  = cfg[7] === 0 ? "" : ampm;
+    const dateParts = [dayNameStr, [dayNumStr, moStr, yrStr].filter(Boolean).join("/")].filter(Boolean);
+    const dateLine = dateParts.join(" ");
+    let timeParts = [hrStr];
+    if (minStr) timeParts.push(minStr);
+    if (secStr) timeParts.push(secStr);
+    const timeBase = timeParts.filter(Boolean).join(":");
+    const timeLine = [timeBase, amStr ? " "+amStr : ""].join("").trim();
+    const fullStr = [dateLine, timeLine].filter(Boolean).join("\n");
+    if (previewDateEl) previewDateEl.innerHTML = dateLine ? dateLine.replace(/\s/g,"<br>") : "(date)";
+    if (previewTimeEl) previewTimeEl.textContent = timeLine || "(time)";
+    COLS.forEach((col, ci) => renderCol(ci));
+  }
 
-    function getCfg() { return window._clockGet().tumblerCfg; }
-    function setCfg(cfg) { window._clockSet(cfg); resetPreviewCycle(); renderPreviews(); }
-
-    function renderPreviews() {
-      const cfg = getCfg();
-      const previewDateEl = wrap.querySelector("#tumb-preview-date");
-      const previewTimeEl = wrap.querySelector("#tumb-preview-time");
-      const now = new Date();
-      const DOW_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-      const DOW_LONG  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-      const d = now.getDate(), mo = now.getMonth()+1, y = now.getFullYear();
-      const dd = String(d).padStart(2,"0"), mm = String(mo).padStart(2,"0");
-      const yy = String(y).slice(-2);
-      const dowL = DOW_LONG[now.getDay()];
-      const dayNameMap = ["",dowL.slice(0,1),dowL.slice(0,2),dowL.slice(0,3),dowL.slice(0,4),dowL.slice(0,5),dowL];
-      const dayNameStr = cfg[0] === 0 ? "" : (dayNameMap[cfg[0]] || "");
-      const dayNumStr  = cfg[1] === 0 ? "" : cfg[1] === 1 ? String(d) : dd;
-      const moStr      = cfg[2] === 0 ? "" : cfg[2] === 1 ? String(mo) : mm;
-      const yrStr      = cfg[3] === 0 ? "" : cfg[3] === 1 ? yy : String(y);
-      const h24 = now.getHours(), h12 = h24 % 12 || 12;
-      const mi = String(now.getMinutes()).padStart(2,"0");
-      const se = String(now.getSeconds()).padStart(2,"0");
-      const ms = String(now.getMilliseconds()).padStart(3,"0");
-      const ampm = h24 >= 12 ? "pm" : "am";
-      let hrStr = "";
-      if      (cfg[4]===1) hrStr = String(h12);
-      else if (cfg[4]===2) hrStr = String(h12).padStart(2,"0");
-      else if (cfg[4]===3) hrStr = String(h24);
-      else if (cfg[4]===4) hrStr = String(h24).padStart(2,"0");
-      const minStr = cfg[5] === 0 ? "" : mi;
-      const secStr = cfg[6] === 0 ? "" : se;
-      const amStr  = cfg[7] === 0 ? "" : ampm;
-      const dateParts = [dayNameStr, [dayNumStr, moStr, yrStr].filter(Boolean).join("/")].filter(Boolean);
-      const dateLine = dateParts.join(" ");
-      let timeParts = [hrStr];
-      if (minStr) timeParts.push(minStr);
-      if (secStr) timeParts.push(secStr);
-      const timeBase = timeParts.filter(Boolean).join(":");
-      const timeLine = [timeBase, amStr ? " "+amStr : ""].join("").trim();
-      const fullStr = [dateLine, timeLine].filter(Boolean).join("\n");
-      if (previewDateEl) previewDateEl.innerHTML = dateLine ? dateLine.replace(/\s/g,"<br>") : "(date)";
-      if (previewTimeEl) previewTimeEl.textContent = timeLine || "(time)";
-      COLS.forEach((col, ci) => renderCol(ci));
-    }
-
-    function liveVal(ci, optIdx, now) {
-      if (optIdx === 0) return "—";
-      const DOW_LONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-      const dowL = DOW_LONG[now.getDay()];
-      const d   = now.getDate(),  mo = now.getMonth() + 1, y = now.getFullYear();
-      const h24 = now.getHours(), h12 = h24 % 12 || 12;
-      const mi  = String(now.getMinutes()).padStart(2,"0");
-      const se  = String(now.getSeconds()).padStart(2,"0");
-      const ms  = String(now.getMilliseconds()).padStart(3,"0");
-      const ampm = h24 >= 12 ? "pm" : "am";
+  function liveVal(ci, optIdx, now) {
+    if (optIdx === 0) return "—";
+    const DOW_LONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const dowL = DOW_LONG[now.getDay()];
+    const d   = now.getDate(),  mo = now.getMonth() + 1, y = now.getFullYear();
+    const h24 = now.getHours(), h12 = h24 % 12 || 12;
+    const mi  = String(now.getMinutes()).padStart(2,"0");
+    const se  = String(now.getSeconds()).padStart(2,"0");
+    const ms  = String(now.getMilliseconds()).padStart(3,"0");
+    const ampm = h24 >= 12 ? "pm" : "am";
       if (ci === 0) return dowL.slice(0, optIdx) || "—";           // 1→F, 2→Fr, 3→Fri …
       if (ci === 1) return optIdx === 1 ? String(d) : String(d).padStart(2,"0");
       if (ci === 2) return optIdx === 1 ? String(mo) : String(mo).padStart(2,"0");
@@ -380,298 +378,128 @@
         requestAnimationFrame(() => requestAnimationFrame(syncPreviewSizes));
       }
     }).observe(_settingsOverlayEl, { attributes: true, attributeFilter: ["class"] });
-(function(){
-  const _files = [
-    './index.html','./utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
-    './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
-    './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
-    './slider-init.js','./color-picker.js','./app-data.js','./clock.js','./app.css','./settings-ui.css',
-    './service-worker.js','./manifest.json','./LauncherActivity.java','./NotificationReceiver.java',
-    './BootReceiver.java','./AndroidManifest.xml'
-  ];
-  Promise.all(_files.map(f=>fetch(f+'?nocache='+Date.now(),{cache:'no-store'}).then(r=>r.text()).catch(()=>'')))
-    .then(texts=>{
-      const totalLines = texts.reduce((a,t)=>a+t.split('\n').length,0);
-      const totalChars = texts.reduce((a,t)=>a+t.length,0);
-      const el=document.getElementById('app-stats');
-      if(el){
-        el.innerHTML=totalLines.toLocaleString()+' lines<br>'+totalChars.toLocaleString()+' chars';
-        el.style.color=hex8ToCss(_btnStyleFor('top-version').fg);
-        el.style.opacity='0.4';
-      }
-  const vEl=document.getElementById('app-version');
-  if(vEl){
-    const vNum=parseInt(vEl.textContent.replace('v',''))||0;
-    const vColors=['#00FFFFFF','#FF00FFFF','#FFFF00FF'];
-    const autoColor=vColors[vNum%3];
-    const _lastStyledVer=parseInt(localStorage.getItem('_lastStyledVersion')||'0');
-    if(vNum!==_lastStyledVer){
-      try{const _rawSaved=JSON.parse(localStorage.getItem('_btnStyles'));const _oldStyle=_rawSaved?.['top-version']||null;if(_oldStyle)localStorage.setItem('_versionPrevStyle',JSON.stringify(_oldStyle));const _oldFg=_oldStyle?.fg||null;if(_oldFg)localStorage.setItem('_versionPrevFg',_oldFg);}catch{}
-      _btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:autoColor,fgStops:null});
-      localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));
-      localStorage.setItem('_lastStyledVersion',String(vNum));
-      localStorage.setItem('_versionUpdatePending','1');
-      localStorage.setItem('_versionColor', autoColor);
-    } else {
-      const _savedVer=localStorage.getItem('_btnStyles');
-      if(_savedVer){try{const _parsed=JSON.parse(_savedVer);if(_parsed['top-version']?.fg)_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},_parsed['top-version']);}catch{}}
-    }
-    applyBtnStyle();
-  }
-});
-})();
+    (function(){
+      const _files = [
+        './index.html','./utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
+        './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
+        './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
+        './slider-init.js','./color-picker.js','./app-data.js','./clock.js','./app.css','./settings-ui.css',
+        './service-worker.js','./manifest.json','./LauncherActivity.java','./NotificationReceiver.java',
+        './BootReceiver.java','./AndroidManifest.xml'
+      ];
+      Promise.all(_files.map(f=>fetch(f+'?nocache='+Date.now(),{cache:'no-store'}).then(r=>r.text()).catch(()=>'')))
+      .then(texts=>{
+        const totalLines = texts.reduce((a,t)=>a+t.split('\n').length,0);
+        const totalChars = texts.reduce((a,t)=>a+t.length,0);
+        const el=document.getElementById('app-stats');
+        if(el){
+          el.innerHTML=totalLines.toLocaleString()+' lines<br>'+totalChars.toLocaleString()+' chars';
+          el.style.color=hex8ToCss(_btnStyleFor('top-version').fg);
+          el.style.opacity='0.4';
+        }
+        const vEl=document.getElementById('app-version');
+        if(vEl){
+          const vNum=parseInt(vEl.textContent.replace('v',''))||0;
+          const vColors=['#00FFFFFF','#FF00FFFF','#FFFF00FF'];
+          const autoColor=vColors[vNum%3];
+          const _lastStyledVer=parseInt(localStorage.getItem('_lastStyledVersion')||'0');
+          if(vNum!==_lastStyledVer){
+            try{const _rawSaved=JSON.parse(localStorage.getItem('_btnStyles'));const _oldStyle=_rawSaved?.['top-version']||null;if(_oldStyle)localStorage.setItem('_versionPrevStyle',JSON.stringify(_oldStyle));const _oldFg=_oldStyle?.fg||null;if(_oldFg)localStorage.setItem('_versionPrevFg',_oldFg);}catch{}
+            _btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},{fg:autoColor,fgStops:null});
+            localStorage.setItem('_btnStyles',JSON.stringify(_btnStyles));
+            localStorage.setItem('_lastStyledVersion',String(vNum));
+            localStorage.setItem('_versionUpdatePending','1');
+            localStorage.setItem('_versionColor', autoColor);
+          } else {
+            const _savedVer=localStorage.getItem('_btnStyles');
+            if(_savedVer){try{const _parsed=JSON.parse(_savedVer);if(_parsed['top-version']?.fg)_btnStyles['top-version']=Object.assign({},_btnStyles['top-version']||{},_parsed['top-version']);}catch{}}
+          }
+          applyBtnStyle();
+        }
+      });
+    })();
     buildTumbler();
     requestAnimationFrame(syncPreviewSizes);
     new ResizeObserver(() => syncPreviewSizes()).observe(document.getElementById("top-grid"));
     setInterval(() => {
-  renderPreviews();
-  if (document.getElementById('settings-overlay').classList.contains('active') && window._cfRender) {
-    window._cfRender();
-  }
-}, 1000);
+      renderPreviews();
+      if (document.getElementById('settings-overlay').classList.contains('active') && window._cfRender) {
+        window._cfRender();
+      }
+    }, 1000);
   })();
 
-if (localStorage.getItem('_swJustUpdated') === '1') {
-  localStorage.removeItem('_swJustUpdated');
-  setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 2500);
-}
+  if (localStorage.getItem('_swJustUpdated') === '1') {
+    localStorage.removeItem('_swJustUpdated');
+    setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 2500);
+  }
 
-window._verifyDeployedVersion = (function() {
-  let _pending = false;
-  const _verifyFiles = [
-    './index.html',
-    './service-worker.js',
-    './manifest.json',
-    './utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
-    './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
-    './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
-    './slider-init.js','./color-picker.js','./app-data.js','./clock.js',
-    './app.css','./settings-ui.css',
-    './LauncherActivity.java','./NotificationReceiver.java','./BootReceiver.java','./AndroidManifest.xml',
-  ];
-  return function() {
-    if (_pending) return;
-    _pending = true;
-    const vEl = document.getElementById('app-version');
-    const statsEl = document.getElementById('app-stats');
-    if (!vEl || !statsEl) { _pending = false; return; }
-    const localVer = parseInt(vEl.textContent.replace('v','')) || 0;
-    if (!statsEl.dataset.swOrig) {
-      statsEl.dataset.swOrig = statsEl.innerHTML;
-      statsEl.dataset.swOrigColor = statsEl.style.color;
-    }
-    window._versionCheckState = 'checking';
-    statsEl.innerHTML = 'checking CDN...';
-    statsEl.style.color = hex8ToCss(_btnStyleFor('top-version').fg);
-    statsEl.style.opacity = '1';
-    const nc = Date.now();
-    Promise.all(
-      _verifyFiles.map(f => fetch(f + '?nocache=' + nc, { cache: 'no-store' }).then(r => r.text()))
-    ).then(texts => {
-      const results = _verifyFiles.map((f, i) => {
-        const t = texts[i];
-        if (f === './index.html') {
-          const m = t.match(/id="app-version"[^>]*>v(\d+)</);
-          return { f, ver: m ? parseInt(m[1]) : 0 };
-        }
-        if (f === './manifest.json') {
-          const m = t.match(/\?v=(\d+)/);
-          return { f, ver: m ? parseInt(m[1]) : 0 };
-        }
-        const m = t.match(/@version (\d+)/);
-        return { f, ver: m ? parseInt(m[1]) : 0 };
-      });
-      const stale = results.filter(r => r.ver !== localVer);
-      if (!stale.length) {
-        window._versionCheckState = 'synced';
-        statsEl.innerHTML = 'CDN synced v' + localVer + '<br>' + _verifyFiles.length + ' files ok';
-        statsEl.style.color = '#99ff99';
-        statsEl.style.opacity = '1';
-        try { const _ac=new AudioContext(); const _o=_ac.createOscillator(); const _g=_ac.createGain(); _o.connect(_g); _g.connect(_ac.destination); _o.frequency.value=1500; _g.gain.setValueAtTime(0.3,_ac.currentTime); _g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.4); _o.start(); _o.stop(_ac.currentTime+0.4); } catch(e) {}
-        _pending = false;
-      } else {
-        const minVer = Math.min(...stale.map(r => r.ver).filter(Boolean));
-        statsEl.innerHTML = 'CDN: v' + (minVer || '?') + '<br>' + stale.length + ' file' + (stale.length > 1 ? 's' : '') + ' stale';
-        statsEl.style.color = '#ffaa00';
-        statsEl.style.opacity = '1';
-        _pending = false;
-        setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 5000);
+  window._verifyDeployedVersion = (function() {
+    let _pending = false;
+    const _verifyFiles = [
+      './index.html',
+      './service-worker.js',
+      './manifest.json',
+      './utils.js','./tracker.js','./bootstrap.js','./styles-core.js',
+      './styles-colors.js','./settings-panel.js','./settings-change.js','./styles-drag-rows.js',
+      './coverflow.js','./drag.js','./manage.js','./tumbler.js','./font.js','./notifications.js',
+      './slider-init.js','./color-picker.js','./app-data.js','./clock.js',
+      './app.css','./settings-ui.css',
+      './LauncherActivity.java','./NotificationReceiver.java','./BootReceiver.java','./AndroidManifest.xml',
+    ];
+    return function() {
+      if (_pending) return;
+      _pending = true;
+      const vEl = document.getElementById('app-version');
+      const statsEl = document.getElementById('app-stats');
+      if (!vEl || !statsEl) { _pending = false; return; }
+      const localVer = parseInt(vEl.textContent.replace('v','')) || 0;
+      if (!statsEl.dataset.swOrig) {
+        statsEl.dataset.swOrig = statsEl.innerHTML;
+        statsEl.dataset.swOrigColor = statsEl.style.color;
       }
-    }).catch(() => {
-      statsEl.innerHTML = 'fetch failed';
-      statsEl.style.color = '#ff6666';
+      window._versionCheckState = 'checking';
+      statsEl.innerHTML = 'checking CDN...';
+      statsEl.style.color = hex8ToCss(_btnStyleFor('top-version').fg);
       statsEl.style.opacity = '1';
-      _pending = false;
-    });
-  };
-})();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      const nc = Date.now();
+      Promise.all(
+        _verifyFiles.map(f => fetch(f + '?nocache=' + nc, { cache: 'no-store' }).then(r => r.text()))
+        ).then(texts => {
+          const results = _verifyFiles.map((f, i) => {
+            const t = texts[i];
+            if (f === './index.html') {
+              const m = t.match(/id="app-version"[^>]*>v(\d+)</);
+              return { f, ver: m ? parseInt(m[1]) : 0 };
+            }
+            if (f === './manifest.json') {
+              const m = t.match(/\?v=(\d+)/);
+              return { f, ver: m ? parseInt(m[1]) : 0 };
+            }
+            const m = t.match(/@version (\d+)/);
+            return { f, ver: m ? parseInt(m[1]) : 0 };
+          });
+          const stale = results.filter(r => r.ver !== localVer);
+          if (!stale.length) {
+            window._versionCheckState = 'synced';
+            statsEl.innerHTML = 'CDN synced v' + localVer + '<br>' + _verifyFiles.length + ' files ok';
+            statsEl.style.color = '#99ff99';
+            statsEl.style.opacity = '1';
+            try { const _ac=new AudioContext(); const _o=_ac.createOscillator(); const _g=_ac.createGain(); _o.connect(_g); _g.connect(_ac.destination); _o.frequency.value=1500; _g.gain.setValueAtTime(0.3,_ac.currentTime); _g.gain.exponentialRampToValueAtTime(0.001,_ac.currentTime+0.4); _o.start(); _o.stop(_ac.currentTime+0.4); } catch(e) {}
+            _pending = false;
+          } else {
+            const minVer = Math.min(...stale.map(r => r.ver).filter(Boolean));
+            statsEl.innerHTML = 'CDN: v' + (minVer || '?') + '<br>' + stale.length + ' file' + (stale.length > 1 ? 's' : '') + ' stale';
+            statsEl.style.color = '#ffaa00';
+            statsEl.style.opacity = '1';
+            _pending = false;
+            setTimeout(() => { if (window._verifyDeployedVersion) window._verifyDeployedVersion(); }, 5000);
+          }
+        }).catch(() => {
+          statsEl.innerHTML = 'fetch failed';
+          statsEl.style.color = '#ff6666';
+          statsEl.style.opacity = '1';
+          _pending = false;
+        });
+      };
+    })();

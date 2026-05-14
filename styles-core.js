@@ -1,4 +1,4 @@
-// @version 1395
+// @version 1396
 
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
@@ -308,7 +308,7 @@ if (navigator.storage && navigator.storage.persist) {
   }
   applyAppStyle();
 
-  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16, fgStroke: '#00000000', fgStrokeW: 0, fontSize: 16, fontWeight: 400, fontScaleX: 100 };
+  const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16, fgStroke: '#00000000', fgStrokeW: 0, fontSize: 16, fontWeight: 400, fontScaleX: 100, border: '#00000000', activeBorder: '#00000000' };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem("_btnStyle"));
@@ -400,7 +400,7 @@ if (navigator.storage && navigator.storage.persist) {
     if (_s && typeof _s === "object") _btnStyles = _s;
   } catch {}
   function _btnStyleFor(id) {
-    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6, fgStroke: btnStyle.fgStroke || '#00000000', fgStrokeW: btnStyle.fgStrokeW ?? 0, fontSize: btnStyle.fontSize ?? 16, fontWeight: btnStyle.fontWeight ?? 400, fontScaleX: btnStyle.fontScaleX ?? 100 };
+    const base = { bg: btnStyle.bg, fg: btnStyle.fg, glow: btnStyle.glow, activeGlow: btnStyle.activeGlow || btnStyle.glow, activeBg: btnStyle.activeBg, font: btnStyle.font, tap: btnStyle.tap, btnRadius: btnStyle.btnRadius ?? 6, fgStroke: btnStyle.fgStroke || '#00000000', fgStrokeW: btnStyle.fgStrokeW ?? 0, fontSize: btnStyle.fontSize ?? 16, fontWeight: btnStyle.fontWeight ?? 400, fontScaleX: btnStyle.fontScaleX ?? 100, border: btnStyle.border || '#00000000', activeBorder: btnStyle.activeBorder || '#00000000' };
     const _cachedVersionColor = localStorage.getItem('_versionColor');
     const TOP_GRID_DEFAULTS = {
       'top-clear-all':     { bg: '#5a1a1aFF', fg: '#ff9999FF' },
@@ -410,15 +410,15 @@ if (navigator.storage && navigator.storage.persist) {
       'top-manage-habits': { bg: '#444444FF', fg: '#FFFFFFFF' },
       'top-orient-lock':        { bg: '#2a2a2aFF', fg: '#999999FF', glow: '#00000000' },
       'top-orient-lock-locked': { bg: '#2a2a2aFF', fg: '#99ff99FF', glow: '#00000000' },
-      'sg-buttons':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-sliders':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-clock':         { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-checkboxes':    { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-app':           { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-tables':        { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-notifications': { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-swatches':      { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
-      'sg-toggles':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000' },
+      'sg-buttons':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-sliders':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-clock':         { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-checkboxes':    { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-app':           { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-tables':        { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-notifications': { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-swatches':      { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
+      'sg-toggles':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
       'top-version':       { bg: '#444444FF', fg: _cachedVersionColor || '#FFFFFFFF' },
       };
     return Object.assign({}, base, TOP_GRID_DEFAULTS[id] || {}, _btnStyles[id] || {});
@@ -495,6 +495,8 @@ window._applyTextStyle = _applyTextStyle;
     buttonsEl.style.setProperty("--btn-glow",      hex8ToCss(btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-glow", hex8ToCss(btnStyle.activeGlow || btnStyle.glow));
     buttonsEl.style.setProperty("--btn-active-bg", _bgCss(btnStyle.activeBg));
+    buttonsEl.style.setProperty("--btn-border", hex8ToCss(btnStyle.border || '#00000000'));
+    buttonsEl.style.setProperty("--btn-active-border", hex8ToCss(btnStyle.activeBorder || '#00000000'));
     document.documentElement.style.setProperty("--btn-radius", (btnStyle.btnRadius ?? 6) + 'px');
     document.documentElement.style.setProperty("--slider-border-color",  hex8ToCss(btnStyle.sliderBorder));
     document.documentElement.style.setProperty("--slider-h",             btnStyle.sliderH + "px");
@@ -581,6 +583,9 @@ window._applyTextStyle = _applyTextStyle;
   if (_btn) {
     _btn.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
     _btn.style.fontSize = (_s.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
+    _btn.style.borderWidth = '1px';
+    _btn.style.borderStyle = 'solid';
+    _btn.style.borderColor = hex8ToCss(_s.border || '#00000000');
     let _tspan = _btn.querySelector('.btn-text-label');
     if (!_tspan && _btn.textContent.trim() && !_btn.querySelector('svg')) {
       _tspan = document.createElement('span');
@@ -623,6 +628,9 @@ window._applyTextStyle = _applyTextStyle;
       if (_habBtn) {
   _habBtn.style.borderRadius = _habRadius + 'px';
   _habBtn.style.fontSize = (_hs.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
+  _habBtn.style.borderWidth = '1px';
+  _habBtn.style.borderStyle = 'solid';
+  _habBtn.style.borderColor = hex8ToCss(_hs.border || '#00000000');
   let _htspan = _habBtn.querySelector('.btn-text-label');
   if (!_htspan) {
     const _htxt = _habBtn.textContent.trim();
@@ -708,6 +716,7 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
       el.style.fontSize = (_s.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
       el.style.borderRadius = (_s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
       el.style.boxShadow = `0 0 8px 3px ${hex8ToCss(_s.glow)}`;
+      el.style.border = '1px solid ' + hex8ToCss(_s.border || '#444444FF');
       el.style.setProperty('--sg-active-glow', hex8ToCss(_s.activeGlow || _s.glow));
       let _sgspan = el.querySelector('.btn-text-label');
       if (!_sgspan) {
@@ -730,6 +739,8 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
       btn.style.setProperty("--btn-glow",      hex8ToCss(s.glow));
       btn.style.setProperty("--btn-active-glow", hex8ToCss(s.activeGlow || s.glow));
       btn.style.setProperty("--btn-active-bg", _bgCss(s.activeBg));
+      btn.style.setProperty("--btn-border", hex8ToCss(s.border || '#00000000'));
+      btn.style.setProperty("--btn-active-border", hex8ToCss(s.activeBorder || s.border || '#00000000'));
       btn.style.setProperty("--btn-font",      s.font);
       btn.style.fontFamily = s.font;
       btn.style.borderRadius = (s.btnRadius ?? btnStyle.btnRadius ?? 6) + 'px';
@@ -757,173 +768,3 @@ _vBtn.onpointermove = (e) => { if (Math.hypot(e.clientX - _vTapX, e.clientY - _v
     wrap.appendChild(overlay);
   });
   applyBtnStyle(true);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-<!-- @version 1395 -->
+<!-- @version 1396 -->
 <!--
     Copyright 2019 Google Inc. All Rights Reserved.
 
@@ -13,8 +13,8 @@
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
      See the License for the specific language governing permissions and
      limitations under the License.
--->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+ -->
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -38,159 +38,160 @@
             android:name="asset_statements"
             android:resource="@string/assetStatements" />
 
-        <meta-data
-            android:name="web_manifest_url"
-            android:value="@string/webManifestUrl" />
-
-        <meta-data
-            android:name="twa_generator"
-            android:value="@string/generatorApp" />
-
-        <activity android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
-            android:exported="false"
-            android:enabled="true"
-            android:excludeFromRecents="true">
             <meta-data
-                android:name="android.support.customtabs.trusted.MANAGE_SPACE_URL"
-                android:value="@string/launchUrl" />
-            <intent-filter>
-                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+                android:name="web_manifest_url"
+                android:value="@string/webManifestUrl" />
 
-        <activity android:name="LauncherActivity"
-            android:alwaysRetainTaskState="true"
-            android:label="@string/launcherName"
-            android:exported="true"
-            android:launchMode="singleTop">
-            <meta-data android:name="android.support.customtabs.trusted.DEFAULT_URL"
-                android:value="@string/launchUrl" />
+                <meta-data
+                    android:name="twa_generator"
+                    android:value="@string/generatorApp" />
 
-            <meta-data
-                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
-                android:resource="@color/colorPrimary" />
+                    <activity android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
+                        android:exported="false"
+                        android:enabled="true"
+                        android:excludeFromRecents="true">
+                        <meta-data
+                            android:name="android.support.customtabs.trusted.MANAGE_SPACE_URL"
+                            android:value="@string/launchUrl" />
+                            <intent-filter>
+                                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                                <category android:name="android.intent.category.DEFAULT" />
+                            </intent-filter>
+                        </activity>
 
-            <meta-data
-                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
-                android:resource="@color/colorPrimaryDark" />
+                        <activity android:name="LauncherActivity"
+                            android:alwaysRetainTaskState="true"
+                            android:label="@string/launcherName"
+                            android:exported="true"
+                            android:launchMode="singleTop">
+                            <meta-data android:name="android.support.customtabs.trusted.DEFAULT_URL"
+                                android:value="@string/launchUrl" />
 
-            <meta-data
-                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
-                android:resource="@color/navigationColor" />
+                                <meta-data
+                                    android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+                                    android:resource="@color/colorPrimary" />
 
-            <meta-data
-                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
-                android:resource="@color/navigationColorDark" />
+                                    <meta-data
+                                        android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
+                                        android:resource="@color/colorPrimaryDark" />
 
-            <meta-data
-                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR"
-                android:resource="@color/navigationDividerColor" />
+                                        <meta-data
+                                            android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+                                            android:resource="@color/navigationColor" />
 
-            <meta-data
-                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR_DARK"
-                android:resource="@color/navigationDividerColorDark" />
+                                            <meta-data
+                                                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
+                                                android:resource="@color/navigationColorDark" />
 
-            <meta-data android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
-                android:resource="@drawable/splash"/>
+                                                <meta-data
+                                                    android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR"
+                                                    android:resource="@color/navigationDividerColor" />
 
-            <meta-data android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
-                android:resource="@color/backgroundColor"/>
+                                                    <meta-data
+                                                        android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR_DARK"
+                                                        android:resource="@color/navigationDividerColorDark" />
 
-            <meta-data android:name="android.support.customtabs.trusted.SPLASH_SCREEN_FADE_OUT_DURATION"
-                android:value="@integer/splashScreenFadeOutDuration"/>
+                                                        <meta-data android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+                                                            android:resource="@drawable/splash"/>
 
-            <meta-data android:name="android.support.customtabs.trusted.FILE_PROVIDER_AUTHORITY"
-                android:value="@string/providerAuthority"/>
+                                                            <meta-data android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+                                                                android:resource="@color/backgroundColor"/>
 
-            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+                                                                <meta-data android:name="android.support.customtabs.trusted.SPLASH_SCREEN_FADE_OUT_DURATION"
+                                                                    android:value="@integer/splashScreenFadeOutDuration"/>
 
-            <meta-data android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
-                android:value="@string/fallbackType" />
+                                                                    <meta-data android:name="android.support.customtabs.trusted.FILE_PROVIDER_AUTHORITY"
+                                                                        android:value="@string/providerAuthority"/>
 
-            <meta-data android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
-                android:value="@string/orientation"/>
+                                                                        <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                                                                        <meta-data android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
+                                                                            android:value="@string/fallbackType" />
 
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https"
-                    android:host="@string/hostName"
-                    android:pathPrefix="/evorulz.github.io/"
-                />
-            </intent-filter>
+                                                                            <meta-data android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
+                                                                                android:value="@string/orientation"/>
 
-            <!-- Handles myfiles:// URLs from the web app to launch Samsung My Files natively -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="myfiles" />
-            </intent-filter>
+                                                                                <intent-filter>
+                                                                                    <action android:name="android.intent.action.MAIN" />
+                                                                                    <category android:name="android.intent.category.LAUNCHER" />
+                                                                                </intent-filter>
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="appsettings" />
-            </intent-filter>
+                                                                                <intent-filter android:autoVerify="true">
+                                                                                    <action android:name="android.intent.action.VIEW"/>
+                                                                                    <category android:name="android.intent.category.DEFAULT" />
+                                                                                    <category android:name="android.intent.category.BROWSABLE"/>
+                                                                                    <data android:scheme="https"
+                                                                                        android:host="@string/hostName"
+                                                                                        android:pathPrefix="/evorulz.github.io/"
+                                                                                        />
+                                                                                    </intent-filter>
 
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="habitnotify" />
-            </intent-filter>
+                                                                                    <!-- Handles myfiles:// URLs from the web app to launch Samsung My Files natively -->
+                                                                                    <intent-filter>
+                                                                                        <action android:name="android.intent.action.VIEW" />
+                                                                                        <category android:name="android.intent.category.DEFAULT" />
+                                                                                        <category android:name="android.intent.category.BROWSABLE" />
+                                                                                        <data android:scheme="myfiles" />
+                                                                                    </intent-filter>
+
+                                                                                    <intent-filter>
+                                                                                        <action android:name="android.intent.action.VIEW" />
+                                                                                        <category android:name="android.intent.category.DEFAULT" />
+                                                                                        <category android:name="android.intent.category.BROWSABLE" />
+                                                                                        <data android:scheme="appsettings" />
+                                                                                    </intent-filter>
+
+                                                                                    <intent-filter>
+                                                                                        <action android:name="android.intent.action.VIEW" />
+                                                                                        <category android:name="android.intent.category.DEFAULT" />
+                                                                                        <category android:name="android.intent.category.BROWSABLE" />
+                                                                                        <data android:scheme="habitnotify" />
+                                                                                    </intent-filter>
 
 
-        </activity>
+                                                                                </activity>
 
-        <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" />
+                                                                                <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" />
 
-        <activity android:name="com.google.androidbrowserhelper.trusted.WebViewFallbackActivity"
-            android:configChanges="orientation|screenSize" />
+                                                                                <activity android:name="com.google.androidbrowserhelper.trusted.WebViewFallbackActivity"
+                                                                                    android:configChanges="orientation|screenSize" />
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="@string/providerAuthority"
-            android:grantUriPermissions="true"
-            android:exported="false">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths" />
-        </provider>
+                                                                                    <provider
+                                                                                        android:name="androidx.core.content.FileProvider"
+                                                                                        android:authorities="@string/providerAuthority"
+                                                                                        android:grantUriPermissions="true"
+                                                                                        android:exported="false">
+                                                                                        <meta-data
+                                                                                            android:name="android.support.FILE_PROVIDER_PATHS"
+                                                                                            android:resource="@xml/filepaths" />
+                                                                                        </provider>
 
-        <service
-            android:name=".DelegationService"
-            android:enabled="true"
-            android:exported="true">
+                                                                                        <service
+                                                                                            android:name=".DelegationService"
+                                                                                            android:enabled="true"
+                                                                                            android:exported="true">
 
-            <meta-data
-                android:name="android.support.customtabs.trusted.SMALL_ICON"
-                android:resource="@drawable/ic_notification_icon" />
+                                                                                            <meta-data
+                                                                                                android:name="android.support.customtabs.trusted.SMALL_ICON"
+                                                                                                android:resource="@drawable/ic_notification_icon" />
 
-            <intent-filter>
-                <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </service>
+                                                                                                <intent-filter>
+                                                                                                    <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE"/>
+                                                                                                    <category android:name="android.intent.category.DEFAULT"/>
+                                                                                                </intent-filter>
+                                                                                            </service>
 
-        <activity android:name="com.google.androidbrowserhelper.trusted.NotificationPermissionRequestActivity" />
-        <receiver android:name=".NotificationReceiver" android:exported="true" />
-        <receiver android:name=".BootReceiver" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+                                                                                            <activity android:name="com.google.androidbrowserhelper.trusted.NotificationPermissionRequestActivity" />
+                                                                                            <receiver android:name=".NotificationReceiver" android:exported="true" />
+                                                                                            <receiver android:name=".BootReceiver" android:exported="true">
+                                                                                                <intent-filter>
+                                                                                                    <action android:name="android.intent.action.BOOT_COMPLETED" />
+                                                                                                </intent-filter>
+                                                                                            </receiver>
 
-    </application>
-</manifest>
+                                                                                        </application>
+                                                                                    </manifest>
+
 
 
 

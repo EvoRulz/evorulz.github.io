@@ -1,35 +1,35 @@
-// @version 1395
+// @version 1396
 
   // ── Bootstrap ──────────────────────────────────────────────
-  const buttonsEl  = document.getElementById("buttons");
-  const sectionsEl = document.getElementById("sections");
+const buttonsEl  = document.getElementById("buttons");
+const sectionsEl = document.getElementById("sections");
 
   // Pre-create all section divs (always present in DOM so open state survives reorder)
-  const sectionEls = {};
-  TRACKER_CONFIGS.forEach(config => {
-    const section = document.createElement("div");
-    section.id        = `section-${config.id}`;
-    section.className = "tracker-section";
-    sectionsEl.appendChild(section);
-    sectionEls[config.id] = section;
-  });
+const sectionEls = {};
+TRACKER_CONFIGS.forEach(config => {
+  const section = document.createElement("div");
+  section.id        = `section-${config.id}`;
+  section.className = "tracker-section";
+  sectionsEl.appendChild(section);
+  sectionEls[config.id] = section;
+});
 
   // Track which trackers have been lazy-initialised
-  const initializedSet = new Set();
+const initializedSet = new Set();
 
   // ── Active section management ──────────────────────────────
   // Only one section open at a time; button glows when its section is open.
-  function getActiveSectionId() {
-    return TRACKER_CONFIGS.map(c=>c.id).find(id => sectionEls[id].style.display === "block") || null;
-  }
+function getActiveSectionId() {
+  return TRACKER_CONFIGS.map(c=>c.id).find(id => sectionEls[id].style.display === "block") || null;
+}
 
-  function setActiveSection(targetId) {
+function setActiveSection(targetId) {
     // Close all sections and unglow all buttons
-    TRACKER_CONFIGS.forEach(c => {
-      sectionEls[c.id].style.display = "none";
-      const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${c.id}"]`);
-      if (btn) btn.classList.remove("active");
-    });
+  TRACKER_CONFIGS.forEach(c => {
+    sectionEls[c.id].style.display = "none";
+    const btn = buttonsEl.querySelector(`.tracker-btn[data-id="${c.id}"]`);
+    if (btn) btn.classList.remove("active");
+  });
 
     if (!targetId) return; // just close everything
 
@@ -77,31 +77,31 @@
     btn.dataset.id  = config.id;
     const _bspan = document.createElement('span'); _bspan.className = 'btn-text-label'; _bspan.dataset.text = config.label; _bspan.textContent = config.label; btn.appendChild(_bspan);
     let _tapX = null, _tapY = null;
-btn.addEventListener('pointerdown', (e) => {
-  _tapX = e.clientX; _tapY = e.clientY;
-  console.log('[btn] pointerdown', config.id, 'drag:', window._dragEnabled, 'interact:', window._interactEnabled);
-  const _s = _btnStyleFor(config.id);
-  btn.style.background = hex8ToCss(_s.tap || btnStyle.tap);
-});
-btn.addEventListener('pointerup', (e) => {
-  const _s = _btnStyleFor(config.id);
-  btn.style.background = hex8ToCss(_s.bg);
-  const dist = (_tapX !== null) ? Math.hypot(e.clientX - _tapX, e.clientY - _tapY) : 999;
-  console.log('[btn] pointerup', config.id, 'dist:', dist.toFixed(1), 'dragOccurred:', window._habitDragOccurred, 'interact:', window._interactEnabled);
-  _tapX = null; _tapY = null;
-  if (dist > 10) { console.log('[btn] suppressed: moved too far'); return; }
-  if (window._habitDragOccurred) { console.log('[btn] suppressed: drag occurred'); return; }
-  if (window._interactEnabled === false) { console.log('[btn] suppressed: interact disabled'); return; }
-  console.log('[btn] opening section', config.id);
-  const currentlyOpen = getActiveSectionId();
-  setActiveSection(currentlyOpen === config.id ? null : config.id);
-});
-btn.addEventListener('pointercancel', () => {
-  console.log('[btn] pointercancel', config.id);
-  const _s = _btnStyleFor(config.id);
-  btn.style.background = hex8ToCss(_s.bg);
-  _tapX = null; _tapY = null;
-});
+    btn.addEventListener('pointerdown', (e) => {
+      _tapX = e.clientX; _tapY = e.clientY;
+      console.log('[btn] pointerdown', config.id, 'drag:', window._dragEnabled, 'interact:', window._interactEnabled);
+      const _s = _btnStyleFor(config.id);
+      btn.style.background = hex8ToCss(_s.tap || btnStyle.tap);
+    });
+    btn.addEventListener('pointerup', (e) => {
+      const _s = _btnStyleFor(config.id);
+      btn.style.background = hex8ToCss(_s.bg);
+      const dist = (_tapX !== null) ? Math.hypot(e.clientX - _tapX, e.clientY - _tapY) : 999;
+      console.log('[btn] pointerup', config.id, 'dist:', dist.toFixed(1), 'dragOccurred:', window._habitDragOccurred, 'interact:', window._interactEnabled);
+      _tapX = null; _tapY = null;
+      if (dist > 10) { console.log('[btn] suppressed: moved too far'); return; }
+      if (window._habitDragOccurred) { console.log('[btn] suppressed: drag occurred'); return; }
+      if (window._interactEnabled === false) { console.log('[btn] suppressed: interact disabled'); return; }
+      console.log('[btn] opening section', config.id);
+      const currentlyOpen = getActiveSectionId();
+      setActiveSection(currentlyOpen === config.id ? null : config.id);
+    });
+    btn.addEventListener('pointercancel', () => {
+      console.log('[btn] pointercancel', config.id);
+      const _s = _btnStyleFor(config.id);
+      btn.style.background = hex8ToCss(_s.bg);
+      _tapX = null; _tapY = null;
+    });
     return btn;
   }
 
@@ -153,173 +153,3 @@ btn.addEventListener('pointercancel', () => {
     _tg.style.gridAutoRows = maxH + 'px';
   }
   requestAnimationFrame(equalizeTopGrid);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

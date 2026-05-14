@@ -1,4 +1,4 @@
-// @version 1395
+// @version 1396
 
 (function() {
   function todayStr() {
@@ -22,7 +22,7 @@
       (s.hours  || 0) * 60 * 60 * 1000 +
       (s.minutes|| 0) * 60 * 1000 +
       (s.seconds|| 0) * 1000
-    ) || 60 * 60 * 1000;
+      ) || 60 * 60 * 1000;
   }
 
   function isPushupsDone() {
@@ -116,9 +116,9 @@ window.notifRefreshPermission = function() {
     try {
       const s = JSON.parse(window.AndroidSettings.getPermissionStatus());
       el.innerHTML =
-        'Web: <span style="color:' + webColor + '">' + webPerm + '</span>' +
-        '<br>Notifications: <span style="color:' + (s.notifications ? '#99ff99' : '#ff9999') + '">' + (s.notifications ? 'granted' : 'denied') + '</span>' +
-        '<br>Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>';
+      'Web: <span style="color:' + webColor + '">' + webPerm + '</span>' +
+      '<br>Notifications: <span style="color:' + (s.notifications ? '#99ff99' : '#ff9999') + '">' + (s.notifications ? 'granted' : 'denied') + '</span>' +
+      '<br>Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>';
     } catch {
       el.innerHTML = 'Web: <span style="color:' + webColor + '">' + webPerm + '</span>';
     }
@@ -145,7 +145,7 @@ window.notifSaveSchedule = function() {
     (s.hours   || 0) * 60 * 60 * 1000 +
     (s.minutes || 0) * 60 * 1000 +
     (s.seconds || 0) * 1000
-  ) || 60 * 60 * 1000;
+    ) || 60 * 60 * 1000;
   window.location.href = 'habitnotify://schedule?interval=' + intervalMs;
   console.log('[notif] scheduling interval ms:', intervalMs);
   const btn = document.getElementById('notif-save-schedule-btn');
@@ -203,7 +203,7 @@ function _notifTickCountdown() {
       (_s.hours   || 0) * 60 * 60 * 1000 +
       (_s.minutes || 0) * 60 * 1000 +
       (_s.seconds || 0) * 1000
-    ) || 60 * 60 * 1000;
+      ) || 60 * 60 * 1000;
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(_ms);
     } else {
@@ -241,7 +241,7 @@ setInterval(() => {
       (_s2.hours   || 0) * 60 * 60 * 1000 +
       (_s2.minutes || 0) * 60 * 1000 +
       (_s2.seconds || 0) * 1000
-    ) || 60 * 60 * 1000;
+      ) || 60 * 60 * 1000;
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(_ms2);
     } else {
@@ -273,7 +273,7 @@ window.notifToggle = function() {
       (s.hours   || 0) * 60 * 60 * 1000 +
       (s.minutes || 0) * 60 * 1000 +
       (s.seconds || 0) * 1000
-    ) || 60 * 60 * 1000;
+      ) || 60 * 60 * 1000;
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
     } else {
@@ -292,7 +292,7 @@ window.notifSetOffTimer = function() {
     g('notif-off-hours') * 60 * 60 * 1000 +
     g('notif-off-mins')  * 60 * 1000 +
     g('notif-off-secs')  * 1000
-  );
+    );
   if (!ms) { window.notifSetOffForever(); return; }
   localStorage.setItem('_notifOffUntil', String(Date.now() + ms));
   _notifTickCountdown();
@@ -321,173 +321,3 @@ window.notifSendTest = async function() {
     } catch(e) {}
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

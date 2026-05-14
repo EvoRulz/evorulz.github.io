@@ -1,35 +1,35 @@
-// @version 1395
+// @version 1396
 
-const CACHE = "habit-tracker-v1395";
+const CACHE = "habit-tracker-v1396";
 
 const ASSETS = [
   "./",
-  "./index.html?v=1395",
-  "./manifest.json?v=1395",
-  "./icon-192.png?v=1395",
-  "./icon-512.png?v=1395",
-  "./settings-overlay-1.js?v=1395",
-  "./settings-overlay-2.js?v=1395",
-  "./utils.js?v=1395",
-  "./clock.js?v=1395",
-  "./tracker.js?v=1395",
-  "./app-data.js?v=1395",
-  "./styles-core.js?v=1395",
-  "./styles-colors.js?v=1395",
-  "./settings-panel.js?v=1395",
-  "./settings-change.js?v=1395",
-  "./styles-drag-rows.js?v=1395",
-  "./coverflow.js?v=1395",
-  "./drag.js?v=1395",
-  "./manage.js?v=1395",
-  "./tumbler.js?v=1395",
-  "./bootstrap.js?v=1395",
-  "./font.js?v=1395",
-  "./notifications.js?v=1395",
-  "./slider-init.js?v=1395",
-  "./color-picker.js?v=1395",
-  "./app.css?v=1395",
-  "./settings-ui.css?v=1395"
+  "./index.html?v=1396",
+  "./manifest.json?v=1396",
+  "./icon-192.png?v=1396",
+  "./icon-512.png?v=1396",
+  "./settings-overlay-1.js?v=1396",
+  "./settings-overlay-2.js?v=1396",
+  "./utils.js?v=1396",
+  "./clock.js?v=1396",
+  "./tracker.js?v=1396",
+  "./app-data.js?v=1396",
+  "./styles-core.js?v=1396",
+  "./styles-colors.js?v=1396",
+  "./settings-panel.js?v=1396",
+  "./settings-change.js?v=1396",
+  "./styles-drag-rows.js?v=1396",
+  "./coverflow.js?v=1396",
+  "./drag.js?v=1396",
+  "./manage.js?v=1396",
+  "./tumbler.js?v=1396",
+  "./bootstrap.js?v=1396",
+  "./font.js?v=1396",
+  "./notifications.js?v=1396",
+  "./slider-init.js?v=1396",
+  "./color-picker.js?v=1396",
+  "./app.css?v=1396",
+  "./settings-ui.css?v=1396"
 ];
 
 self.addEventListener("notificationclick", e => {
@@ -41,7 +41,7 @@ self.addEventListener("notificationclick", e => {
       }
       if (clients.openWindow) return clients.openWindow("./");
     })
-  );
+    );
 });
 
 self.addEventListener("push", e => {
@@ -53,7 +53,7 @@ self.addEventListener("push", e => {
       vibrate: [200],
       tag: "habit-reminder"
     })
-  );
+    );
 });
 
 self.addEventListener("install", e => {
@@ -65,7 +65,7 @@ self.addEventListener("install", e => {
     }).then(() => {
       self.clients.matchAll({includeUncontrolled:true,type:'window'}).then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-installed"})));
     })
-  );
+    );
   self.skipWaiting();
 });
 
@@ -79,10 +79,10 @@ self.addEventListener("activate", e => {
             return caches.delete(k);
           }
         })
-      )
-    ).then(() => {
-      self.clients.matchAll({includeUncontrolled:true,type:'window'}).then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-activated"})));
-    })
-  );
+        )
+      ).then(() => {
+        self.clients.matchAll({includeUncontrolled:true,type:'window'}).then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-activated"})));
+      })
+      );
   self.clients.claim();
 });

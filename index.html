@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Arimo&family=Cinzel&family=Comfortaa&family=Cousine&family=Dancing+Script&family=EB+Garamond&family=Exo+2&family=Fira+Code&family=Gelasio&family=IBM+Plex+Mono&family=Inconsolata&family=Josefin+Sans&family=Jost&family=Libre+Baskerville&family=Libre+Franklin&family=Lora&family=Merriweather&family=Montserrat&family=Noto+Sans&family=Noto+Serif&family=Nunito&family=Open+Sans&family=Oswald&family=Philosopher&family=Playfair+Display&family=Poppins&family=PT+Mono&family=PT+Sans&family=PT+Serif&family=Raleway&family=Roboto&family=Roboto+Condensed&family=Roboto+Mono&family=Roboto+Slab&family=Rubik&family=Source+Code+Pro&family=Teko&family=Titillium+Web&family=Ubuntu&family=Ubuntu+Mono&family=Unna&family=Work+Sans&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Arimo&family=Cinzel&family=Comfortaa&family=Cousine&family=Dancing+Script&family=EB+Garamond&family=Exo+2&family=Fira+Code&family=Gelasio&family=IBM+Plex+Mono&family=Inconsolata&family=Josefin+Sans&family=Jost&family=Libre+Baskerville&family=Libre+Franklin&family=Lora&family=Merriweather&family=Montserrat&family=Noto+Sans&family=Noto+Serif&family=Nunito&family=Open+Sans&family=Oswald&family=Philosopher&family=Playfair+Display&family=Poppins&family=PT+Mono&family=PT+Sans&family=PT+Serif&family=Raleway&family=Roboto&family=Roboto+Condensed&family=Roboto+Mono&family=Roboto+Slab&family=Rubik&family=Source+Code+Pro&family=Teko&family=Titillium+Web&family=Ubuntu&family=Ubuntu+Mono&family=Unna&family=Work+Sans&display=swap" rel="stylesheet">
   <title>Habit Tracker</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -22,48 +22,48 @@
   <div id="confirm-box">
     <p id="confirm-msg"></p>
     <input id="confirm-input" type="text" placeholder="Habit Tracker"
-           autocomplete="off" spellcheck="false">
+    autocomplete="off" spellcheck="false">
     <div id="confirm-hint"></div>
     <button id="confirm-cancel" onclick="confirmCancel()">Cancel</button>
   </div>
 </div>
 
 <div id="zoom-wrapper">
-<div id="zoom-content">
-<div id="top-grid">
-  <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
-  <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1395</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
-  <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
-  <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
-  <div class="top-item" data-item="settings">
-    <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
-      <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
-    </button>
+  <div id="zoom-content">
+    <div id="top-grid">
+      <div class="top-item" data-item="title"><span id="title-span" class="title-span flame-active" style="font-size:22px;font-weight:bold;color:white;pointer-events:auto" onclick="this.classList.toggle('flame-active')">Habit Tracker</span></div>
+      <div class="top-item" data-item="version"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><span id="app-version" style="font-size:14px;visibility:hidden;">v1396</span><span id="app-stats" style="font-size:9px;color:#555;line-height:1.4;text-align:center;"></span></div></div>
+      <div class="top-item" data-item="date" style="background:var(--clock-date-bg,transparent)"><span id="live-date" style="font-size:var(--clock-date-size,13px);color:var(--clock-date-color,#666);letter-spacing:0.02em;cursor:pointer;line-height:1.3;text-align:center"></span></div>
+      <div class="top-item" data-item="time" style="background:var(--clock-time-bg,transparent)"><span id="live-time" style="font-size:var(--clock-time-size,13px);color:var(--clock-time-color,#666);letter-spacing:0.02em;cursor:pointer"></span></div>
+      <div class="top-item" data-item="settings">
+        <button id="settings-cog" onclick="settingsOpen()" title="Button style settings">
+          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.325 2.317a1.75 1.75 0 0 1 3.35 0l.07.254a1.75 1.75 0 0 0 2.494 1.08l.235-.127a1.75 1.75 0 0 1 2.369 2.369l-.127.235a1.75 1.75 0 0 0 1.08 2.494l.254.07a1.75 1.75 0 0 1 0 3.35l-.254.07a1.75 1.75 0 0 0-1.08 2.494l.127.235a1.75 1.75 0 0 1-2.369 2.369l-.235-.127a1.75 1.75 0 0 0-2.494 1.08l-.07.254a1.75 1.75 0 0 1-3.35 0l-.07-.254a1.75 1.75 0 0 0-2.494-1.08l-.235.127a1.75 1.75 0 0 1-2.369-2.369l.127-.235a1.75 1.75 0 0 0-1.08-2.494l-.254-.07a1.75 1.75 0 0 1 0-3.35l.254-.07a1.75 1.75 0 0 0 1.08-2.494l-.127-.235a1.75 1.75 0 0 1 2.369-2.369l.235.127a1.75 1.75 0 0 0 2.494-1.08l.07-.254ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+        </button>
+      </div>
+      <div class="top-item" data-item="export-all"><button class="app-btn" onclick="appExport()" onpointerdown="this.classList.add('active')" onpointerup="this.classList.remove('active')" onpointerleave="this.classList.remove('active')">Export All</button></div>
+      <div class="top-item" data-item="import-all">
+        <button class="app-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
+        <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
+      </div>
+      <div class="top-item" data-item="export-layout"><button class="app-btn" onclick="exportLayout()">Export Layout</button></div>
+      <div class="top-item" data-item="import-layout">
+        <button class="app-btn" onclick="document.getElementById('layout-import-file').click()">Import Layout</button>
+        <input type="file" id="layout-import-file" accept=".json" style="display:none" onchange="importLayout(this)">
+      </div>
+      <div class="top-item" data-item="clear-all"><button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button></div>
+      <div class="top-item" data-item="my-files"><button class="app-btn" onclick="openMyFiles()">My Files</button></div>
+      <div class="top-item" data-item="hard-reload"><button class="app-btn" onclick="hardReload()">Hard Reload</button></div>
+      <div class="top-item" data-item="hide-habits"><button class="app-btn" id="hide-habits-btn" onclick="toggleHabits()">Hide Habits</button></div>
+      <div class="top-item" data-item="manage-habits"><button class="app-btn" onclick="manageOpen()">Manage Habits</button></div>
+      <div class="top-item" data-item="orient-lock">
+        <button id="orient-lock-btn" onclick="toggleOrientLock()" title="Lock screen orientation">
+          <svg id="orient-lock-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"></svg>
+        </button>
+      </div>
+    </div>
+    <div id="buttons"></div>
+    <div id="sections"></div>
   </div>
-  <div class="top-item" data-item="export-all"><button class="app-btn" onclick="appExport()" onpointerdown="this.classList.add('active')" onpointerup="this.classList.remove('active')" onpointerleave="this.classList.remove('active')">Export All</button></div>
-  <div class="top-item" data-item="import-all">
-    <button class="app-btn" onclick="document.getElementById('app-import-file').click()">Import All</button>
-    <input type="file" id="app-import-file" accept=".json" style="display:none" onchange="appImport(this)">
-  </div>
-  <div class="top-item" data-item="export-layout"><button class="app-btn" onclick="exportLayout()">Export Layout</button></div>
-  <div class="top-item" data-item="import-layout">
-    <button class="app-btn" onclick="document.getElementById('layout-import-file').click()">Import Layout</button>
-    <input type="file" id="layout-import-file" accept=".json" style="display:none" onchange="importLayout(this)">
-  </div>
-  <div class="top-item" data-item="clear-all"><button class="app-btn btn-clear-all" onclick="appClear()">Clear All</button></div>
-  <div class="top-item" data-item="my-files"><button class="app-btn" onclick="openMyFiles()">My Files</button></div>
-  <div class="top-item" data-item="hard-reload"><button class="app-btn" onclick="hardReload()">Hard Reload</button></div>
-  <div class="top-item" data-item="hide-habits"><button class="app-btn" id="hide-habits-btn" onclick="toggleHabits()">Hide Habits</button></div>
-  <div class="top-item" data-item="manage-habits"><button class="app-btn" onclick="manageOpen()">Manage Habits</button></div>
-  <div class="top-item" data-item="orient-lock">
-    <button id="orient-lock-btn" onclick="toggleOrientLock()" title="Lock screen orientation">
-      <svg id="orient-lock-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"></svg>
-    </button>
-  </div>
-</div>
-<div id="buttons"></div>
-<div id="sections"></div>
-</div>
 </div>
 <div id="zoom-spacer"></div>
 <!-- Manage Habits overlay -->
@@ -94,8 +94,8 @@
   </div>
   <div class="ctrl-group ctrl-zoom-group">
     <button style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;" onclick="ctrlZoom(zoomToSlider(Math.max(50,parseInt(document.getElementById('zoom-label').textContent)-1)),false)">&#8722;</button>
-<input type="range" id="zoom-slider" min="50" max="300" value="175" oninput="ctrlZoom(this.value)">
-<button style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;" onclick="ctrlZoom(zoomToSlider(Math.min(300,parseInt(document.getElementById('zoom-label').textContent)+1)),false)">+</button>
+    <input type="range" id="zoom-slider" min="50" max="300" value="175" oninput="ctrlZoom(this.value)">
+    <button style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid var(--slider-btn-border,#555);border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;" onclick="ctrlZoom(zoomToSlider(Math.min(300,parseInt(document.getElementById('zoom-label').textContent)+1)),false)">+</button>
     <span class="ctrl-label" id="zoom-label">100%</span>
   </div>
   <div class="ctrl-group">
