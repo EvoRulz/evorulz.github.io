@@ -1,4 +1,4 @@
-// @version 1418
+// @version 1419
   // ── Bootstrap ──────────────────────────────────────────────
 const buttonsEl  = document.getElementById("buttons");
 const sectionsEl = document.getElementById("sections");
@@ -38,6 +38,7 @@ function setActiveSection(targetId) {
       trackers[targetId].init();
       initializedSet.add(targetId);
     }
+    setTimeout(() => { sectionEls[targetId].scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
   }
   // ── Button order persistence ───────────────────────────────
   function loadButtonOrder() {
