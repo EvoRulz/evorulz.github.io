@@ -1,4 +1,4 @@
-// @version 1424
+// @version 1425
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -196,7 +196,7 @@
       }
       let _ghdrag = false, _ghdragMoved = false;
       h.addEventListener('pointerdown', e => {
-        if (Date.now() - _gRenderTime < 150) return;
+        if (Date.now() - _gRenderTime < 50) return;
         e.stopPropagation(); e.preventDefault();
         _gSel = i;
         hw.querySelectorAll('[data-gi]').forEach((hh, ii) => {
