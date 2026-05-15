@@ -1,4 +1,4 @@
-// @version 1425
+// @version 1426
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -399,14 +399,14 @@ el.innerHTML =
 `<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +
 `<button id="cp-grad-deg-plus" style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid ${sb};border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
 `</div>` +
-`<div><div class="cp-field-label" style="${ls}">Hue</div>` +
-`<input id="cp-hue" type="range" min="0" max="360" value="${mo.H}" style="${ss}"></div>` +
-`<div><div class="cp-field-label" style="${ls}">Saturation</div>` +
-`<input id="cp-sat" type="range" min="0" max="100" value="${mo.S}" style="${ss}"></div>` +
-`<div><div class="cp-field-label" style="${ls}">Brightness</div>` +
-`<input id="cp-bri" type="range" min="0" max="100" value="${mo.B}" style="${ss}"></div>` +
-`<div><div class="cp-field-label" style="${ls}">Alpha</div>` +
-`<input id="cp-alpha" type="range" min="0" max="255" value="255" style="${ss}"></div>` +
+`<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}min-width:60px;margin-bottom:0;">Hue</div>` +
+`<input id="cp-hue" type="range" min="0" max="360" value="${mo.H}" style="${ss}flex:1;"></div>` +
+`<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}min-width:60px;margin-bottom:0;">Saturation</div>` +
+`<input id="cp-sat" type="range" min="0" max="100" value="${mo.S}" style="${ss}flex:1;"></div>` +
+`<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}min-width:60px;margin-bottom:0;">Brightness</div>` +
+`<input id="cp-bri" type="range" min="0" max="100" value="${mo.B}" style="${ss}flex:1;"></div>` +
+`<div style="display:flex;align-items:center;gap:8px;"><div class="cp-field-label" style="${ls}min-width:60px;margin-bottom:0;">Alpha</div>` +
+`<input id="cp-alpha" type="range" min="0" max="255" value="255" style="${ss}flex:1;"></div>` +
 `<div style="display:flex;gap:6px;align-items:center;margin-top:2px;">` +
 `<input id="cp-hex" type="text" maxlength="9" ` +
 `style="flex:1;min-width:0;background:#111;border:1px solid ${sb};border-radius:4px;padding:4px 6px;font-size:12px;font-family:monospace;outline:none;text-transform:uppercase;letter-spacing:0.04em;${_txtGrad ? `background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-image:${_txtGrad};color:transparent;` : `color:${txt};`}" ` +
