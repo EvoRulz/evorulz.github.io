@@ -1,4 +1,4 @@
-// @version 1419
+// @version 1420
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -435,12 +435,8 @@ document.body.appendChild(el);
     if (e.target.closest('input, button, .alpha-slider, #cp-grad-hw')) return;
     const r = el.getBoundingClientRect();
     ox = e.clientX - r.left; oy = e.clientY - r.top;
-    holdReady = false;
-    holdTimer = setTimeout(() => {
-      holdReady = true;
-      el.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.85), 0 4px 24px rgba(0,0,0,0.65)';
-      el.style.cursor = 'grab';
-    }, 1000);
+    holdReady = true;
+    el.style.cursor = 'grab';
     el.setPointerCapture(e.pointerId);
     e.stopPropagation(); e.preventDefault();
   });
