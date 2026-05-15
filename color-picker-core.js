@@ -1,4 +1,4 @@
-// @version 1421
+// @version 1422
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -295,7 +295,10 @@ function _gPlus() {
     }
   }
   _gRender();
-  _gSave(); _cpRefreshSwatch();
+  _gSave();
+  window._cpActiveDrag = true;
+  _cpRefreshSwatch();
+  window._cpActiveDrag = false;
 }
 function _gMinus() {
   if (!_ga) return;
@@ -311,7 +314,10 @@ function _gMinus() {
     else { _ga[mids[0]].isPercent = true; _gSel = 0; }
   }
   _gRender();
-  _gSave(); _cpRefreshSwatch();
+  _gSave();
+  window._cpActiveDrag = true;
+  _cpRefreshSwatch();
+  window._cpActiveDrag = false;
 }
 window._cpMod = {
     get H()           { return H; },           set H(v)           { H = v; },
