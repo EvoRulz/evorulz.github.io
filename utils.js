@@ -1,4 +1,4 @@
- // @version 1431
+ // @version 1432
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -228,13 +228,17 @@ function ctrlToggleDrag() {
   if (t) t.classList.toggle('on', window._dragEnabled);
 }
 async function hardReload() {
-  if ('serviceWorker' in navigator) {
-    const regs = await navigator.serviceWorker.getRegistrations();
-    for (const r of regs) await r.unregister();
-  }
-const keys = await caches.keys();
-for (const k of keys) await caches.delete(k);
-  window.location.replace(location.href.replace(/[?#].*$/, '') + '?t=' + Date.now());
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const r of regs) await r.unregister();
+    }
+  } catch(e) {}
+  try {
+    const keys = await caches.keys();
+    for (const k of keys) await caches.delete(k);
+  } catch(e) {}
+  window.location.href = location.href.replace(/[?#].*$/, '') + '?t=' + Date.now();
 }
 (function() {
   const _zs = document.getElementById('zoom-slider');
