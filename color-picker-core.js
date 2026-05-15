@@ -1,4 +1,4 @@
-// @version 1427
+// @version 1428
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -268,10 +268,6 @@ function _gPlus() {
       const denom = _ga[pctI+1].pos - _ga[pctI-1].pos;
       const t = denom > 0 ? (_ga[pctI].pos - _ga[pctI-1].pos)/denom : 0.5;
       _ga[pctI] = { ..._ga[pctI], isPercent:false, hex8: _gInterp(_ga[pctI-1].hex8, _ga[pctI+1].hex8, t) };
-      if (_ga.length < 10) {
-        const _nPos = (_ga[pctI].pos + _ga[pctI + 1].pos) / 2;
-        _ga.splice(pctI + 1, 0, { pos: _nPos, hex8: _gHex8(), isEnd: false, isPercent: true });
-      }
       _gSel = pctI;
       _gLoadHandle(pctI);
     } else if (_ga.length < 10) {
