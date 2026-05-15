@@ -1,4 +1,4 @@
-/* @version 1428 */
+/* @version 1429 */
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .color-settings-row { display:inline-flex; flex-direction:column; gap:4px; width:auto; vertical-align:top; }
@@ -219,6 +219,7 @@ th.sorted-desc::after { content: " ▼"; }
 .bar-total  { height: 100%; background: var(--bar-total-color,  #8000ff); transition: width 0.2s; }
 .bar-streak { height: 100%; background: var(--bar-streak-color, #375623); transition: width 0.2s; }
 .bar-anti-streak { height: 100%; background: var(--bar-anti-streak-color, #8B0000); transition: width 0.2s; }
+.today-row > td { background: var(--today-bg, #333333) !important; color: var(--today-text, #FFD700) !important; }
 td.set-cell { padding: 0; }
 td.set-cell input[type="number"] { height: 18px; padding: 0; }
 input[type="number"] {

@@ -1,4 +1,4 @@
-// @version 1428
+// @version 1429
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -146,6 +146,7 @@ function createTracker(config) {
     const statusOpts=`<option value=""></option>`+
     STATUSES.map(s=>`<option value="${s}"${saved.status===s?" selected":""}>${s}</option>`).join("");
     const tr=document.createElement("tr");
+    if (ds === dateStr(new Date())) tr.classList.add('today-row');
     tr.dataset.date=ds;
     let html=`
         <td>${displayDate(ds)}</td>

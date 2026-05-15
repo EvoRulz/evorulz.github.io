@@ -1,4 +1,4 @@
-// @version 1428
+// @version 1429
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -417,6 +417,28 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         <div class="hex-copy-row">
           <input type="text" class="hex-input" id="s-app-anti-streak-text-hex" maxlength="9" oninput="onHexInput('s-app-anti-streak-text')" spellcheck="false" autocomplete="off">
           <button class="copy-btn" onclick="copyHex('s-app-anti-streak-text',this)">Copy</button>
+        </div>
+      </div>
+  <div class="color-settings-row" data-app-row="todaybg">
+        <label>Today background</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-today-bg" oninput="onColorPickerChange('s-app-today-bg')">
+          <input type="range" class="alpha-slider" id="s-app-today-bg-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-today-bg')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-today-bg-hex" maxlength="9" oninput="onHexInput('s-app-today-bg')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-today-bg',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-app-row="todaytext">
+        <label>Today text color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-app-today-text" oninput="onColorPickerChange('s-app-today-text')">
+          <input type="range" class="alpha-slider" id="s-app-today-text-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-app-today-text')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-app-today-text-hex" maxlength="9" oninput="onHexInput('s-app-today-text')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-app-today-text',this)">Copy</button>
         </div>
       </div>
       <div class="color-settings-row" data-app-row="settext">

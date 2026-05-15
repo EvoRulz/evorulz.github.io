@@ -1,4 +1,4 @@
-// @version 1428
+// @version 1429
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -366,6 +366,8 @@ function settingsChange() {
   if(document.getElementById('s-app-streak-text'))      appStyle.streakText     = getColorValue('s-app-streak-text');
   if(document.getElementById('s-app-anti-streak-text')) appStyle.antiStreakText  = getColorValue('s-app-anti-streak-text');
   if(document.getElementById('s-app-set-text'))         appStyle.setValueText   = getColorValue('s-app-set-text');
+  if(document.getElementById('s-app-today-bg'))   appStyle.todayBg   = getColorValue('s-app-today-bg');
+  if(document.getElementById('s-app-today-text')) appStyle.todayText = getColorValue('s-app-today-text');
   if(document.getElementById('s-app-text'))       appStyle.textColor   = getColorValue('s-app-text');
   applyAppStyle();
   _applyStatusBarColor();
@@ -481,6 +483,8 @@ async function settingsReset() {
   setColorValue('s-app-streak-text',      appStyle.streakText    || "#FFFFFFFF");
   setColorValue('s-app-anti-streak-text', appStyle.antiStreakText || "#8B0000FF");
   setColorValue('s-app-set-text',         appStyle.setValueText  || "#FFFFFFFF");
+  setColorValue('s-app-today-bg',   APP_STYLE_DEFAULTS.todayBg);
+  setColorValue('s-app-today-text', APP_STYLE_DEFAULTS.todayText);
   applyBtnStyle();
   window._clockSet([6, 1, 1, 1, 2, 1, 1, 0]);
   settingsUpdatePreview();

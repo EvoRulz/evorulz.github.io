@@ -1,4 +1,4 @@
-// @version 1428
+// @version 1429
 // ── Settings open/close/save/cancel/reset/export/import ───
 let _appStyleSnapshot = null;
 let _clockSnapshot    = null;
@@ -375,6 +375,8 @@ function settingsOpen() {
     setColorValue("s-app-streak-text",      appStyle.streakText    || "#FFFFFFFF");
     setColorValue("s-app-anti-streak-text", appStyle.antiStreakText || "#8B0000FF");
     setColorValue("s-app-set-text",         appStyle.setValueText  || "#FFFFFFFF");
+    setColorValue("s-app-today-bg",   appStyle.todayBg   || "#333333FF");
+    setColorValue("s-app-today-text", appStyle.todayText || "#FFD700FF");
     const isGrad = appStyle.bgType.startsWith("gradient");
     const isPat  = appStyle.bgType.startsWith("pattern");
     const isImg  = appStyle.bgType === "image";
