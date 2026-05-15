@@ -1,4 +1,4 @@
-// @version 1430
+// @version 1431
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -292,9 +292,7 @@ function _gPlus() {
   }
   _gRender();
   _gSave();
-  window._cpActiveDrag = true;
   _cpRefreshSwatch();
-  window._cpActiveDrag = false;
 }
 function _gMinus() {
   if (!_ga) return;
@@ -311,9 +309,7 @@ function _gMinus() {
   }
   _gRender();
   _gSave();
-  window._cpActiveDrag = true;
   _cpRefreshSwatch();
-  window._cpActiveDrag = false;
 }
 window._cpMod = {
     get H()           { return H; },           set H(v)           { H = v; },
