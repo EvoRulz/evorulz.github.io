@@ -1,4 +1,4 @@
-// @version 1432
+// @version 1433
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -485,7 +485,7 @@ _cpCopyBtn.addEventListener('click', function() {
 el.querySelector('#cp-grad-minus').addEventListener('pointerdown', e => e.stopPropagation());
 el.querySelector('#cp-grad-minus').addEventListener('click',       e => { e.stopPropagation(); mo._gMinus(); _updateModeToggle(); _updateGradVisibility(); });
 el.querySelector('#cp-grad-plus').addEventListener('pointerdown',  e => e.stopPropagation());
-el.querySelector('#cp-grad-plus').addEventListener('click',        e => { e.stopPropagation(); mo._gPlus(); _updateModeToggle(); _updateGradVisibility(); if (mo.popup) void mo.popup.offsetHeight; mo._gRender(); requestAnimationFrame(() => mo._gRender()); });
+el.querySelector('#cp-grad-plus').addEventListener('click',        e => { e.stopPropagation(); mo._gPlus(); _updateModeToggle(); _updateGradVisibility(); if (mo.popup) void mo.popup.offsetHeight; mo._gRender(); setTimeout(() => mo._gRender(), 0); });
 makeDragger(el.querySelector('#cp-grad-deg'), nv => {
   const _dv = mo.popup && mo.popup.querySelector('#cp-grad-deg-val');
   if (_dv) _dv.textContent = nv + '\u00b0';
