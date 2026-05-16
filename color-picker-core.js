@@ -1,4 +1,4 @@
-// @version 1438
+// @version 1439
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -124,7 +124,8 @@
     [H,S,B] = rgbToHsb(r,g,b);
     const aEl = popup && popup.querySelector('#cp-alpha');
     if (aEl) aEl.value = parseInt(_ga[i].hex8.slice(7,9)||'ff',16);
-    refreshTracks(); refreshAlphaTrack();
+    if (window._cpRefreshTracks) window._cpRefreshTracks();
+    if (window._cpRefreshAlphaTrack) window._cpRefreshAlphaTrack();
     const hexEl = popup && popup.querySelector('#cp-hex');
     if (hexEl) hexEl.value = _ga[i].hex8;
   }
