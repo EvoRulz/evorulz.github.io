@@ -1,4 +1,4 @@
-// @version 1435
+// @version 1436
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -424,7 +424,7 @@ el.innerHTML =
 `<button id="cp-copy" style="background:#2a2a2a;border:1px solid ${sb};border-radius:4px;color:#aaa;cursor:pointer;padding:4px 8px;font-size:12px;flex-shrink:0;">Copy</button>` +
 `</div>`;
 el.querySelectorAll('.cp-field-label').forEach(function(label) {
-  const grad = c.textStops ? mo._gBuildCSS(c.textStops) : null;
+  const grad = c.textStops ? mo._gBuildCSS(c.textStops, null, c.textMode || 'linear') : null;
   if (grad) {
     label.style.background = grad;
     label.style.webkitBackgroundClip = 'text';
