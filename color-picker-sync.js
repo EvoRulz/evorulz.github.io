@@ -1,7 +1,12 @@
-// @version 1433
+// @version 1434
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
+  if (c.bgMode && window._cpSetGradientMode) window._cpSetGradientMode('s-cp-bg', c.bgMode);
+  if (c.borderMode && window._cpSetGradientMode) window._cpSetGradientMode('s-cp-border', c.borderMode);
+  if (c.labelMode && window._cpSetGradientMode) window._cpSetGradientMode('s-cp-label', c.labelMode);
+  if (c.textMode && window._cpSetGradientMode) window._cpSetGradientMode('s-cp-text', c.textMode);
+  if (c.labelBorderMode && window._cpSetGradientMode) window._cpSetGradientMode('s-cp-label-outline', c.labelBorderMode);
   if (c.bgStops && window._cpSetGradientStops) {
     window._cpSetGradientStops('s-cp-bg', c.bgStops);
     const _bgOv = document.getElementById('s-cp-bg-swatch-overlay');
@@ -72,12 +77,17 @@ window._cpSaveFromUI = function () {
     labelSize: (function(){ const el = document.getElementById('s-cp-label-size'); return el ? parseInt(el.value) : 8; })(),
     labelStroke: (function(){ const el = document.getElementById('s-cp-label-stroke'); return el ? parseFloat(el.value) / 10 : 0.5; })(),
     labelFont: (function(){ const el = document.getElementById('s-cp-label-font'); return el ? el.value : 'sans-serif'; })(),
+    textMode:        window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-text')          : 'solid',
+    labelMode:       window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-label')         : 'solid',
+    bgMode:          window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-bg')            : 'solid',
+    borderMode:      window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-border')        : 'solid',
+    labelBorderMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-label-outline') : 'solid',
   }));
   window._applyLabelToSwatches();
 };
 window._applyLabelToSwatches = function _applyLabelToSwatches() {
   const c = window._cpCfg();
-  const fillGrad = c.labelStops ? window._cpBuildCSS(c.labelStops) : (c.label && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
+  const fillGrad = c.labelStops ? window._cpBuildCSS(c.labelStops, null, c.labelMode || 'linear') : (c.label && typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
   const outlineColor = c.labelOutline ? window._cpH8css(c.labelOutline) : 'rgba(0,0,0,1)';
   const outlineGrad = c.labelBorderStops ? window._cpBuildCSS(c.labelBorderStops) : null;
   const _szEl = document.getElementById('s-cp-label-size');
@@ -357,9 +367,9 @@ function buildPopup() {
   const brIsGrad = c.border && typeof c.border === 'string' && (c.border.startsWith('linear-gradient') || c.border.startsWith('radial-gradient'));
   const br = brIsGrad ? c.border : mo.h8css(c.border);
   const bgLayer = brIsGrad ? (bgIsGrad ? bg : `linear-gradient(${bg}, ${bg})`) : bg;
-  const _lblGrad = c.labelStops ? mo._gBuildCSS(c.labelStops) : (typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
+  const _lblGrad = c.labelStops ? mo._gBuildCSS(c.labelStops, null, c.labelMode || 'linear') : (typeof c.label === 'string' && (c.label.startsWith('linear-gradient') || c.label.startsWith('radial-gradient'))) ? c.label : null;
+  const _txtGrad = c.textStops ? mo._gBuildCSS(c.textStops, null, c.textMode || 'linear') : (typeof c.text === 'string' && (c.text.startsWith('linear-gradient') || c.text.startsWith('radial-gradient'))) ? c.text : null;
   const lbl = _lblGrad || mo.h8css(typeof c.label === 'string' ? c.label : '#bbbbbbFF');
-  const _txtGrad = c.textStops ? mo._gBuildCSS(c.textStops) : (typeof c.text === 'string' && (c.text.startsWith('linear-gradient') || c.text.startsWith('radial-gradient'))) ? c.text : null;
   const txt = _txtGrad || mo.h8css(typeof c.text === 'string' ? c.text : '#FFFFFFFF');
   const sb = mo.h8css((typeof btnStyle !== 'undefined' && btnStyle.sliderBorder) || '#555555FF');
   injectThumbCSS(v);
