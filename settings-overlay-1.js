@@ -1,4 +1,4 @@
-// @version 1450
+// @version 1451
 document.body.insertAdjacentHTML('beforeend', `
 <!-- Settings overlay -->
 <div id="settings-overlay">
@@ -18,7 +18,8 @@ document.body.insertAdjacentHTML('beforeend', `
       <div id="cf-outer" style="margin-left:-20px;margin-right:-20px;">
         <div id="cf-stage"></div>
       </div>
-      <div id="cf-select-bar" style="display:flex;align-items:center;gap:8px;padding:6px 0 2px 0;flex-wrap:wrap;">
+      <div id="cf-select-bar" style="display:flex;align-items:center;gap:8px;padding:6px 0 4px 0;flex-wrap:wrap;">
+        <div id="cf-sel-count" style="font-size:11px;color:#555;min-height:13px;flex-shrink:0;"></div>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-all" style="width:14px;height:14px;margin:0;cursor:pointer;"> Select All</label>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-current" style="width:14px;height:14px;margin:0;cursor:pointer;"> Select</label>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-group" style="width:14px;height:14px;margin:0;cursor:pointer;"> Group:</label>
@@ -27,7 +28,6 @@ document.body.insertAdjacentHTML('beforeend', `
           <div id="cf-group-dropdown" style="display:none;position:fixed;background:#1a1a1a;border:1px solid #555;border-radius:6px;z-index:99999;overflow-y:auto;max-height:200px;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,0.7);"></div>
         </div>
       </div>
-      <div id="cf-sel-count" style="font-size:11px;color:#555;min-height:13px;padding-bottom:4px;"></div>
       <div class="color-settings-row" data-btn-row="bg">
         <label>Background color</label>
         <div class="color-picker-row">
