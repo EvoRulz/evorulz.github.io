@@ -1,4 +1,4 @@
-// @version 1455
+// @version 1456
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -341,6 +341,7 @@ window._cpMod = {
     _gMinus:          ()     => _gMinus(),
     _cpRefreshSwatch: ()     => _cpRefreshSwatch(),
   };
+  window._cpClearGradient    = function(id) { _gd[id] = null; _gdRadial[id] = null; _gdConic[id] = null; _gMode[id] = 'solid'; };
   window._cpH8css            = h8css;
   window._cpBuildCSS         = _gBuildCSS;
   window._cpCfg              = cpCfg;
