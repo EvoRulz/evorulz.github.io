@@ -1,4 +1,4 @@
-// @version 1452
+// @version 1453
 /// ── Drag-to-reorder — HABIT BUTTONS ──────────────────────
 const DRAG_THRESHOLD = 6;
 var drag = null;
@@ -96,7 +96,7 @@ function toggleHabits() {
   applyBtnStyle();
   if (window._cfBuild) {
     const newItems = window._cfItems();
-    const targetId = habitsVisible ? 'top-hide-habits' : 'top-show-habits';
+    const targetId = 'top-hide-habits';
     const newIdx = newItems.findIndex(it => it.id === targetId);
     if (newIdx !== -1 && window._cfSetIdx) window._cfSetIdx(newIdx);
     window._cfBuild();

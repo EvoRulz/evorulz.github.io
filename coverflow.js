@@ -1,4 +1,4 @@
-// @version 1452
+// @version 1453
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -57,8 +57,7 @@ function cfSyncTuningUI() {
     items.push({ id: 'top-time',           label: 'Time',           isTopGrid: true });
     items.push({ id: 'top-version',        label: 'Version',        isTopGrid: true });
     items.push({ id: 'top-settings',       label: 'Settings',       isTopGrid: true });
-    const _habitsItemId = _cfHabitsFlipped ? 'top-show-habits' : 'top-hide-habits';
-    items.push({ id: _habitsItemId, label: _cfHabitsFlipped ? 'Show Habits' : 'Hide Habits', isTopGrid: true });
+    items.push({ id: 'top-hide-habits', label: _cfHabitsFlipped ? 'Show Habits' : 'Hide Habits', isTopGrid: true });
     items.push({ id: 'top-manage-habits', label: 'Manage Habits', isTopGrid: true });
     items.push({ id: _orientLocked ? 'top-orient-lock-locked' : 'top-orient-lock', label: _orientLocked ? 'Unlock Orient' : 'Lock Orient', isTopGrid: true });
   // Add habit buttons
