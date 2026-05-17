@@ -1,4 +1,4 @@
-// @version 1441
+// @version 1442
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -411,4 +411,16 @@ window.addEventListener('load', function() {
   });
   applySwatchOrder();
 })();
-
+(function() {
+  var _soSafeTimer = null;
+  document.addEventListener('pointerdown', function() {
+    clearTimeout(_soSafeTimer);
+  }, { passive: true });
+  document.addEventListener('pointerup', function() {
+    clearTimeout(_soSafeTimer);
+    _soSafeTimer = setTimeout(function() {
+      var _so = document.getElementById('settings-overlay');
+      if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
+    }, 400);
+  }, { passive: true });
+})();
