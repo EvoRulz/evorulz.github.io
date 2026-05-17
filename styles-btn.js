@@ -1,4 +1,4 @@
-// @version 1453
+// @version 1454
   const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16, fgStroke: '#00000000', fgStrokeW: 0, fontSize: 16, fontWeight: 400, fontScaleX: 100, border: '#00000000', activeBorder: '#00000000' };
   let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
   try {
@@ -98,6 +98,7 @@
       'top-date':          { bg: '#00000000', fg: '#666666FF', glow: '#00000000' },
       'top-time':          { bg: '#00000000', fg: '#666666FF', glow: '#00000000' },
       'top-manage-habits': { bg: '#444444FF', fg: '#FFFFFFFF' },
+      'top-show-habits':   { bg: '#444444FF', fg: '#FFFFFFFF' },
       'top-orient-lock':        { bg: '#2a2a2aFF', fg: '#999999FF', glow: '#00000000' },
       'top-orient-lock-locked': { bg: '#2a2a2aFF', fg: '#99ff99FF', glow: '#00000000' },
       'sg-buttons':       { bg: '#2a2a2aFF', fg: '#aaaaaaFF', glow: '#00000000', border: '#444444FF' },
@@ -307,13 +308,14 @@ window._applyTextStyle = _applyTextStyle;
     }
     const _habEl = document.querySelector('.top-item[data-item="hide-habits"]');
     if (_habEl) {
-      const _hs = _btnStyleFor('top-hide-habits');
+      const _habStyleId = (typeof habitsVisible !== 'undefined' && !habitsVisible) ? 'top-show-habits' : 'top-hide-habits';
+      const _hs = _btnStyleFor(_habStyleId);
       _habEl.style.setProperty('--hide-habits-bg',   _bgCss(_hs.bg));
       _habEl.style.setProperty('--hide-habits-fg',   hex8ToCss(_hs.fg));
       _habEl.style.setProperty('--hide-habits-font', _hs.font);
       _habEl.style.setProperty('--hide-habits-glow', hex8ToCss(_hs.glow || '#00000000'));
       const _habBtn = _habEl.querySelector('button');
-      const _habRadius = _btnStyles['top-hide-habits']?.btnRadius ?? btnStyle.btnRadius ?? 6;
+      const _habRadius = _btnStyles[_habStyleId]?.btnRadius ?? btnStyle.btnRadius ?? 6;
       if (_habBtn) {
   _habBtn.style.borderRadius = _habRadius + 'px';
   _habBtn.style.fontSize = (_hs.fontSize ?? btnStyle.fontSize ?? 16) + 'px';
