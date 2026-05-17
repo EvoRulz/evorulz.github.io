@@ -1,11 +1,10 @@
-// @version 1443
+// @version 1444
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
 function saveSliderRowOrder() {
   const grid = document.getElementById('sg-sliders');
   if (!grid) return;
-  grid.style.touchAction = 'none';
   const order = [...grid.querySelectorAll('[data-slider-row]')].map(el => el.dataset.sliderRow);
   localStorage.setItem('_sliderRowOrder', JSON.stringify(order));
 }
@@ -32,7 +31,6 @@ function applySliderRowOrder() {
   if (!grid) return;
   function srCancel() {
     clearTimeout(srHoldTimer); srHoldTimer = null; srReady = false;
-    grid.style.touchAction = 'none';
     const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
     if (srDrag) {
       srDrag.item.style.boxShadow = '';
@@ -53,8 +51,6 @@ function applySliderRowOrder() {
       pointerId: e.pointerId,
     };
     srReady = false;
-    e.preventDefault();
-    const _srSo = document.getElementById('settings-overlay'); if (_srSo) { _srSo.style.overflowY = 'hidden'; _srSo.style.touchAction = 'none'; }
     if (e.target.closest('.slider-row-handle')) {
       srReady = true;
       srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
@@ -74,7 +70,7 @@ function applySliderRowOrder() {
     if (!srDrag) return;
     const moved = Math.hypot(e.clientX - srDrag.startX, e.clientY - srDrag.startY);
     if (!srReady) {
-      if (moved > 10) srCancel();
+      if (moved > 76) srCancel();
       return;
     }
     e.preventDefault();
@@ -139,7 +135,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   let rReady = false;
   const grid = document.getElementById(containerId);
   if (!grid) return;
-  grid.style.touchAction = 'none';
   function saveOrder() {
     const order = [...grid.querySelectorAll('[' + itemAttr + ']')].map(el => el.getAttribute(itemAttr));
     localStorage.setItem(saveKey, JSON.stringify(order));
@@ -159,7 +154,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   }
   function rCancel() {
     clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
-    grid.style.touchAction = 'none';
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     if (rDrag) {
       rDrag.item.style.opacity = '';
@@ -183,12 +177,9 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
       pointerId: e.pointerId,
     };
     rReady = false;
-    e.preventDefault();
     try { item.setPointerCapture(e.pointerId); } catch(_) {}
-    const _rsoI = document.getElementById('settings-overlay'); if (_rsoI) { _rsoI.style.overflowY = 'hidden'; _rsoI.style.touchAction = 'none'; }
     if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
       rReady = true;
-      grid.style.touchAction = 'none';
       item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
     } else {
       rHoldTimer = setTimeout(() => {
@@ -204,7 +195,7 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
     if (!rDrag) return;
     const moved = Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY);
     if (!rReady) {
-      if (moved > 10) rCancel();
+      if (moved > 76) rCancel();
       return;
     }
     e.preventDefault();
@@ -300,7 +291,7 @@ window.addEventListener('load', function() {
   let swDrag = null, swHoldTimer = null, swReady = false;
   const swGrid = document.getElementById('sg-swatches');
   if (!swGrid) return;
-  swGrid.style.touchAction = 'none';
+  const SW_SCROLL_THRESHOLD = 76;
   function swCancel() {
     clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
@@ -335,8 +326,6 @@ window.addEventListener('load', function() {
       w: rect.width, h: rect.height,
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
     };
-    e.preventDefault();
-    const _swSo = document.getElementById('settings-overlay'); if (_swSo) { _swSo.style.overflowY = 'hidden'; _swSo.style.touchAction = 'none'; }
     swHoldTimer = setTimeout(() => {
       if (swDrag) { swReady = true; swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)'; }
     }, 400);
@@ -344,7 +333,7 @@ window.addEventListener('load', function() {
   document.addEventListener('pointermove', e => {
     if (!swDrag) return;
     const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
-    if (!swReady) { if (moved > 10) swCancel(); return; }
+    if (!swReady) { if (moved > SW_SCROLL_THRESHOLD) swCancel(); return; }
     e.preventDefault();
     if (!swDrag.active) {
       if (moved < 6) return;

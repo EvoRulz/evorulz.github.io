@@ -1,4 +1,4 @@
-// @version 1443
+// @version 1444
 /// ── Drag-to-reorder — HABIT BUTTONS ──────────────────────
 const DRAG_THRESHOLD = 6;
 var drag = null;
@@ -127,7 +127,7 @@ sgGrid.addEventListener('pointerdown', e => {
 sgGrid.addEventListener('pointermove', e => {
   if (!sgDrag) return;
   if (!sgDrag.active) {
-    if (Math.hypot(e.clientX - sgDrag.startX, e.clientY - sgDrag.startY) < 14) return;
+    if (Math.hypot(e.clientX - sgDrag.startX, e.clientY - sgDrag.startY) < 76) return;
     sgDrag.active = true;
     e.preventDefault();
     const _so = document.getElementById('settings-overlay');
