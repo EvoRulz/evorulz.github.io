@@ -1,4 +1,4 @@
-// @version 1444
+// @version 1445
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -369,15 +369,17 @@ function cfBuild(){
     stage.appendChild(el);
   });
   cfRender();
-  stage.style.touchAction = 'none';
+  stage.style.touchAction = 'pan-y';
   if (_cfAnimId) { cancelAnimationFrame(_cfAnimId); _cfAnimId = null; }
   if (_cfPointerAC) _cfPointerAC.abort();
   _cfPointerAC = new AbortController();
   const sig = _cfPointerAC.signal;
   let dragStartX = null;
+  let dragStartY = null;
   let dragStartIdx = null;
   let displayIdx = cfIdx;
   let didDrag = false;
+  let dragAxis = null;
   function springTo(target) {
     if (_cfAnimId) cancelAnimationFrame(_cfAnimId);
     const startIdx = displayIdx;
@@ -402,11 +404,11 @@ function cfBuild(){
   }
   stage.addEventListener('pointerdown', e => {
     dragStartX = e.clientX;
+    dragStartY = e.clientY;
     dragStartIdx = displayIdx;
     didDrag = false;
+    dragAxis = null;
     if (_cfAnimId) { cancelAnimationFrame(_cfAnimId); _cfAnimId = null; }
-    stage.setPointerCapture(e.pointerId);
-    e.preventDefault();
         // flash the card closest to the tap point
     const stageRect = stage.getBoundingClientRect();
     const tapX = e.clientX - stageRect.left;
@@ -426,6 +428,14 @@ function cfBuild(){
   stage.addEventListener('pointermove', e => {
     if (dragStartX === null) return;
     const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    if (!dragAxis) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      dragAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+      if (dragAxis === 'y') return;
+      stage.setPointerCapture(e.pointerId);
+    }
+    if (dragAxis === 'y') return;
     if (Math.abs(dx) > 4) didDrag = true;
     if (!didDrag) return;
     e.preventDefault();
@@ -444,7 +454,9 @@ function cfBuild(){
     const wasDrag = didDrag;
     const upX = e.clientX;
     dragStartX = null;
+    dragStartY = null;
     didDrag = false;
+    dragAxis = null;
     const n = window._cfItems().length;
     const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
     cfIdx = target;
@@ -485,11 +497,15 @@ function cfBuild(){
   }, { signal: sig });
   stage.addEventListener('pointercancel', () => {
     if (dragStartX === null) return;
+    [...stage.querySelectorAll('.cf-item')].forEach(el => {
+      const _id = window._cfItems()[parseInt(el.dataset.cfI)]?.id;
+      if (_id) { const _s = _btnStyleFor(_id); el.style.background = hex8ToCss(_s.bg); }
+    });
     const n = window._cfItems().length;
     const target = Math.max(0, Math.min(Math.round(displayIdx), n - 1));
     cfIdx = target;
     springTo(target);
-    dragStartX = null; didDrag = false; dragStartIdx = null;
+    dragStartX = null; dragStartY = null; didDrag = false; dragStartIdx = null; dragAxis = null;
   }, { signal: sig });
 }
 window._cfBuild = function() { cfBuild(); cfLoadPickersForId(cfActiveId()); };
