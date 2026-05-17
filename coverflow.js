@@ -1,4 +1,4 @@
-// @version 1446
+// @version 1447
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -359,7 +359,8 @@ function cfBuild(){
       } else if (items[i].id === 'top-manage-habits') {
         manageOpen();
       } else if (items[i].id === 'top-hide-habits' || items[i].id === 'top-show-habits') {
-        toggleHabits();
+        cfRender();
+        cfLoadPickersForId(cfActiveId());
       } else if (items[i].id === 'top-orient-lock' || items[i].id === 'top-orient-lock-locked') {
         _orientLocked = !_orientLocked; document.getElementById('orient-lock-icon').innerHTML = _orientLocked ? _LOCK_PATH : _UNLOCK_PATH; cfBuild(); cfLoadPickersForId(cfActiveId());
       } else {
@@ -483,7 +484,7 @@ function cfBuild(){
         manageOpen();
         cfLoadPickersForId(cfActiveId());
       } else if (tappedItem && (tappedItem.id === 'top-hide-habits' || tappedItem.id === 'top-show-habits')) {
-        toggleHabits();
+        springTo(closest);
         cfLoadPickersForId(cfActiveId());
       } else if (tappedItem && (tappedItem.id === 'top-orient-lock' || tappedItem.id === 'top-orient-lock-locked')) {
         _orientLocked = !_orientLocked; document.getElementById('orient-lock-icon').innerHTML = _orientLocked ? _LOCK_PATH : _UNLOCK_PATH; cfBuild(); cfLoadPickersForId(cfActiveId());
