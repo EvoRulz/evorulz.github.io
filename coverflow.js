@@ -1,4 +1,4 @@
-// @version 1449
+// @version 1450
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -286,7 +286,7 @@ function cfSyncTuningUI() {
         el.style.padding = '0';
         el.innerHTML = '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:currentColor">' + (_locked ? _lockPath : _unlockPath) + '</svg>';
       } else {
-        const styleId = items[i].id === 'top-hide-habits' ? (habitsVisible ? 'top-hide-habits' : 'top-show-habits') : items[i].id;
+        const styleId = (items[i].id === 'top-hide-habits' || items[i].id === 'top-show-habits') ? (habitsVisible ? 'top-hide-habits' : 'top-show-habits') : items[i].id;
         const s2 = _btnStyleFor(styleId);
         el.style.background = _bgCss(s2.bg);
         el.style.color      = hex8ToCss(s2.fg);
