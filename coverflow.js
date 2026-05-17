@@ -1,4 +1,4 @@
-// @version 1445
+// @version 1446
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -161,6 +161,7 @@ function cfSyncTuningUI() {
     document.querySelectorAll('.alpha-slider:not([id$="-alpha"])').forEach(s => updateSliderFill(s));
     if (window.fontPickerSync) fontPickerSync();
     settingsUpdatePreview();
+    if (window._onCfItemChange) window._onCfItemChange(id);
   }
   function cfRenderAt(idx) {
     const _saved = cfIdx;
@@ -531,4 +532,124 @@ document.getElementById("settings-cancel").addEventListener("click", e => {
 document.getElementById("settings-reset").addEventListener("click", e => {
   e.stopPropagation();
 });
+// ── Coverflow selection & group management ─────────────────
+window._cfSelection = new Set();
+function _cfDefaultGroups() {
+  return {
+    main: ['top-export-all','top-import-all','top-export-layout','top-import-layout','top-clear-all','top-my-files','top-hard-reload','top-date','top-time','top-version','top-settings','top-hide-habits','top-manage-habits','top-orient-lock'],
+    habits: typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.map(function(c){return c.id;}) : [],
+    settings: ['sg-buttons','sg-sliders','sg-clock','sg-checkboxes','sg-app','sg-tables','sg-notifications','sg-swatches','sg-toggles'],
+  };
+}
+function _cfGetGroups() {
+  var g = _cfDefaultGroups();
+  try {
+    var s = JSON.parse(localStorage.getItem('_cfGroups'));
+    if (s && typeof s === 'object') { for (var k in s) { if (k !== 'habits') g[k] = s[k]; } }
+  } catch(e) {}
+  g.habits = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.map(function(c){return c.id;}) : g.habits;
+  return g;
+}
+function _cfPersistGroup(name, ids) {
+  var s = {}; try { s = JSON.parse(localStorage.getItem('_cfGroups')) || {}; } catch(e) {}
+  s[name] = ids; localStorage.setItem('_cfGroups', JSON.stringify(s));
+}
+function _cfRemoveGroup(name) {
+  var s = {}; try { s = JSON.parse(localStorage.getItem('_cfGroups')) || {}; } catch(e) {}
+  delete s[name]; localStorage.setItem('_cfGroups', JSON.stringify(s));
+}
+function _cfUpdateSelectBar() {
+  var allCb = document.getElementById('cf-sel-all');
+  var curCb = document.getElementById('cf-sel-current');
+  var cntEl = document.getElementById('cf-sel-count');
+  if (!allCb) return;
+  var activeId = window._cfActiveId ? window._cfActiveId() : null;
+  var items = window._cfItems ? window._cfItems() : [];
+  var allIds = items.map(function(i){return i.id;});
+  var selCount = allIds.filter(function(id){return window._cfSelection.has(id);}).length;
+  allCb.indeterminate = selCount > 0 && selCount < allIds.length;
+  allCb.checked = allIds.length > 0 && selCount === allIds.length;
+  if (curCb && activeId) curCb.checked = window._cfSelection.has(activeId);
+  if (cntEl) cntEl.textContent = window._cfSelection.size > 0 ? window._cfSelection.size + ' selected' : '';
+}
+function _cfPopulateGroupSelect() {
+  var sel = document.getElementById('cf-group-select');
+  if (!sel) return;
+  var groups = _cfGetGroups();
+  var prev = sel.value;
+  sel.innerHTML = '';
+  Object.keys(groups).forEach(function(name) {
+    var opt = document.createElement('option');
+    opt.value = name; opt.textContent = name; sel.appendChild(opt);
+  });
+  if (prev && groups[prev]) sel.value = prev;
+  else if (sel.options.length) sel.value = sel.options[0].value;
+}
+window._onCfItemChange = _cfUpdateSelectBar;
+(function() {
+  var allCb  = document.getElementById('cf-sel-all');
+  var curCb  = document.getElementById('cf-sel-current');
+  var grpCb  = document.getElementById('cf-sel-group');
+  var grpSel = document.getElementById('cf-group-select');
+  var savBtn = document.getElementById('cf-group-save-btn');
+  var newBtn = document.getElementById('cf-group-new-btn');
+  var delBtn = document.getElementById('cf-group-del-btn');
+  if (!allCb) return;
+  _cfPopulateGroupSelect();
+  allCb.addEventListener('change', function() {
+    var items = window._cfItems ? window._cfItems() : [];
+    if (this.checked) items.forEach(function(i){ window._cfSelection.add(i.id); });
+    else window._cfSelection.clear();
+    if (grpCb) grpCb.checked = false;
+    _cfUpdateSelectBar();
+  });
+  curCb.addEventListener('change', function() {
+    var id = window._cfActiveId ? window._cfActiveId() : null;
+    if (!id) return;
+    if (this.checked) window._cfSelection.add(id);
+    else window._cfSelection.delete(id);
+    _cfUpdateSelectBar();
+  });
+  grpCb.addEventListener('change', function() {
+    var name = grpSel ? grpSel.value : null;
+    if (!name) return;
+    var ids = (_cfGetGroups()[name] || []);
+    if (this.checked) ids.forEach(function(id){ window._cfSelection.add(id); });
+    else ids.forEach(function(id){ window._cfSelection.delete(id); });
+    _cfUpdateSelectBar();
+  });
+  if (grpSel) grpSel.addEventListener('change', function() {
+    if (grpCb && grpCb.checked) grpCb.dispatchEvent(new Event('change'));
+  });
+  if (savBtn) savBtn.addEventListener('click', function() {
+    var name = grpSel ? grpSel.value : null;
+    if (!name) return;
+    _cfPersistGroup(name, Array.from(window._cfSelection));
+    var btn = this; btn.textContent = 'Saved';
+    setTimeout(function(){ btn.textContent = 'Save'; }, 900);
+  });
+  if (newBtn) newBtn.addEventListener('click', function() {
+    var name = (prompt('New group name:') || '').trim();
+    if (!name) return;
+    _cfPersistGroup(name, Array.from(window._cfSelection));
+    _cfPopulateGroupSelect();
+    if (grpSel) grpSel.value = name;
+    var btn = this; btn.textContent = 'Created';
+    setTimeout(function(){ btn.textContent = 'New'; }, 900);
+  });
+  if (delBtn) delBtn.addEventListener('click', function() {
+    var name = grpSel ? grpSel.value : null;
+    if (!name) return;
+    _cfRemoveGroup(name);
+    _cfPopulateGroupSelect();
+    window._cfSelection.clear();
+    _cfUpdateSelectBar();
+  });
+  var _cfBuildOrig = window._cfBuild;
+  window._cfBuild = function() {
+    if (_cfBuildOrig) _cfBuildOrig();
+    _cfPopulateGroupSelect();
+    _cfUpdateSelectBar();
+  };
+})();
 

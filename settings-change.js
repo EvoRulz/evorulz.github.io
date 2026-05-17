@@ -1,4 +1,4 @@
-// @version 1445
+// @version 1446
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -347,6 +347,17 @@ function settingsChange() {
   if(_cdrIn && _cfId !== 'top-date') _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, { btnRadius: Number(_cdrIn.value) });
   if(_ctrIn && _cfId !== 'top-time') _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, { btnRadius: Number(_ctrIn.value) });
   _saveBtnStyles();
+  (function(){
+    var _msId = window._cfActiveId ? window._cfActiveId() : null;
+    if (!window._cfSelection || window._cfSelection.size <= 1 || !_msId) return;
+    if (_msId === 'top-date' || _msId === 'top-time') return;
+    var _src = _btnStyles[_msId]; if (!_src) return;
+    var _copy = JSON.parse(JSON.stringify(_src));
+    window._cfSelection.forEach(function(_sid) {
+      if (_sid === _msId || _sid === 'top-date' || _sid === 'top-time') return;
+      _btnStyles[_sid] = Object.assign(_btnStyles[_sid] || {}, _copy);
+    });
+  })();
   applyBtnStyle();
   if(window._cfRender) window._cfRender();
   if(window._tumblerRenderPreviews) window._tumblerRenderPreviews();
