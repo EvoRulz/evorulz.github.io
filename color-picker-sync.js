@@ -1,4 +1,4 @@
-// @version 1442
+// @version 1443
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -404,7 +404,7 @@ el.innerHTML =
 `<button id="cp-grad-plus"  style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid ${sb};border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>` +
 `</div>` +
 `<div id="cp-grad-deg-row" style="display:flex;align-items:center;gap:var(--slider-btn-gap,0px);">` +
-`<span id="cp-grad-deg-val" style="font-size:11px;${_txtGrad ? `background:${_txtGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;` : `color:${txt};`}min-width:32px;text-align:left;flex-shrink:0;">360\u00b0</span>` +
+`<span id="cp-grad-deg-val" class="cp-field-label" style="font-size:11px;${_txtGrad ? `background:${_txtGrad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;display:inline-block;` : `color:${txt};`}min-width:32px;text-align:left;flex-shrink:0;">360\u00b0</span>` +
 `<button id="cp-grad-deg-minus" style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid ${sb};border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">&#8722;</button>` +
 `<div style="position:relative;flex:1;min-width:0;"><input id="cp-grad-deg" type="range" min="0" max="360" value="360" style="width:100%;height:${v.height};border-radius:${v.spread}/${v.radius};border:1px solid ${sb};outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;touch-action:none;box-sizing:border-box;display:block;"></div>` +
 `<button id="cp-grad-deg-plus" style="background:var(--slider-btn-bg,#2a2a2a);border:1px solid ${sb};border-radius:var(--slider-btn-r,4px);color:var(--slider-btn-fg,#aaa);cursor:pointer;width:var(--slider-btn-w,22px);height:var(--slider-btn-h,22px);font-size:16px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;">+</button>` +
@@ -435,7 +435,13 @@ el.querySelectorAll('.cp-field-label').forEach(function(label) {
     label.style.marginBottom = '2px';
     label.style.display = 'inline-block';
   } else {
-    label.style.cssText = 'font-size:11px;color:' + (txt || 'rgba(255,255,255,1)') + ';margin-bottom:2px;';
+    label.style.fontSize = '11px';
+    label.style.color = txt || 'rgba(255,255,255,1)';
+    label.style.marginBottom = '2px';
+    label.style.background = '';
+    label.style.webkitBackgroundClip = '';
+    label.style.backgroundClip = '';
+    label.style.webkitTextFillColor = '';
   }
 });
 document.body.appendChild(el);
