@@ -1,4 +1,4 @@
-// @version 1447
+// @version 1448
 document.body.insertAdjacentHTML('beforeend', `
 <!-- Settings overlay -->
 <div id="settings-overlay">
@@ -22,10 +22,10 @@ document.body.insertAdjacentHTML('beforeend', `
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-all" style="width:14px;height:14px;margin:0;cursor:pointer;"> Select All</label>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-current" style="width:14px;height:14px;margin:0;cursor:pointer;"> Select</label>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-group" style="width:14px;height:14px;margin:0;cursor:pointer;"> Group:</label>
-        <select id="cf-group-select" style="background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:2px 6px;font-size:12px;outline:none;max-width:90px;"></select>
-        <button id="cf-group-save-btn" style="background:#1a2a1a;color:#99ff99;border:none;border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer;touch-action:manipulation;flex-shrink:0;">Save</button>
-        <button id="cf-group-new-btn" style="background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer;touch-action:manipulation;flex-shrink:0;">New</button>
-        <button id="cf-group-del-btn" style="background:#2a1a1a;color:#ff9999;border:none;border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer;touch-action:manipulation;flex-shrink:0;">Del</button>
+        <div id="cf-group-wrap" style="position:relative;flex:1;min-width:0;">
+          <input id="cf-group-input" type="text" placeholder="Group..." autocomplete="off" spellcheck="false" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:2px 6px;font-size:12px;outline:none;box-sizing:border-box;">
+          <div id="cf-group-dropdown" style="display:none;position:fixed;background:#1a1a1a;border:1px solid #555;border-radius:6px;z-index:99999;overflow-y:auto;max-height:200px;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,0.7);"></div>
+        </div>
       </div>
       <div id="cf-sel-count" style="font-size:11px;color:#555;min-height:13px;padding-bottom:4px;"></div>
       <div class="color-settings-row" data-btn-row="bg">

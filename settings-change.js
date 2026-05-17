@@ -1,4 +1,4 @@
-// @version 1447
+// @version 1448
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -498,6 +498,8 @@ async function settingsReset() {
   setColorValue('s-app-today-text', APP_STYLE_DEFAULTS.todayText);
   applyBtnStyle();
   window._clockSet([6, 1, 1, 1, 2, 1, 1, 0]);
+  window._workingCfGroups = {};
+  if (window._cfBuild) window._cfBuild();
   settingsUpdatePreview();
   if(window.fontPickerSync)fontPickerSync();
 }

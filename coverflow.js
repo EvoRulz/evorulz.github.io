@@ -1,4 +1,4 @@
-// @version 1447
+// @version 1448
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -535,6 +535,12 @@ document.getElementById("settings-reset").addEventListener("click", e => {
 });
 // ── Coverflow selection & group management ─────────────────
 window._cfSelection = new Set();
+if (!window._workingCfGroups) {
+  try {
+    var _wcgInit = JSON.parse(localStorage.getItem('_cfGroups'));
+    window._workingCfGroups = (_wcgInit && typeof _wcgInit === 'object') ? _wcgInit : {};
+  } catch(e) { window._workingCfGroups = {}; }
+}
 function _cfDefaultGroups() {
   return {
     main: ['top-export-all','top-import-all','top-export-layout','top-import-layout','top-clear-all','top-my-files','top-hard-reload','top-date','top-time','top-version','top-settings','top-hide-habits','top-manage-habits','top-orient-lock'],
@@ -544,20 +550,20 @@ function _cfDefaultGroups() {
 }
 function _cfGetGroups() {
   var g = _cfDefaultGroups();
-  try {
-    var s = JSON.parse(localStorage.getItem('_cfGroups'));
-    if (s && typeof s === 'object') { for (var k in s) { if (k !== 'habits') g[k] = s[k]; } }
-  } catch(e) {}
+  var custom = window._workingCfGroups || {};
+  for (var k in custom) { if (k !== 'habits') g[k] = custom[k]; }
   g.habits = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.map(function(c){return c.id;}) : g.habits;
   return g;
 }
 function _cfPersistGroup(name, ids) {
-  var s = {}; try { s = JSON.parse(localStorage.getItem('_cfGroups')) || {}; } catch(e) {}
-  s[name] = ids; localStorage.setItem('_cfGroups', JSON.stringify(s));
+  if (!window._workingCfGroups) window._workingCfGroups = {};
+  window._workingCfGroups[name] = ids;
+  if (typeof settingsChange === 'function') settingsChange();
 }
 function _cfRemoveGroup(name) {
-  var s = {}; try { s = JSON.parse(localStorage.getItem('_cfGroups')) || {}; } catch(e) {}
-  delete s[name]; localStorage.setItem('_cfGroups', JSON.stringify(s));
+  if (!window._workingCfGroups) return;
+  delete window._workingCfGroups[name];
+  if (typeof settingsChange === 'function') settingsChange();
 }
 function _cfUpdateSelectBar() {
   var allCb = document.getElementById('cf-sel-all');
@@ -574,83 +580,155 @@ function _cfUpdateSelectBar() {
   if (cntEl) cntEl.textContent = window._cfSelection.size > 0 ? window._cfSelection.size + ' selected' : '';
 }
 function _cfPopulateGroupSelect() {
-  var sel = document.getElementById('cf-group-select');
-  if (!sel) return;
-  var groups = _cfGetGroups();
-  var prev = sel.value;
-  sel.innerHTML = '';
-  Object.keys(groups).forEach(function(name) {
-    var opt = document.createElement('option');
-    opt.value = name; opt.textContent = name; sel.appendChild(opt);
-  });
-  if (prev && groups[prev]) sel.value = prev;
-  else if (sel.options.length) sel.value = sel.options[0].value;
+  var inp = document.getElementById('cf-group-input');
+  if (!inp || inp === document.activeElement) return;
+  if (window._cfCurrentGroup) {
+    var groups = _cfGetGroups();
+    if (!groups[window._cfCurrentGroup]) {
+      var keys = Object.keys(groups);
+      window._cfCurrentGroup = keys[0] || null;
+    }
+    inp.value = window._cfCurrentGroup || '';
+  }
 }
 window._onCfItemChange = _cfUpdateSelectBar;
 (function() {
   var allCb  = document.getElementById('cf-sel-all');
   var curCb  = document.getElementById('cf-sel-current');
   var grpCb  = document.getElementById('cf-sel-group');
-  var grpSel = document.getElementById('cf-group-select');
-  var savBtn = document.getElementById('cf-group-save-btn');
-  var newBtn = document.getElementById('cf-group-new-btn');
-  var delBtn = document.getElementById('cf-group-del-btn');
+  var grpInp = document.getElementById('cf-group-input');
+  var grpDdl = document.getElementById('cf-group-dropdown');
   if (!allCb) return;
-  _cfPopulateGroupSelect();
+  if (!window._cfCurrentGroup) {
+    var _ig = _cfGetGroups(); window._cfCurrentGroup = Object.keys(_ig)[0] || null;
+  }
+  if (grpInp && window._cfCurrentGroup) grpInp.value = window._cfCurrentGroup;
+  function _autoSaveCurrentGroup() {
+    var name = window._cfCurrentGroup; if (!name) return;
+    if (_cfDefaultGroups()[name]) return;
+    _cfPersistGroup(name, Array.from(window._cfSelection));
+  }
+  function _openDdl() {
+    if (!grpDdl || !grpInp) return;
+    var groups = _cfGetGroups();
+    var query = (grpInp.value || '').trim().toLowerCase();
+    var keys = Object.keys(groups);
+    var filtered = query ? keys.filter(function(k){ return k.toLowerCase().indexOf(query) !== -1; }) : keys;
+    var rect = grpInp.getBoundingClientRect();
+    grpDdl.style.left = rect.left + 'px';
+    grpDdl.style.top = (rect.bottom + 2) + 'px';
+    grpDdl.style.width = Math.max(160, rect.width) + 'px';
+    grpDdl.innerHTML = '';
+    var defaults = _cfDefaultGroups();
+    filtered.forEach(function(name) {
+      var isDefault = !!defaults[name];
+      var item = document.createElement('div');
+      item.style.cssText = 'display:flex;align-items:center;padding:6px 10px;cursor:pointer;font-size:12px;color:#fff;gap:4px;';
+      var nameSpan = document.createElement('span');
+      nameSpan.textContent = name; nameSpan.style.flex = '1';
+      item.appendChild(nameSpan);
+      if (!isDefault) {
+        var xBtn = document.createElement('button');
+        xBtn.textContent = 'x';
+        xBtn.style.cssText = 'background:none;border:none;color:#666;cursor:pointer;font-size:11px;padding:0 2px;line-height:1;flex-shrink:0;';
+        xBtn.addEventListener('pointerenter', function(){ xBtn.style.color = '#ff9999'; });
+        xBtn.addEventListener('pointerleave', function(){ xBtn.style.color = '#666'; });
+        xBtn.addEventListener('pointerdown', function(e){ e.stopPropagation(); e.preventDefault(); });
+        xBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          _cfRemoveGroup(name);
+          if (window._cfCurrentGroup === name) {
+            var ng = _cfGetGroups(); window._cfCurrentGroup = Object.keys(ng)[0] || null;
+            if (grpInp) grpInp.value = window._cfCurrentGroup || '';
+          }
+          _openDdl(); _cfUpdateSelectBar();
+        });
+        item.appendChild(xBtn);
+      }
+      item.addEventListener('pointerdown', function(e){ e.preventDefault(); });
+      item.addEventListener('pointerenter', function(){ item.style.background = '#2a2a2a'; });
+      item.addEventListener('pointerleave', function(){ item.style.background = ''; });
+      item.addEventListener('click', function() {
+        window._cfCurrentGroup = name; grpInp.value = name; grpDdl.style.display = 'none';
+        var ids = (_cfGetGroups()[name] || []);
+        window._cfSelection.clear();
+        ids.forEach(function(id){ window._cfSelection.add(id); });
+        grpCb.checked = true; _cfUpdateSelectBar();
+      });
+      grpDdl.appendChild(item);
+    });
+    var typed = (grpInp.value || '').trim();
+    var exactMatch = keys.find(function(k){ return k.toLowerCase() === typed.toLowerCase(); });
+    if (typed && !exactMatch) {
+      var createItem = document.createElement('div');
+      createItem.style.cssText = 'padding:6px 10px;cursor:pointer;font-size:12px;color:#99ccff;';
+      createItem.textContent = '+ Create "' + typed + '"';
+      createItem.addEventListener('pointerdown', function(e){ e.preventDefault(); });
+      createItem.addEventListener('pointerenter', function(){ createItem.style.background = '#2a2a2a'; });
+      createItem.addEventListener('pointerleave', function(){ createItem.style.background = ''; });
+      createItem.addEventListener('click', function() {
+        var newName = (grpInp.value || '').trim(); if (!newName) return;
+        _cfPersistGroup(newName, Array.from(window._cfSelection));
+        window._cfCurrentGroup = newName; grpInp.value = newName;
+        grpDdl.style.display = 'none'; _cfUpdateSelectBar();
+      });
+      grpDdl.appendChild(createItem);
+    }
+    grpDdl.style.display = grpDdl.children.length ? 'block' : 'none';
+  }
+  function _closeDdl() { if (grpDdl) grpDdl.style.display = 'none'; }
+  if (grpInp) {
+    grpInp.addEventListener('focus', _openDdl);
+    grpInp.addEventListener('input', _openDdl);
+    grpInp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var name = (grpInp.value || '').trim(); if (!name) return;
+        var groups = _cfGetGroups();
+        var existing = Object.keys(groups).find(function(k){ return k.toLowerCase() === name.toLowerCase(); });
+        if (existing) { window._cfCurrentGroup = existing; grpInp.value = existing; }
+        else { _cfPersistGroup(name, Array.from(window._cfSelection)); window._cfCurrentGroup = name; }
+        _closeDdl(); _cfUpdateSelectBar();
+      } else if (e.key === 'Escape') {
+        grpInp.value = window._cfCurrentGroup || ''; _closeDdl();
+      }
+    });
+  }
+  document.addEventListener('pointerdown', function(e) {
+    if (!grpInp || !grpDdl) return;
+    if (!grpInp.contains(e.target) && !grpDdl.contains(e.target)) {
+      var name = (grpInp.value || '').trim();
+      if (name && name !== window._cfCurrentGroup) {
+        var groups = _cfGetGroups();
+        var existing = Object.keys(groups).find(function(k){ return k.toLowerCase() === name.toLowerCase(); });
+        if (existing) { window._cfCurrentGroup = existing; grpInp.value = existing; }
+        else { grpInp.value = window._cfCurrentGroup || ''; }
+      }
+      _closeDdl();
+    }
+  }, true);
   allCb.addEventListener('change', function() {
     var items = window._cfItems ? window._cfItems() : [];
     if (this.checked) items.forEach(function(i){ window._cfSelection.add(i.id); });
     else window._cfSelection.clear();
     if (grpCb) grpCb.checked = false;
-    _cfUpdateSelectBar();
+    _autoSaveCurrentGroup(); _cfUpdateSelectBar();
   });
   curCb.addEventListener('change', function() {
-    var id = window._cfActiveId ? window._cfActiveId() : null;
-    if (!id) return;
-    if (this.checked) window._cfSelection.add(id);
-    else window._cfSelection.delete(id);
-    _cfUpdateSelectBar();
+    var id = window._cfActiveId ? window._cfActiveId() : null; if (!id) return;
+    if (this.checked) window._cfSelection.add(id); else window._cfSelection.delete(id);
+    _autoSaveCurrentGroup(); _cfUpdateSelectBar();
   });
   grpCb.addEventListener('change', function() {
-    var name = grpSel ? grpSel.value : null;
-    if (!name) return;
+    var name = window._cfCurrentGroup; if (!name) return;
     var ids = (_cfGetGroups()[name] || []);
     if (this.checked) ids.forEach(function(id){ window._cfSelection.add(id); });
     else ids.forEach(function(id){ window._cfSelection.delete(id); });
     _cfUpdateSelectBar();
   });
-  if (grpSel) grpSel.addEventListener('change', function() {
-    if (grpCb && grpCb.checked) grpCb.dispatchEvent(new Event('change'));
-  });
-  if (savBtn) savBtn.addEventListener('click', function() {
-    var name = grpSel ? grpSel.value : null;
-    if (!name) return;
-    _cfPersistGroup(name, Array.from(window._cfSelection));
-    var btn = this; btn.textContent = 'Saved';
-    setTimeout(function(){ btn.textContent = 'Save'; }, 900);
-  });
-  if (newBtn) newBtn.addEventListener('click', function() {
-    var name = (prompt('New group name:') || '').trim();
-    if (!name) return;
-    _cfPersistGroup(name, Array.from(window._cfSelection));
-    _cfPopulateGroupSelect();
-    if (grpSel) grpSel.value = name;
-    var btn = this; btn.textContent = 'Created';
-    setTimeout(function(){ btn.textContent = 'New'; }, 900);
-  });
-  if (delBtn) delBtn.addEventListener('click', function() {
-    var name = grpSel ? grpSel.value : null;
-    if (!name) return;
-    _cfRemoveGroup(name);
-    _cfPopulateGroupSelect();
-    window._cfSelection.clear();
-    _cfUpdateSelectBar();
-  });
   var _cfBuildOrig = window._cfBuild;
   window._cfBuild = function() {
     if (_cfBuildOrig) _cfBuildOrig();
-    _cfPopulateGroupSelect();
-    _cfUpdateSelectBar();
+    _cfPopulateGroupSelect(); _cfUpdateSelectBar();
   };
 })();
 

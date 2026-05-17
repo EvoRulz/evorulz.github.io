@@ -1,4 +1,4 @@
-// @version 1447
+// @version 1448
 // ── Settings open/close/save/cancel/reset/export/import ───
 let _appStyleSnapshot = null;
 let _clockSnapshot    = null;
@@ -55,6 +55,7 @@ function _captureStyleSnapshot() {
     appStyle: Object.assign({}, appStyle, { stops: appStyle.stops.slice(), imgData: appStyle.imgData }),
     clock: window._clockGet().tumblerCfg.slice(),
     cpSettings: (function(){ try { return JSON.parse(localStorage.getItem('_cpSettings')); } catch(e) { return null; } })(),
+    cfGroups: JSON.parse(JSON.stringify(window._workingCfGroups || {})),
   };
 }
 function _updateUndoRedoBtns() { _updateSettingsBtns(); }
@@ -175,6 +176,10 @@ function _applyStyleSnapshot(snap) {
     if (snap.cpSettings) { localStorage.setItem('_cpSettings', JSON.stringify(snap.cpSettings)); } else { localStorage.removeItem('_cpSettings'); }
     if (window._cpSyncUI) window._cpSyncUI();
     if (window._cpRefresh) window._cpRefresh(); else if (window._cpRebuild) window._cpRebuild();
+  }
+  if (snap.cfGroups !== undefined) {
+    window._workingCfGroups = JSON.parse(JSON.stringify(snap.cfGroups));
+    if (window._cfBuild) window._cfBuild();
   }
   if (document.getElementById('settings-overlay').classList.contains('active')) {
     _syncSettingsPanelUI();
@@ -446,6 +451,7 @@ async function settingsSave() {
     try { await ImgDB.del("bgImage"); } catch {}
   }
   localStorage.setItem("_clockTumbler", JSON.stringify(window._clockGet().tumblerCfg));
+  localStorage.setItem("_cfGroups", JSON.stringify(window._workingCfGroups || {}));
   applyBtnStyle();
   applyAppStyle();
 }
