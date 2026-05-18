@@ -1,4 +1,4 @@
-// @version 1463
+// @version 1464
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -9,6 +9,7 @@ window._cpSyncUI = function () {
   if (c.labelBorderMode && window._cpSetGradientMode) window._cpSetGradientMode('s-cp-label-outline', c.labelBorderMode);
   if (c.bgStops && window._cpSetGradientStops) {
     window._cpSetGradientStops('s-cp-bg', c.bgStops);
+    if (c.bgDeg != null && window._cpSetGradientDeg) window._cpSetGradientDeg('s-cp-bg', c.bgDeg);
     const _bgOv = document.getElementById('s-cp-bg-swatch-overlay');
     if (_bgOv) { const _g = window._cpGetGradient('s-cp-bg'); if (_g) _bgOv.style.background = _g; }
   } else {
@@ -16,6 +17,7 @@ window._cpSyncUI = function () {
   }
   if (c.borderStops && window._cpSetGradientStops) {
     window._cpSetGradientStops('s-cp-border', c.borderStops);
+    if (c.borderDeg != null && window._cpSetGradientDeg) window._cpSetGradientDeg('s-cp-border', c.borderDeg);
     const _brOv = document.getElementById('s-cp-border-swatch-overlay');
     if (_brOv) { const _g = window._cpGetGradient('s-cp-border'); if (_g) _brOv.style.background = _g; }
   } else {
@@ -29,6 +31,7 @@ window._cpSyncUI = function () {
   }
   if (c.labelBorderStops && window._cpSetGradientStops) {
     window._cpSetGradientStops('s-cp-label-outline', c.labelBorderStops);
+    if (c.labelBorderDeg != null && window._cpSetGradientDeg) window._cpSetGradientDeg('s-cp-label-outline', c.labelBorderDeg);
     const _lbOv = document.getElementById('s-cp-label-outline-swatch-overlay');
     if (_lbOv) { const _g = window._cpGetGradient('s-cp-label-outline'); if (_g) _lbOv.style.background = _g; }
   } else if (c.labelBorder) {
@@ -36,6 +39,7 @@ window._cpSyncUI = function () {
   }
   if (c.labelStops && window._cpSetGradientStops) {
     window._cpSetGradientStops('s-cp-label', c.labelStops);
+    if (c.labelDeg != null && window._cpSetGradientDeg) window._cpSetGradientDeg('s-cp-label', c.labelDeg);
     const _lbOv = document.getElementById('s-cp-label-swatch-overlay');
     if (_lbOv) { const _g = window._cpGetGradient('s-cp-label'); if (_g) _lbOv.style.background = _g; }
   } else {
@@ -43,6 +47,7 @@ window._cpSyncUI = function () {
   }
   if (c.textStops && window._cpSetGradientStops) {
     window._cpSetGradientStops('s-cp-text', c.textStops);
+    if (c.textDeg != null && window._cpSetGradientDeg) window._cpSetGradientDeg('s-cp-text', c.textDeg);
     const _txOv = document.getElementById('s-cp-text-swatch-overlay');
     if (_txOv) { const _g = window._cpGetGradient('s-cp-text'); if (_g) _txOv.style.background = _g; }
   } else {
@@ -82,6 +87,11 @@ window._cpSaveFromUI = function () {
     bgMode:          window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-bg')            : 'solid',
     borderMode:      window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-border')        : 'solid',
     labelBorderMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-cp-label-outline') : 'solid',
+    bgDeg:          window._cpGetGradientDeg ? window._cpGetGradientDeg('s-cp-bg')            : 360,
+    borderDeg:      window._cpGetGradientDeg ? window._cpGetGradientDeg('s-cp-border')        : 360,
+    labelDeg:       window._cpGetGradientDeg ? window._cpGetGradientDeg('s-cp-label')         : 360,
+    textDeg:        window._cpGetGradientDeg ? window._cpGetGradientDeg('s-cp-text')          : 360,
+    labelBorderDeg: window._cpGetGradientDeg ? window._cpGetGradientDeg('s-cp-label-outline') : 360,
   }));
   window._applyLabelToSwatches();
 };
