@@ -1,4 +1,4 @@
-// @version 1462
+// @version 1463
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -92,7 +92,9 @@ function cfSyncTuningUI() {
     if (window._cpClearGradient) { window._cpClearGradient('s-bg'); window._cpClearGradient('s-fg'); window._cpClearGradient('s-fgstroke'); }
     setColorValue('s-bg',       s.bg);
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', s.bgStops || null, s.bgMode || 'solid');
-    if (window._cpSetGradientDeg) window._cpSetGradientDeg('s-bg', s.bgDeg ?? 360);
+    let _cfBgDeg = s.bgDeg ?? 360;
+    if (typeof s.bg === 'string') { const _m = s.bg.match(/linear-gradient\((-?\d+)deg/); if (_m) _cfBgDeg = parseInt(_m[1]); }
+    if (window._cpSetGradientDeg) window._cpSetGradientDeg('s-bg', _cfBgDeg);
     setColorValue('s-fg',       s.fg);
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null);
     const _sfgOv = document.getElementById('s-fg-swatch-overlay');
