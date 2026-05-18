@@ -1,4 +1,4 @@
-// @version 1467
+// @version 1468
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -117,6 +117,7 @@ function cfSyncTuningUI() {
     const _rVal = s.btnRadius ?? btnStyle.btnRadius ?? 6;
     const _rEl = document.getElementById("s-radius"); if (_rEl) _rEl.value = String(_rVal);
     const _rvEl = document.getElementById("s-radius-val"); if (_rvEl) _rvEl.textContent = _rVal + "px";
+    if (window._cpSetGradientStops && s.bgStops && s.bgMode && s.bgMode !== 'solid') window._cpSetGradientStops('s-bg', s.bgStops, s.bgMode);
     {
       const _sbOv = document.getElementById('s-bg-swatch-overlay');
       const _builtGrad = window._cpGetGradient ? window._cpGetGradient('s-bg') : null;
