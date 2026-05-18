@@ -1,4 +1,4 @@
-// @version 1459
+// @version 1460
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -345,7 +345,7 @@ window._cpMod = {
   window._cpH8css            = h8css;
   window._cpBuildCSS         = _gBuildCSS;
   window._cpCfg              = cpCfg;
-  window._cpGetGradient      = id => { const mode = _gMode[id]; if (mode === 'solid') return null; if (mode === 'radial') { const s = _gdRadial[id]; return s ? _gBuildCSS(s, null, 'radial') : null; } if (mode === 'conic') { const s = _gdConic[id]; return s ? _gBuildCSS(s, null, 'conic') : null; } const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id] ?? 90, 'linear') : null; };
+  window._cpGetGradient      = id => { const mode = _gMode[id]; if (mode === 'solid') return null; if (mode === 'radial') { const s = _gdRadial[id]; return s ? _gBuildCSS(s, null, 'radial') : null; } if (mode === 'conic') { const s = _gdConic[id]; return s ? _gBuildCSS(s, null, 'conic') : null; } const s = _gd[id]; return s ? _gBuildCSS(s, _gdeg[id] ?? 360, 'linear') : null; };
   window._cpGetGradientDeg   = id => _gdeg[id] ?? 360;
   window._cpSetGradientDeg   = (id, deg) => { _gdeg[id] = deg; };
   window._cpGetGradientStops = id => { const mode = _gMode[id]; if (mode === 'solid') return null; const s = mode === 'radial' ? _gdRadial[id] : mode === 'conic' ? _gdConic[id] : _gd[id]; return s ? s.map(x => ({...x})) : null; };

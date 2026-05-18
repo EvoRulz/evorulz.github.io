@@ -1,4 +1,4 @@
-// @version 1459
+// @version 1460
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -166,6 +166,9 @@ function settingsChange() {
       const dateColor = getColorValue('s-fg');
       _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
         bg: getStyleValue('s-bg'), fg: dateColor,
+        bgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-bg') : null,
+        bgMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-bg') : 'solid',
+        bgDeg: window._cpGetGradientDeg ? window._cpGetGradientDeg('s-bg') : 90,
         glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
         activeBg: getStyleValue('s-activebg'),
         tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
@@ -188,6 +191,9 @@ function settingsChange() {
       const timeColor = getColorValue('s-fg');
       _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, {
         bg: getStyleValue('s-bg'), fg: timeColor,
+        bgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-bg') : null,
+        bgMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-bg') : 'solid',
+        bgDeg: window._cpGetGradientDeg ? window._cpGetGradientDeg('s-bg') : 90,
         glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
         activeBg: getStyleValue('s-activebg'),
         tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
