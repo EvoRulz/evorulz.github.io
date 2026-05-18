@@ -1,4 +1,4 @@
-// @version 1460
+// @version 1461
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -92,7 +92,7 @@ function cfSyncTuningUI() {
     if (window._cpClearGradient) { window._cpClearGradient('s-bg'); window._cpClearGradient('s-fg'); window._cpClearGradient('s-fgstroke'); }
     setColorValue('s-bg',       s.bg);
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', s.bgStops || null, s.bgMode || 'solid');
-    if (window._cpSetGradientDeg) window._cpSetGradientDeg('s-bg', s.bgDeg ?? 90);
+    if (window._cpSetGradientDeg) window._cpSetGradientDeg('s-bg', s.bgDeg ?? 360);
     setColorValue('s-fg',       s.fg);
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null);
     const _sfgOv = document.getElementById('s-fg-swatch-overlay');

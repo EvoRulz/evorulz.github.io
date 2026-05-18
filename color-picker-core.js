@@ -1,4 +1,4 @@
-// @version 1460
+// @version 1461
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -116,7 +116,7 @@
       }
     }
     const _degSaveEl = popup && popup.querySelector('#cp-grad-deg');
-    if (inp && _degSaveEl) _gdeg[inp.id] = parseInt(_degSaveEl.value) || 90;
+    if (inp && _degSaveEl) { const _d = parseInt(_degSaveEl.value, 10); _gdeg[inp.id] = isNaN(_d) ? 360 : _d; }
   }
   function _gLoadHandle(i) {
     if (!_ga || !_ga[i] || _ga[i].isPercent) return;
