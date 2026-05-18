@@ -1,4 +1,4 @@
-// @version 1465
+// @version 1466
 const BTN_STYLE_DEFAULTS = { bg: "#444444FF", fg: "#FFFFFFFF", font: "sans-serif", glow: "#9659FFFF", activeGlow: "#9659FFFF", activeBg: "#555555FF", tap: "#FFFFFF40", tapHighlight: "#0000FFFF", btnRadius: 6, sliderBorder: "#555555FF", sliderHandleBorder: "#00000000", sliderH: 8, sliderR: 4, sliderW: 100, sliderHandleW: 16, checkboxChecked: "#90EE90FF", checkboxMark: "#000000FF", checkboxBorder: "#555555FF", checkboxBg: "#111111FF", sliderHandleHole: 0, sliderBtnGap: 0, sliderBtnBg: "#2a2a2aFF", sliderBtnFg: "#aaaaaaFF", sliderBtnBorder: "#555555FF", sliderBtnW: 22, sliderBtnH: 22, sliderBtnR: 4, clockDateColor: "#666666FF", clockTimeColor: "#666666FF", clockDateSize: 13, clockTimeSize: 13, clockBg: "#00000000", sliderHandleGlow: "#FFFFFF00", sliderHandleActiveGlow: "#FFFFFFD9", toggleOffBg: "#333333FF", toggleOnBg: "#1a5a1aFF", toggleSwitchOff: "#666666FF", toggleSwitchOn: "#99ff99FF", toggleBorderOff: "#555555FF", toggleBorderOn: "#2a7a2aFF", toggleW: 44, toggleH: 24, toggleSwitchSize: 16, fgStroke: '#00000000', fgStrokeW: 0, fontSize: 16, fontWeight: 400, fontScaleX: 100, border: '#00000000', activeBorder: '#00000000' };
 let btnStyle = Object.assign({}, BTN_STYLE_DEFAULTS);
 try {
@@ -123,7 +123,7 @@ function _applyTextStyle(el, s) {
   const _fgSv = s.fgStroke ?? btnStyle.fgStroke ?? '#00000000';
   const _strokeIsGrad = s.fgStrokeStops && s.fgStrokeStops.length >= 2;
   const strokeGrad = _strokeIsGrad
-  ? 'linear-gradient(to right,' + s.fgStrokeStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')'
+  ? ((typeof _fgSv === 'string' && (_fgSv.startsWith('radial-gradient') || _fgSv.startsWith('conic-gradient') || _fgSv.startsWith('linear-gradient'))) ? _fgSv : 'linear-gradient(to right,' + s.fgStrokeStops.map(st => hex8ToCss(st.hex8) + ' ' + (st.pos * 100).toFixed(1) + '%').join(',') + ')')
   : null;
   const strokeC = _strokeIsGrad
   ? 'transparent'
