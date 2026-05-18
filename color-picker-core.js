@@ -1,4 +1,4 @@
-// @version 1457
+// @version 1458
 // ── color-picker.js ────────────────────────────────────────
 (function () {
   function hsbToRgb(h, s, b) {
@@ -359,7 +359,7 @@ window._cpMod = {
     } else {
       _gd[id] = stops ? stops.map(s => ({...s})) : null;
       if (stops && stops.length >= 2) { if (_gMode[id] !== 'radial' && _gMode[id] !== 'conic') _gMode[id] = 'linear'; }
-      else if (!stops) { if (_gMode[id] !== 'radial' && _gMode[id] !== 'conic') _gMode[id] = 'solid'; }
+      else if (!stops && mode === undefined) { if (_gMode[id] !== 'radial' && _gMode[id] !== 'conic') _gMode[id] = 'solid'; }
     }
   };
   window._cpGetGradientMode  = id => _gMode[id] || 'solid';
