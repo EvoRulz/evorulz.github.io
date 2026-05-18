@@ -1,4 +1,4 @@
-// @version 1456
+// @version 1457
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -577,6 +577,13 @@ function openFor(swatch) {
   mo._gLoad();
   mo.popup = buildPopup();
   position(swatch);
+  const _initDegEl = mo.popup.querySelector('#cp-grad-deg');
+  if (_initDegEl && inp) {
+    const _storedDeg = window._cpGetGradientDeg ? window._cpGetGradientDeg(inp.id) : 360;
+    _initDegEl.value = String(_storedDeg);
+    const _initDegValEl = mo.popup.querySelector('#cp-grad-deg-val');
+    if (_initDegValEl) _initDegValEl.textContent = _storedDeg + '\u00b0';
+  }
   const _realAlpha = document.getElementById(inp.id + '-alpha');
   const _popupAlpha = mo.popup.querySelector('#cp-alpha');
   if (_realAlpha && _popupAlpha) _popupAlpha.value = _realAlpha.value;

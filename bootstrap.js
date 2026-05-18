@@ -1,4 +1,4 @@
-// @version 1456
+// @version 1457
   // ── Bootstrap ──────────────────────────────────────────────
 const buttonsEl  = document.getElementById("buttons");
 const sectionsEl = document.getElementById("sections");
@@ -75,7 +75,7 @@ function setActiveSection(targetId) {
     });
     btn.addEventListener('pointerup', (e) => {
       const _s = _btnStyleFor(config.id);
-      btn.style.background = hex8ToCss(_s.bg);
+      btn.style.background = _bgCss(_s.bg);
       const dist = (_tapX !== null) ? Math.hypot(e.clientX - _tapX, e.clientY - _tapY) : 999;
       _tapX = null; _tapY = null;
       if (dist > 10) {return;}
@@ -86,7 +86,7 @@ function setActiveSection(targetId) {
     });
     btn.addEventListener('pointercancel', () => {
       const _s = _btnStyleFor(config.id);
-      btn.style.background = hex8ToCss(_s.bg);
+      btn.style.background = _bgCss(_s.bg);
       _tapX = null; _tapY = null;
     });
     return btn;
