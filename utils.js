@@ -1,4 +1,4 @@
- // @version 1482
+ // @version 1483
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -211,7 +211,7 @@ function _applyZoom(ctx, zoom) {
     const c = document.getElementById('zoom-content');
     if (!c) return;
     if (zoom === 100) { c.style.transform = ''; c.style.transformOrigin = ''; c.style.height = ''; }
-    else { c.style.transformOrigin = 'top center'; c.style.transform = 'scale(' + scale + ')'; c.style.height = (c.scrollHeight * scale) + 'px'; }
+    else { const _zw = document.getElementById('zoom-wrapper'); const _pm = c.style.transform.match(/scale\(([^)]+)\)/); const _ps = _pm ? parseFloat(_pm[1]) : 1; c.style.transformOrigin = 'top center'; c.style.transform = 'scale(' + scale + ')'; c.style.height = (c.scrollHeight * scale) + 'px'; if (_zw && _ps > 0) _zw.scrollLeft = Math.round(_zw.scrollLeft * scale / _ps); }
   }
 }
 function _syncSlider(ctx) {
