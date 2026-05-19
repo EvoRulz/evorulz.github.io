@@ -1,4 +1,4 @@
- // @version 1485
+ // @version 1476
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -163,55 +163,14 @@ function _applyZoom(ctx, zoom) {
     else { p.style.transformOrigin = 'top center'; p.style.transform = 'scale(' + scale + ')'; }
   } else if (ctx === 'settings') {
     const p = document.getElementById('settings-panel');
-    const ov = document.getElementById('settings-overlay');
     if (!p) return;
-    let wrap = document.getElementById('settings-zoom-wrap');
-    if (zoom <= 100) {
-      p.style.width = '';
-      p.style.marginLeft = '';
-      if (zoom === 100) {
-        p.style.transform = '';
-        p.style.transformOrigin = '';
-      } else {
-        p.style.transformOrigin = 'top center';
-        p.style.transform = 'scale(' + scale + ')';
-      }
-      if (wrap) wrap.style.cssText = 'width:100%;';
-      if (ov) { ov.style.overflowX = 'hidden'; ov.scrollLeft = 0; }
-    } else {
-      const ovW = ov ? ov.clientWidth : window.innerWidth;
-      const scaledW = Math.round(ovW * scale);
-      const prevScaledW = wrap ? Math.round(wrap.offsetWidth) : ovW;
-      let newScrollLeft;
-      if (prevScaledW > ovW && ov) {
-        const cxFrac = (ov.scrollLeft + ovW / 2) / prevScaledW;
-        newScrollLeft = Math.round(cxFrac * scaledW - ovW / 2);
-        newScrollLeft = Math.max(0, Math.min(newScrollLeft, scaledW - ovW));
-      } else {
-        newScrollLeft = Math.round((scaledW - ovW) / 2);
-      }
-      if (!wrap) {
-        wrap = document.createElement('div');
-        wrap.id = 'settings-zoom-wrap';
-        p.parentNode.insertBefore(wrap, p);
-        wrap.appendChild(p);
-      }
-      wrap.style.cssText = 'width:' + scaledW + 'px;';
-      p.style.width = ovW + 'px';
-      p.style.marginLeft = '';
-      p.style.transformOrigin = 'top left';
-      p.style.transform = 'scale(' + scale + ')';
-      if (ov) {
-        ov.style.overflowX = 'auto';
-        void ov.scrollWidth;
-        ov.scrollLeft = newScrollLeft;
-      }
-    }
+    if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; }
+    else { p.style.transformOrigin = 'top left'; p.style.transform = 'scale(' + scale + ')'; }
   } else {
     const c = document.getElementById('zoom-content');
     if (!c) return;
     if (zoom === 100) { c.style.transform = ''; c.style.transformOrigin = ''; c.style.height = ''; }
-    else { const _zw = document.getElementById('zoom-wrapper'); const _pm = c.style.transform.match(/scale\(([^)]+)\)/); const _ps = _pm ? parseFloat(_pm[1]) : 1; c.style.transformOrigin = 'top center'; c.style.transform = 'scale(' + scale + ')'; c.style.height = (c.scrollHeight * scale) + 'px'; if (_zw && _ps > 0) _zw.scrollLeft = Math.round(_zw.scrollLeft * scale / _ps); }
+    else { c.style.transformOrigin = 'top center'; c.style.transform = 'scale(' + scale + ')'; c.style.height = (c.scrollHeight * scale) + 'px'; }
   }
 }
 function _syncSlider(ctx) {

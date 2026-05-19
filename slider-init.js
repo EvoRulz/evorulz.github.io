@@ -1,4 +1,4 @@
-// @version 1485
+// @version 1476
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
   var overlay = document.createElement('div');
@@ -22,22 +22,7 @@ var dragging = false;
     var ratio = (parseFloat(s.value)-cachedMin)/(cachedMax-cachedMin);
     var thumbCX = cachedRect.left + ratio*(cachedRect.width-cachedHandleW) + cachedHandleW/2;
     var hitRadius = Math.max(cachedHandleW, 28);
-    if (Math.abs(e.clientX - thumbCX) > hitRadius) {
-      var _panStartX = e.clientX, _panStartY = e.clientY;
-      var _panEl = null;
-      var _so = document.getElementById('settings-overlay');
-      if (_so && _so.classList.contains('active')) { _panEl = _so; } else { _panEl = document.getElementById('zoom-wrapper'); }
-      if (!_panEl) return;
-      var _panSX = _panEl.scrollLeft, _panSY = _panEl.scrollTop;
-      overlay.style.touchAction = 'none';
-      overlay.setPointerCapture(e.pointerId);
-      function _panMove(ev) { _panEl.scrollLeft = _panSX + (_panStartX - ev.clientX); _panEl.scrollTop = _panSY + (_panStartY - ev.clientY); }
-      function _panEnd() { overlay.style.touchAction = 'pan-y'; overlay.removeEventListener('pointermove', _panMove); overlay.removeEventListener('pointerup', _panEnd); overlay.removeEventListener('pointercancel', _panEnd); }
-      overlay.addEventListener('pointermove', _panMove);
-      overlay.addEventListener('pointerup', _panEnd);
-      overlay.addEventListener('pointercancel', _panEnd);
-      return;
-    }
+    if (Math.abs(e.clientX - thumbCX) > hitRadius) return;
     overlay.style.touchAction = 'none';
     s.classList.add('handle-active');
     e.preventDefault();
