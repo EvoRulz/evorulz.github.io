@@ -1,4 +1,4 @@
- // @version 1477
+ // @version 1478
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -166,16 +166,30 @@ function _applyZoom(ctx, zoom) {
     const ov = document.getElementById('settings-overlay');
     if (!p) return;
     let wrap = document.getElementById('settings-zoom-wrap');
-    if (zoom === 100) {
-      p.style.transform = '';
-      p.style.transformOrigin = '';
+    if (zoom <= 100) {
       p.style.width = '';
       p.style.marginLeft = '';
+      if (zoom === 100) {
+        p.style.transform = '';
+        p.style.transformOrigin = '';
+      } else {
+        p.style.transformOrigin = 'top center';
+        p.style.transform = 'scale(' + scale + ')';
+      }
       if (wrap) wrap.style.cssText = 'width:100%;';
-      if (ov) { ov.style.overflowX = ''; ov.scrollLeft = 0; }
+      if (ov) { ov.style.overflowX = 'hidden'; ov.scrollLeft = 0; }
     } else {
       const ovW = ov ? ov.clientWidth : window.innerWidth;
       const scaledW = Math.round(ovW * scale);
+      const prevScaledW = wrap ? Math.round(wrap.offsetWidth) : ovW;
+      let newScrollLeft;
+      if (prevScaledW > ovW && ov) {
+        const cxFrac = (ov.scrollLeft + ovW / 2) / prevScaledW;
+        newScrollLeft = Math.round(cxFrac * scaledW - ovW / 2);
+        newScrollLeft = Math.max(0, Math.min(newScrollLeft, scaledW - ovW));
+      } else {
+        newScrollLeft = Math.round((scaledW - ovW) / 2);
+      }
       if (!wrap) {
         wrap = document.createElement('div');
         wrap.id = 'settings-zoom-wrap';
@@ -189,7 +203,7 @@ function _applyZoom(ctx, zoom) {
       p.style.transform = 'scale(' + scale + ')';
       if (ov) {
         ov.style.overflowX = 'auto';
-        requestAnimationFrame(() => { ov.scrollLeft = Math.round((scaledW - ovW) / 2); });
+        requestAnimationFrame(() => { ov.scrollLeft = newScrollLeft; });
       }
     }
   } else {
