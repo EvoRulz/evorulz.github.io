@@ -1,4 +1,4 @@
-// @version 1472
+// @version 1473
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -178,6 +178,7 @@ function settingsChange() {
         fontScaleX: Number(document.getElementById('s-clock-date-scalex')?.value ?? 100),
         fontWeight: Number(document.getElementById('s-clock-date-weight')?.value ?? 400),
         fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+        fgMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fg') : 'solid',
         fgStroke: getStyleValue('s-fgstroke'),
         fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
         fgStrokeMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fgstroke') : 'solid',
@@ -202,6 +203,7 @@ function settingsChange() {
         fontScaleX: Number(document.getElementById('s-clock-time-scalex')?.value ?? 100),
         fontWeight: Number(document.getElementById('s-clock-time-weight')?.value ?? 400),
         fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+        fgMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fg') : 'solid',
         fgStroke: getStyleValue('s-fgstroke'),
         fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
         fgStrokeMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fgstroke') : 'solid',
@@ -224,7 +226,8 @@ function settingsChange() {
         glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
         activeBg: getStyleValue('s-activebg'),
         tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
-        fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+        ffgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+        fgMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fg') : 'solid',
         fgStroke: getStyleValue('s-fgstroke'),
         fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
         fgStrokeMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fgstroke') : 'solid',

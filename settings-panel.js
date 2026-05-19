@@ -1,4 +1,4 @@
-// @version 1472
+// @version 1473
 // ── Settings open/close/save/cancel/reset/export/import ───
 let _appStyleSnapshot = null;
 let _clockSnapshot    = null;
@@ -253,7 +253,7 @@ function settingsOpen() {
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', _initS.bgStops || null);
     setColorValue('s-bg',           _initS.bg);
     setColorValue('s-fg',           _initS.fg);
-    if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', _initS.fgStops || null);
+    if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', _initS.fgStops || null, _initS.fgMode || 'solid');
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-fgstroke', _initS.fgStrokeStops || null, _initS.fgStrokeMode || 'solid');
     setColorValue('s-fgstroke', _initS.fgStroke || btnStyle.fgStroke || '#00000000');
     const _sfgsOv2 = document.getElementById('s-fgstroke-swatch-overlay');
