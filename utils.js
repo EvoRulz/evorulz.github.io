@@ -1,4 +1,4 @@
- // @version 1475
+ // @version 1476
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -163,9 +163,10 @@ function _applyZoom(ctx, zoom) {
     else { p.style.transformOrigin = 'top center'; p.style.transform = 'scale(' + scale + ')'; }
   } else if (ctx === 'settings') {
     const p = document.getElementById('settings-panel');
+    const ov = document.getElementById('settings-overlay');
     if (!p) return;
-    if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; }
-    else { p.style.transformOrigin = 'top left'; p.style.transform = 'scale(' + scale + ')'; }
+    if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; p.style.marginLeft = ''; if (ov) ov.scrollLeft = 0; }
+    else { const lp = Math.round(p.offsetWidth * (scale - 1) / 2); p.style.marginLeft = lp + 'px'; p.style.transformOrigin = 'top center'; p.style.transform = 'scale(' + scale + ')'; if (ov) requestAnimationFrame(() => { ov.scrollLeft = lp; }); }
   } else {
     const c = document.getElementById('zoom-content');
     if (!c) return;
