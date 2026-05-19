@@ -1,4 +1,4 @@
- // @version 1479
+ // @version 1480
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -203,7 +203,8 @@ function _applyZoom(ctx, zoom) {
       p.style.transform = 'scale(' + scale + ')';
       if (ov) {
         ov.style.overflowX = 'auto';
-        requestAnimationFrame(() => { ov.scrollLeft = newScrollLeft; });
+        void ov.scrollWidth;
+        ov.scrollLeft = newScrollLeft;
       }
     }
   } else {
