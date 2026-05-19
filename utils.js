@@ -1,4 +1,4 @@
- // @version 1476
+ // @version 1477
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -165,8 +165,33 @@ function _applyZoom(ctx, zoom) {
     const p = document.getElementById('settings-panel');
     const ov = document.getElementById('settings-overlay');
     if (!p) return;
-    if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; p.style.marginLeft = ''; if (ov) ov.scrollLeft = 0; }
-    else { const lp = Math.round(p.offsetWidth * (scale - 1) / 2); p.style.marginLeft = lp + 'px'; p.style.transformOrigin = 'top center'; p.style.transform = 'scale(' + scale + ')'; if (ov) requestAnimationFrame(() => { ov.scrollLeft = lp; }); }
+    let wrap = document.getElementById('settings-zoom-wrap');
+    if (zoom === 100) {
+      p.style.transform = '';
+      p.style.transformOrigin = '';
+      p.style.width = '';
+      p.style.marginLeft = '';
+      if (wrap) wrap.style.cssText = 'width:100%;';
+      if (ov) { ov.style.overflowX = ''; ov.scrollLeft = 0; }
+    } else {
+      const ovW = ov ? ov.clientWidth : window.innerWidth;
+      const scaledW = Math.round(ovW * scale);
+      if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'settings-zoom-wrap';
+        p.parentNode.insertBefore(wrap, p);
+        wrap.appendChild(p);
+      }
+      wrap.style.cssText = 'width:' + scaledW + 'px;';
+      p.style.width = ovW + 'px';
+      p.style.marginLeft = '';
+      p.style.transformOrigin = 'top left';
+      p.style.transform = 'scale(' + scale + ')';
+      if (ov) {
+        ov.style.overflowX = 'auto';
+        requestAnimationFrame(() => { ov.scrollLeft = Math.round((scaledW - ovW) / 2); });
+      }
+    }
   } else {
     const c = document.getElementById('zoom-content');
     if (!c) return;

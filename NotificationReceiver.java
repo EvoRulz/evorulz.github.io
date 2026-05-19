@@ -1,4 +1,4 @@
-// @version 1476
+// @version 1477
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
