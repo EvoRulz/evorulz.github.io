@@ -1,4 +1,4 @@
-// @version 1473
+// @version 1474
 // ── Settings open/close/save/cancel/reset/export/import ───
 let _appStyleSnapshot = null;
 let _clockSnapshot    = null;

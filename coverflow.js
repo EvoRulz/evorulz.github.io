@@ -1,4 +1,4 @@
-// @version 1473
+// @version 1474
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -114,6 +114,7 @@ function cfSyncTuningUI() {
     if (window._cpSetGradientDeg) window._cpSetGradientDeg('s-bg', _cfBgDeg);
     setColorValue('s-fg',       s.fg);
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-fg', s.fgStops || null, s.fgMode || 'solid');
+    if (typeof s.fg === 'string') { const _fgDegM = s.fg.match(/linear-gradient\((-?\d+)deg/); if (_fgDegM && window._cpSetGradientDeg) window._cpSetGradientDeg('s-fg', parseInt(_fgDegM[1])); }
     const _sfgOv = document.getElementById('s-fg-swatch-overlay');
     const _sfgGrad = window._cpGetGradient ? window._cpGetGradient('s-fg') : null;
     if (_sfgOv && _sfgGrad) { _sfgOv.style.background = _sfgGrad; } else { updateAlphaSliderBg('s-fg'); }

@@ -1,4 +1,4 @@
-// @version 1473
+// @version 1474
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -163,7 +163,7 @@ function settingsChange() {
   const _cfId = window._cfActiveId ? window._cfActiveId() : null;
   if(_cfId) {
     if(_cfId === 'top-date') {
-      const dateColor = getColorValue('s-fg');
+      const dateColor = getStyleValue('s-fg');
       _btnStyles['top-date'] = Object.assign(_btnStyles['top-date'] || {}, {
         bg: getStyleValue('s-bg'), fg: dateColor,
         bgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-bg') : null,
@@ -190,7 +190,7 @@ function settingsChange() {
       setColorValue('s-clock-date-glow', getColorValue('s-glow'));
       updateAlphaSliderBg('s-clock-date-glow');
     }else if(_cfId === 'top-time') {
-      const timeColor = getColorValue('s-fg');
+      const timeColor = getStyleValue('s-fg');
       _btnStyles['top-time'] = Object.assign(_btnStyles['top-time'] || {}, {
         bg: getStyleValue('s-bg'), fg: timeColor,
         bgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-bg') : null,
@@ -222,7 +222,7 @@ function settingsChange() {
         bgDeg: window._cpGetGradientDeg ? window._cpGetGradientDeg('s-bg') : 90,
         border: getColorValue('s-border'),
         activeBorder: getColorValue('s-activeborder'),
-        fg: getColorValue('s-fg'),
+        fg: getStyleValue('s-fg'),
         glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
         activeBg: getStyleValue('s-activebg'),
         tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,

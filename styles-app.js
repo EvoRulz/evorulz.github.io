@@ -1,4 +1,4 @@
-// @version 1473
+// @version 1474
 // ── IndexedDB image store ──────────────────────────────────
 if (navigator.storage && navigator.storage.persist) {
   navigator.storage.persist().catch(() => {});
