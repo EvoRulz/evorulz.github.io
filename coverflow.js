@@ -1,4 +1,4 @@
-// @version 1468
+// @version 1469
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -38,6 +38,7 @@ function cfSyncTuningUI() {
 (function() {
   let cfIdx = 0;
   let _cfHabitsFlipped = false;
+  let _cfLastLoadedId = null;
   window._cfItems = function cfItems() {
     const items = [];
   // Add top-grid buttons
@@ -89,6 +90,22 @@ function cfSyncTuningUI() {
       localStorage.removeItem('_versionPrevStyle');
     }
     const s = _btnStyleFor(id);
+    if (_cfLastLoadedId && _cfLastLoadedId !== id && window._cpGetGradientMode) {
+      const _prevBgMode = window._cpGetGradientMode('s-bg');
+      if (_prevBgMode !== 'solid' && window._cpGetGradientStops) {
+        const _prevBgStops = window._cpGetGradientStops('s-bg');
+        if (_prevBgStops && _prevBgStops.length >= 2) {
+          const _prevBgGrad = window._cpGetGradient ? window._cpGetGradient('s-bg') : null;
+          _btnStyles[_cfLastLoadedId] = Object.assign(_btnStyles[_cfLastLoadedId] || {}, {
+            bgMode: _prevBgMode,
+            bgStops: _prevBgStops,
+            bgDeg: window._cpGetGradientDeg ? window._cpGetGradientDeg('s-bg') : 360,
+          });
+          if (_prevBgGrad) _btnStyles[_cfLastLoadedId].bg = _prevBgGrad;
+        }
+      }
+    }
+    _cfLastLoadedId = id;
     if (window._cpClearGradient) { window._cpClearGradient('s-bg'); window._cpClearGradient('s-fg'); window._cpClearGradient('s-fgstroke'); }
     setColorValue('s-bg',       s.bg);
     if (window._cpSetGradientStops) window._cpSetGradientStops('s-bg', s.bgStops || null, s.bgMode || 'solid');
@@ -553,7 +570,7 @@ function _cfGetGroups() {
   var g = _cfDefaultGroups();
   var custom = window._workingCfGroups || {};
   for (var k in custom) { if (k !== 'habits') g[k] = custom[k]; }
-  g.habits = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.map(function(c){return c.id;}) : g.habits;
+    g.habits = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.map(function(c){return c.id;}) : g.habits;
   return g;
 }
 function _cfPersistGroup(name, ids) {
