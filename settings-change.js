@@ -1,4 +1,4 @@
-// @version 1471
+// @version 1472
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -180,6 +180,7 @@ function settingsChange() {
         fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
         fgStroke: getStyleValue('s-fgstroke'),
         fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+        fgStrokeMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fgstroke') : 'solid',
         fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
         border: getColorValue('s-border'),
         activeBorder: getColorValue('s-activeborder'),
@@ -203,6 +204,7 @@ function settingsChange() {
         fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
         fgStroke: getStyleValue('s-fgstroke'),
         fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+        fgStrokeMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fgstroke') : 'solid',
         fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
         border: getColorValue('s-border'),
         activeBorder: getColorValue('s-activeborder'),
@@ -225,6 +227,7 @@ function settingsChange() {
         fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
         fgStroke: getStyleValue('s-fgstroke'),
         fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
+        fgStrokeMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fgstroke') : 'solid',
         fgStrokeW: Number(document.getElementById('s-fgstrokew')?.value ?? 0),
         border: getColorValue('s-border'),
         activeBorder: getColorValue('s-activeborder'),
