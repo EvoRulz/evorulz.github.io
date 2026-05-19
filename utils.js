@@ -1,4 +1,4 @@
- // @version 1474
+ // @version 1475
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -165,7 +165,7 @@ function _applyZoom(ctx, zoom) {
     const p = document.getElementById('settings-panel');
     if (!p) return;
     if (zoom === 100) { p.style.transform = ''; p.style.transformOrigin = ''; }
-    else { p.style.transformOrigin = 'top center'; p.style.transform = 'scale(' + scale + ')'; }
+    else { p.style.transformOrigin = 'top left'; p.style.transform = 'scale(' + scale + ')'; }
   } else {
     const c = document.getElementById('zoom-content');
     if (!c) return;
