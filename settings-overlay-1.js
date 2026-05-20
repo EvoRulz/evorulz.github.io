@@ -1,4 +1,4 @@
-// @version 1486
+// @version 1487
 document.body.insertAdjacentHTML('beforeend', `
 <!-- Settings overlay -->
 <div id="settings-overlay">
@@ -19,7 +19,7 @@ document.body.insertAdjacentHTML('beforeend', `
         <div id="cf-stage"></div>
       </div>
       <div id="cf-select-bar" style="display:flex;align-items:center;gap:8px;padding:6px 0 4px 0;flex-wrap:wrap;">
-        <div id="cf-sel-count" style="font-size:11px;color:#555;min-height:13px;flex-shrink:0;"></div>
+        <div id="cf-sel-count" style="font-size:11px;color:#555;min-height:13px;min-width:70px;flex-shrink:0;"></div>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-all"> Select All</label>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-current"> Select</label>
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;user-select:none;-webkit-user-select:none;"><input type="checkbox" id="cf-sel-group"> Group:</label>
