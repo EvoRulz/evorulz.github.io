@@ -1,8 +1,8 @@
-// @version 1482
+// @version 1483
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:absolute;inset:0;z-index:10;cursor:pointer;touch-action:pan-y;';
+  overlay.style.cssText = 'position:absolute;inset:0;z-index:10;cursor:pointer;touch-action:pan-x pan-y;';
   var par = s.parentElement;
   if(getComputedStyle(par).position === 'static') par.style.position = 'relative';
   par.appendChild(overlay);
@@ -48,13 +48,13 @@ var dragging = false;
     if(dragging){ e.stopPropagation(); }
     dragging = false;
     grabOffsetX = 0;
-    overlay.style.touchAction = 'pan-y';
+    overlay.style.touchAction = 'pan-x pan-y';
     s.classList.remove('handle-active');
   });
   overlay.addEventListener('pointercancel', function(){
     dragging = false;
     grabOffsetX = 0;
-    overlay.style.touchAction = 'pan-y';
+    overlay.style.touchAction = 'pan-x pan-y';
     s.classList.remove('handle-active');
   });
 });
