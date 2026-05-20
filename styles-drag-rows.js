@@ -1,4 +1,4 @@
-// @version 1488
+// @version 1489
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -64,6 +64,7 @@ function applySliderRowOrder() {
         srDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         grid.style.touchAction = 'none';
         const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
+        try { srDrag.item.setPointerCapture(srDrag.pointerId); } catch {}
       }
     }, 500);
   });
@@ -190,6 +191,7 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
           const _soHold = document.getElementById('settings-overlay');
           if (_soHold) _soHold.style.overflowY = 'hidden';
           rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+          try { rDrag.item.setPointerCapture(rDrag.pointerId); } catch {}
         }
       }, 400);
     }
@@ -300,6 +302,7 @@ window.addEventListener('load', function() {
   const SW_SCROLL_THRESHOLD = 76;
   function swCancel() {
     clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
+    swGrid.style.touchAction = '';
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     if (swDrag) {
       swDrag.item.style.boxShadow = '';
@@ -333,7 +336,14 @@ window.addEventListener('load', function() {
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
     };
     swHoldTimer = setTimeout(() => {
-      if (swDrag) { swReady = true; swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)'; }
+      if (swDrag) {
+        swReady = true;
+        swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+        swGrid.style.touchAction = 'none';
+        const _soSw = document.getElementById('settings-overlay');
+        if (_soSw) _soSw.style.overflowY = 'hidden';
+        try { swDrag.item.setPointerCapture(swDrag.pointerId); } catch {}
+      }
     }, 400);
   });
   document.addEventListener('pointermove', e => {
