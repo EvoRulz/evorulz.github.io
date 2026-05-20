@@ -1,4 +1,4 @@
-// @version 1484
+// @version 1485
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -31,6 +31,7 @@ function applySliderRowOrder() {
   if (!grid) return;
   function srCancel() {
     clearTimeout(srHoldTimer); srHoldTimer = null; srReady = false;
+    grid.style.touchAction = '';
     const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = '';
     if (srDrag) {
       srDrag.item.style.boxShadow = '';
@@ -117,7 +118,6 @@ function applySliderRowOrder() {
   const srUp = () => {
     if (!srDrag) return;
     const wasActive = srDrag.active;
-    grid.style.touchAction = 'none';
     srCancel();
     if (wasActive) saveSliderRowOrder();
   };
@@ -154,6 +154,7 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   }
   function rCancel() {
     clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
+    grid.style.touchAction = '';
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     if (rDrag) {
       rDrag.item.style.opacity = '';
@@ -177,7 +178,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
       pointerId: e.pointerId,
     };
     rReady = false;
-    try { item.setPointerCapture(e.pointerId); } catch(_) {}
     if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
       rReady = true;
       item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
@@ -193,9 +193,12 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   });
   document.addEventListener('pointermove', e => {
     if (!rDrag) return;
-    const moved = Math.hypot(e.clientX - rDrag.startX, e.clientY - rDrag.startY);
+    const _rdx = Math.abs(e.clientX - rDrag.startX);
+    const _rdy = Math.abs(e.clientY - rDrag.startY);
+    const moved = Math.hypot(_rdx, _rdy);
     if (!rReady) {
-      if (moved > 76) rCancel();
+      if (_rdy > 8 && _rdy > _rdx) rCancel();
+      else if (moved > 76) rCancel();
       return;
     }
     e.preventDefault();

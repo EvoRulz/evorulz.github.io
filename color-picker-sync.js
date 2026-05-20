@@ -1,4 +1,4 @@
-// @version 1484
+// @version 1485
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -163,7 +163,6 @@ function _resolveSwatchEl(e) {
 document.addEventListener('pointerdown', function(e) {
   const sw = _resolveSwatchEl(e);
   if (!sw) return;
-  e.preventDefault();
   _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw; _swatchGlowTimer = setTimeout(() => { if (_swatchDownEl === sw) sw.style.boxShadow = '0 0 10px 4px rgba(255,255,255,0.75)'; }, 380);
 }, true);
 document.addEventListener('pointerup', function(e) {

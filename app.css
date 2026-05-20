@@ -1,4 +1,4 @@
-/* @version 1484 */
+/* @version 1485 */
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .color-settings-row { display:inline-flex; flex-direction:column; gap:4px; width:auto; vertical-align:top; }
@@ -6,7 +6,7 @@
 .color-picker-row { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
 .color-swatch-wrap { position:relative; width:68px; height:68px; flex-shrink:0; border-radius:4px; border:1px solid #555;
   overflow:hidden; cursor:pointer; background: repeating-conic-gradient(#444 0% 25%, #222 0% 50%) 0 0 / 8px 8px; touch-action: pan-x pan-y; }
-.color-swatch-wrap input[type="color"] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; padding:0; margin:0; border:none; }
+.color-swatch-wrap input[type="color"] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; padding:0; margin:0; border:none; pointer-events:none; }
 .color-swatch-overlay { position:absolute; inset:0; pointer-events:auto; border-radius:3px; display:flex; align-items:center; justify-content:center; }
 .color-swatch-label { font-size:8px; font-weight:bold; color:#fff; text-align:center; padding:2px 4px; user-select:none; -webkit-user-select:none; line-height:1.2; word-break:normal;
  overflow-wrap:break-word; max-width:100%; pointer-events:none; position:relative; display:inline-block; paint-order: stroke fill; }
