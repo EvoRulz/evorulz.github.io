@@ -1,4 +1,4 @@
-/* @version 1483 */
+/* @version 1484 */
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .color-settings-row { display:inline-flex; flex-direction:column; gap:4px; width:auto; vertical-align:top; }
@@ -290,3 +290,4 @@ td textarea {
   font-size: 13px; align-self: flex-start;
 }
 #confirm-cancel:hover { background: #444; }
+
