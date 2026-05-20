@@ -1,4 +1,4 @@
-// @version 1490
+// @version 1491
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -390,7 +390,7 @@ function cfBuild(){
     stage.appendChild(el);
   });
   cfRender();
-  stage.style.touchAction = 'none';
+  stage.style.touchAction = 'pan-y';
   if (_cfAnimId) { cancelAnimationFrame(_cfAnimId); _cfAnimId = null; }
   if (_cfPointerAC) _cfPointerAC.abort();
   _cfPointerAC = new AbortController();
@@ -429,7 +429,6 @@ function cfBuild(){
     dragStartIdx = displayIdx;
     didDrag = false;
     dragAxis = null;
-    stage.setPointerCapture(e.pointerId);
     if (_cfAnimId) { cancelAnimationFrame(_cfAnimId); _cfAnimId = null; }
         // flash the card closest to the tap point
     const stageRect = stage.getBoundingClientRect();
@@ -455,11 +454,12 @@ function cfBuild(){
       if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
       dragAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
       if (dragAxis === 'y') {
-        stage.style.touchAction = 'pan-y';
-        try { stage.releasePointerCapture(e.pointerId); } catch {}
+        [...stage.querySelectorAll('.cf-item')].forEach(el => { const _id = window._cfItems()[parseInt(el.dataset.cfI)]?.id; if (_id) { const _s = _btnStyleFor(_id); el.style.background = hex8ToCss(_s.bg); } });
         dragStartX = null; dragStartY = null; dragAxis = null;
         return;
       }
+      stage.style.touchAction = 'none';
+      try { stage.setPointerCapture(e.pointerId); } catch {}
     }
     if (dragAxis === 'y') return;
     if (Math.abs(dx) > 4) didDrag = true;
@@ -471,7 +471,7 @@ function cfBuild(){
     cfRenderAt(displayIdx);
   }, { signal: sig });
   stage.addEventListener('pointerup', e => {
-    stage.style.touchAction = 'none';
+    stage.style.touchAction = 'pan-y';
     if (dragStartX === null) return;
         // reset any tapped card background
     [...stage.querySelectorAll('.cf-item')].forEach(el => {
@@ -533,10 +533,10 @@ function cfBuild(){
     cfIdx = target;
     springTo(target);
     dragStartX = null; dragStartY = null; didDrag = false; dragStartIdx = null; dragAxis = null;
-    stage.style.touchAction = 'none';
+    stage.style.touchAction = 'pan-y';
   }, { signal: sig });
   stage.addEventListener('lostpointercapture', () => {
-    stage.style.touchAction = 'none';
+    stage.style.touchAction = 'pan-y';
   }, { signal: sig });
 }
 window._cfBuild = function() { cfBuild(); cfLoadPickersForId(cfActiveId()); };

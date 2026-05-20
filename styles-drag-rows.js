@@ -1,4 +1,4 @@
-// @version 1490
+// @version 1491
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -349,7 +349,7 @@ window.addEventListener('load', function() {
   document.addEventListener('pointermove', e => {
     if (!swDrag) return;
     const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
-    if (!swReady) { if (moved > SW_SCROLL_THRESHOLD) swCancel(); return; }
+    if (!swReady) { return; }
     e.preventDefault();
     if (!swDrag.active) {
       if (moved < 6) return;
