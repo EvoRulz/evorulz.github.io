@@ -1,4 +1,4 @@
-// @version 1485
+// @version 1486
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -180,12 +180,15 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
     rReady = false;
     if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
       rReady = true;
+      grid.style.touchAction = 'none';
       item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
     } else {
       rHoldTimer = setTimeout(() => {
         if (rDrag) {
           rReady = true;
           grid.style.touchAction = 'none';
+          const _soHold = document.getElementById('settings-overlay');
+          if (_soHold) _soHold.style.overflowY = 'hidden';
           rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         }
       }, 400);

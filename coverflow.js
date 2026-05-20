@@ -1,4 +1,4 @@
-// @version 1485
+// @version 1486
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -453,11 +453,9 @@ function cfBuild(){
     if (!dragAxis) {
       if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
       dragAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
-      if (dragAxis === 'y') return;
-      stage.setPointerCapture(e.pointerId);
-    }
-    if (dragAxis === 'y') return;
-    if (Math.abs(dx) > 4) didDrag = true;
+          if (dragAxis === 'x') stage.setPointerCapture(e.pointerId);
+        }
+        if (Math.abs(dx) > 4) didDrag = true;
     if (!didDrag) return;
     e.preventDefault();
     const n = window._cfItems().length;
