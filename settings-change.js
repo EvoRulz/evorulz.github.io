@@ -1,4 +1,4 @@
-// @version 1495
+// @version 1496
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -226,7 +226,7 @@ function settingsChange() {
         glow: getColorValue('s-glow'), activeGlow: getColorValue('s-activeglow'),
         activeBg: getStyleValue('s-activebg'),
         tap: getColorValue('s-tap'), font: document.getElementById("s-font").value,
-        ffgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
+        fgStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fg') : null,
         fgMode: window._cpGetGradientMode ? window._cpGetGradientMode('s-fg') : 'solid',
         fgStroke: getStyleValue('s-fgstroke'),
         fgStrokeStops: window._cpGetGradientStops ? window._cpGetGradientStops('s-fgstroke') : null,
