@@ -1,4 +1,4 @@
-// @version 1500
+// @version 1501
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -303,7 +303,7 @@ window.addEventListener('load', function() {
   function swCancel() {
     clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
     swGrid.style.touchAction = '';
-    const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
+    const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
     if (swDrag) {
       swDrag.item.style.boxShadow = '';
       swDrag.item.style.opacity = '';
@@ -342,7 +342,7 @@ window.addEventListener('load', function() {
         swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
         swGrid.style.touchAction = 'none';
         const _soSw = document.getElementById('settings-overlay');
-        if (_soSw) _soSw.style.overflowY = 'hidden';
+        if (_soSw) { _soSw.style.overflowY = 'hidden'; _soSw.style.overflowX = 'hidden'; }
         try { swDrag.item.setPointerCapture(swDrag.pointerId); } catch {}
       }
     }, 400);
@@ -412,7 +412,7 @@ window.addEventListener('load', function() {
       clearTimeout(swHoldTimer); swHoldTimer = null;
       if (swDrag) { swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)'; }
       swDrag = null; swReady = false;
-      const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
+      const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
     }
   });
   applySwatchOrder();
@@ -426,7 +426,7 @@ window.addEventListener('load', function() {
     clearTimeout(_soSafeTimer);
     _soSafeTimer = setTimeout(function() {
       var _so = document.getElementById('settings-overlay');
-      if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
+      if (_so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
     }, 400);
   }, { passive: true });
 })();
