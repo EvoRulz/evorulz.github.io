@@ -1,4 +1,4 @@
-// @version 1497
+// @version 1498
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -587,12 +587,14 @@ function _cfGetGroups() {
 function _cfPersistGroup(name, ids) {
   if (!window._workingCfGroups) window._workingCfGroups = {};
   window._workingCfGroups[name] = ids;
-  if (typeof settingsChange === 'function') settingsChange();
+  _settingsHasChanges = true;
+  if (typeof _updateUndoRedoBtns === 'function') _updateUndoRedoBtns();
 }
 function _cfRemoveGroup(name) {
   if (!window._workingCfGroups) return;
   delete window._workingCfGroups[name];
-  if (typeof settingsChange === 'function') settingsChange();
+  _settingsHasChanges = true;
+  if (typeof _updateUndoRedoBtns === 'function') _updateUndoRedoBtns();
 }
 function _cfUpdateSelectBar() {
   var allCb = document.getElementById('cf-sel-all');
@@ -607,6 +609,13 @@ function _cfUpdateSelectBar() {
   allCb.checked = allIds.length > 0 && selCount === allIds.length;
   if (curCb && activeId) curCb.checked = window._cfSelection.has(activeId);
   if (cntEl) cntEl.textContent = window._cfSelection.size > 0 ? window._cfSelection.size + ' selected' : '';
+  var _grpCb2 = document.getElementById('cf-sel-group');
+  if (_grpCb2 && window._cfCurrentGroup) {
+    var _grpIds2 = (_cfGetGroups()[window._cfCurrentGroup] || []);
+    var _grpSelCount2 = _grpIds2.filter(function(id){ return window._cfSelection.has(id); }).length;
+    _grpCb2.indeterminate = _grpSelCount2 > 0 && _grpSelCount2 < _grpIds2.length;
+    _grpCb2.checked = _grpIds2.length > 0 && _grpSelCount2 === _grpIds2.length;
+  }
 }
 function _cfPopulateGroupSelect() {
   var inp = document.getElementById('cf-group-input');
@@ -645,9 +654,13 @@ window._onCfItemChange = _cfUpdateSelectBar;
     var filtered = query ? keys.filter(function(k){ return k.toLowerCase().indexOf(query) !== -1; })
     .concat(keys.filter(function(k){ return k.toLowerCase().indexOf(query) === -1; })) : keys;
     var rect = grpInp.getBoundingClientRect();
-    grpDdl.style.left = rect.left + 'px';
+    var _ddW = Math.max(160, rect.width);
+    var _ddLeft = rect.left;
+    if (_ddLeft + _ddW > window.innerWidth - 8) _ddLeft = window.innerWidth - _ddW - 8;
+    if (_ddLeft < 8) _ddLeft = 8;
+    grpDdl.style.left = _ddLeft + 'px';
     grpDdl.style.top = (rect.bottom + 2) + 'px';
-    grpDdl.style.width = Math.max(160, rect.width) + 'px';
+    grpDdl.style.width = _ddW + 'px';
     grpDdl.innerHTML = '';
     var defaults = _cfDefaultGroups();
     filtered.forEach(function(name) {
