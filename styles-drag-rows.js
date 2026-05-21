@@ -1,4 +1,4 @@
-// @version 1501
+// @version 1502
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -297,13 +297,17 @@ window.addEventListener('load', function() {
 });
 (function() {
   let swDrag = null, swHoldTimer = null, swReady = false;
+  let swScrolling = false, _swLastTouch = null;
   const swGrid = document.getElementById('sg-swatches');
   if (!swGrid) return;
   const SW_SCROLL_THRESHOLD = 76;
   function swCancel() {
-    clearTimeout(swHoldTimer); swHoldTimer = null; swReady = false;
+    clearTimeout(swHoldTimer); swHoldTimer = null;
+    const _wasReady = swReady;
+    swReady = false;
     swGrid.style.touchAction = '';
-    const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
+    const _so = document.getElementById('settings-overlay');
+    if (_wasReady && _so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
     if (swDrag) {
       swDrag.item.style.boxShadow = '';
       swDrag.item.style.opacity = '';
@@ -325,6 +329,22 @@ window.addEventListener('load', function() {
       });
     } catch {}
   }
+  (function() {
+    const _soTm = document.getElementById('settings-overlay');
+    if (!_soTm) return;
+    _soTm.addEventListener('touchmove', function(ev) {
+      if (!swScrolling) return;
+      ev.preventDefault();
+      if (swReady) return;
+      const touch = ev.touches && ev.touches[0];
+      if (touch && _swLastTouch) {
+        _soTm.scrollTop  += _swLastTouch.clientY - touch.clientY;
+        _soTm.scrollLeft += _swLastTouch.clientX - touch.clientX;
+      }
+      if (touch) _swLastTouch = { clientX: touch.clientX, clientY: touch.clientY };
+    }, { passive: false });
+  })();
+  window._swScrollingReset = function() { swScrolling = false; _swLastTouch = null; };
   swGrid.addEventListener('pointerdown', e => {
     const item = e.target.closest('[data-swatch-row]');
     if (!item || swDrag) return;
@@ -336,6 +356,8 @@ window.addEventListener('load', function() {
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
       _lastY: e.clientY,
     };
+    swScrolling = true;
+    _swLastTouch = { clientX: e.clientX, clientY: e.clientY };
     swHoldTimer = setTimeout(() => {
       if (swDrag) {
         swReady = true;
@@ -393,6 +415,8 @@ window.addEventListener('load', function() {
     }
   }, { passive: false });
   document.addEventListener('pointerup', () => {
+    swScrolling = false;
+    _swLastTouch = null;
     if (!swDrag) return;
     const wasActive = swDrag.active;
     swCancel();
@@ -404,15 +428,15 @@ window.addEventListener('load', function() {
     }
   });
   document.addEventListener('pointercancel', () => {
+    swScrolling = false;
+    _swLastTouch = null;
     if (!swDrag) return;
-    if (swDrag.active) {
-      swCancel();
+    const _wasActive = swDrag.active;
+    swCancel();
+    if (_wasActive) {
       setTimeout(() => { window._settingsRowDragging = false; }, 100);
     } else {
-      clearTimeout(swHoldTimer); swHoldTimer = null;
-      if (swDrag) { swDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)'; }
-      swDrag = null; swReady = false;
-      const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
+      window._settingsRowDragging = false;
     }
   });
   applySwatchOrder();
@@ -427,6 +451,7 @@ window.addEventListener('load', function() {
     _soSafeTimer = setTimeout(function() {
       var _so = document.getElementById('settings-overlay');
       if (_so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
+      if (window._swScrollingReset) window._swScrollingReset();
     }, 400);
   }, { passive: true });
 })();
