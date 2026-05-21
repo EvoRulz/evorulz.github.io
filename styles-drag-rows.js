@@ -1,4 +1,4 @@
-// @version 1503
+// @version 1504
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -134,8 +134,22 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   let rDrag = null;
   let rHoldTimer = null;
   let rReady = false;
+  let rScrolling = false, rLastTouch = null;
   const grid = document.getElementById(containerId);
   if (!grid) return;
+  const _soEl = document.getElementById('settings-overlay');
+  if (_soEl) {
+    _soEl.addEventListener('touchmove', function(ev) {
+      if (!rScrolling) return;
+      ev.preventDefault();
+      if (rReady) return;
+      const touch = ev.touches && ev.touches[0];
+      if (touch && rLastTouch) {
+        _soEl.scrollTop += rLastTouch.clientY - touch.clientY;
+      }
+      if (touch) rLastTouch = { clientX: touch.clientX, clientY: touch.clientY };
+    }, { passive: false });
+  }
   function saveOrder() {
     const order = [...grid.querySelectorAll('[' + itemAttr + ']')].map(el => el.getAttribute(itemAttr));
     localStorage.setItem(saveKey, JSON.stringify(order));
@@ -155,6 +169,7 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   }
   function rCancel() {
     clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
+    rScrolling = false; rLastTouch = null;
     grid.style.touchAction = '';
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     if (rDrag) {
@@ -179,6 +194,8 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
       pointerId: e.pointerId,
     };
     rReady = false;
+    rScrolling = true;
+    rLastTouch = { clientX: e.clientX, clientY: e.clientY };
     rHoldTimer = setTimeout(() => {
       if (rDrag) {
         rReady = true;
