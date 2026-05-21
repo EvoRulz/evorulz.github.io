@@ -1,4 +1,4 @@
-// @version 1502
+// @version 1503
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -179,22 +179,16 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
       pointerId: e.pointerId,
     };
     rReady = false;
-    if (!e.target.closest('input, select, button, textarea, .color-swatch-wrap, .alpha-slider')) {
-      rReady = true;
-      grid.style.touchAction = 'none';
-      item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-    } else {
-      rHoldTimer = setTimeout(() => {
-        if (rDrag) {
-          rReady = true;
-          grid.style.touchAction = 'none';
-          const _soHold = document.getElementById('settings-overlay');
-          if (_soHold) _soHold.style.overflowY = 'hidden';
-          rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
-          try { rDrag.item.setPointerCapture(rDrag.pointerId); } catch {}
-        }
-      }, 400);
-    }
+    rHoldTimer = setTimeout(() => {
+      if (rDrag) {
+        rReady = true;
+        grid.style.touchAction = 'none';
+        const _soHold = document.getElementById('settings-overlay');
+        if (_soHold) _soHold.style.overflowY = 'hidden';
+        rDrag.item.style.boxShadow = '0 0 14px 5px rgba(255,255,255,0.85)';
+        try { rDrag.item.setPointerCapture(rDrag.pointerId); } catch {}
+      }
+    }, 400);
   });
   document.addEventListener('pointermove', e => {
     if (!rDrag) return;

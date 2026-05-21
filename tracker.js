@@ -1,4 +1,4 @@
-// @version 1502
+// @version 1503
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
