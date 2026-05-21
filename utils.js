@@ -1,4 +1,4 @@
- // @version 1496
+ // @version 1497
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -172,11 +172,16 @@ function _applyZoom(ctx, zoom) {
       if (zoom === 100) {
         p.style.transform = '';
         p.style.transformOrigin = '';
+        p.style.width = '';
+        if (wrap && wrap.parentNode) {
+          wrap.parentNode.insertBefore(p, wrap);
+          wrap.parentNode.removeChild(wrap);
+        }
       } else {
         p.style.transformOrigin = 'top center';
         p.style.transform = 'scale(' + scale + ')';
+        if (wrap) wrap.style.cssText = 'width:100%;';
       }
-      if (wrap) wrap.style.cssText = 'width:100%;';
       if (ov) { ov.style.overflowX = 'hidden'; ov.scrollLeft = 0; }
     } else {
       const ovW = ov ? ov.clientWidth : window.innerWidth;

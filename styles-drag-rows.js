@@ -1,4 +1,4 @@
-// @version 1496
+// @version 1497
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -336,6 +336,7 @@ window.addEventListener('load', function() {
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
       _lastY: e.clientY,
     };
+    try { swGrid.setPointerCapture(e.pointerId); } catch {}
     swHoldTimer = setTimeout(() => {
       if (swDrag) {
         swReady = true;
