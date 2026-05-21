@@ -1,4 +1,4 @@
-// @version 1494
+// @version 1495
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -334,6 +334,7 @@ window.addEventListener('load', function() {
       offX: e.clientX - rect.left, offY: e.clientY - rect.top,
       w: rect.width, h: rect.height,
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
+      _lastY: e.clientY,
     };
     swHoldTimer = setTimeout(() => {
       if (swDrag) {
@@ -349,7 +350,7 @@ window.addEventListener('load', function() {
   document.addEventListener('pointermove', e => {
     if (!swDrag) return;
     const moved = Math.hypot(e.clientX - swDrag.startX, e.clientY - swDrag.startY);
-    if (!swReady) { if (moved > 76) swCancel(); return; }
+    if (!swReady) { const _dy = e.clientY - swDrag._lastY; swDrag._lastY = e.clientY; const _so = document.getElementById('settings-overlay'); if (_so) _so.scrollTop -= _dy; return; }
     e.preventDefault();
     if (!swDrag.active) {
       if (moved < 6) return;
@@ -358,8 +359,8 @@ window.addEventListener('load', function() {
       try { swDrag.item.setPointerCapture(swDrag.pointerId); } catch (_) {}
       const _so = document.getElementById('settings-overlay'); if (_so) _so.style.overflowY = 'hidden';
       const rect = swDrag.item.getBoundingClientRect();
-      swDrag.offX = swDrag.startX - rect.left;
-      swDrag.offY = swDrag.startY - rect.top;
+      swDrag.offX = e.clientX - rect.left;
+      swDrag.offY = e.clientY - rect.top;
       swDrag.ghost = swDrag.item.cloneNode(true);
       Object.assign(swDrag.ghost.style, {
         position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
@@ -415,10 +416,6 @@ window.addEventListener('load', function() {
     }
   });
   applySwatchOrder();
-  const _soTm = document.getElementById('settings-overlay');
-  if (_soTm) _soTm.addEventListener('touchmove', function(e) {
-    if (swReady) e.preventDefault();
-  }, { passive: false });
 })();
 (function() {
   var _soSafeTimer = null;

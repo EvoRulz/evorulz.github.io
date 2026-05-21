@@ -1,4 +1,4 @@
-// @version 1494
+// @version 1495
 document.body.insertAdjacentHTML('beforeend', `
 <!-- Settings overlay -->
 <div id="settings-overlay">
