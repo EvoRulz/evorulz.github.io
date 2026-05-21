@@ -1,4 +1,4 @@
-/* @version 1504 */
+/* @version 1505 */
 /* ── Settings cog & panel ── */
     #settings-cog {
       width: 34px; height: 34px; border-radius: 50%;
@@ -545,7 +545,6 @@ input[type="checkbox"]:hover {
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 12px;
-  touch-action: none;
 }
 #zoom-wrapper {
   position: fixed;
