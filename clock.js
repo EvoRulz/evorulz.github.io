@@ -1,4 +1,4 @@
-// @version 1498
+// @version 1499
 // ── Live clock ─────────────────────────────────────────────
 (function() {
   const dateEl = document.getElementById("live-date");

@@ -1,4 +1,4 @@
-// @version 1498
+// @version 1499
 // ── Coverflow tuning params ────────────────────────────────
 const cfTuning = { stepTx: 0.55, maxAngle: 89, scaleFalloff: 0.05, opacityFalloff: 0.10, duration: 20, cardW: 0.36, shape: 6 };
 try { const _ct = JSON.parse(localStorage.getItem("_cfTuning")); if (_ct) Object.assign(cfTuning, _ct); } catch {}
@@ -693,10 +693,7 @@ window._onCfItemChange = _cfUpdateSelectBar;
       item.addEventListener('pointerleave', function(){ item.style.background = ''; });
       item.addEventListener('click', function() {
         window._cfCurrentGroup = name; grpInp.value = name; grpDdl.style.display = 'none';
-        var ids = (_cfGetGroups()[name] || []);
-        window._cfSelection.clear();
-        ids.forEach(function(id){ window._cfSelection.add(id); });
-        grpCb.checked = true; _cfUpdateSelectBar();
+        _cfUpdateSelectBar();
       });
       grpDdl.appendChild(item);
     });
