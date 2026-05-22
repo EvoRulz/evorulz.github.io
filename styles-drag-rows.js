@@ -1,4 +1,4 @@
-// @version 1505
+// @version 1506
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -449,4 +449,20 @@ window.addEventListener('load', function() {
     }, 400);
   }, { passive: true });
 })();
-
+(function() {
+  let _csActive = false, _csLastY = null;
+  const _soCsEl = document.getElementById('settings-overlay');
+  if (!_soCsEl) return;
+  _soCsEl.addEventListener('touchstart', function(e) {
+    if (e.target && e.target.closest('#sg-swatches')) { _csActive = false; _csLastY = null; return; }
+    _csActive = !!(e.target && e.target.closest('.color-swatch-wrap'));
+    _csLastY = _csActive ? e.touches[0].clientY : null;
+  }, { passive: true });
+  _soCsEl.addEventListener('touchmove', function(e) {
+    if (!_csActive || _csLastY === null || !e.touches[0]) return;
+    _soCsEl.scrollTop += _csLastY - e.touches[0].clientY;
+    _csLastY = e.touches[0].clientY;
+  }, { passive: true });
+  _soCsEl.addEventListener('touchend',   function() { _csActive = false; _csLastY = null; }, { passive: true });
+  _soCsEl.addEventListener('touchcancel', function() { _csActive = false; _csLastY = null; }, { passive: true });
+})();
