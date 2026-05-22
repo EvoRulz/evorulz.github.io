@@ -1,4 +1,4 @@
-// @version 1509
+// @version 1510
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -260,8 +260,9 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   const _soRTm = document.getElementById('settings-overlay');
   if (_soRTm) {
     _soRTm.addEventListener('touchmove', function(ev) {
-      if (!rScrolling || rReady) return;
-      ev.preventDefault();
+      if (!rScrolling) return;
+    ev.preventDefault();
+    if (rReady) return;
       const touch = ev.touches && ev.touches[0];
       if (touch && _rLastTouch) {
         _soRTm.scrollTop  += _rLastTouch.clientY - touch.clientY;
