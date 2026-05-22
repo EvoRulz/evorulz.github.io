@@ -1,4 +1,4 @@
-// @version 1508
+// @version 1509
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -134,6 +134,7 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   let rDrag = null;
   let rHoldTimer = null;
   let rReady = false;
+  let rScrolling = false, _rLastTouch = null;
   const grid = document.getElementById(containerId);
   if (!grid) return;
   function saveOrder() {
@@ -155,6 +156,7 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   }
   function rCancel() {
     clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
+    rScrolling = false; _rLastTouch = null;
     grid.style.touchAction = '';
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     if (rDrag) {
@@ -178,6 +180,8 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
       ghost: null, lastOver: null, active: false,
       pointerId: e.pointerId,
     };
+    rScrolling = true;
+    _rLastTouch = { clientX: e.clientX, clientY: e.clientY };
     rReady = false;
     rHoldTimer = setTimeout(() => {
       if (rDrag) {
@@ -243,6 +247,7 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
     }
   }, { passive: false });
   document.addEventListener('pointerup', () => {
+    rScrolling = false; _rLastTouch = null;
     if (!rDrag) return;
     const wasActive = rDrag.active;
     rCancel();
@@ -252,6 +257,19 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
     if (!rDrag) return;
     rCancel();
   });
+  const _soRTm = document.getElementById('settings-overlay');
+  if (_soRTm) {
+    _soRTm.addEventListener('touchmove', function(ev) {
+      if (!rScrolling || rReady) return;
+      ev.preventDefault();
+      const touch = ev.touches && ev.touches[0];
+      if (touch && _rLastTouch) {
+        _soRTm.scrollTop  += _rLastTouch.clientY - touch.clientY;
+        _soRTm.scrollLeft += _rLastTouch.clientX - touch.clientX;
+      }
+      if (touch) _rLastTouch = { clientX: touch.clientX, clientY: touch.clientY };
+    }, { passive: false });
+  }
   applyOrder();
 }
 makeRowsDraggable('sg-buttons', 'data-btn-row', '_btnRowOrder');
