@@ -1,4 +1,4 @@
-// @version 1506
+// @version 1507
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -466,3 +466,4 @@ window.addEventListener('load', function() {
   _soCsEl.addEventListener('touchend',   function() { _csActive = false; _csLastY = null; }, { passive: true });
   _soCsEl.addEventListener('touchcancel', function() { _csActive = false; _csLastY = null; }, { passive: true });
 })();
+
