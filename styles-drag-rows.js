@@ -1,4 +1,4 @@
-// @version 1506
+// @version 1507
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -449,4 +449,25 @@ window.addEventListener('load', function() {
     }, 400);
   }, { passive: true });
 })();
-
+(function() {
+  var _soEl = document.getElementById('settings-overlay');
+  if (!_soEl) return;
+  var _soLast = null, _soActive = false;
+  document.addEventListener('pointerdown', function(e) {
+    if (!_soEl.classList.contains('active')) return;
+    if (e.target.closest('#sg-swatches')) return;
+    _soActive = !!e.target.closest('.settings-group-content, #settings-panel');
+    if (_soActive) _soLast = { x: e.clientX, y: e.clientY };
+  }, { passive: true });
+  _soEl.addEventListener('touchmove', function(e) {
+    if (!_soActive || window._settingsRowDragging) return;
+    var t = e.touches && e.touches[0];
+    if (!t || !_soLast) return;
+    e.preventDefault();
+    _soEl.scrollTop  += _soLast.y - t.clientY;
+    _soEl.scrollLeft += _soLast.x - t.clientX;
+    _soLast = { x: t.clientX, y: t.clientY };
+  }, { passive: false });
+  document.addEventListener('pointerup',     function() { _soActive = false; _soLast = null; }, { passive: true });
+  document.addEventListener('pointercancel', function() { _soActive = false; _soLast = null; }, { passive: true });
+})();
