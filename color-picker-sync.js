@@ -1,4 +1,4 @@
-// @version 1511
+// @version 1506
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
@@ -144,7 +144,6 @@ window._applyLabelToSwatches = function _applyLabelToSwatches() {
 };
   // ── Intercept all swatch pointerdowns ──────────────────────
 let _swatchDownX = null, _swatchDownY = null, _swatchDownEl = null, _swatchGlowTimer = null;
-let _swatchScrollY = null, _swatchScrollX = null;
 function _resolveSwatchEl(e) {
   let sw = e.target.closest('.color-swatch-wrap');
   if (!sw) {
@@ -164,7 +163,7 @@ function _resolveSwatchEl(e) {
 document.addEventListener('pointerdown', function(e) {
   const sw = _resolveSwatchEl(e);
   if (!sw) return;
-  _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw; _swatchScrollY = e.clientY; _swatchScrollX = e.clientX; _swatchGlowTimer = setTimeout(() => { if (_swatchDownEl === sw) sw.style.boxShadow = '0 0 10px 4px rgba(255,255,255,0.75)'; }, 380);
+  _swatchDownX = e.clientX; _swatchDownY = e.clientY; _swatchDownEl = sw; _swatchGlowTimer = setTimeout(() => { if (_swatchDownEl === sw) sw.style.boxShadow = '0 0 10px 4px rgba(255,255,255,0.75)'; }, 380);
 }, true);
 document.addEventListener('pointerup', function(e) {
   if (_swatchGlowTimer) { clearTimeout(_swatchGlowTimer); _swatchGlowTimer = null; }
@@ -184,17 +183,8 @@ document.addEventListener('pointerup', function(e) {
 document.addEventListener('pointercancel', function() {
   if (_swatchGlowTimer) { clearTimeout(_swatchGlowTimer); _swatchGlowTimer = null; }
   if (_swatchDownEl) _swatchDownEl.style.boxShadow = '';
-  _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null; _swatchScrollY = null; _swatchScrollX = null;
+  _swatchDownX = null; _swatchDownY = null; _swatchDownEl = null;
 }, true);
-document.addEventListener('touchmove', function(e) {
-  if (!_swatchDownEl || window._cpActiveDrag) return;
-  const _so = document.getElementById('settings-overlay');
-  if (!_so || !_so.classList.contains('active')) return;
-  const t = e.touches && e.touches[0]; if (!t) return;
-  if (_swatchScrollY !== null) { _so.scrollTop += _swatchScrollY - t.clientY; _so.scrollLeft += _swatchScrollX - t.clientX; }
-  _swatchScrollY = t.clientY; _swatchScrollX = t.clientX;
-  e.preventDefault();
-}, { passive: false });
 // ── Popup render & management (moved from color-picker-core.js) ─────────────
 (function () {
   function _m() { return window._cpMod; }

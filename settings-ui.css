@@ -1,4 +1,4 @@
-/* @version 1511 */
+/* @version 1506 */
 /* ── Settings cog & panel ── */
     #settings-cog {
       width: 34px; height: 34px; border-radius: 50%;
@@ -102,7 +102,7 @@
       background: rgba(0,0,0,0.78); z-index: 9998;
       align-items: flex-start; justify-content: center;
       overflow-y: auto;
-      overflow-x: auto;
+      overflow-x: hidden;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }

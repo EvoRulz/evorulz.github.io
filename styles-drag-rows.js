@@ -1,4 +1,4 @@
-// @version 1511
+// @version 1506
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -134,7 +134,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   let rDrag = null;
   let rHoldTimer = null;
   let rReady = false;
-  let rScrolling = false, _rLastTouch = null;
   const grid = document.getElementById(containerId);
   if (!grid) return;
   function saveOrder() {
@@ -156,7 +155,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   }
   function rCancel() {
     clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
-    rScrolling = false; _rLastTouch = null;
     grid.style.touchAction = '';
     const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
     if (rDrag) {
@@ -180,8 +178,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
       ghost: null, lastOver: null, active: false,
       pointerId: e.pointerId,
     };
-    rScrolling = true;
-    _rLastTouch = { clientX: e.clientX, clientY: e.clientY };
     rReady = false;
     rHoldTimer = setTimeout(() => {
       if (rDrag) {
@@ -247,7 +243,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
     }
   }, { passive: false });
   document.addEventListener('pointerup', () => {
-    rScrolling = false; _rLastTouch = null;
     if (!rDrag) return;
     const wasActive = rDrag.active;
     rCancel();
@@ -257,20 +252,6 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
     if (!rDrag) return;
     rCancel();
   });
-  const _soRTm = document.getElementById('settings-overlay');
-  if (_soRTm) {
-    _soRTm.addEventListener('touchmove', function(ev) {
-      if (!rScrolling) return;
-    ev.preventDefault();
-    if (rReady) return;
-      const touch = ev.touches && ev.touches[0];
-      if (touch && _rLastTouch) {
-        _soRTm.scrollTop  += _rLastTouch.clientY - touch.clientY;
-        _soRTm.scrollLeft += _rLastTouch.clientX - touch.clientX;
-      }
-      if (touch) _rLastTouch = { clientX: touch.clientX, clientY: touch.clientY };
-    }, { passive: false });
-  }
   applyOrder();
 }
 makeRowsDraggable('sg-buttons', 'data-btn-row', '_btnRowOrder');
@@ -467,25 +448,5 @@ window.addEventListener('load', function() {
       if (window._swScrollingReset) window._swScrollingReset();
     }, 400);
   }, { passive: true });
-})();
-(function() {
-  let _csActive = false, _csLastY = null, _csLastX = null;
-  const _soCsEl = document.getElementById('settings-overlay');
-  if (!_soCsEl) return;
-  _soCsEl.addEventListener('touchstart', function(e) {
-    if (e.target && e.target.closest('#sg-swatches')) { _csActive = false; _csLastY = null; return; }
-    _csActive = !!(e.target && e.target.closest('.color-swatch-wrap'));
-    _csLastY = _csActive ? e.touches[0].clientY : null;
-    _csLastX = _csActive ? e.touches[0].clientX : null;
-  }, { passive: true });
-  _soCsEl.addEventListener('touchmove', function(e) {
-    if (!_csActive || _csLastY === null || !e.touches[0]) return;
-    _soCsEl.scrollTop += _csLastY - e.touches[0].clientY;
-    _soCsEl.scrollLeft += _csLastX - e.touches[0].clientX;
-    _csLastY = e.touches[0].clientY;
-    _csLastX = e.touches[0].clientX;
-  }, { passive: true });
-  _soCsEl.addEventListener('touchend',   function() { _csActive = false; _csLastY = null; _csLastX = null; }, { passive: true });
-  _soCsEl.addEventListener('touchcancel', function() { _csActive = false; _csLastY = null; _csLastX = null; }, { passive: true });
 })();
 
