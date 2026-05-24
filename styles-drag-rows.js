@@ -1,4 +1,4 @@
-// @version 1507
+// @version 1510
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -471,3 +471,4 @@ window.addEventListener('load', function() {
   document.addEventListener('pointerup',     function() { _soActive = false; _soLast = null; }, { passive: true });
   document.addEventListener('pointercancel', function() { _soActive = false; _soLast = null; }, { passive: true });
 })();
+
