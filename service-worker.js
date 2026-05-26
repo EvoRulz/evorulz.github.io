@@ -4,8 +4,8 @@ const ASSETS = [
   "./",
   "./index.html?v=1516",
   "./manifest.json?v=1516",
-  "./icon-192.png?v=1516",
-  "./icon-512.png?v=1516",
+  "./icons/icon-192.png?v=1516",
+  "./icons/icon-512.png?v=1516",
   "./settings-overlay-1.js?v=1516",
   "./settings-overlay-2.js?v=1516",
   "./utils.js?v=1516",
@@ -47,7 +47,7 @@ self.addEventListener("push", e => {
   e.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "./icon-192.png",
+      icon: "./icons/icon-192.png",
       vibrate: [200],
       tag: "habit-reminder"
     })
