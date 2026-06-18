@@ -1,4 +1,4 @@
-// @version 1516
+// @version 1517
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -156,7 +156,12 @@ function makeRowsDraggable(containerId, itemAttr, saveKey) {
   function rCancel() {
     clearTimeout(rHoldTimer); rHoldTimer = null; rReady = false;
     grid.style.touchAction = '';
-    const _so = document.getElementById('settings-overlay'); if (_so) { _so.style.overflowY = ''; _so.style.touchAction = ''; }
+    const _so = document.getElementById('settings-overlay');
+    if (_so) {
+      _so.style.overflowY = '';
+      _so.style.touchAction = '';
+      _so.style.overflowX = (parseInt(localStorage.getItem('_zoomSettings')) || 100) > 100 ? 'auto' : '';
+    }
     if (rDrag) {
       rDrag.item.style.opacity = '';
       rDrag.item.style.boxShadow = '';
@@ -301,7 +306,11 @@ window.addEventListener('load', function() {
     swReady = false;
     swGrid.style.touchAction = '';
     const _so = document.getElementById('settings-overlay');
-    if (_wasReady && _so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
+    if (_wasReady && _so) {
+      _so.style.overflowY = '';
+      _so.style.touchAction = '';
+      _so.style.overflowX = (parseInt(localStorage.getItem('_zoomSettings')) || 100) > 100 ? 'auto' : '';
+    }
     if (swDrag) {
       swDrag.item.style.boxShadow = '';
       swDrag.item.style.opacity = '';
@@ -444,7 +453,11 @@ window.addEventListener('load', function() {
     clearTimeout(_soSafeTimer);
     _soSafeTimer = setTimeout(function() {
       var _so = document.getElementById('settings-overlay');
-      if (_so) { _so.style.overflowY = ''; _so.style.overflowX = ''; _so.style.touchAction = ''; }
+      if (_so) {
+        _so.style.overflowY = '';
+        _so.style.touchAction = '';
+        _so.style.overflowX = (parseInt(localStorage.getItem('_zoomSettings')) || 100) > 100 ? 'auto' : '';
+      }
       if (window._swScrollingReset) window._swScrollingReset();
     }, 400);
   }, { passive: true });
