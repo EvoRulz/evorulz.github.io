@@ -1,4 +1,4 @@
-// @version 1517
+// @version 1518
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -333,7 +333,7 @@ window.addEventListener('load', function() {
     } catch {}
   }
   (function() {
-    const _soTm = document.getElementById('settings-overlay');
+    var _soTm = document.getElementById('settings-overlay');
     if (!_soTm) return;
     _soTm.addEventListener('touchmove', function(ev) {
       if (!swScrolling) return;
@@ -346,6 +346,13 @@ window.addEventListener('load', function() {
       }
       if (touch) _swLastTouch = { clientX: touch.clientX, clientY: touch.clientY };
     }, { passive: false });
+    document.addEventListener('pointermove', function(ev) {
+      if (ev.pointerType === 'touch') return;
+      if (!swScrolling || swReady || ev.buttons === 0 || !_swLastTouch) return;
+      _soTm.scrollTop  += _swLastTouch.clientY - ev.clientY;
+      _soTm.scrollLeft += _swLastTouch.clientX - ev.clientX;
+      _swLastTouch = { clientX: ev.clientX, clientY: ev.clientY };
+    }, { passive: true });
   })();
   window._swScrollingReset = function() { swScrolling = false; _swLastTouch = null; };
   swGrid.addEventListener('pointerdown', e => {
@@ -466,11 +473,23 @@ window.addEventListener('load', function() {
   var _soEl = document.getElementById('settings-overlay');
   if (!_soEl) return;
   var _soLast = null, _soActive = false;
+  function _soIsZoomed() { return (parseInt(localStorage.getItem('_zoomSettings')) || 100) > 100; }
   document.addEventListener('pointerdown', function(e) {
     if (!_soEl.classList.contains('active')) return;
     if (e.target.closest('#sg-swatches')) return;
     _soActive = !!e.target.closest('.settings-group-content, #settings-panel');
-    if (_soActive) _soLast = { x: e.clientX, y: e.clientY };
+    if (_soActive) {
+      _soLast = { x: e.clientX, y: e.clientY };
+      var _sp = document.getElementById('settings-panel');
+      if (_sp && _soIsZoomed()) _sp.style.cursor = 'grabbing';
+    }
+  }, { passive: true });
+  document.addEventListener('pointermove', function(e) {
+    if (e.pointerType === 'touch') return;
+    if (!_soActive || window._settingsRowDragging || !_soLast || e.buttons === 0) return;
+    _soEl.scrollTop  += _soLast.y - e.clientY;
+    _soEl.scrollLeft += _soLast.x - e.clientX;
+    _soLast = { x: e.clientX, y: e.clientY };
   }, { passive: true });
   _soEl.addEventListener('touchmove', function(e) {
     if (!_soActive || window._settingsRowDragging) return;
@@ -481,7 +500,13 @@ window.addEventListener('load', function() {
     _soEl.scrollLeft += _soLast.x - t.clientX;
     _soLast = { x: t.clientX, y: t.clientY };
   }, { passive: false });
-  document.addEventListener('pointerup',     function() { _soActive = false; _soLast = null; }, { passive: true });
-  document.addEventListener('pointercancel', function() { _soActive = false; _soLast = null; }, { passive: true });
+  function _soRestoreCursor() {
+    _soActive = false;
+    _soLast = null;
+    var _sp = document.getElementById('settings-panel');
+    if (_sp && _soIsZoomed()) _sp.style.cursor = 'grab';
+  }
+  document.addEventListener('pointerup',     _soRestoreCursor, { passive: true });
+  document.addEventListener('pointercancel', _soRestoreCursor, { passive: true });
 })();
 
