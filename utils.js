@@ -1,4 +1,4 @@
- // @version 1520
+ // @version 1521
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -154,7 +154,7 @@ function _getActiveZoomCtx() {
 function _zoomKey(ctx) {
   return ctx === 'popup' ? '_zoomPopup' : ctx === 'settings' ? '_zoomSettings' : '_zoomMain';
 }
-function _applyZoom(ctx, zoom) {
+function _applyZoom(ctx, zoom, preserveAnchor) {
   const scale = zoom / 100;
   if (ctx === 'popup') {
     const p = document.getElementById('cp-popup');
@@ -166,6 +166,11 @@ function _applyZoom(ctx, zoom) {
     const ov = document.getElementById('settings-overlay');
     if (!p) return;
     let wrap = document.getElementById('settings-zoom-wrap');
+    let _sFrac = 0;
+    if (preserveAnchor && ov) {
+      const _maxST = ov.scrollHeight - ov.clientHeight;
+      _sFrac = _maxST > 0 ? ov.scrollTop / _maxST : 0;
+    }
     if (zoom <= 100) {
       p.style.width = '';
       p.style.marginLeft = '';
@@ -214,11 +219,39 @@ function _applyZoom(ctx, zoom) {
       }
       p.style.cursor = 'grab';
     }
+    if (preserveAnchor && ov) {
+      requestAnimationFrame(() => {
+        const _newMax = ov.scrollHeight - ov.clientHeight;
+        if (_newMax > 0) ov.scrollTop = Math.round(_sFrac * _newMax);
+      });
+    }
   } else {
+    const wrapper = document.getElementById('zoom-wrapper');
     const c = document.getElementById('zoom-content');
-    if (!c) return;
-    if (zoom === 100) { c.style.transform = ''; c.style.transformOrigin = ''; c.style.height = ''; }
-    else { c.style.transformOrigin = 'top center'; c.style.transform = 'scale(' + scale + ')'; c.style.height = (c.scrollHeight * scale) + 'px'; }
+    if (!c || !wrapper) return;
+    let _anchorTop = null, _anchorLeft = null;
+    if (preserveAnchor) {
+      const _om = c.style.transform.match(/scale\(([^)]+)\)/);
+      const _os = _om ? parseFloat(_om[1]) : 1;
+      if (_os > 0) {
+        _anchorTop = wrapper.scrollTop * scale / _os;
+        _anchorLeft = wrapper.scrollLeft * scale / _os;
+      }
+    }
+    c.style.height = '';
+    const _naturalH = c.scrollHeight;
+    if (zoom === 100) {
+      c.style.transform = '';
+      c.style.transformOrigin = '';
+    } else {
+      c.style.transformOrigin = 'top center';
+      c.style.transform = 'scale(' + scale + ')';
+      c.style.height = (_naturalH * scale) + 'px';
+    }
+    if (_anchorTop !== null) {
+      wrapper.scrollTop = Math.max(0, _anchorTop);
+      wrapper.scrollLeft = Math.max(0, _anchorLeft);
+    }
   }
 }
 function _syncSlider(ctx) {
@@ -241,7 +274,7 @@ function ctrlZoom(sliderVal, snap = true) {
   const ctx = _getActiveZoomCtx();
   localStorage.setItem(_zoomKey(ctx), zoom);
   if (ctx === 'main') localStorage.setItem('_zoom', zoom);
-  _applyZoom(ctx, zoom);
+  _applyZoom(ctx, zoom, true);
 }
 new MutationObserver(function(muts) {
   muts.forEach(function(m) {
@@ -343,7 +376,7 @@ function ctrlToggleInteract() {
     const ctx = _getActiveZoomCtx();
     localStorage.setItem(_zoomKey(ctx), zoom);
     if (ctx === 'main') localStorage.setItem('_zoom', zoom);
-    _applyZoom(ctx, zoom);
+    _applyZoom(ctx, zoom, true);
     const sl = document.getElementById('zoom-slider');
     const lb = document.getElementById('zoom-label');
     if (sl) sl.value = Math.round(zoomToSlider(zoom));
