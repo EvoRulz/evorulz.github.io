@@ -1,4 +1,4 @@
-// @version 1519
+// @version 1520
 /// ── Drag-to-reorder — HABIT BUTTONS ──────────────────────
 const DRAG_THRESHOLD = 6;
 var drag = null;
@@ -190,6 +190,10 @@ document.addEventListener('pointercancel', e => {
   if (sgDrag.ghost) sgDrag.ghost.remove();
   sgDrag = null;
 });
+function saveSettingsGroupOrder() {
+  const order = [...sgGrid.children].map(el => el.dataset.group);
+  localStorage.setItem('_settingsGroupOrder', JSON.stringify(order));
+}
 function applySettingsGroupOrder() {
   try {
     const saved = JSON.parse(localStorage.getItem('_settingsGroupOrder'));

@@ -1,4 +1,4 @@
-// @version 1519
+// @version 1520
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -356,8 +356,11 @@ window.addEventListener('load', function() {
   })();
   window._swScrollingReset = function() { swScrolling = false; _swLastTouch = null; };
   swGrid.addEventListener('pointerdown', e => {
+    if (swDrag) return;
+    swScrolling = true;
+    _swLastTouch = { clientX: e.clientX, clientY: e.clientY };
     const item = e.target.closest('[data-swatch-row]');
-    if (!item || swDrag) return;
+    if (!item) return;
     const rect = item.getBoundingClientRect();
     swDrag = {
       item, startX: e.clientX, startY: e.clientY,
@@ -366,8 +369,6 @@ window.addEventListener('load', function() {
       ghost: null, lastOver: null, active: false, pointerId: e.pointerId,
       _lastY: e.clientY,
     };
-    swScrolling = true;
-    _swLastTouch = { clientX: e.clientX, clientY: e.clientY };
     swHoldTimer = setTimeout(() => {
       if (swDrag) {
         swReady = true;

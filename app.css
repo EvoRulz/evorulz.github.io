@@ -1,4 +1,4 @@
-/* @version 1519 */
+/* @version 1520 */
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .color-settings-row { display:inline-flex; flex-direction:column; gap:4px; width:auto; vertical-align:top; }
@@ -41,6 +41,7 @@
 [data-app-row] { user-select:none; -webkit-user-select:none; }
 [data-clock-row] { user-select:none; -webkit-user-select:none; }
 [data-checkbox-row] { user-select:none; -webkit-user-select:none; }
+[data-toggle-row] { user-select:none; -webkit-user-select:none; }
 [data-btn-row] > label { cursor:grab; }
 [data-btn-row] > label:active { cursor:grabbing; }
 #settings-groups-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; touch-action:none; }
