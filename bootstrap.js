@@ -1,4 +1,4 @@
-// @version 1523
+// @version 1524
   // ── Bootstrap ──────────────────────────────────────────────
 const buttonsEl  = document.getElementById("buttons");
 const sectionsEl = document.getElementById("sections");

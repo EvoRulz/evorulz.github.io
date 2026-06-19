@@ -1,4 +1,4 @@
-// @version 1523
+// @version 1524
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -24,6 +24,26 @@ public class NotificationReceiver extends BroadcastReceiver {
             cal.get(java.util.Calendar.YEAR),
             cal.get(java.util.Calendar.MONTH) + 1,
             cal.get(java.util.Calendar.DAY_OF_MONTH));
+        boolean isDone = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getBoolean("done_" + todayKey, false);
+        if (isDone) {
+            long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .getLong("intervalMs", 0);
+            if (intervalMs > 0) {
+                AlarmManager am2 = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                Intent i2 = new Intent(context, NotificationReceiver.class);
+                PendingIntent pi2 = PendingIntent.getBroadcast(context, 0, i2,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am2.canScheduleExactAlarms()) {
+                    am2.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                        System.currentTimeMillis() + intervalMs, pi2);
+                } else {
+                    am2.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                        System.currentTimeMillis() + intervalMs, pi2);
+                }
+            }
+            return;
+        }
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
         PendingIntent launchPi = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Notification n = new NotificationCompat.Builder(context, "habit_reminders")

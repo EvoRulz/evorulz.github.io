@@ -1,4 +1,4 @@
-// @version 1523
+// @version 1524
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -242,6 +242,17 @@ function onReasonInput(ds,el) {
 }
 function onInput(ds) {
   setRowFromDOM(ds);
+  if (hasSets && ds === dateStr(new Date())) {
+    const total = sum(store[ds]?.sets || []);
+    const target = (function() {
+      try { return JSON.parse(localStorage.getItem('_notifSettings'))?.targetReps || 0; } catch { return 0; }
+    })();
+    const done = target > 0 && total >= target;
+    if (window.notifMarkDone) window.notifMarkDone(ds, done);
+    if (done) {
+      window.location.href = 'habitnotify://schedule?interval=0';
+    }
+  }
   if (autoStatus) {
     const ns=autoStatus(store[ds]);
     if (ns!==null) {
