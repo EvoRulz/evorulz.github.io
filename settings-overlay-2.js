@@ -1,4 +1,4 @@
-// @version 1525
+// @version 1526
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -455,7 +455,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       </div>
     <div class="settings-group-content" id="sg-notifications">
         <div class="settings-row" style="justify-content:space-between;gap:12px;">
-        <label style="font-size:13px;color:#bbb;">Notifications enabled</label>
+        <label id="notif-enabled-label" style="font-size:13px;color:#bbb;">Notifications: OFF</label>
         <div id="notif-toggle-wrap" onclick="notifToggle()" style="width:48px;height:26px;border-radius:13px;background:#333;border:1px solid #555;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;touch-action:manipulation;">
           <div id="notif-toggle-switch" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#666;transition:left 0.2s,background 0.2s;pointer-events:none;"></div>
         </div>

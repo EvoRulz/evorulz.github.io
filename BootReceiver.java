@@ -1,4 +1,4 @@
-// @version 1525
+// @version 1526
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.app.PendingIntent;

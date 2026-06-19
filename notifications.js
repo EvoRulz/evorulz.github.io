@@ -1,4 +1,4 @@
-// @version 1525
+// @version 1526
 (function() {
   function todayStr() {
     const d = new Date();
@@ -133,7 +133,9 @@ window.notifSaveSchedule = function() {
     (s.minutes || 0) * 60 * 1000 +
     (s.seconds || 0) * 1000
     ) || 60 * 60 * 1000;
-  window.location.href = 'habitnotify://schedule?interval=' + intervalMs;
+  if (localStorage.getItem('_notifEnabled') === 'true') {
+    window.location.href = 'habitnotify://schedule?interval=' + intervalMs;
+  }
   console.log('[notif] scheduling interval ms:', intervalMs);
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; setTimeout(() => btn.textContent = orig, 1200); }
@@ -166,6 +168,8 @@ function _notifUpdateToggleUI() {
   if (wrap)    { wrap.style.background = enabled ? _onBg : _offBg; wrap.style.borderColor = enabled ? _borderOn : _borderOff; }
   if (switchEl)    { switchEl.style.left = enabled ? '27px' : '3px'; switchEl.style.background = enabled ? _switchOn : _switchOff; }
   if (offWrap) { offWrap.style.display = enabled ? 'none' : 'flex'; }
+  const labelEl = document.getElementById('notif-enabled-label');
+  if (labelEl) labelEl.textContent = 'Notifications: ' + (enabled ? 'ON' : 'OFF');
 }
 function _notifTickCountdown() {
   const el = document.getElementById('notif-countdown-display');
