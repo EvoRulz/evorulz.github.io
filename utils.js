@@ -1,4 +1,4 @@
- // @version 1522
+ // @version 1523
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -192,10 +192,12 @@ function _applyZoom(ctx, zoom, preserveAnchor) {
     } else {
       const ovW = ov ? ov.clientWidth : window.innerWidth;
       const scaledW = Math.round(ovW * scale);
-      const prevScaledW = wrap ? Math.round(wrap.offsetWidth) : ovW;
+      const _prevScaleM = p.style.transform.match(/scale\(([^)]+)\)/);
+      const prevScaledW = _prevScaleM ? Math.round(ovW * parseFloat(_prevScaleM[1])) : ovW;
+      const _savedSL = ov ? ov.scrollLeft : 0;
       let newScrollLeft;
       if (prevScaledW > ovW && ov) {
-        const cxFrac = (ov.scrollLeft + ovW / 2) / prevScaledW;
+        const cxFrac = (_savedSL + ovW / 2) / prevScaledW;
         newScrollLeft = Math.round(cxFrac * scaledW - ovW / 2);
         newScrollLeft = Math.max(0, Math.min(newScrollLeft, scaledW - ovW));
       } else {
@@ -216,6 +218,8 @@ function _applyZoom(ctx, zoom, preserveAnchor) {
         ov.style.overflowX = 'auto';
         void ov.scrollWidth;
         ov.scrollLeft = newScrollLeft;
+        const _slFix = newScrollLeft;
+        requestAnimationFrame(() => { if (ov.scrollLeft !== _slFix) ov.scrollLeft = _slFix; });
       }
       p.style.cursor = 'grab';
     }
