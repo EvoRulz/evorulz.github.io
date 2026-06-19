@@ -1,4 +1,4 @@
-// @version 1526
+// @version 1527
 (function() {
   function todayStr() {
     const d = new Date();
@@ -22,17 +22,33 @@
       ) || 60 * 60 * 1000;
   }
   function isPushupsDone() {
-    try {
-      const raw = localStorage.getItem('pushups:' + todayStr());
-      if (!raw) return false;
+  try {
+    const raw = localStorage.getItem('pushups:' + todayStr());
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    const target = getNotifSettings().targetReps || 0;
+    if (target === 0) return false;
+    const total = Array.isArray(data.sets) ? data.sets.reduce((a, b) => a + (b || 0), 0) : 0;
+    return total >= target;
+  } catch {}
+  return false;
+}
+function _notifSyncDone() {
+  try {
+    const ds = todayStr();
+    const raw = localStorage.getItem('pushups:' + ds);
+    const target = getNotifSettings().targetReps || 0;
+    let done = false;
+    if (target > 0 && raw) {
       const data = JSON.parse(raw);
-      const target = getNotifSettings().targetReps || 0;
-      const total = Array.isArray(data.sets) ? data.sets.reduce((a,b) => a + (b||0), 0) : 0;
-      if (data.status === 'yes') return target === 0 || total >= target;
-      if (total > 0) return target === 0 || total >= target;
-    } catch {}
-    return false;
-  }
+      const total = Array.isArray(data.sets) ? data.sets.reduce((a, b) => a + (b || 0), 0) : 0;
+      done = total >= target;
+    }
+    if (window.notifMarkDone) window.notifMarkDone(ds, done);
+    return done;
+  } catch {}
+  return false;
+}
   async function notify() {
     if (localStorage.getItem('_notifEnabled') !== 'true') return;
     if (isPushupsDone()) return;
@@ -125,6 +141,7 @@ window.notifSaveSchedule = function() {
     targetReps: g('notif-target-reps'),
   };
   localStorage.setItem('_notifSettings', JSON.stringify(s));
+  _notifSyncDone();
   if (window._notifReschedule) window._notifReschedule();
   const intervalMs = (
     (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
@@ -258,6 +275,7 @@ window.notifToggle = function() {
     if (window.AndroidSettings && window.AndroidSettings.setNotifEnabled) {
       window.AndroidSettings.setNotifEnabled(true);
     }
+    _notifSyncDone();
     const s = JSON.parse(localStorage.getItem('_notifSettings') || '{}');
     const intervalMs = (
       (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
