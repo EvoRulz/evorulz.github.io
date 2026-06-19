@@ -1,4 +1,4 @@
- // @version 1521
+ // @version 1522
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
@@ -234,8 +234,10 @@ function _applyZoom(ctx, zoom, preserveAnchor) {
       const _om = c.style.transform.match(/scale\(([^)]+)\)/);
       const _os = _om ? parseFloat(_om[1]) : 1;
       if (_os > 0) {
-        _anchorTop = wrapper.scrollTop * scale / _os;
-        _anchorLeft = wrapper.scrollLeft * scale / _os;
+        const _vh = wrapper.clientHeight;
+        const _vw = wrapper.clientWidth;
+        _anchorTop = (wrapper.scrollTop + _vh / 2) * scale / _os - _vh / 2;
+        _anchorLeft = (wrapper.scrollLeft + _vw / 2) * scale / _os - _vw / 2;
       }
     }
     c.style.height = '';
