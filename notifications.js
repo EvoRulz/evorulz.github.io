@@ -1,4 +1,4 @@
-// @version 1524
+// @version 1525
 (function() {
   function todayStr() {
     const d = new Date();
@@ -34,6 +34,7 @@
     return false;
   }
   async function notify() {
+    if (localStorage.getItem('_notifEnabled') !== 'true') return;
     if (isPushupsDone()) return;
     const h = new Date().getHours();
     if (h < 7 || h >= 23) return;
@@ -238,6 +239,9 @@ window.notifToggle = function() {
     localStorage.setItem('_notifEnabled', 'false');
     localStorage.removeItem('_notifOffUntil');
     if (window._notifReschedule) window._notifReschedule();
+    if (window.AndroidSettings && window.AndroidSettings.setNotifEnabled) {
+      window.AndroidSettings.setNotifEnabled(false);
+    }
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(0);
     } else {
@@ -247,6 +251,9 @@ window.notifToggle = function() {
     localStorage.setItem('_notifEnabled', 'true');
     localStorage.removeItem('_notifOffUntil');
     if (window._notifReschedule) window._notifReschedule();
+    if (window.AndroidSettings && window.AndroidSettings.setNotifEnabled) {
+      window.AndroidSettings.setNotifEnabled(true);
+    }
     const s = JSON.parse(localStorage.getItem('_notifSettings') || '{}');
     const intervalMs = (
       (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +

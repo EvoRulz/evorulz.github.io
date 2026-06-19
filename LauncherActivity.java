@@ -1,4 +1,4 @@
-// @version 1524
+// @version 1525
 /*
  * Copyright 2020 Google Inc.
  *
@@ -101,6 +101,11 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             i.setData(Uri.parse("package:io.github.evorulz.twa"));
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
+        }
+        @JavascriptInterface
+        public void setNotifEnabled(boolean enabled) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .edit().putBoolean("notifEnabled", enabled).apply();
         }
         @JavascriptInterface
         public void scheduleRepeatingNotification(long intervalMs) {

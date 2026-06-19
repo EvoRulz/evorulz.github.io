@@ -1,4 +1,4 @@
-// @version 1524
+// @version 1525
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -14,6 +14,9 @@ import androidx.core.app.NotificationCompat;
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        boolean notifEnabled = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getBoolean("notifEnabled", true);
+        if (!notifEnabled) return;
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel ch = new NotificationChannel("habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
