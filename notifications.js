@@ -1,4 +1,4 @@
-// @version 1527
+// @version 1528
 (function() {
   function todayStr() {
     const d = new Date();
@@ -85,6 +85,7 @@ function _notifSyncDone() {
       notify();
     }, getIntervalMs());
   }
+  window._notifSyncDone = _notifSyncDone;
   window._notifReschedule = function() {
     if (_notifInterval) clearInterval(_notifInterval);
     schedule();
@@ -141,7 +142,7 @@ window.notifSaveSchedule = function() {
     targetReps: g('notif-target-reps'),
   };
   localStorage.setItem('_notifSettings', JSON.stringify(s));
-  _notifSyncDone();
+  if (window._notifSyncDone) window._notifSyncDone();
   if (window._notifReschedule) window._notifReschedule();
   const intervalMs = (
     (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
@@ -151,7 +152,11 @@ window.notifSaveSchedule = function() {
     (s.seconds || 0) * 1000
     ) || 60 * 60 * 1000;
   if (localStorage.getItem('_notifEnabled') === 'true') {
-    window.location.href = 'habitnotify://schedule?interval=' + intervalMs;
+    if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
+      window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
+    } else {
+      window.location.href = 'intent://schedule?interval=' + intervalMs + '#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
+    }
   }
   console.log('[notif] scheduling interval ms:', intervalMs);
   const btn = document.getElementById('notif-save-schedule-btn');
@@ -266,7 +271,7 @@ window.notifToggle = function() {
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(0);
     } else {
-      window.location.href = 'habitnotify://schedule?interval=0';
+      window.location.href = 'intent://schedule?interval=0#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
     }
   } else {
     localStorage.setItem('_notifEnabled', 'true');
@@ -275,7 +280,7 @@ window.notifToggle = function() {
     if (window.AndroidSettings && window.AndroidSettings.setNotifEnabled) {
       window.AndroidSettings.setNotifEnabled(true);
     }
-    _notifSyncDone();
+    if (window._notifSyncDone) window._notifSyncDone();
     const s = JSON.parse(localStorage.getItem('_notifSettings') || '{}');
     const intervalMs = (
       (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
@@ -287,7 +292,7 @@ window.notifToggle = function() {
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
     } else {
-      window.location.href = 'habitnotify://schedule?interval=' + intervalMs;
+      window.location.href = 'intent://schedule?interval=' + intervalMs + '#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
     }
   }
   _notifUpdateToggleUI();
