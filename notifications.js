@@ -1,4 +1,4 @@
-// @version 1528
+// @version 1529
 (function() {
   function todayStr() {
     const d = new Date();
@@ -21,9 +21,15 @@
       (s.seconds|| 0) * 1000
       ) || 60 * 60 * 1000;
   }
+  function _notifTrackerPrefix() {
+    try {
+      const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.hasSets) : null;
+      return cfg ? cfg.id + ':' : 'pushups:';
+    } catch { return 'pushups:'; }
+  }
   function isPushupsDone() {
   try {
-    const raw = localStorage.getItem('pushups:' + todayStr());
+    const raw = localStorage.getItem(_notifTrackerPrefix() + todayStr());
     if (!raw) return false;
     const data = JSON.parse(raw);
     const target = getNotifSettings().targetReps || 0;
@@ -36,7 +42,7 @@
 function _notifSyncDone() {
   try {
     const ds = todayStr();
-    const raw = localStorage.getItem('pushups:' + ds);
+    const raw = localStorage.getItem(_notifTrackerPrefix() + ds);
     const target = getNotifSettings().targetReps || 0;
     let done = false;
     if (target > 0 && raw) {
@@ -86,10 +92,37 @@ function _notifSyncDone() {
     }, getIntervalMs());
   }
   window._notifSyncDone = _notifSyncDone;
+  window.notifDebugRefresh = function() {
+    const el = document.getElementById('notif-debug-output');
+    if (!el) return;
+    const ds = todayStr();
+    const prefix = _notifTrackerPrefix();
+    const key = prefix + ds;
+    const raw = localStorage.getItem(key);
+    const target = getNotifSettings().targetReps || 0;
+    let total = 0;
+    let setsStr = '(no data)';
+    if (raw) {
+      try {
+        const data = JSON.parse(raw);
+        const sets = Array.isArray(data.sets) ? data.sets : [];
+        total = sets.reduce((a, b) => a + (b || 0), 0);
+        setsStr = '[' + sets.map(v => (v === null || v === undefined) ? '-' : v).join(', ') + ']';
+      } catch { setsStr = '(parse error)'; }
+    }
+    const done = target > 0 && total >= target;
+    el.innerHTML =
+      '<span style="color:#666;">key:</span> <span style="color:#aaa;font-family:monospace;">' + key + '</span><br>' +
+      '<span style="color:#666;">sets:</span> <span style="color:#aaa;font-family:monospace;">' + setsStr + '</span><br>' +
+      '<span style="color:#666;">total:</span> <span style="color:#aaa;">' + total +
+      '</span>  <span style="color:#666;">target:</span> <span style="color:#aaa;">' + target + '</span><br>' +
+      '<span style="color:#666;">done (JS):</span> <span style="color:' + (done ? '#99ff99' : '#ff9999') + ';">' + done + '</span>';
+  };
   window._notifReschedule = function() {
     if (_notifInterval) clearInterval(_notifInterval);
     schedule();
   };
+  setTimeout(() => { _notifSyncDone(); }, 3000);
   setTimeout(() => {
     if (!('Notification' in window)) return;
     const _offUntil = parseInt(localStorage.getItem('_notifOffUntil') || '0');
@@ -175,6 +208,7 @@ window.notifLoadScheduleUI = function() {
   } catch {}
   _notifUpdateToggleUI();
   _notifTickCountdown();
+  if (window.notifDebugRefresh) window.notifDebugRefresh();
 };
 function _notifUpdateToggleUI() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';

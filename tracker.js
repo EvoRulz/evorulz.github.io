@@ -1,4 +1,4 @@
-// @version 1528
+// @version 1529
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -249,9 +249,6 @@ function onInput(ds) {
     })();
     const done = target > 0 && total >= target;
     if (window.notifMarkDone) window.notifMarkDone(ds, done);
-    if (done) {
-      window.location.href = 'habitnotify://schedule?interval=0';
-    }
   }
   if (autoStatus) {
     const ns=autoStatus(store[ds]);

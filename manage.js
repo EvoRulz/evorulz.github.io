@@ -1,4 +1,4 @@
-// @version 1528
+// @version 1529
 // ── Manage Habits ──────────────────────────────────────────
 function manageOpen() {
   manageRenderList();
@@ -17,9 +17,13 @@ function manageRenderList() {
     const safeName = cfg.label.replace(/&/g,"&amp;").replace(/"/g,"&quot;");
     row.innerHTML = `
         <input type="checkbox" class="manage-habit-checkbox" data-id="${cfg.id}" onchange="manageUpdateSelectAll()">
-        <input class="manage-habit-name" type="text" value="${safeName}" data-id="${cfg.id}" autocomplete="off" spellcheck="false">
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;">
+          <input class="manage-habit-name" type="text" value="${safeName}" data-id="${cfg.id}"
+                 autocomplete="off" spellcheck="false" style="width:100%;box-sizing:border-box;">
+          <span style="font-size:10px;color:#555;font-family:monospace;padding-left:2px;user-select:all;-webkit-user-select:all;">${cfg.id}</span>
+        </div>
         <button class="manage-rename-btn" onclick="manageRename('${cfg.id}',this)">Rename</button>
-      <button class="manage-delete-btn" onclick="manageDelete('${cfg.id}')">Delete</button>`;
+        <button class="manage-delete-btn" onclick="manageDelete('${cfg.id}')">Delete</button>`;
       list.appendChild(row);
     });
   document.getElementById("manage-select-all").checked = false;
