@@ -1,4 +1,4 @@
-// @version 1529
+// @version 1530
 /*
  * Copyright 2020 Google Inc.
  *
@@ -280,6 +280,14 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     i2.setData(Uri.parse("package:io.github.evorulz.twa"));
                     i2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i2);
+                }
+                return;
+            } else if ("markdone".equals(host)) {
+                String dateParam = data.getQueryParameter("date");
+                String doneParam = data.getQueryParameter("done");
+                if (dateParam != null && doneParam != null) {
+                    boolean isDone = "1".equals(doneParam);
+                    getSharedPreferences("notif", Context.MODE_PRIVATE).edit().putBoolean("done_" + dateParam, isDone).apply();
                 }
                 return;
             }

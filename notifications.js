@@ -1,4 +1,4 @@
-// @version 1529
+// @version 1530
 (function() {
   function todayStr() {
     const d = new Date();
@@ -351,8 +351,15 @@ window.notifSetOffForever = function() {
 };
 window.notifMarkDone = function(dateKey, done) {
   if (window.AndroidSettings && window.AndroidSettings.markHabitDone) {
-    window.AndroidSettings.markHabitDone(dateKey, done);
+    try { window.AndroidSettings.markHabitDone(dateKey, done); return; } catch (e) {}
   }
+  try {
+    const a = document.createElement('a');
+    a.href = 'habitnotify://markdone?date=' + encodeURIComponent(dateKey) + '&done=' + (done ? '1' : '0');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (e) {}
 };
 window.notifSendTest = async function() {
   const btn = document.getElementById('notif-send-test-btn');
