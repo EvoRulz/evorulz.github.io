@@ -1,35 +1,34 @@
-// @version 1531
-const CACHE = "habit-tracker-v1531";
+// @version 1532
+const CACHE = "habit-tracker-v1532";
 const ASSETS = [
-  "./",
-  "./index.html?v=1531",
-  "./manifest.json?v=1531",
-  "./icons/icon-192.png?v=1531",
-  "./icons/icon-512.png?v=1531",
-  "./settings-overlay-1.js?v=1531",
-  "./settings-overlay-2.js?v=1531",
-  "./utils.js?v=1531",
-  "./clock.js?v=1531",
-  "./tracker.js?v=1531",
-  "./app-data.js?v=1531",
-  "./styles-app.js?v=1531",
-  "./styles-btn.js?v=1531",
-  "./styles-colors.js?v=1531",
-  "./settings-panel.js?v=1531",
-  "./settings-change.js?v=1531",
-  "./styles-drag-rows.js?v=1531",
-  "./coverflow.js?v=1531",
-  "./drag.js?v=1531",
-  "./manage.js?v=1531",
-  "./tumbler.js?v=1531",
-  "./bootstrap.js?v=1531",
-  "./font.js?v=1531",
-  "./notifications.js?v=1531",
-  "./slider-init.js?v=1531",
-  "./color-picker-core.js?v=1531",
-  "./color-picker-sync.js?v=1531",
-  "./app.css?v=1531",
-  "./settings-ui.css?v=1531"
+  "./index.html?v=1532",
+  "./manifest.json?v=1532",
+  "./icons/icon-192.png?v=1532",
+  "./icons/icon-512.png?v=1532",
+  "./settings-overlay-1.js?v=1532",
+  "./settings-overlay-2.js?v=1532",
+  "./utils.js?v=1532",
+  "./clock.js?v=1532",
+  "./tracker.js?v=1532",
+  "./app-data.js?v=1532",
+  "./styles-app.js?v=1532",
+  "./styles-btn.js?v=1532",
+  "./styles-colors.js?v=1532",
+  "./settings-panel.js?v=1532",
+  "./settings-change.js?v=1532",
+  "./styles-drag-rows.js?v=1532",
+  "./coverflow.js?v=1532",
+  "./drag.js?v=1532",
+  "./manage.js?v=1532",
+  "./tumbler.js?v=1532",
+  "./bootstrap.js?v=1532",
+  "./font.js?v=1532",
+  "./notifications.js?v=1532",
+  "./slider-init.js?v=1532",
+  "./color-picker-core.js?v=1532",
+  "./color-picker-sync.js?v=1532",
+  "./app.css?v=1532",
+  "./settings-ui.css?v=1532"
 ];
 self.addEventListener("notificationclick", e => {
   e.notification.close();
@@ -56,13 +55,16 @@ self.addEventListener("push", e => {
 self.addEventListener("install", e => {
   e.waitUntil(
     caches.open(CACHE).then(c => {
-      console.log("Caching assets...");
       self.clients.matchAll({includeUncontrolled:true,type:'window'}).then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-installing"})));
-      return c.addAll(ASSETS);
+      return Promise.all(
+        ASSETS.map(url =>
+          fetch(url).then(res => { if (res.ok) return c.put(url, res); }).catch(() => {})
+        )
+      );
     }).then(() => {
       self.clients.matchAll({includeUncontrolled:true,type:'window'}).then(cls => cls.forEach(c2 => c2.postMessage({type:"sw-installed"})));
     })
-    );
+  );
   self.skipWaiting();
 });
 self.addEventListener("activate", e => {

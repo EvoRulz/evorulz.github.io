@@ -1,4 +1,4 @@
-// @version 1531
+// @version 1532
 function _makeFontTumbler(selectId, wrapId, onChangeCb) {
   function getOpts() {
     var sel = document.getElementById(selectId);
