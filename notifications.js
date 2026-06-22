@@ -1,4 +1,4 @@
-// @version 1533
+// @version 1534
 (function() {
   function todayStr() {
     const d = new Date();
@@ -355,14 +355,17 @@ window.notifMarkDone = function(dateKey, done) {
     try { window.AndroidSettings.markHabitDone(dateKey, done); } catch (e) {}
     return;
   }
+  const _syncKey = '_nmdSync_' + dateKey;
+  const _lastSynced = localStorage.getItem(_syncKey);
+  const _doneVal = done ? '1' : '0';
+  const _needsSync = (done && _lastSynced !== '1') || (!done && _lastSynced === '1');
+  if (!_needsSync) return;
   if (dateKey === _notifMarkDoneLast.date && done === _notifMarkDoneLast.done) return;
   _notifMarkDoneLast = { date: dateKey, done: done };
+  localStorage.setItem(_syncKey, _doneVal);
   try {
-    const a = document.createElement('a');
-    a.href = 'habitnotify://markdone?date=' + encodeURIComponent(dateKey) + '&done=' + (done ? '1' : '0');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.location.href = 'intent://markdone?date=' + encodeURIComponent(dateKey) +
+      '&done=' + _doneVal + '#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
   } catch(e) {}
 };
 window.notifSendTest = async function() {

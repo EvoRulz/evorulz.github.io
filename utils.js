@@ -1,4 +1,4 @@
- // @version 1533
+ // @version 1534
   // ── Constants ──────────────────────────────────────────────
 const MIN_DATE       = new Date("2026-03-14");
 const MAX_DATE       = new Date("2111-04-19");
