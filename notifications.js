@@ -1,4 +1,4 @@
-// @version 1532
+// @version 1533
 (function() {
   function todayStr() {
     const d = new Date();
@@ -349,10 +349,21 @@ window.notifSetOffForever = function() {
   localStorage.removeItem('_notifOffUntil');
   _notifTickCountdown();
 };
+let _notifMarkDoneLast = { date: null, done: null };
 window.notifMarkDone = function(dateKey, done) {
   if (window.AndroidSettings && window.AndroidSettings.markHabitDone) {
     try { window.AndroidSettings.markHabitDone(dateKey, done); } catch (e) {}
+    return;
   }
+  if (dateKey === _notifMarkDoneLast.date && done === _notifMarkDoneLast.done) return;
+  _notifMarkDoneLast = { date: dateKey, done: done };
+  try {
+    const a = document.createElement('a');
+    a.href = 'habitnotify://markdone?date=' + encodeURIComponent(dateKey) + '&done=' + (done ? '1' : '0');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch(e) {}
 };
 window.notifSendTest = async function() {
   const btn = document.getElementById('notif-send-test-btn');
