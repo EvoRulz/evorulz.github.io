@@ -1,4 +1,4 @@
-// @version 1534
+// @version 1535
 /*
  * Copyright 2020 Google Inc.
  *
@@ -33,8 +33,19 @@ import androidx.core.app.NotificationCompat;
 import android.webkit.WebView;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 public class LauncherActivity
 extends com.google.androidbrowserhelper.trusted.LauncherActivity {
+    private static final int LOCAL_NOTIF_PORT = 8765;
+    private ServerSocket _localServer = null;
+    private Thread _localServerThread = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,6 +198,104 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         if (wv != null) {
             wv.addJavascriptInterface(new OrientationBridge(), "AndroidOrientation");
             wv.addJavascriptInterface(new SettingsBridge(), "AndroidSettings");
+        }
+        startLocalServer();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopLocalServer();
+    }
+    private void startLocalServer() {
+        if (_localServerThread != null && _localServerThread.isAlive()) return;
+        try {
+            _localServer = new ServerSocket(LOCAL_NOTIF_PORT);
+            _localServerThread = new Thread(() -> {
+                while (!Thread.currentThread().isInterrupted() && _localServer != null && !_localServer.isClosed()) {
+                    try {
+                        Socket client = _localServer.accept();
+                        new Thread(() -> handleLocalRequest(client)).start();
+                    } catch (Exception e) {
+                        if (_localServer == null || _localServer.isClosed()) break;
+                    }
+                }
+            });
+            _localServerThread.setDaemon(true);
+            _localServerThread.start();
+        } catch (Exception e) {}
+    }
+    private void stopLocalServer() {
+        try {
+            if (_localServer != null && !_localServer.isClosed()) _localServer.close();
+        } catch (Exception e) {}
+        if (_localServerThread != null) { _localServerThread.interrupt(); _localServerThread = null; }
+        _localServer = null;
+    }
+    private void handleLocalRequest(Socket client) {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            String requestLine = reader.readLine();
+            String origin = "https://evorulz.github.io";
+            String h;
+            while ((h = reader.readLine()) != null && !h.isEmpty()) {
+                if (h.startsWith("Origin: ")) origin = h.substring(8).trim();
+            }
+            boolean isOptions = requestLine != null && requestLine.startsWith("OPTIONS ");
+            if (!isOptions && requestLine != null && requestLine.startsWith("GET ")) {
+                String path = requestLine.split(" ")[1];
+                String[] parts = path.split("\\?", 2);
+                String endpoint = parts[0];
+                String query = parts.length > 1 ? parts[1] : "";
+                Map<String, String> params = new HashMap<>();
+                for (String pair : query.split("&")) {
+                    String[] kv = pair.split("=", 2);
+                    if (kv.length == 2) {
+                        try { params.put(kv[0], URLDecoder.decode(kv[1], "UTF-8")); } catch (Exception ignored) {}
+                    }
+                }
+                if ("/schedule".equals(endpoint)) {
+                    long ivMs = 0;
+                    try { ivMs = Long.parseLong(params.containsKey("interval") ? params.get("interval") : "0"); } catch (Exception ignored) {}
+                    boolean en = !"0".equals(params.containsKey("enabled") ? params.get("enabled") : "1");
+                    final long fIv = ivMs;
+                    final boolean fEn = en;
+                    runOnUiThread(() -> {
+                        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        Intent i = new Intent(LauncherActivity.this, NotificationReceiver.class);
+                        PendingIntent pi = PendingIntent.getBroadcast(LauncherActivity.this, 0, i,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                        am.cancel(pi);
+                        getSharedPreferences("notif", MODE_PRIVATE).edit()
+                            .putLong("intervalMs", fIv).putBoolean("notifEnabled", fEn).apply();
+                        if (fIv > 0 && fEn) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+                                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + fIv, pi);
+                            } else {
+                                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + fIv, pi);
+                            }
+                        }
+                    });
+                } else if ("/markdone".equals(endpoint)) {
+                    String date = params.containsKey("date") ? params.get("date") : "";
+                    boolean done = "1".equals(params.containsKey("done") ? params.get("done") : "0");
+                    if (!date.isEmpty()) {
+                        getSharedPreferences("notif", MODE_PRIVATE).edit().putBoolean("done_" + date, done).apply();
+                    }
+                }
+            }
+            String corsHdrs = "Access-Control-Allow-Origin: " + origin + "\r\n" +
+                "Access-Control-Allow-Methods: GET, OPTIONS\r\n" +
+                "Access-Control-Allow-Private-Network: true\r\n";
+            int bodyLen = isOptions ? 0 : 2;
+            String response = "HTTP/1.1 200 OK\r\n" + corsHdrs +
+                "Content-Type: text/plain\r\nContent-Length: " + bodyLen + "\r\nConnection: close\r\n\r\n" +
+                (isOptions ? "" : "ok");
+            OutputStream out = client.getOutputStream();
+            out.write(response.getBytes("UTF-8"));
+            out.flush();
+            client.close();
+        } catch (Exception e) {
+            try { client.close(); } catch (Exception ignored) {}
         }
     }
     private WebView findWebView(android.view.View v) {

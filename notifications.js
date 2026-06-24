@@ -1,4 +1,5 @@
-// @version 1534
+// @version 1535
+function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
     const d = new Date();
@@ -188,7 +189,7 @@ window.notifSaveSchedule = function() {
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
     } else {
-      window.location.href = 'intent://schedule?interval=' + intervalMs + '#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
+      _localNotifFetch('/schedule?interval=' + intervalMs + '&enabled=1');
     }
   }
   console.log('[notif] scheduling interval ms:', intervalMs);
@@ -251,7 +252,7 @@ function _notifTickCountdown() {
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(_ms);
     } else {
-      window.location.href = 'habitnotify://schedule?interval=' + _ms;
+      _localNotifFetch('/schedule?interval=' + _ms + '&enabled=1');
     }
     el.textContent = '';
     return;
@@ -288,7 +289,7 @@ setInterval(() => {
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(_ms2);
     } else {
-      window.location.href = 'habitnotify://schedule?interval=' + _ms2;
+      _localNotifFetch('/schedule?interval=' + _ms2 + '&enabled=1');
     }
   }
   _notifTickCountdown();
@@ -305,7 +306,7 @@ window.notifToggle = function() {
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(0);
     } else {
-      window.location.href = 'intent://schedule?interval=0#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
+      _localNotifFetch('/schedule?interval=0&enabled=0');
     }
   } else {
     localStorage.setItem('_notifEnabled', 'true');
@@ -326,7 +327,7 @@ window.notifToggle = function() {
     if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
       window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
     } else {
-      window.location.href = 'intent://schedule?interval=' + intervalMs + '#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
+      _localNotifFetch('/schedule?interval=' + intervalMs + '&enabled=1');
     }
   }
   _notifUpdateToggleUI();
@@ -363,10 +364,7 @@ window.notifMarkDone = function(dateKey, done) {
   if (dateKey === _notifMarkDoneLast.date && done === _notifMarkDoneLast.done) return;
   _notifMarkDoneLast = { date: dateKey, done: done };
   localStorage.setItem(_syncKey, _doneVal);
-  try {
-    window.location.href = 'intent://markdone?date=' + encodeURIComponent(dateKey) +
-      '&done=' + _doneVal + '#Intent;scheme=habitnotify;package=io.github.evorulz.twa;end';
-  } catch(e) {}
+  _localNotifFetch('/markdone?date=' + encodeURIComponent(dateKey) + '&done=' + _doneVal);
 };
 window.notifSendTest = async function() {
   const btn = document.getElementById('notif-send-test-btn');
