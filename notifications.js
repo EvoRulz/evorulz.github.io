@@ -1,4 +1,4 @@
-// @version 1537
+// @version 1538
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -210,6 +210,7 @@ window.notifLoadScheduleUI = function() {
   _notifUpdateToggleUI();
   _notifTickCountdown();
   if (window.notifDebugRefresh) window.notifDebugRefresh();
+  if (window.notifLoadSoundName) window.notifLoadSoundName();
 };
 function _notifUpdateToggleUI() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';
@@ -365,6 +366,117 @@ window.notifMarkDone = function(dateKey, done) {
   _notifMarkDoneLast = { date: dateKey, done: done };
   localStorage.setItem(_syncKey, _doneVal);
   _localNotifFetch('/markdone?date=' + encodeURIComponent(dateKey) + '&done=' + _doneVal);
+};
+window.notifLoadSoundName = function() {
+  const nameEl = document.getElementById('notif-sound-name');
+  if (!nameEl) return;
+  if (window.AndroidSettings && window.AndroidSettings.getNotifSound) {
+    try {
+      const s = JSON.parse(window.AndroidSettings.getNotifSound());
+      nameEl.textContent = s.name || 'Default';
+    } catch(e) { nameEl.textContent = 'Default'; }
+  } else {
+    nameEl.textContent = '(Android app only)';
+  }
+};
+window.notifOpenSoundPicker = function() {
+  if (!window.AndroidSettings || !window.AndroidSettings.getNotifSoundList) {
+    alert('Sound picker requires the Android app.');
+    return;
+  }
+  let soundList;
+  try { soundList = JSON.parse(window.AndroidSettings.getNotifSoundList()); }
+  catch(e) { alert('Could not load sounds.'); return; }
+  let currentUri = '';
+  try { const _cur = JSON.parse(window.AndroidSettings.getNotifSound()); currentUri = _cur.uri || ''; } catch(e) {}
+  let selectedUri = currentUri;
+  let selectedName = 'None';
+  soundList.forEach(function(s) { if (s.uri === currentUri) selectedName = s.name; });
+  const overlay = document.createElement('div');
+  overlay.style.cssText =
+    'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  const box = document.createElement('div');
+  box.style.cssText =
+    'background:#1c1c1c;border:1px solid #555;border-radius:10px;padding:20px;width:90%;max-width:400px;' +
+    'display:flex;flex-direction:column;gap:12px;box-sizing:border-box;max-height:80vh;';
+  const titleEl = document.createElement('div');
+  titleEl.textContent = 'Notification Sound';
+  titleEl.style.cssText = 'font-size:15px;color:#fff;font-weight:600;flex-shrink:0;';
+  const list = document.createElement('div');
+  list.style.cssText = 'overflow-y:auto;display:flex;flex-direction:column;gap:2px;flex:1;min-height:0;';
+  soundList.forEach(function(sound) {
+    const isSelected = sound.uri === currentUri;
+    const item = document.createElement('div');
+    item.dataset.uri = sound.uri;
+    item.dataset.name = sound.name;
+    item.style.cssText =
+      'padding:10px 12px;border-radius:6px;cursor:pointer;font-size:13px;color:#fff;' +
+      'display:flex;align-items:center;gap:10px;' +
+      'background:' + (isSelected ? '#1a2a3a' : 'transparent') + ';' +
+      'border:1px solid ' + (isSelected ? '#4488cc' : 'transparent') + ';';
+    const dot = document.createElement('div');
+    dot.style.cssText =
+      'width:8px;height:8px;border-radius:50%;flex-shrink:0;background:' + (isSelected ? '#99ccff' : '#555') + ';';
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = sound.name;
+    nameSpan.style.flex = '1';
+    item.appendChild(dot);
+    item.appendChild(nameSpan);
+    item.addEventListener('click', function() {
+      Array.from(list.children).forEach(function(el) {
+        el.style.background = 'transparent';
+        el.style.borderColor = 'transparent';
+        const d = el.querySelector('div');
+        if (d) d.style.background = '#555';
+      });
+      item.style.background = '#1a2a3a';
+      item.style.borderColor = '#4488cc';
+      dot.style.background = '#99ccff';
+      selectedUri = sound.uri;
+      selectedName = sound.name;
+      if (window.AndroidSettings && window.AndroidSettings.previewNotifSound) {
+        window.AndroidSettings.previewNotifSound(sound.uri);
+      }
+    });
+    list.appendChild(item);
+  });
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;flex-shrink:0;';
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText =
+    'flex:1;padding:9px 0;background:#333;color:#ccc;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
+  cancelBtn.onclick = function() {
+    if (window.AndroidSettings && window.AndroidSettings.stopNotifSoundPreview) {
+      window.AndroidSettings.stopNotifSoundPreview();
+    }
+    document.body.removeChild(overlay);
+  };
+  const selectBtn = document.createElement('button');
+  selectBtn.textContent = 'Select';
+  selectBtn.style.cssText =
+    'flex:1;padding:9px 0;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;';
+  selectBtn.onclick = function() {
+    if (window.AndroidSettings && window.AndroidSettings.stopNotifSoundPreview) {
+      window.AndroidSettings.stopNotifSoundPreview();
+    }
+    if (window.AndroidSettings && window.AndroidSettings.setNotifSound) {
+      window.AndroidSettings.setNotifSound(selectedUri, selectedName);
+    }
+    const nameEl = document.getElementById('notif-sound-name');
+    if (nameEl) nameEl.textContent = selectedName || 'None';
+    document.body.removeChild(overlay);
+  };
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(selectBtn);
+  box.appendChild(titleEl);
+  box.appendChild(list);
+  box.appendChild(btnRow);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  let _found = null;
+  Array.from(list.children).forEach(function(el) { if (el.dataset.uri === currentUri) _found = el; });
+  if (_found) setTimeout(function() { _found.scrollIntoView({ block: 'center', behavior: 'instant' }); }, 80);
 };
 window.notifSendTest = async function() {
   const btn = document.getElementById('notif-send-test-btn');

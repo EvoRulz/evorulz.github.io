@@ -1,4 +1,4 @@
-// @version 1537
+// @version 1538
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
+import android.media.AudioAttributes;
+import android.net.Uri;
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -19,7 +21,15 @@ public class NotificationReceiver extends BroadcastReceiver {
         if (!notifEnabled) return;
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel ch = new NotificationChannel("habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+            String _savedUri = context.getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri", null);
+            NotificationChannel ch = new NotificationChannel(
+                "habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+            if (_savedUri != null && !_savedUri.isEmpty()) {
+                AudioAttributes attrs = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                ch.setSound(Uri.parse(_savedUri), attrs);
+            }
             nm.createNotificationChannel(ch);
         }
         java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -49,14 +59,17 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
         PendingIntent launchPi = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        Notification n = new NotificationCompat.Builder(context, "habit_reminders")
-        .setSmallIcon(R.drawable.ic_notification_icon)
-        .setContentTitle("Habit Tracker")
-        .setContentText("Pushups not done yet today.")
-        .setContentIntent(launchPi)
-        .setAutoCancel(true)
-        .build();
-        nm.notify((int) System.currentTimeMillis(), n);
+        NotificationCompat.Builder _nb = new NotificationCompat.Builder(context, "habit_reminders")
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentTitle("Habit Tracker")
+            .setContentText("Pushups not done yet today.")
+            .setContentIntent(launchPi)
+            .setAutoCancel(true);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            String _su = context.getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri", null);
+            if (_su != null && !_su.isEmpty()) _nb.setSound(Uri.parse(_su));
+        }
+        nm.notify((int) System.currentTimeMillis(), _nb.build());
         long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
         .getLong("intervalMs", 0);
         if (intervalMs > 0) {

@@ -1,4 +1,4 @@
-// @version 1537
+// @version 1538
 /*
  * Copyright 2020 Google Inc.
  *
@@ -41,9 +41,16 @@ import java.net.Socket;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import android.media.RingtoneManager;
+import android.media.Ringtone;
+import android.media.AudioAttributes;
+import android.database.Cursor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 public class LauncherActivity
 extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     private static final int LOCAL_NOTIF_PORT = 8765;
+    private Ringtone _previewRingtone = null;
     private ServerSocket _localServer = null;
     private Thread _localServerThread = null;
     @Override
@@ -140,6 +147,77 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             .edit().putBoolean("done_" + dateKey, done).apply();
         }
         @JavascriptInterface
+        public String getNotifSoundList() {
+            try {
+                RingtoneManager rm = new RingtoneManager(LauncherActivity.this);
+                rm.setType(RingtoneManager.TYPE_NOTIFICATION);
+                Cursor cursor = rm.getCursor();
+                JSONArray arr = new JSONArray();
+                JSONObject none = new JSONObject();
+                none.put("name", "None");
+                none.put("uri", "");
+                arr.put(none);
+                while (cursor.moveToNext()) {
+                    String sName = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+                    Uri sUri = rm.getRingtoneUri(cursor.getPosition());
+                    JSONObject obj = new JSONObject();
+                    obj.put("name", sName);
+                    obj.put("uri", sUri.toString());
+                    arr.put(obj);
+                }
+                return arr.toString();
+            } catch (Exception e) { return "[]"; }
+        }
+        @JavascriptInterface
+        public void previewNotifSound(String uriStr) {
+            try {
+                if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
+                if (uriStr == null || uriStr.isEmpty()) return;
+                _previewRingtone = RingtoneManager.getRingtone(LauncherActivity.this, Uri.parse(uriStr));
+                if (_previewRingtone != null) _previewRingtone.play();
+            } catch (Exception e) {}
+        }
+        @JavascriptInterface
+        public void stopNotifSoundPreview() {
+            try {
+                if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
+            } catch (Exception e) {}
+        }
+        @JavascriptInterface
+        public void setNotifSound(String uriStr, String name) {
+            try {
+                if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
+                String _uri = uriStr == null ? "" : uriStr;
+                String _name = name == null ? "Default" : name;
+                getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                    .putString("soundUri", _uri).putString("soundName", _name).apply();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    NotificationManager _nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    _nm.deleteNotificationChannel("habit_reminders");
+                    NotificationChannel _ch = new NotificationChannel(
+                        "habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                    if (!_uri.isEmpty()) {
+                        AudioAttributes _attrs = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                        _ch.setSound(Uri.parse(_uri), _attrs);
+                    } else {
+                        _ch.setSound(null, null);
+                    }
+                    _nm.createNotificationChannel(_ch);
+                }
+            } catch (Exception e) {}
+        }
+        @JavascriptInterface
+        public String getNotifSound() {
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("uri", getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri", ""));
+                obj.put("name", getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundName", "Default"));
+                return obj.toString();
+            } catch (Exception e) { return "{\"uri\":\"\",\"name\":\"Default\"}"; }
+        }
+        @JavascriptInterface
         public void showNotification(String title, String body) {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -148,14 +226,17 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             }
             Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
             PendingIntent launchPi = PendingIntent.getActivity(LauncherActivity.this, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            Notification n = new NotificationCompat.Builder(LauncherActivity.this, "habit_reminders")
-            .setSmallIcon(R.drawable.ic_notification_icon)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setContentIntent(launchPi)
-            .setAutoCancel(true)
-            .build();
-            nm.notify((int) System.currentTimeMillis(), n);
+            NotificationCompat.Builder _nb = new NotificationCompat.Builder(LauncherActivity.this, "habit_reminders")
+                .setSmallIcon(R.drawable.ic_notification_icon)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setContentIntent(launchPi)
+                .setAutoCancel(true);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                String _su = getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri", null);
+                if (_su != null && !_su.isEmpty()) _nb.setSound(Uri.parse(_su));
+            }
+            nm.notify((int) System.currentTimeMillis(), _nb.build());
         }
     }
     public class OrientationBridge {
@@ -205,6 +286,10 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopLocalServer();
+        if (_previewRingtone != null) {
+            try { _previewRingtone.stop(); } catch (Exception e) {}
+            _previewRingtone = null;
+        }
     }
     private void startLocalServer() {
         if (_localServerThread != null && _localServerThread.isAlive()) return;

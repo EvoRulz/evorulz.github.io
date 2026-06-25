@@ -1,4 +1,4 @@
-// @version 1537
+// @version 1538
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -503,6 +503,17 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         <button id="notif-send-test-btn" onclick="notifSendTest()" style="padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Send Test</button>
       </div>
       <div id="notif-status-msg" style="font-size:12px;color:#888;min-height:16px;margin-top:6px;"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #333;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <label style="font-size:13px;color:#bbb;flex-shrink:0;">Notification Sound</label>
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <span id="notif-sound-name"
+            style="font-size:12px;color:#aaa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;">Default</span>
+          <button onclick="notifOpenSoundPicker()"
+            style="padding:5px 12px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:12px;flex-shrink:0;">
+            Change
+          </button>
+        </div>
+      </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid #333;display:flex;flex-direction:column;gap:8px;">
         <div style="font-size:13px;color:#bbb;">Resend interval</div>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
