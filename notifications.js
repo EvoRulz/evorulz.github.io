@@ -1,4 +1,4 @@
-// @version 1539
+// @version 1540
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -211,6 +211,8 @@ window.notifLoadScheduleUI = function() {
   _notifTickCountdown();
   if (window.notifDebugRefresh) window.notifDebugRefresh();
   if (window.notifLoadSoundName) window.notifLoadSoundName();
+  const btn = document.getElementById('notif-save-schedule-btn');
+  if (btn) btn.textContent = 'Saved';
 };
 function _notifUpdateToggleUI() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';
