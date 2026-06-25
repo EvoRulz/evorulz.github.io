@@ -1,4 +1,4 @@
-// @version 1540
+// @version 1541
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -460,6 +460,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
           <div id="notif-toggle-switch" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#666;transition:left 0.2s,background 0.2s;pointer-events:none;"></div>
         </div>
       </div>
+      <div id="notif-next-fire-display" style="font-size:12px;color:#aaa;min-height:16px;padding:4px 0;"></div>
       <div id="notif-off-wrap" style="display:flex;flex-direction:column;gap:8px;padding:10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;">
         <div style="font-size:12px;color:#888;">Auto-enable after (all zero = indefinite)</div>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">

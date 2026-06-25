@@ -1,4 +1,4 @@
-// @version 1540
+// @version 1541
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -193,6 +193,7 @@ window.notifSaveSchedule = function() {
     }
   }
   console.log('[notif] scheduling interval ms:', intervalMs);
+  setTimeout(_notifRefreshNextFire, 800);
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; setTimeout(() => btn.textContent = orig, 1200); }
 };
@@ -209,11 +210,45 @@ window.notifLoadScheduleUI = function() {
   } catch {}
   _notifUpdateToggleUI();
   _notifTickCountdown();
+  _notifRefreshNextFire();
   if (window.notifDebugRefresh) window.notifDebugRefresh();
   if (window.notifLoadSoundName) window.notifLoadSoundName();
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) btn.textContent = 'Saved';
 };
+let _notifNextFireMs = 0;
+function _notifRefreshNextFire() {
+  if (window.AndroidSettings && window.AndroidSettings.getNextFireTime) {
+    try { _notifNextFireMs = Number(window.AndroidSettings.getNextFireTime()); } catch(e) { _notifNextFireMs = 0; }
+    _notifUpdateNextFireDisplay();
+    return;
+  }
+  fetch('http://localhost:8765/nextfiretime')
+    .then(r => r.text())
+    .then(t => { _notifNextFireMs = Number(t) || 0; _notifUpdateNextFireDisplay(); })
+    .catch(() => { _notifNextFireMs = 0; _notifUpdateNextFireDisplay(); });
+}
+function _notifUpdateNextFireDisplay() {
+  const el = document.getElementById('notif-next-fire-display');
+  if (!el) return;
+  const enabled = localStorage.getItem('_notifEnabled') === 'true';
+  if (!enabled || !_notifNextFireMs) { el.textContent = ''; return; }
+  const remaining = _notifNextFireMs - Date.now();
+  if (remaining <= 0) { el.textContent = 'Firing soon...'; return; }
+  const totalSec = Math.floor(remaining / 1000);
+  const s = totalSec % 60;
+  const totalMin = Math.floor(totalSec / 60);
+  const m = totalMin % 60;
+  const totalHr = Math.floor(totalMin / 60);
+  const h = totalHr % 24;
+  const d = Math.floor(totalHr / 24);
+  const parts = [];
+  if (d) parts.push(d + 'd');
+  if (h) parts.push(h + 'h');
+  if (m) parts.push(m + 'm');
+  parts.push(s + 's');
+  el.textContent = 'Next notification in: ' + parts.join(' ');
+}
 function _notifUpdateToggleUI() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';
   const wrap  = document.getElementById('notif-toggle-wrap');
@@ -296,6 +331,7 @@ setInterval(() => {
     }
   }
   _notifTickCountdown();
+  _notifUpdateNextFireDisplay();
 }, 1000);
 window.notifToggle = function() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';
@@ -335,6 +371,7 @@ window.notifToggle = function() {
   }
   _notifUpdateToggleUI();
   _notifTickCountdown();
+  setTimeout(_notifRefreshNextFire, 800);
 };
 window.notifSetOffTimer = function() {
   const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };

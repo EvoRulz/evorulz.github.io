@@ -1,4 +1,4 @@
-// @version 1540
+// @version 1541
 /*
  * Copyright 2020 Google Inc.
  *
@@ -126,19 +126,28 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 .edit().putBoolean("notifEnabled", enabled).apply();
         }
         @JavascriptInterface
+        public String getNextFireTime() {
+            return String.valueOf(getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .getLong("nextFireMs", 0));
+        }
+        @JavascriptInterface
         public void scheduleRepeatingNotification(long intervalMs) {
             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent i = new Intent(LauncherActivity.this, NotificationReceiver.class);
             PendingIntent pi = PendingIntent.getBroadcast(LauncherActivity.this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             am.cancel(pi);
             if (intervalMs > 0) {
+                long _nextFire = System.currentTimeMillis() + intervalMs;
                 LauncherActivity.this.getSharedPreferences("notif", Context.MODE_PRIVATE)
-                .edit().putLong("intervalMs", intervalMs).apply();
+                    .edit().putLong("intervalMs", intervalMs).putLong("nextFireMs", _nextFire).apply();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
                 } else {
-                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
                 }
+            } else {
+                LauncherActivity.this.getSharedPreferences("notif", Context.MODE_PRIVATE)
+                    .edit().putLong("nextFireMs", 0).apply();
             }
         }
         @JavascriptInterface
@@ -191,21 +200,7 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 String _name = name == null ? "Default" : name;
                 getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
                     .putString("soundUri", _uri).putString("soundName", _name).apply();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationManager _nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    _nm.deleteNotificationChannel("habit_reminders");
-                    NotificationChannel _ch = new NotificationChannel(
-                        "habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
-                    if (!_uri.isEmpty()) {
-                        AudioAttributes _attrs = new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
-                        _ch.setSound(Uri.parse(_uri), _attrs);
-                    } else {
-                        _ch.setSound(null, null);
-                    }
-                    _nm.createNotificationChannel(_ch);
-                }
+                _createNotifChannel(_uri);
             } catch (Exception e) {}
         }
         @JavascriptInterface
@@ -220,13 +215,16 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         @JavascriptInterface
         public void showNotification(String title, String body) {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            String _chId = _getChannelId();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel ch = new NotificationChannel("habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
-                nm.createNotificationChannel(ch);
+                if (nm.getNotificationChannel(_chId) == null) {
+                    NotificationChannel ch = new NotificationChannel(_chId, "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                    nm.createNotificationChannel(ch);
+                }
             }
             Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
             PendingIntent launchPi = PendingIntent.getActivity(LauncherActivity.this, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            NotificationCompat.Builder _nb = new NotificationCompat.Builder(LauncherActivity.this, "habit_reminders")
+            NotificationCompat.Builder _nb = new NotificationCompat.Builder(LauncherActivity.this, _chId)
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(title)
                 .setContentText(body)
@@ -266,10 +264,12 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             }
             if (pi == null) {
                 PendingIntent newPi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                long _nextFireOnStart = System.currentTimeMillis() + savedInterval;
+                getSharedPreferences("notif", Context.MODE_PRIVATE).edit().putLong("nextFireMs", _nextFireOnStart).apply();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + savedInterval, newPi);
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFireOnStart, newPi);
                 } else {
-                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + savedInterval, newPi);
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFireOnStart, newPi);
                 }
             }
         }
@@ -290,6 +290,30 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             try { _previewRingtone.stop(); } catch (Exception e) {}
             _previewRingtone = null;
         }
+    }
+    private String _getChannelId() {
+        return getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getString("channelId", "habit_reminders");
+    }
+    private void _createNotifChannel(String uriStr) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        NotificationManager _nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        _nm.deleteNotificationChannel(_getChannelId());
+        int _ver = getSharedPreferences("notif", Context.MODE_PRIVATE).getInt("channelVer", 0) + 1;
+        String _newId = "habit_v" + _ver;
+        getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+            .putInt("channelVer", _ver).putString("channelId", _newId).apply();
+        NotificationChannel _ch = new NotificationChannel(
+            _newId, "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+        if (uriStr != null && !uriStr.isEmpty()) {
+            AudioAttributes _attrs = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+            _ch.setSound(Uri.parse(uriStr), _attrs);
+        } else {
+            _ch.setSound(null, null);
+        }
+        _nm.createNotificationChannel(_ch);
     }
     private void startLocalServer() {
         if (_localServerThread != null && _localServerThread.isAlive()) return;
@@ -351,13 +375,15 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                         PendingIntent pi = PendingIntent.getBroadcast(LauncherActivity.this, 0, i,
                             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                         am.cancel(pi);
+                        long _nextFire2 = fIv > 0 && fEn ? System.currentTimeMillis() + fIv : 0;
                         getSharedPreferences("notif", MODE_PRIVATE).edit()
-                            .putLong("intervalMs", fIv).putBoolean("notifEnabled", fEn).apply();
+                            .putLong("intervalMs", fIv).putBoolean("notifEnabled", fEn)
+                            .putLong("nextFireMs", _nextFire2).apply();
                         if (fIv > 0 && fEn) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-                                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + fIv, pi);
+                                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire2, pi);
                             } else {
-                                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + fIv, pi);
+                                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire2, pi);
                             }
                         }
                     });
@@ -394,6 +420,9 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     obj.put("name", getSharedPreferences("notif", MODE_PRIVATE).getString("soundName", "Default"));
                     responseBody = obj.toString();
                 } catch (Exception e) { responseBody = "{\"uri\":\"\",\"name\":\"Default\"}"; }
+            } else if ("/nextfiretime".equals(endpoint)) {
+                responseBody = String.valueOf(
+                    getSharedPreferences("notif", MODE_PRIVATE).getLong("nextFireMs", 0));
             } else if ("/setsound".equals(endpoint)) {
                 final String _sUri = params.containsKey("uri") ? params.get("uri") : "";
                 final String _sName = params.containsKey("name") ? params.get("name") : "Default";
@@ -402,21 +431,7 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                         if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
                         getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
                             .putString("soundUri", _sUri).putString("soundName", _sName).apply();
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            NotificationManager _nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                            _nm.deleteNotificationChannel("habit_reminders");
-                            NotificationChannel _ch = new NotificationChannel(
-                                "habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
-                            if (!_sUri.isEmpty()) {
-                                AudioAttributes _attrs = new AudioAttributes.Builder()
-                                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
-                                _ch.setSound(Uri.parse(_sUri), _attrs);
-                            } else {
-                                _ch.setSound(null, null);
-                            }
-                            _nm.createNotificationChannel(_ch);
-                        }
+                        _createNotifChannel(_sUri);
                     } catch (Exception e) {}
                 });
             } else if ("/previewsound".equals(endpoint)) {

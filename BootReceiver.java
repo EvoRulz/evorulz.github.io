@@ -1,4 +1,4 @@
-// @version 1540
+// @version 1541
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -19,10 +19,13 @@ public class BootReceiver extends BroadcastReceiver {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, NotificationReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        long _nextFire = System.currentTimeMillis() + intervalMs;
+        context.getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+            .putLong("nextFireMs", _nextFire).apply();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
         } else {
-            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
         }
     }
 }

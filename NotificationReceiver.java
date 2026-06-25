@@ -1,4 +1,4 @@
-// @version 1540
+// @version 1541
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -20,17 +20,22 @@ public class NotificationReceiver extends BroadcastReceiver {
             .getBoolean("notifEnabled", true);
         if (!notifEnabled) return;
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        String _chId = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getString("channelId", "habit_reminders");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String _savedUri = context.getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri", null);
-            NotificationChannel ch = new NotificationChannel(
-                "habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
-            if (_savedUri != null && !_savedUri.isEmpty()) {
-                AudioAttributes attrs = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
-                ch.setSound(Uri.parse(_savedUri), attrs);
+            if (nm.getNotificationChannel(_chId) == null) {
+                String _savedUri = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+                    .getString("soundUri", null);
+                NotificationChannel ch = new NotificationChannel(
+                    _chId, "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                if (_savedUri != null && !_savedUri.isEmpty()) {
+                    AudioAttributes attrs = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                    ch.setSound(Uri.parse(_savedUri), attrs);
+                }
+                nm.createNotificationChannel(ch);
             }
-            nm.createNotificationChannel(ch);
         }
         java.util.Calendar cal = java.util.Calendar.getInstance();
         String todayKey = String.format("%d-%02d-%02d",
@@ -47,19 +52,20 @@ public class NotificationReceiver extends BroadcastReceiver {
                 Intent i2 = new Intent(context, NotificationReceiver.class);
                 PendingIntent pi2 = PendingIntent.getBroadcast(context, 0, i2,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                long _nextFire2 = System.currentTimeMillis() + intervalMs;
+                context.getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                    .putLong("nextFireMs", _nextFire2).apply();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am2.canScheduleExactAlarms()) {
-                    am2.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + intervalMs, pi2);
+                    am2.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire2, pi2);
                 } else {
-                    am2.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + intervalMs, pi2);
+                    am2.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire2, pi2);
                 }
             }
             return;
         }
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
         PendingIntent launchPi = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        NotificationCompat.Builder _nb = new NotificationCompat.Builder(context, "habit_reminders")
+        NotificationCompat.Builder _nb = new NotificationCompat.Builder(context, _chId)
             .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle("Habit Tracker")
             .setContentText("Pushups not done yet today.")
@@ -76,10 +82,13 @@ public class NotificationReceiver extends BroadcastReceiver {
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent i = new Intent(context, NotificationReceiver.class);
             PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            long _nextFire = System.currentTimeMillis() + intervalMs;
+            context.getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                .putLong("nextFireMs", _nextFire).apply();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
             } else {
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + intervalMs, pi);
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
             }
         }
     }
