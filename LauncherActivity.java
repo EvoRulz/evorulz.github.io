@@ -1,4 +1,4 @@
-// @version 1535
+// @version 1536
 /*
  * Copyright 2020 Google Inc.
  *
@@ -202,15 +202,15 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         startLocalServer();
     }
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         stopLocalServer();
     }
     private void startLocalServer() {
         if (_localServerThread != null && _localServerThread.isAlive()) return;
-        try {
-            _localServer = new ServerSocket(LOCAL_NOTIF_PORT);
-            _localServerThread = new Thread(() -> {
+        _localServerThread = new Thread(() -> {
+            try {
+                _localServer = new ServerSocket(LOCAL_NOTIF_PORT);
                 while (!Thread.currentThread().isInterrupted() && _localServer != null && !_localServer.isClosed()) {
                     try {
                         Socket client = _localServer.accept();
@@ -219,10 +219,10 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                         if (_localServer == null || _localServer.isClosed()) break;
                     }
                 }
-            });
-            _localServerThread.setDaemon(true);
-            _localServerThread.start();
-        } catch (Exception e) {}
+            } catch (Exception e) {}
+        });
+        _localServerThread.setDaemon(true);
+        _localServerThread.start();
     }
     private void stopLocalServer() {
         try {
