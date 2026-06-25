@@ -1,4 +1,4 @@
-<!-- @version 1536 -->
+<!-- @version 1537 -->
 <!--
     Copyright 2019 Google Inc. All Rights Reserved.
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +12,8 @@
      limitations under the License.
  -->
  <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>

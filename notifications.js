@@ -1,4 +1,4 @@
-// @version 1536
+// @version 1537
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
