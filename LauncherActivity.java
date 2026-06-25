@@ -1,4 +1,4 @@
-// @version 1538
+// @version 1539
 /*
  * Copyright 2020 Google Inc.
  *
@@ -326,7 +326,8 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 if (h.startsWith("Origin: ")) origin = h.substring(8).trim();
             }
             boolean isOptions = requestLine != null && requestLine.startsWith("OPTIONS ");
-            if (!isOptions && requestLine != null && requestLine.startsWith("GET ")) {
+        String responseBody = "ok";
+        if (!isOptions && requestLine != null && requestLine.startsWith("GET ")) {
                 String path = requestLine.split(" ")[1];
                 String[] parts = path.split("\\?", 2);
                 String endpoint = parts[0];
@@ -361,24 +362,93 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                         }
                     });
                 } else if ("/markdone".equals(endpoint)) {
-                    String date = params.containsKey("date") ? params.get("date") : "";
-                    boolean done = "1".equals(params.containsKey("done") ? params.get("done") : "0");
-                    if (!date.isEmpty()) {
-                        getSharedPreferences("notif", MODE_PRIVATE).edit().putBoolean("done_" + date, done).apply();
-                    }
+                String date = params.containsKey("date") ? params.get("date") : "";
+                boolean done = "1".equals(params.containsKey("done") ? params.get("done") : "0");
+                if (!date.isEmpty()) {
+                    getSharedPreferences("notif", MODE_PRIVATE).edit().putBoolean("done_" + date, done).apply();
                 }
+            } else if ("/sounds".equals(endpoint)) {
+                try {
+                    RingtoneManager rm = new RingtoneManager(LauncherActivity.this);
+                    rm.setType(RingtoneManager.TYPE_NOTIFICATION);
+                    Cursor cursor = rm.getCursor();
+                    JSONArray arr = new JSONArray();
+                    JSONObject noneObj = new JSONObject();
+                    noneObj.put("name", "None");
+                    noneObj.put("uri", "");
+                    arr.put(noneObj);
+                    while (cursor.moveToNext()) {
+                        String sName = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+                        Uri sUri = rm.getRingtoneUri(cursor.getPosition());
+                        JSONObject obj = new JSONObject();
+                        obj.put("name", sName);
+                        obj.put("uri", sUri.toString());
+                        arr.put(obj);
+                    }
+                    responseBody = arr.toString();
+                } catch (Exception e) { responseBody = "[]"; }
+            } else if ("/currentsound".equals(endpoint)) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("uri", getSharedPreferences("notif", MODE_PRIVATE).getString("soundUri", ""));
+                    obj.put("name", getSharedPreferences("notif", MODE_PRIVATE).getString("soundName", "Default"));
+                    responseBody = obj.toString();
+                } catch (Exception e) { responseBody = "{\"uri\":\"\",\"name\":\"Default\"}"; }
+            } else if ("/setsound".equals(endpoint)) {
+                final String _sUri = params.containsKey("uri") ? params.get("uri") : "";
+                final String _sName = params.containsKey("name") ? params.get("name") : "Default";
+                runOnUiThread(() -> {
+                    try {
+                        if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
+                        getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                            .putString("soundUri", _sUri).putString("soundName", _sName).apply();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            NotificationManager _nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                            _nm.deleteNotificationChannel("habit_reminders");
+                            NotificationChannel _ch = new NotificationChannel(
+                                "habit_reminders", "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                            if (!_sUri.isEmpty()) {
+                                AudioAttributes _attrs = new AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                                _ch.setSound(Uri.parse(_sUri), _attrs);
+                            } else {
+                                _ch.setSound(null, null);
+                            }
+                            _nm.createNotificationChannel(_ch);
+                        }
+                    } catch (Exception e) {}
+                });
+            } else if ("/previewsound".equals(endpoint)) {
+                final String _pUri = params.containsKey("uri") ? params.get("uri") : "";
+                runOnUiThread(() -> {
+                    try {
+                        if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
+                        if (!_pUri.isEmpty()) {
+                            _previewRingtone = RingtoneManager.getRingtone(LauncherActivity.this, Uri.parse(_pUri));
+                            if (_previewRingtone != null) _previewRingtone.play();
+                        }
+                    } catch (Exception e) {}
+                });
+            } else if ("/stoppreview".equals(endpoint)) {
+                runOnUiThread(() -> {
+                    try {
+                        if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
+                    } catch (Exception e) {}
+                });
             }
-            String corsHdrs = "Access-Control-Allow-Origin: " + origin + "\r\n" +
-                "Access-Control-Allow-Methods: GET, OPTIONS\r\n" +
-                "Access-Control-Allow-Private-Network: true\r\n";
-            int bodyLen = isOptions ? 0 : 2;
-            String response = "HTTP/1.1 200 OK\r\n" + corsHdrs +
-                "Content-Type: text/plain\r\nContent-Length: " + bodyLen + "\r\nConnection: close\r\n\r\n" +
-                (isOptions ? "" : "ok");
-            OutputStream out = client.getOutputStream();
-            out.write(response.getBytes("UTF-8"));
-            out.flush();
-            client.close();
+        }
+        String corsHdrs = "Access-Control-Allow-Origin: " + origin + "\r\n" +
+            "Access-Control-Allow-Methods: GET, OPTIONS\r\n" +
+            "Access-Control-Allow-Private-Network: true\r\n";
+        byte[] bodyBytes = isOptions ? new byte[0] : responseBody.getBytes("UTF-8");
+        String response = "HTTP/1.1 200 OK\r\n" + corsHdrs +
+            "Content-Type: application/json\r\nContent-Length: " + bodyBytes.length + "\r\nConnection: close\r\n\r\n";
+        OutputStream out = client.getOutputStream();
+        out.write(response.getBytes("UTF-8"));
+        if (!isOptions) out.write(bodyBytes);
+        out.flush();
+        client.close();
         } catch (Exception e) {
             try { client.close(); } catch (Exception ignored) {}
         }

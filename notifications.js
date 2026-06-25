@@ -1,4 +1,4 @@
-// @version 1538
+// @version 1539
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -376,19 +376,30 @@ window.notifLoadSoundName = function() {
       nameEl.textContent = s.name || 'Default';
     } catch(e) { nameEl.textContent = 'Default'; }
   } else {
-    nameEl.textContent = '(Android app only)';
+    fetch('http://localhost:8765/currentsound')
+      .then(r => r.json())
+      .then(s => { nameEl.textContent = s.name || 'Default'; })
+      .catch(() => { nameEl.textContent = 'Default'; });
   }
 };
-window.notifOpenSoundPicker = function() {
-  if (!window.AndroidSettings || !window.AndroidSettings.getNotifSoundList) {
-    alert('Sound picker requires the Android app.');
-    return;
-  }
+window.notifOpenSoundPicker = async function() {
   let soundList;
-  try { soundList = JSON.parse(window.AndroidSettings.getNotifSoundList()); }
-  catch(e) { alert('Could not load sounds.'); return; }
   let currentUri = '';
-  try { const _cur = JSON.parse(window.AndroidSettings.getNotifSound()); currentUri = _cur.uri || ''; } catch(e) {}
+  if (window.AndroidSettings && window.AndroidSettings.getNotifSoundList) {
+    try { soundList = JSON.parse(window.AndroidSettings.getNotifSoundList()); }
+    catch(e) { alert('Could not load sounds.'); return; }
+    try { const _cur = JSON.parse(window.AndroidSettings.getNotifSound()); currentUri = _cur.uri || ''; } catch(e) {}
+  } else {
+    try {
+      const [_lr, _cr] = await Promise.all([
+        fetch('http://localhost:8765/sounds'),
+        fetch('http://localhost:8765/currentsound')
+      ]);
+      soundList = await _lr.json();
+      const _cur = await _cr.json();
+      currentUri = _cur.uri || '';
+    } catch(e) { alert('Could not load sounds.'); return; }
+  }
   let selectedUri = currentUri;
   let selectedName = 'None';
   soundList.forEach(function(s) { if (s.uri === currentUri) selectedName = s.name; });
@@ -436,6 +447,8 @@ window.notifOpenSoundPicker = function() {
       selectedName = sound.name;
       if (window.AndroidSettings && window.AndroidSettings.previewNotifSound) {
         window.AndroidSettings.previewNotifSound(sound.uri);
+      } else {
+        fetch('http://localhost:8765/previewsound?uri=' + encodeURIComponent(sound.uri)).catch(() => {});
       }
     });
     list.appendChild(item);
@@ -449,6 +462,8 @@ window.notifOpenSoundPicker = function() {
   cancelBtn.onclick = function() {
     if (window.AndroidSettings && window.AndroidSettings.stopNotifSoundPreview) {
       window.AndroidSettings.stopNotifSoundPreview();
+    } else {
+      fetch('http://localhost:8765/stoppreview').catch(() => {});
     }
     document.body.removeChild(overlay);
   };
@@ -459,9 +474,13 @@ window.notifOpenSoundPicker = function() {
   selectBtn.onclick = function() {
     if (window.AndroidSettings && window.AndroidSettings.stopNotifSoundPreview) {
       window.AndroidSettings.stopNotifSoundPreview();
+    } else {
+      fetch('http://localhost:8765/stoppreview').catch(() => {});
     }
     if (window.AndroidSettings && window.AndroidSettings.setNotifSound) {
       window.AndroidSettings.setNotifSound(selectedUri, selectedName);
+    } else {
+      fetch('http://localhost:8765/setsound?uri=' + encodeURIComponent(selectedUri) + '&name=' + encodeURIComponent(selectedName)).catch(() => {});
     }
     const nameEl = document.getElementById('notif-sound-name');
     if (nameEl) nameEl.textContent = selectedName || 'None';
