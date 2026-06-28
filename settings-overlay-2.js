@@ -1,4 +1,4 @@
-// @version 1553
+// @version 1554
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -581,6 +581,26 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         <div style="display:flex;flex-direction:column;gap:3px;">
           <label style="font-size:13px;color:#bbb;">Target reps to stop notifying (0 = ignore)</label>
           <input id="notif-target-reps" type="number" min="0" value="0" style="width:80px;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px 8px;font-size:13px;text-align:center;">
+        </div>
+        <div style="padding:10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <span style="font-size:13px;color:#bbb;">Auto-adjust target at midnight</span>
+            <div id="notif-auto-target-toggle" onclick="notifToggleAutoTarget()" style="width:48px;height:26px;border-radius:13px;background:#333;border:1px solid #555;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;touch-action:manipulation;">
+              <div id="notif-auto-target-switch" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#666;transition:left 0.2s,background 0.2s;pointer-events:none;"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+              <label style="font-size:10px;color:#666;">Step (negative to decrease)</label>
+              <input id="notif-auto-step" type="number" value="0"
+                style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px 8px;font-size:13px;text-align:center;box-sizing:border-box;">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+              <label style="font-size:10px;color:#666;">Cap</label>
+              <input id="notif-auto-cap" type="number" value="0"
+                style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px 8px;font-size:13px;text-align:center;box-sizing:border-box;">
+            </div>
+          </div>
         </div>
         <button id="notif-save-schedule-btn" onclick="notifSaveSchedule()" style="padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;align-self:flex-start;">Save Schedule</button>
       </div>

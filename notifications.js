@@ -1,4 +1,4 @@
-// @version 1553
+// @version 1554
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -240,6 +240,10 @@ window.notifSaveSchedule = function() {
   }
   console.log('[notif] scheduling interval ms:', intervalMs);
   setTimeout(_notifRefreshNextFire, 800);
+  const _ats = _getAutoTargetSettings();
+  _ats.step = parseInt(document.getElementById('notif-auto-step')?.value || '0') || 0;
+  _ats.cap  = parseInt(document.getElementById('notif-auto-cap')?.value  || '0') || 0;
+  localStorage.setItem('_notifAutoTarget', JSON.stringify(_ats));
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; setTimeout(() => btn.textContent = orig, 1200); }
 };
@@ -259,6 +263,12 @@ window.notifLoadScheduleUI = function() {
   _notifRefreshNextFire();
   if (window.notifDebugRefresh) window.notifDebugRefresh();
   if (window.notifLoadSoundName) window.notifLoadSoundName();
+  const _atsLoad = _getAutoTargetSettings();
+  const _stepEl = document.getElementById('notif-auto-step');
+  const _capEl  = document.getElementById('notif-auto-cap');
+  if (_stepEl) _stepEl.value = _atsLoad.step !== undefined ? _atsLoad.step : 1;
+  if (_capEl)  _capEl.value  = _atsLoad.cap  !== undefined ? _atsLoad.cap  : 100;
+  _updateAutoTargetToggleUI();
   if (window.notifLoadStartOffsetUI) window.notifLoadStartOffsetUI();
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) btn.textContent = 'Saved';
@@ -942,4 +952,49 @@ window.notifSendTest = async function() {
     } catch(e) {}
   }
 };
+// ── Auto target adjust ─────────────────────────────────────
+function _getAutoTargetSettings() {
+  try { const s = JSON.parse(localStorage.getItem('_notifAutoTarget')); if (s) return s; } catch {}
+  return { enabled: false, step: 1, cap: 100 };
+}
+function _updateAutoTargetToggleUI() {
+  const s   = _getAutoTargetSettings();
+  const wrap = document.getElementById('notif-auto-target-toggle');
+  const sw   = document.getElementById('notif-auto-target-switch');
+  const _onBg     = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF') : '#1a5a1a';
+  const _offBg    = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOffBg    || '#333333FF') : '#333333';
+  const _switchOn  = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOn  || '#99ff99FF') : '#99ff99';
+  const _switchOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOff || '#666666FF') : '#666666';
+  const _borderOn  = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOn  || '#2a7a2aFF') : '#2a7a2a';
+  const _borderOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOff || '#555555FF') : '#555555';
+  if (wrap) { wrap.style.background = s.enabled ? _onBg : _offBg; wrap.style.borderColor = s.enabled ? _borderOn : _borderOff; }
+  if (sw)   { sw.style.left = s.enabled ? '27px' : '3px'; sw.style.background = s.enabled ? _switchOn : _switchOff; }
+}
+window.notifToggleAutoTarget = function() {
+  const s = _getAutoTargetSettings();
+  s.enabled = !s.enabled;
+  localStorage.setItem('_notifAutoTarget', JSON.stringify(s));
+  _updateAutoTargetToggleUI();
+};
+function _applyAutoTargetAdjust() {
+  const s = _getAutoTargetSettings();
+  if (!s.enabled || !s.step) return;
+  let ns;
+  try { ns = JSON.parse(localStorage.getItem('_notifSettings')) || {}; } catch { ns = {}; }
+  const current = ns.targetReps || 0;
+  if (s.step > 0 && current >= s.cap) return;
+  if (s.step < 0 && current <= s.cap) return;
+  let newVal = current + s.step;
+  if (s.step > 0) newVal = Math.min(newVal, s.cap);
+  if (s.step < 0) newVal = Math.max(newVal, s.cap);
+  ns.targetReps = newVal;
+  localStorage.setItem('_notifSettings', JSON.stringify(ns));
+  const el = document.getElementById('notif-target-reps');
+  if (el) el.value = newVal;
+}
+(function _scheduleMidnightAdjust() {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+  setTimeout(function() { _applyAutoTargetAdjust(); _scheduleMidnightAdjust(); }, next - now);
+})();
 

@@ -1,4 +1,4 @@
-// @version 1553
+// @version 1554
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
