@@ -1,4 +1,4 @@
-// @version 1545
+// @version 1546
 document.querySelectorAll('.alpha-slider').forEach(function(s){
   if (s.closest('.color-settings-row')) return;
   var overlay = document.createElement('div');

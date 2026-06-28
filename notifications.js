@@ -1,4 +1,4 @@
-// @version 1545
+// @version 1546
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -633,6 +633,7 @@ function _ndtBuild() {
   _ndtRender();
   _ndtTickInterval = setInterval(() => {
     if (_notifDateSource === 'duration') return;
+    if (_notifDateSource === 'tumbler') return;
     _ndtIdx.sec = (_ndtIdx.sec + 1) % 60;
     if (_ndtIdx.sec === 0) {
       _ndtIdx.min = (_ndtIdx.min + 1) % 60;
@@ -640,10 +641,6 @@ function _ndtBuild() {
         _ndtIdx.hour = (_ndtIdx.hour + 1) % 12;
         if (_ndtIdx.hour === 0) _ndtIdx.ampm = (_ndtIdx.ampm + 1) % 2;
       }
-    }
-    if (_notifDateSource === 'tumbler') {
-      _notifTargetMs = _ndtGetDate().getTime();
-      _ndtSyncDurationFields();
     }
     _ndtRender();
   }, 1000);
