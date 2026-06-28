@@ -1,4 +1,4 @@
-// @version 1543
+// @version 1544
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -447,6 +447,7 @@ const _NDT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'
 const _NDT_YEARS  = Array.from({length:16}, (_,i) => String(new Date().getFullYear() + i));
 const _NDT_HOURS  = ['12','1','2','3','4','5','6','7','8','9','10','11'];
 const _NDT_MINS   = Array.from({length:60}, (_,i) => String(i).padStart(2,'0'));
+const _NDT_SECS   = Array.from({length:60}, (_,i) => String(i).padStart(2,'0'));
 const _NDT_AMPM   = ['am','pm'];
 const _NDT_COLS   = [
   {key:'day',   opts:_NDT_DAYS,   label:'Day'},
@@ -454,19 +455,21 @@ const _NDT_COLS   = [
   {key:'year',  opts:_NDT_YEARS,  label:'Year'},
   {key:'hour',  opts:_NDT_HOURS,  label:'Hour'},
   {key:'min',   opts:_NDT_MINS,   label:'Min'},
+  {key:'sec',   opts:_NDT_SECS,   label:'Sec'},
   {key:'ampm',  opts:_NDT_AMPM,   label:''},
 ];
-const _ndtIdx = {day:0, month:0, year:0, hour:0, min:0, ampm:0};
+const _ndtIdx = {day:0, month:0, year:0, hour:0, min:0, sec:0, ampm:0};
 function _ndtGetDate() {
   const day  = parseInt(_NDT_DAYS[_ndtIdx.day]);
   const month = _ndtIdx.month;
   const year  = parseInt(_NDT_YEARS[_ndtIdx.year]);
   let hour    = parseInt(_NDT_HOURS[_ndtIdx.hour]);
   const min   = _ndtIdx.min;
+  const sec   = _ndtIdx.sec;
   const isPm  = _ndtIdx.ampm === 1;
   if (isPm && hour !== 12) hour += 12;
   if (!isPm && hour === 12) hour = 0;
-  return new Date(year, month, day, hour, min, 0, 0);
+  return new Date(year, month, day, hour, min, sec, 0);
 }
 function _ndtSetDate(date) {
   const day   = date.getDate();
@@ -474,6 +477,7 @@ function _ndtSetDate(date) {
   const year  = date.getFullYear();
   let hour    = date.getHours();
   const min   = date.getMinutes();
+  const sec   = date.getSeconds();
   const isPm  = hour >= 12;
   let hour12  = hour % 12;
   if (hour12 === 0) hour12 = 12;
@@ -484,6 +488,7 @@ function _ndtSetDate(date) {
   const hourIdx = _NDT_HOURS.indexOf(String(hour12));
   _ndtIdx.hour  = hourIdx >= 0 ? hourIdx : 0;
   _ndtIdx.min   = Math.max(0, Math.min(59, min));
+  _ndtIdx.sec   = Math.max(0, Math.min(59, sec));
   _ndtIdx.ampm  = isPm ? 1 : 0;
 }
 function _ndtRender() {
@@ -504,17 +509,7 @@ function _ndtRender() {
     const aDown  = document.createElement('div'); aDown.className  = 'tumb-arrow';         aDown.textContent  = '▼';
     win.append(aUp, elPrev, elSel, elNext, aDown);
   });
-  const preview = document.getElementById('notif-date-tumbler-preview');
-  if (preview) {
-    try {
-      const d   = _ndtGetDate();
-      const mn  = _NDT_MONTHS[d.getMonth()];
-      const h12 = d.getHours() % 12 || 12;
-      const ap  = d.getHours() >= 12 ? 'pm' : 'am';
-      preview.textContent = `${d.getDate()}/${mn}/${d.getFullYear()}  ${h12}:${String(d.getMinutes()).padStart(2,'0')} ${ap}`;
-    } catch {}
   }
-}
 function _ndtSyncDurationFields() {
   const remaining = _notifTargetMs - Date.now();
   const _ids = ['notif-off-years','notif-off-days','notif-off-hours','notif-off-mins','notif-off-secs'];
@@ -563,24 +558,20 @@ function _ndtSetupColDrag(win, ci, key) {
   });
   win.addEventListener('pointercancel', () => { startY = null; lastY = null; accumY = 0; moved = false; });
 }
+let _ndtTickInterval = null;
 function _ndtBuild() {
   const wrap = document.getElementById('notif-date-tumbler-wrap');
   if (!wrap) return;
   wrap.innerHTML = '';
+  if (_ndtTickInterval) { clearInterval(_ndtTickInterval); _ndtTickInterval = null; }
   const lbl = document.createElement('div');
   lbl.style.cssText = 'font-size:11px;color:#666;margin-bottom:4px;';
   lbl.textContent = 'or pick date/time:';
   wrap.appendChild(lbl);
-  const preview = document.createElement('div');
-  preview.id = 'notif-date-tumbler-preview';
-  preview.style.cssText = 'font-size:13px;color:#fff;font-family:monospace;letter-spacing:0.04em;line-height:1.5;' +
-    'padding:8px 12px;background:#1a1a1a;border:1px solid #444;border-radius:6px 6px 0 0;' +
-    'border-bottom:none;text-align:center;';
-  wrap.appendChild(preview);
   const grid = document.createElement('div');
   grid.className = 'tumb-grid';
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(6,1fr);gap:0;' +
-    'border:1px solid #444;border-top:none;border-radius:0 0 6px 6px;overflow:hidden;margin:0;';
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:0;' +
+    'border:1px solid #444;border-radius:6px;overflow:hidden;margin:0;';
   _NDT_COLS.forEach((col, ci) => {
     const colEl = document.createElement('div');
     colEl.className = 'tumb-col'; colEl.dataset.ci = ci; colEl.dataset.key = col.key;
@@ -595,6 +586,22 @@ function _ndtBuild() {
   wrap.appendChild(grid);
   _notifTumblerBuilt = true;
   _ndtRender();
+  _ndtTickInterval = setInterval(() => {
+    if (_notifDateSource === 'duration') return;
+    _ndtIdx.sec = (_ndtIdx.sec + 1) % 60;
+    if (_ndtIdx.sec === 0) {
+      _ndtIdx.min = (_ndtIdx.min + 1) % 60;
+      if (_ndtIdx.min === 0) {
+        _ndtIdx.hour = (_ndtIdx.hour + 1) % 12;
+        if (_ndtIdx.hour === 0) _ndtIdx.ampm = (_ndtIdx.ampm + 1) % 2;
+      }
+    }
+    if (_notifDateSource === 'tumbler') {
+      _notifTargetMs = _ndtGetDate().getTime();
+      _ndtSyncDurationFields();
+    }
+    _ndtRender();
+  }, 1000);
 }
 window.notifSyncDateFromDuration = function() {
   _notifDateSource = 'duration';
