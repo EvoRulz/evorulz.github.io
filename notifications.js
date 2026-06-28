@@ -1,4 +1,4 @@
-// @version 1548
+// @version 1549
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -207,6 +207,8 @@ window.notifLoadStartOffsetUI = function() {
     set('notif-start-hours',   s.hours !== undefined ? s.hours : 0);
     set('notif-start-minutes', s.minutes);
     set('notif-start-seconds', s.seconds);
+    _nostBuild();
+    window.notifSyncStartFromFields();
   } catch {}
 };
 window.notifSaveSchedule = function() {
@@ -651,6 +653,137 @@ window.notifSyncDateFromDuration = function() {
   if (_notifTumblerBuilt) { _ndtSetDate(new Date(_notifTargetMs)); _ndtRender(); }
 };
 window.notifSyncDurationFromDate = function() {};
+// ── Start offset time-of-day tumbler ──────────────────────
+let _nostTumblerBuilt = false;
+const _NOST_HOURS = ['12','1','2','3','4','5','6','7','8','9','10','11'];
+const _NOST_MINS  = Array.from({length:60}, (_,i) => String(i).padStart(2,'0'));
+const _NOST_SECS  = Array.from({length:60}, (_,i) => String(i).padStart(2,'0'));
+const _NOST_AMPM  = ['am','pm'];
+const _NOST_COLS  = [
+  {key:'hour', opts:_NOST_HOURS, label:'Hour'},
+  {key:'min',  opts:_NOST_MINS,  label:'Min'},
+  {key:'sec',  opts:_NOST_SECS,  label:'Sec'},
+  {key:'ampm', opts:_NOST_AMPM,  label:''},
+];
+const _nostIdx = {hour:0, min:0, sec:0, ampm:0};
+function _nostSetTime(totalMs) {
+  const totalSec = Math.floor(totalMs / 1000);
+  const secs = totalSec % 60;
+  const totalMin = Math.floor(totalSec / 60);
+  const mins = totalMin % 60;
+  const totalHr = Math.floor(totalMin / 60) % 24;
+  const isPm = totalHr >= 12;
+  let hour12 = totalHr % 12;
+  if (hour12 === 0) hour12 = 12;
+  const hourIdx = _NOST_HOURS.indexOf(String(hour12));
+  _nostIdx.hour = hourIdx >= 0 ? hourIdx : 0;
+  _nostIdx.min  = Math.max(0, Math.min(59, mins));
+  _nostIdx.sec  = Math.max(0, Math.min(59, secs));
+  _nostIdx.ampm = isPm ? 1 : 0;
+}
+function _nostGetMs() {
+  const hour12 = parseInt(_NOST_HOURS[_nostIdx.hour]);
+  const isPm = _nostIdx.ampm === 1;
+  const hour24 = hour12 % 12 + (isPm ? 12 : 0);
+  return (hour24 * 3600 + _nostIdx.min * 60 + _nostIdx.sec) * 1000;
+}
+function _nostSyncToFields() {
+  const totalMs = _nostGetMs();
+  const totalSec = Math.floor(totalMs / 1000);
+  const secs = totalSec % 60;
+  const totalMin = Math.floor(totalSec / 60);
+  const mins = totalMin % 60;
+  const hours = Math.floor(totalMin / 60) % 24;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  set('notif-start-years', 0);
+  set('notif-start-days', 0);
+  set('notif-start-hours', hours);
+  set('notif-start-minutes', mins);
+  set('notif-start-seconds', secs);
+}
+function _nostRender() {
+  const wrap = document.getElementById('notif-start-time-tumbler-wrap');
+  if (!wrap) return;
+  _NOST_COLS.forEach((col, ci) => {
+    const win = wrap.querySelector(`.nost-col[data-ci="${ci}"] .tumb-window`);
+    if (!win) return;
+    win.innerHTML = '';
+    const opts = col.opts;
+    const sidx = _nostIdx[col.key];
+    const prev = (sidx - 1 + opts.length) % opts.length;
+    const next = (sidx + 1) % opts.length;
+    const aUp    = document.createElement('div'); aUp.className = 'tumb-arrow'; aUp.textContent = '\u25b2';
+    const elPrev = document.createElement('div'); elPrev.className = 'tumb-item tumb-adj'; elPrev.textContent = opts[prev];
+    const elSel  = document.createElement('div'); elSel.className = 'tumb-item tumb-sel'; elSel.textContent = opts[sidx];
+    const elNext = document.createElement('div'); elNext.className = 'tumb-item tumb-adj'; elNext.textContent = opts[next];
+    const aDown  = document.createElement('div'); aDown.className = 'tumb-arrow'; aDown.textContent = '\u25bc';
+    win.append(aUp, elPrev, elSel, elNext, aDown);
+  });
+}
+function _nostSetupColDrag(win, ci, key) {
+  let startY = null, lastY = null, accumY = 0, moved = false;
+  const STEP = 28;
+  function step(dir) {
+    const opts = _NOST_COLS[ci].opts;
+    _nostIdx[key] = (_nostIdx[key] + dir + opts.length) % opts.length;
+    _nostRender();
+    _nostSyncToFields();
+  }
+  win.addEventListener('pointerdown', e => {
+    e.preventDefault(); e.stopPropagation();
+    win.setPointerCapture(e.pointerId);
+    startY = e.clientY; lastY = e.clientY; accumY = 0; moved = false;
+  });
+  win.addEventListener('pointermove', e => {
+    if (startY === null) return;
+    const dy = lastY - e.clientY;
+    if (Math.abs(e.clientY - startY) > 4) moved = true;
+    accumY += dy; lastY = e.clientY;
+    while (accumY >= STEP)  { accumY -= STEP; step(1); }
+    while (accumY <= -STEP) { accumY += STEP; step(-1); }
+  });
+  win.addEventListener('pointerup', e => {
+    if (!moved) { const rect = win.getBoundingClientRect(); step(e.clientY < rect.top + rect.height / 2 ? -1 : 1); }
+    startY = null; lastY = null; accumY = 0; moved = false;
+  });
+  win.addEventListener('pointercancel', () => { startY = null; lastY = null; accumY = 0; moved = false; });
+}
+function _nostBuild() {
+  const wrap = document.getElementById('notif-start-time-tumbler-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-size:11px;color:#666;margin-bottom:4px;';
+  lbl.textContent = 'or pick time:';
+  wrap.appendChild(lbl);
+  const grid = document.createElement('div');
+  grid.className = 'tumb-grid';
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid #444;border-radius:6px;overflow:hidden;margin:0;';
+  _NOST_COLS.forEach((col, ci) => {
+    const colEl = document.createElement('div');
+    colEl.className = 'tumb-col nost-col'; colEl.dataset.ci = ci; colEl.dataset.key = col.key;
+    const colLbl = document.createElement('div');
+    colLbl.className = 'tumb-col-label'; colLbl.textContent = col.label;
+    colEl.appendChild(colLbl);
+    const win = document.createElement('div'); win.className = 'tumb-window';
+    colEl.appendChild(win);
+    grid.appendChild(colEl);
+    _nostSetupColDrag(win, ci, col.key);
+  });
+  wrap.appendChild(grid);
+  _nostTumblerBuilt = true;
+  _nostRender();
+}
+window.notifSyncStartFromFields = function() {
+  const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  const totalMs = (
+    g('notif-start-hours') * 60 * 60 * 1000 +
+    g('notif-start-minutes') * 60 * 1000 +
+    g('notif-start-seconds') * 1000
+  );
+  _nostSetTime(totalMs);
+  if (_nostTumblerBuilt) _nostRender();
+};
 let _notifMarkDoneLast = { date: null, done: null };
 window.notifMarkDone = function(dateKey, done) {
   if (window.AndroidSettings && window.AndroidSettings.markHabitDone) {

@@ -1,4 +1,4 @@
-// @version 1548
+// @version 1549
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -536,20 +536,21 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
           </div>
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Hours</label>
-            <input id="notif-start-hours" type="number" min="0" value="0"
+            <input id="notif-start-hours" type="number" min="0" value="0" oninput="notifSyncStartFromFields()"
               style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Mins</label>
-            <input id="notif-start-minutes" type="number" min="0" value="0"
+            <input id="notif-start-minutes" type="number" min="0" value="0" oninput="notifSyncStartFromFields()"
               style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Secs</label>
-            <input id="notif-start-seconds" type="number" min="0" value="0"
+            <input id="notif-start-seconds" type="number" min="0" value="0" oninput="notifSyncStartFromFields()"
               style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
         </div>
+        <div id="notif-start-time-tumbler-wrap" style="margin-top:4px;"></div>
         <button id="notif-save-start-offset-btn" onclick="notifSaveStartOffset()"
           style="padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;align-self:flex-start;">Save Start Time</button>
       </div>
