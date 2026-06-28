@@ -1,4 +1,4 @@
-// @version 1549
+// @version 1553
 /*
  * Copyright 2020 Google Inc.
  *
@@ -457,27 +457,55 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     } catch (Exception e) {}
                 });
             } else if ("/setstartoffset".equals(endpoint)) {
-                long _offsetMs = 0;
-                try { _offsetMs = Long.parseLong(params.containsKey("offset") ? params.get("offset") : "0"); }
-                catch (Exception ignored) {}
-                final long _fOffsetMs = _offsetMs;
-                runOnUiThread(() -> {
-                    getSharedPreferences("notif", MODE_PRIVATE)
-                        .edit().putLong("startOffsetMs", _fOffsetMs).apply();
-                });
+                    long _offsetMs = 0;
+                    try { _offsetMs = Long.parseLong(params.containsKey("offset") ? params.get("offset") : "0"); }
+                    catch (Exception ignored) {}
+                    final long _fOffsetMs = _offsetMs;
+                    runOnUiThread(() -> {
+                        getSharedPreferences("notif", MODE_PRIVATE)
+                            .edit().putLong("startOffsetMs", _fOffsetMs).apply();
+                    });
+                } else if ("/notify".equals(endpoint)) {
+                    final String _nTitle = params.containsKey("title") ? params.get("title") : "Habit Tracker";
+                    final String _nBody  = params.containsKey("body")  ? params.get("body")  : "Test notification.";
+                    runOnUiThread(() -> {
+                        NotificationManager _nm2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                        String _chId2 = getSharedPreferences("notif", MODE_PRIVATE).getString("channelId", "habit_reminders");
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            if (_nm2.getNotificationChannel(_chId2) == null) {
+                                NotificationChannel _ch2 = new NotificationChannel(
+                                    _chId2, "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                                _nm2.createNotificationChannel(_ch2);
+                            }
+                        }
+                        Intent _li2 = getPackageManager().getLaunchIntentForPackage(getPackageName());
+                        PendingIntent _lpi2 = PendingIntent.getActivity(LauncherActivity.this, 1, _li2,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                        NotificationCompat.Builder _nb2 = new NotificationCompat.Builder(LauncherActivity.this, _chId2)
+                            .setSmallIcon(R.drawable.ic_notification_icon)
+                            .setContentTitle(_nTitle)
+                            .setContentText(_nBody)
+                            .setContentIntent(_lpi2)
+                            .setAutoCancel(true);
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            String _su2 = getSharedPreferences("notif", MODE_PRIVATE).getString("soundUri", null);
+                            if (_su2 != null && !_su2.isEmpty()) _nb2.setSound(Uri.parse(_su2));
+                        }
+                        _nm2.notify((int) System.currentTimeMillis(), _nb2.build());
+                    });
+                }
             }
-        }
-        String corsHdrs = "Access-Control-Allow-Origin: " + origin + "\r\n" +
-            "Access-Control-Allow-Methods: GET, OPTIONS\r\n" +
-            "Access-Control-Allow-Private-Network: true\r\n";
-        byte[] bodyBytes = isOptions ? new byte[0] : responseBody.getBytes("UTF-8");
-        String response = "HTTP/1.1 200 OK\r\n" + corsHdrs +
-            "Content-Type: application/json\r\nContent-Length: " + bodyBytes.length + "\r\nConnection: close\r\n\r\n";
-        OutputStream out = client.getOutputStream();
-        out.write(response.getBytes("UTF-8"));
-        if (!isOptions) out.write(bodyBytes);
-        out.flush();
-        client.close();
+            String corsHdrs = "Access-Control-Allow-Origin: " + origin + "\r\n" +
+                "Access-Control-Allow-Methods: GET, OPTIONS\r\n" +
+                "Access-Control-Allow-Private-Network: true\r\n";
+            byte[] bodyBytes = isOptions ? new byte[0] : responseBody.getBytes("UTF-8");
+            String response = "HTTP/1.1 200 OK\r\n" + corsHdrs +
+                "Content-Type: application/json\r\nContent-Length: " + bodyBytes.length + "\r\nConnection: close\r\n\r\n";
+            OutputStream out = client.getOutputStream();
+            out.write(response.getBytes("UTF-8"));
+            if (!isOptions) out.write(bodyBytes);
+            out.flush();
+            client.close();
         } catch (Exception e) {
             try { client.close(); } catch (Exception ignored) {}
         }
