@@ -1,4 +1,4 @@
-// @version 1547
+// @version 1548
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -539,6 +539,7 @@ function _ndtSetDate(date) {
 function _ndtRender() {
   const wrap = document.getElementById('notif-date-tumbler-wrap');
   if (!wrap) return;
+  const _selColor = (_notifTargetMs > 0 && _notifTargetMs > Date.now()) ? '#fff' : '#555';
   _NDT_COLS.forEach((col, ci) => {
     const win = wrap.querySelector(`.tumb-col[data-ci="${ci}"] .tumb-window`);
     if (!win) return;
@@ -550,6 +551,7 @@ function _ndtRender() {
     const aUp    = document.createElement('div'); aUp.className    = 'tumb-arrow';         aUp.textContent    = '▲';
     const elPrev = document.createElement('div'); elPrev.className = 'tumb-item tumb-adj'; elPrev.textContent = opts[prev];
     const elSel  = document.createElement('div'); elSel.className  = 'tumb-item tumb-sel'; elSel.textContent  = opts[sel];
+    elSel.style.color = _selColor;
     const elNext = document.createElement('div'); elNext.className = 'tumb-item tumb-adj'; elNext.textContent = opts[next];
     const aDown  = document.createElement('div'); aDown.className  = 'tumb-arrow';         aDown.textContent  = '▼';
     win.append(aUp, elPrev, elSel, elNext, aDown);
