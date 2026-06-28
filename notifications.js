@@ -1,4 +1,4 @@
-// @version 1541
+// @version 1542
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -215,6 +215,30 @@ window.notifLoadScheduleUI = function() {
   if (window.notifLoadSoundName) window.notifLoadSoundName();
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) btn.textContent = 'Saved';
+  const _until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
+  const _dtInit = document.getElementById('notif-off-datetime');
+  if (_dtInit) {
+    if (_until > Date.now()) {
+      const _t = new Date(_until);
+      const _p = n => String(n).padStart(2, '0');
+      _dtInit.value = `${_t.getFullYear()}-${_p(_t.getMonth() + 1)}-${_p(_t.getDate())}T${_p(_t.getHours())}:${_p(_t.getMinutes())}`;
+      let _rem = Math.floor((_until - Date.now()) / 1000);
+      const _s = _rem % 60;  _rem = Math.floor(_rem / 60);
+      const _m = _rem % 60;  _rem = Math.floor(_rem / 60);
+      const _h = _rem % 24;  _rem = Math.floor(_rem / 24);
+      const _y = Math.floor(_rem / 365);
+      const _d = _rem % 365;
+      const _sv = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+      _sv('notif-off-years', _y);
+      _sv('notif-off-days',  _d);
+      _sv('notif-off-hours', _h);
+      _sv('notif-off-mins',  _m);
+      _sv('notif-off-secs',  _s);
+    } else {
+      _dtInit.value = '';
+    }
+  }
+  _notifUpdateInputColors();
 };
 let _notifNextFireMs = 0;
 function _notifRefreshNextFire() {
@@ -388,7 +412,54 @@ window.notifSetOffTimer = function() {
 };
 window.notifSetOffForever = function() {
   localStorage.removeItem('_notifOffUntil');
+  const _dtClr = document.getElementById('notif-off-datetime');
+  if (_dtClr) _dtClr.value = '';
+  _notifUpdateInputColors();
   _notifTickCountdown();
+};
+function _notifUpdateInputColors() {
+  const _ids = ['notif-off-years','notif-off-days','notif-off-hours','notif-off-mins','notif-off-secs'];
+  const _allZero = _ids.every(id => { const el = document.getElementById(id); return !el || !(parseInt(el.value) || 0); });
+  const _col = _allZero ? '#555' : '#fff';
+  _ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.color = _col; });
+}
+window.notifSyncDateFromDuration = function() {
+  const _g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  const _ms = (
+    _g('notif-off-years') * 365 * 24 * 60 * 60 * 1000 +
+    _g('notif-off-days')  * 24 * 60 * 60 * 1000 +
+    _g('notif-off-hours') * 60 * 60 * 1000 +
+    _g('notif-off-mins')  * 60 * 1000 +
+    _g('notif-off-secs')  * 1000
+  );
+  const _dtEl = document.getElementById('notif-off-datetime');
+  _notifUpdateInputColors();
+  if (!_dtEl) return;
+  if (_ms <= 0) { _dtEl.value = ''; return; }
+  const _target = new Date(Date.now() + _ms);
+  const _pad = n => String(n).padStart(2, '0');
+  _dtEl.value = `${_target.getFullYear()}-${_pad(_target.getMonth() + 1)}-${_pad(_target.getDate())}T${_pad(_target.getHours())}:${_pad(_target.getMinutes())}`;
+};
+window.notifSyncDurationFromDate = function() {
+  const _dtEl = document.getElementById('notif-off-datetime');
+  const _ids = ['notif-off-years','notif-off-days','notif-off-hours','notif-off-mins','notif-off-secs'];
+  const _zero = () => _ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; });
+  if (!_dtEl || !_dtEl.value) { _zero(); _notifUpdateInputColors(); return; }
+  const _remaining = new Date(_dtEl.value) - Date.now();
+  if (_remaining <= 0) { _zero(); _notifUpdateInputColors(); return; }
+  let _rem = Math.floor(_remaining / 1000);
+  const _secs  = _rem % 60;  _rem = Math.floor(_rem / 60);
+  const _mins  = _rem % 60;  _rem = Math.floor(_rem / 60);
+  const _hours = _rem % 24;  _rem = Math.floor(_rem / 24);
+  const _years = Math.floor(_rem / 365);
+  const _days  = _rem % 365;
+  const _set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  _set('notif-off-years', _years);
+  _set('notif-off-days',  _days);
+  _set('notif-off-hours', _hours);
+  _set('notif-off-mins',  _mins);
+  _set('notif-off-secs',  _secs);
+  _notifUpdateInputColors();
 };
 let _notifMarkDoneLast = { date: null, done: null };
 window.notifMarkDone = function(dateKey, done) {

@@ -1,4 +1,4 @@
-// @version 1541
+// @version 1542
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -466,24 +466,34 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Years</label>
-            <input id="notif-off-years" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+            <input id="notif-off-years" type="number" min="0" value="0" oninput="notifSyncDateFromDuration()"
+              style="width:100%;background:#111;color:#555;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Days</label>
-            <input id="notif-off-days" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+            <input id="notif-off-days" type="number" min="0" value="0" oninput="notifSyncDateFromDuration()"
+              style="width:100%;background:#111;color:#555;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Hours</label>
-            <input id="notif-off-hours" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+            <input id="notif-off-hours" type="number" min="0" value="0" oninput="notifSyncDateFromDuration()"
+              style="width:100%;background:#111;color:#555;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Mins</label>
-            <input id="notif-off-mins" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+            <input id="notif-off-mins" type="number" min="0" value="0" oninput="notifSyncDateFromDuration()"
+              style="width:100%;background:#111;color:#555;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
           <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
             <label style="font-size:10px;color:#666;">Secs</label>
-            <input id="notif-off-secs" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+            <input id="notif-off-secs" type="number" min="0" value="0" oninput="notifSyncDateFromDuration()"
+              style="width:100%;background:#111;color:#555;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:2px;">
+          <span style="font-size:11px;color:#666;flex-shrink:0;">or pick date/time:</span>
+          <input type="datetime-local" id="notif-off-datetime" oninput="notifSyncDurationFromDate()"
+            style="flex:1;background:#111;color:#aaa;border:1px solid #444;border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box;color-scheme:dark;">
         </div>
         <div id="notif-countdown-display" style="font-size:12px;color:#aaa;min-height:16px;">Off indefinitely</div>
         <div style="display:flex;gap:8px;">
