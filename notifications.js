@@ -1,5 +1,18 @@
-// @version 1544
+// @version 1545
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
+function _getStartOffsetMs() {
+  try {
+    const s = JSON.parse(localStorage.getItem('_notifStartOffset'));
+    if (s) return (
+      (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
+      (s.days    || 0) * 24 * 60 * 60 * 1000 +
+      (s.hours   || 0) * 60 * 60 * 1000 +
+      (s.minutes || 0) * 60 * 1000 +
+      (s.seconds || 0) * 1000
+    );
+  } catch {}
+  return 0;
+}
 (function() {
   function todayStr() {
     const d = new Date();
@@ -59,8 +72,9 @@ function _notifSyncDone() {
   async function notify() {
     if (localStorage.getItem('_notifEnabled') !== 'true') return;
     if (isPushupsDone()) return;
-    const h = new Date().getHours();
-    if (h < 7 || h >= 23) return;
+    const _n = new Date();
+    const _msFromMidnight = (_n.getHours() * 3600 + _n.getMinutes() * 60 + _n.getSeconds()) * 1000;
+    if (_msFromMidnight < _getStartOffsetMs()) return;
     try {
       const reg = await navigator.serviceWorker.ready;
       await reg.showNotification('Habit Tracker', {
@@ -165,6 +179,36 @@ window.notifRefreshPermission = function() {
     el.innerHTML = 'Web: <span style="color:' + webColor + '">' + webPerm + '</span>';
   }
 };
+window.notifSaveStartOffset = function() {
+  const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  const s = {
+    years:   g('notif-start-years'),
+    days:    g('notif-start-days'),
+    hours:   g('notif-start-hours'),
+    minutes: g('notif-start-minutes'),
+    seconds: g('notif-start-seconds'),
+  };
+  localStorage.setItem('_notifStartOffset', JSON.stringify(s));
+  const offsetMs = _getStartOffsetMs();
+  if (window.AndroidSettings && window.AndroidSettings.setStartOffset) {
+    window.AndroidSettings.setStartOffset(offsetMs);
+  } else {
+    _localNotifFetch('/setstartoffset?offset=' + offsetMs);
+  }
+  const btn = document.getElementById('notif-save-start-offset-btn');
+  if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; setTimeout(() => btn.textContent = orig, 1200); }
+};
+window.notifLoadStartOffsetUI = function() {
+  try {
+    const s = JSON.parse(localStorage.getItem('_notifStartOffset')) || {};
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || 0; };
+    set('notif-start-years',   s.years);
+    set('notif-start-days',    s.days);
+    set('notif-start-hours',   s.hours !== undefined ? s.hours : 0);
+    set('notif-start-minutes', s.minutes);
+    set('notif-start-seconds', s.seconds);
+  } catch {}
+};
 window.notifSaveSchedule = function() {
   const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
   const s = {
@@ -213,6 +257,7 @@ window.notifLoadScheduleUI = function() {
   _notifRefreshNextFire();
   if (window.notifDebugRefresh) window.notifDebugRefresh();
   if (window.notifLoadSoundName) window.notifLoadSoundName();
+  if (window.notifLoadStartOffsetUI) window.notifLoadStartOffsetUI();
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) btn.textContent = 'Saved';
   const _until = parseInt(localStorage.getItem('_notifOffUntil') || '0');

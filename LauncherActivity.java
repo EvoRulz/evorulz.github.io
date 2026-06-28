@@ -1,4 +1,4 @@
-// @version 1544
+// @version 1545
 /*
  * Copyright 2020 Google Inc.
  *
@@ -211,6 +211,11 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 obj.put("name", getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundName", "Default"));
                 return obj.toString();
             } catch (Exception e) { return "{\"uri\":\"\",\"name\":\"Default\"}"; }
+        }
+        @JavascriptInterface
+        public void setStartOffset(long offsetMs) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .edit().putLong("startOffsetMs", offsetMs).apply();
         }
         @JavascriptInterface
         public void showNotification(String title, String body) {
@@ -450,6 +455,15 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     try {
                         if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
                     } catch (Exception e) {}
+                });
+            } else if ("/setstartoffset".equals(endpoint)) {
+                long _offsetMs = 0;
+                try { _offsetMs = Long.parseLong(params.containsKey("offset") ? params.get("offset") : "0"); }
+                catch (Exception ignored) {}
+                final long _fOffsetMs = _offsetMs;
+                runOnUiThread(() -> {
+                    getSharedPreferences("notif", MODE_PRIVATE)
+                        .edit().putLong("startOffsetMs", _fOffsetMs).apply();
                 });
             }
         }

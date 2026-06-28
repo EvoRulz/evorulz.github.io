@@ -1,4 +1,4 @@
-// @version 1544
+// @version 1545
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -19,6 +19,34 @@ public class NotificationReceiver extends BroadcastReceiver {
         boolean notifEnabled = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
             .getBoolean("notifEnabled", true);
         if (!notifEnabled) return;
+        long _startOffsetMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getLong("startOffsetMs", 0);
+        if (_startOffsetMs > 0) {
+            java.util.Calendar _now = java.util.Calendar.getInstance();
+            long _msFromMidnight = (_now.get(java.util.Calendar.HOUR_OF_DAY) * 3600L
+                + _now.get(java.util.Calendar.MINUTE) * 60L
+                + _now.get(java.util.Calendar.SECOND)) * 1000L;
+            if (_msFromMidnight < _startOffsetMs) {
+                java.util.Calendar _startToday = java.util.Calendar.getInstance();
+                _startToday.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                _startToday.set(java.util.Calendar.MINUTE, 0);
+                _startToday.set(java.util.Calendar.SECOND, 0);
+                _startToday.set(java.util.Calendar.MILLISECOND, 0);
+                long _nextFire = _startToday.getTimeInMillis() + _startOffsetMs;
+                AlarmManager _am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                Intent _i = new Intent(context, NotificationReceiver.class);
+                PendingIntent _pi = PendingIntent.getBroadcast(context, 0, _i,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                context.getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                    .putLong("nextFireMs", _nextFire).apply();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !_am.canScheduleExactAlarms()) {
+                    _am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, _pi);
+                } else {
+                    _am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, _pi);
+                }
+                return;
+            }
+        }
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String _chId = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
             .getString("channelId", "habit_reminders");

@@ -1,4 +1,4 @@
-// @version 1544
+// @version 1545
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -520,6 +520,38 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
             Change
           </button>
         </div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #333;display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:13px;color:#bbb;">Daily schedule start (offset from midnight)</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Years</label>
+            <input id="notif-start-years" type="number" min="0" value="0"
+              style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Days</label>
+            <input id="notif-start-days" type="number" min="0" value="0"
+              style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Hours</label>
+            <input id="notif-start-hours" type="number" min="0" value="0"
+              style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Mins</label>
+            <input id="notif-start-minutes" type="number" min="0" value="0"
+              style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+            <label style="font-size:10px;color:#666;">Secs</label>
+            <input id="notif-start-seconds" type="number" min="0" value="0"
+              style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
+          </div>
+        </div>
+        <button id="notif-save-start-offset-btn" onclick="notifSaveStartOffset()"
+          style="padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;align-self:flex-start;">Save Start Time</button>
       </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid #333;display:flex;flex-direction:column;gap:8px;">
         <div style="font-size:13px;color:#bbb;">Resend interval</div>
