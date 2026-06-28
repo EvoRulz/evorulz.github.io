@@ -1,4 +1,4 @@
-// @version 1542
+// @version 1543
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -216,27 +216,18 @@ window.notifLoadScheduleUI = function() {
   const btn = document.getElementById('notif-save-schedule-btn');
   if (btn) btn.textContent = 'Saved';
   const _until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
-  const _dtInit = document.getElementById('notif-off-datetime');
-  if (_dtInit) {
-    if (_until > Date.now()) {
-      const _t = new Date(_until);
-      const _p = n => String(n).padStart(2, '0');
-      _dtInit.value = `${_t.getFullYear()}-${_p(_t.getMonth() + 1)}-${_p(_t.getDate())}T${_p(_t.getHours())}:${_p(_t.getMinutes())}`;
-      let _rem = Math.floor((_until - Date.now()) / 1000);
-      const _s = _rem % 60;  _rem = Math.floor(_rem / 60);
-      const _m = _rem % 60;  _rem = Math.floor(_rem / 60);
-      const _h = _rem % 24;  _rem = Math.floor(_rem / 24);
-      const _y = Math.floor(_rem / 365);
-      const _d = _rem % 365;
-      const _sv = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
-      _sv('notif-off-years', _y);
-      _sv('notif-off-days',  _d);
-      _sv('notif-off-hours', _h);
-      _sv('notif-off-mins',  _m);
-      _sv('notif-off-secs',  _s);
-    } else {
-      _dtInit.value = '';
-    }
+  _ndtBuild();
+  if (_until > Date.now()) {
+    _notifTargetMs = _until;
+    _notifDateSource = 'tumbler';
+    _ndtSetDate(new Date(_until));
+    _ndtRender();
+    _ndtSyncDurationFields();
+  } else {
+    _notifTargetMs = 0;
+    _notifDateSource = null;
+    _ndtSetDate(new Date(Date.now() + 60 * 60 * 1000));
+    _ndtRender();
   }
   _notifUpdateInputColors();
 };
@@ -353,9 +344,25 @@ setInterval(() => {
     } else {
       _localNotifFetch('/schedule?interval=' + _ms2 + '&enabled=1');
     }
+    _notifTargetMs = 0; _notifDateSource = null;
   }
   _notifTickCountdown();
   _notifUpdateNextFireDisplay();
+  if (_notifTargetMs > 0 && _notifTumblerBuilt) {
+    if (_notifDateSource === 'duration') {
+      const _gi = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+      const _msi = (
+        _gi('notif-off-years') * 365 * 24 * 60 * 60 * 1000 +
+        _gi('notif-off-days')  * 24 * 60 * 60 * 1000 +
+        _gi('notif-off-hours') * 60 * 60 * 1000 +
+        _gi('notif-off-mins')  * 60 * 1000 +
+        _gi('notif-off-secs')  * 1000
+      );
+      if (_msi > 0) { _notifTargetMs = Date.now() + _msi; _ndtSetDate(new Date(_notifTargetMs)); _ndtRender(); }
+    } else if (_notifDateSource === 'tumbler') {
+      _ndtSyncDurationFields();
+    }
+  }
 }, 1000);
 window.notifToggle = function() {
   const enabled = localStorage.getItem('_notifEnabled') === 'true';
@@ -398,22 +405,30 @@ window.notifToggle = function() {
   setTimeout(_notifRefreshNextFire, 800);
 };
 window.notifSetOffTimer = function() {
-  const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
-  const ms = (
-    g('notif-off-years') * 365 * 24 * 60 * 60 * 1000 +
-    g('notif-off-days')  * 24 * 60 * 60 * 1000 +
-    g('notif-off-hours') * 60 * 60 * 1000 +
-    g('notif-off-mins')  * 60 * 1000 +
-    g('notif-off-secs')  * 1000
+  let ms;
+  if (_notifTargetMs > 0) {
+    ms = _notifTargetMs - Date.now();
+  } else {
+    const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+    ms = (
+      g('notif-off-years') * 365 * 24 * 60 * 60 * 1000 +
+      g('notif-off-days')  * 24 * 60 * 60 * 1000 +
+      g('notif-off-hours') * 60 * 60 * 1000 +
+      g('notif-off-mins')  * 60 * 1000 +
+      g('notif-off-secs')  * 1000
     );
-  if (!ms) { window.notifSetOffForever(); return; }
+  }
+  if (!ms || ms <= 0) { window.notifSetOffForever(); return; }
   localStorage.setItem('_notifOffUntil', String(Date.now() + ms));
   _notifTickCountdown();
 };
 window.notifSetOffForever = function() {
   localStorage.removeItem('_notifOffUntil');
-  const _dtClr = document.getElementById('notif-off-datetime');
-  if (_dtClr) _dtClr.value = '';
+  _notifTargetMs = 0;
+  _notifDateSource = null;
+  ['notif-off-years','notif-off-days','notif-off-hours','notif-off-mins','notif-off-secs']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; });
+  if (_notifTumblerBuilt) { _ndtSetDate(new Date(Date.now() + 60 * 60 * 1000)); _ndtRender(); }
   _notifUpdateInputColors();
   _notifTickCountdown();
 };
@@ -423,44 +438,180 @@ function _notifUpdateInputColors() {
   const _col = _allZero ? '#555' : '#fff';
   _ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.color = _col; });
 }
-window.notifSyncDateFromDuration = function() {
-  const _g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
-  const _ms = (
-    _g('notif-off-years') * 365 * 24 * 60 * 60 * 1000 +
-    _g('notif-off-days')  * 24 * 60 * 60 * 1000 +
-    _g('notif-off-hours') * 60 * 60 * 1000 +
-    _g('notif-off-mins')  * 60 * 1000 +
-    _g('notif-off-secs')  * 1000
-  );
-  const _dtEl = document.getElementById('notif-off-datetime');
-  _notifUpdateInputColors();
-  if (!_dtEl) return;
-  if (_ms <= 0) { _dtEl.value = ''; return; }
-  const _target = new Date(Date.now() + _ms);
-  const _pad = n => String(n).padStart(2, '0');
-  _dtEl.value = `${_target.getFullYear()}-${_pad(_target.getMonth() + 1)}-${_pad(_target.getDate())}T${_pad(_target.getHours())}:${_pad(_target.getMinutes())}`;
-};
-window.notifSyncDurationFromDate = function() {
-  const _dtEl = document.getElementById('notif-off-datetime');
+// ── Notification date tumbler ──────────────────────────────
+let _notifTargetMs = 0;
+let _notifDateSource = null;
+let _notifTumblerBuilt = false;
+const _NDT_DAYS   = Array.from({length:31}, (_,i) => String(i+1));
+const _NDT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const _NDT_YEARS  = Array.from({length:16}, (_,i) => String(new Date().getFullYear() + i));
+const _NDT_HOURS  = ['12','1','2','3','4','5','6','7','8','9','10','11'];
+const _NDT_MINS   = Array.from({length:60}, (_,i) => String(i).padStart(2,'0'));
+const _NDT_AMPM   = ['am','pm'];
+const _NDT_COLS   = [
+  {key:'day',   opts:_NDT_DAYS,   label:'Day'},
+  {key:'month', opts:_NDT_MONTHS, label:'Month'},
+  {key:'year',  opts:_NDT_YEARS,  label:'Year'},
+  {key:'hour',  opts:_NDT_HOURS,  label:'Hour'},
+  {key:'min',   opts:_NDT_MINS,   label:'Min'},
+  {key:'ampm',  opts:_NDT_AMPM,   label:''},
+];
+const _ndtIdx = {day:0, month:0, year:0, hour:0, min:0, ampm:0};
+function _ndtGetDate() {
+  const day  = parseInt(_NDT_DAYS[_ndtIdx.day]);
+  const month = _ndtIdx.month;
+  const year  = parseInt(_NDT_YEARS[_ndtIdx.year]);
+  let hour    = parseInt(_NDT_HOURS[_ndtIdx.hour]);
+  const min   = _ndtIdx.min;
+  const isPm  = _ndtIdx.ampm === 1;
+  if (isPm && hour !== 12) hour += 12;
+  if (!isPm && hour === 12) hour = 0;
+  return new Date(year, month, day, hour, min, 0, 0);
+}
+function _ndtSetDate(date) {
+  const day   = date.getDate();
+  const month = date.getMonth();
+  const year  = date.getFullYear();
+  let hour    = date.getHours();
+  const min   = date.getMinutes();
+  const isPm  = hour >= 12;
+  let hour12  = hour % 12;
+  if (hour12 === 0) hour12 = 12;
+  _ndtIdx.day   = Math.max(0, Math.min(30, day - 1));
+  _ndtIdx.month = month;
+  const yearIdx = _NDT_YEARS.indexOf(String(year));
+  _ndtIdx.year  = yearIdx >= 0 ? yearIdx : 0;
+  const hourIdx = _NDT_HOURS.indexOf(String(hour12));
+  _ndtIdx.hour  = hourIdx >= 0 ? hourIdx : 0;
+  _ndtIdx.min   = Math.max(0, Math.min(59, min));
+  _ndtIdx.ampm  = isPm ? 1 : 0;
+}
+function _ndtRender() {
+  const wrap = document.getElementById('notif-date-tumbler-wrap');
+  if (!wrap) return;
+  _NDT_COLS.forEach((col, ci) => {
+    const win = wrap.querySelector(`.tumb-col[data-ci="${ci}"] .tumb-window`);
+    if (!win) return;
+    win.innerHTML = '';
+    const opts = col.opts;
+    const sel  = _ndtIdx[col.key];
+    const prev = (sel - 1 + opts.length) % opts.length;
+    const next = (sel + 1) % opts.length;
+    const aUp    = document.createElement('div'); aUp.className    = 'tumb-arrow';         aUp.textContent    = '▲';
+    const elPrev = document.createElement('div'); elPrev.className = 'tumb-item tumb-adj'; elPrev.textContent = opts[prev];
+    const elSel  = document.createElement('div'); elSel.className  = 'tumb-item tumb-sel'; elSel.textContent  = opts[sel];
+    const elNext = document.createElement('div'); elNext.className = 'tumb-item tumb-adj'; elNext.textContent = opts[next];
+    const aDown  = document.createElement('div'); aDown.className  = 'tumb-arrow';         aDown.textContent  = '▼';
+    win.append(aUp, elPrev, elSel, elNext, aDown);
+  });
+  const preview = document.getElementById('notif-date-tumbler-preview');
+  if (preview) {
+    try {
+      const d   = _ndtGetDate();
+      const mn  = _NDT_MONTHS[d.getMonth()];
+      const h12 = d.getHours() % 12 || 12;
+      const ap  = d.getHours() >= 12 ? 'pm' : 'am';
+      preview.textContent = `${d.getDate()}/${mn}/${d.getFullYear()}  ${h12}:${String(d.getMinutes()).padStart(2,'0')} ${ap}`;
+    } catch {}
+  }
+}
+function _ndtSyncDurationFields() {
+  const remaining = _notifTargetMs - Date.now();
   const _ids = ['notif-off-years','notif-off-days','notif-off-hours','notif-off-mins','notif-off-secs'];
-  const _zero = () => _ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; });
-  if (!_dtEl || !_dtEl.value) { _zero(); _notifUpdateInputColors(); return; }
-  const _remaining = new Date(_dtEl.value) - Date.now();
-  if (_remaining <= 0) { _zero(); _notifUpdateInputColors(); return; }
-  let _rem = Math.floor(_remaining / 1000);
-  const _secs  = _rem % 60;  _rem = Math.floor(_rem / 60);
-  const _mins  = _rem % 60;  _rem = Math.floor(_rem / 60);
-  const _hours = _rem % 24;  _rem = Math.floor(_rem / 24);
-  const _years = Math.floor(_rem / 365);
-  const _days  = _rem % 365;
-  const _set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
-  _set('notif-off-years', _years);
-  _set('notif-off-days',  _days);
-  _set('notif-off-hours', _hours);
-  _set('notif-off-mins',  _mins);
-  _set('notif-off-secs',  _secs);
+  if (remaining <= 0) {
+    _ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; });
+    _notifUpdateInputColors(); return;
+  }
+  let rem    = Math.floor(remaining / 1000);
+  const secs  = rem % 60;  rem = Math.floor(rem / 60);
+  const mins  = rem % 60;  rem = Math.floor(rem / 60);
+  const hours = rem % 24;  rem = Math.floor(rem / 24);
+  const years = Math.floor(rem / 365);
+  const days  = rem % 365;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  set('notif-off-years', years); set('notif-off-days', days);
+  set('notif-off-hours', hours); set('notif-off-mins', mins); set('notif-off-secs', secs);
   _notifUpdateInputColors();
+}
+function _ndtSetupColDrag(win, ci, key) {
+  let startY = null, lastY = null, accumY = 0, moved = false;
+  const STEP = 28;
+  function step(dir) {
+    const opts = _NDT_COLS[ci].opts;
+    _ndtIdx[key] = (_ndtIdx[key] + dir + opts.length) % opts.length;
+    _ndtRender();
+    _notifDateSource = 'tumbler';
+    _notifTargetMs = _ndtGetDate().getTime();
+    _ndtSyncDurationFields();
+  }
+  win.addEventListener('pointerdown', e => {
+    e.preventDefault(); e.stopPropagation();
+    win.setPointerCapture(e.pointerId);
+    startY = e.clientY; lastY = e.clientY; accumY = 0; moved = false;
+  });
+  win.addEventListener('pointermove', e => {
+    if (startY === null) return;
+    const dy = lastY - e.clientY;
+    if (Math.abs(e.clientY - startY) > 4) moved = true;
+    accumY += dy; lastY = e.clientY;
+    while (accumY >= STEP)  { accumY -= STEP; step(1); }
+    while (accumY <= -STEP) { accumY += STEP; step(-1); }
+  });
+  win.addEventListener('pointerup', e => {
+    if (!moved) { const rect = win.getBoundingClientRect(); step(e.clientY < rect.top + rect.height / 2 ? -1 : 1); }
+    startY = null; lastY = null; accumY = 0; moved = false;
+  });
+  win.addEventListener('pointercancel', () => { startY = null; lastY = null; accumY = 0; moved = false; });
+}
+function _ndtBuild() {
+  const wrap = document.getElementById('notif-date-tumbler-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-size:11px;color:#666;margin-bottom:4px;';
+  lbl.textContent = 'or pick date/time:';
+  wrap.appendChild(lbl);
+  const preview = document.createElement('div');
+  preview.id = 'notif-date-tumbler-preview';
+  preview.style.cssText = 'font-size:13px;color:#fff;font-family:monospace;letter-spacing:0.04em;line-height:1.5;' +
+    'padding:8px 12px;background:#1a1a1a;border:1px solid #444;border-radius:6px 6px 0 0;' +
+    'border-bottom:none;text-align:center;';
+  wrap.appendChild(preview);
+  const grid = document.createElement('div');
+  grid.className = 'tumb-grid';
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(6,1fr);gap:0;' +
+    'border:1px solid #444;border-top:none;border-radius:0 0 6px 6px;overflow:hidden;margin:0;';
+  _NDT_COLS.forEach((col, ci) => {
+    const colEl = document.createElement('div');
+    colEl.className = 'tumb-col'; colEl.dataset.ci = ci; colEl.dataset.key = col.key;
+    const colLbl = document.createElement('div');
+    colLbl.className = 'tumb-col-label'; colLbl.textContent = col.label;
+    colEl.appendChild(colLbl);
+    const win = document.createElement('div'); win.className = 'tumb-window';
+    colEl.appendChild(win);
+    grid.appendChild(colEl);
+    _ndtSetupColDrag(win, ci, col.key);
+  });
+  wrap.appendChild(grid);
+  _notifTumblerBuilt = true;
+  _ndtRender();
+}
+window.notifSyncDateFromDuration = function() {
+  _notifDateSource = 'duration';
+  _notifUpdateInputColors();
+  const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  const ms = (
+    g('notif-off-years') * 365 * 24 * 60 * 60 * 1000 +
+    g('notif-off-days')  * 24 * 60 * 60 * 1000 +
+    g('notif-off-hours') * 60 * 60 * 1000 +
+    g('notif-off-mins')  * 60 * 1000 +
+    g('notif-off-secs')  * 1000
+  );
+  if (ms <= 0) { _notifTargetMs = 0; return; }
+  _notifTargetMs = Date.now() + ms;
+  if (_notifTumblerBuilt) { _ndtSetDate(new Date(_notifTargetMs)); _ndtRender(); }
 };
+window.notifSyncDurationFromDate = function() {};
 let _notifMarkDoneLast = { date: null, done: null };
 window.notifMarkDone = function(dateKey, done) {
   if (window.AndroidSettings && window.AndroidSettings.markHabitDone) {

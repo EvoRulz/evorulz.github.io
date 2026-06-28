@@ -1,4 +1,4 @@
-// @version 1542
+// @version 1543
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -490,11 +490,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
               style="width:100%;background:#111;color:#555;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:2px;">
-          <span style="font-size:11px;color:#666;flex-shrink:0;">or pick date/time:</span>
-          <input type="datetime-local" id="notif-off-datetime" oninput="notifSyncDurationFromDate()"
-            style="flex:1;background:#111;color:#aaa;border:1px solid #444;border-radius:4px;padding:4px 8px;font-size:12px;box-sizing:border-box;color-scheme:dark;">
-        </div>
+        <div id="notif-date-tumbler-wrap" style="margin-top:4px;"></div>
         <div id="notif-countdown-display" style="font-size:12px;color:#aaa;min-height:16px;">Off indefinitely</div>
         <div style="display:flex;gap:8px;">
           <button onclick="notifSetOffTimer()" style="padding:6px 14px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Set timer</button>
