@@ -1,4 +1,4 @@
-// @version 1556
+// @version 1557
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -951,14 +951,11 @@ window.notifOpenSoundPicker = async function() {
 window.notifSendTest = async function() {
   const btn = document.getElementById('notif-send-test-btn');
   if (btn) { btn.textContent = 'Sent'; btn.disabled = true; setTimeout(() => { btn.textContent = 'Send Test'; btn.disabled = false; }, 1500); }
-  if (window.AndroidSettings && window.AndroidSettings.showNotification) {
-    window.AndroidSettings.showNotification('Habit Tracker', 'Test notification.');
-  } else {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      await reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], tag: 'habit-reminder' });
-    } catch(e) {}
-  }
+  fetch('http://localhost:8765/notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Test notification.')).catch(() => {
+    navigator.serviceWorker && navigator.serviceWorker.ready
+      .then(reg => reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], tag: 'habit-reminder' }))
+      .catch(() => {});
+  });
 };
 // ── Auto target adjust ─────────────────────────────────────
 function _getAutoTargetSettings() {
