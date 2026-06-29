@@ -1,4 +1,4 @@
-// @version 1554
+// @version 1555
 /*
  * Copyright 2020 Google Inc.
  *
@@ -257,24 +257,28 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     @Override
     protected void onStart() {
         long savedInterval = getSharedPreferences("notif", Context.MODE_PRIVATE)
-        .getLong("intervalMs", 0);
+            .getLong("intervalMs", 0);
         if (savedInterval > 0) {
-            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-            Intent i = new Intent(this, NotificationReceiver.class);
-            PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
-            if (savedInterval == 0) {
-                savedInterval = 60 * 60 * 1000L;
-                getSharedPreferences("notif", Context.MODE_PRIVATE)
-                .edit().putLong("intervalMs", savedInterval).apply();
-            }
-            if (pi == null) {
-                PendingIntent newPi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                long _nextFireOnStart = System.currentTimeMillis() + savedInterval;
-                getSharedPreferences("notif", Context.MODE_PRIVATE).edit().putLong("nextFireMs", _nextFireOnStart).apply();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFireOnStart, newPi);
-                } else {
-                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFireOnStart, newPi);
+            boolean _notifEnabledOnStart = getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .getBoolean("notifEnabled", true);
+            if (_notifEnabledOnStart) {
+                AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                Intent i = new Intent(this, NotificationReceiver.class);
+                long _nextFireSaved = getSharedPreferences("notif", Context.MODE_PRIVATE)
+                    .getLong("nextFireMs", 0);
+                boolean _alarmLateOrMissed = _nextFireSaved == 0
+                    || _nextFireSaved < System.currentTimeMillis() - 60000L;
+                PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+                if (pi == null || _alarmLateOrMissed) {
+                    PendingIntent newPi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                    long _nextFireOnStart = System.currentTimeMillis() + savedInterval;
+                    getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                        .putLong("nextFireMs", _nextFireOnStart).apply();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+                        am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFireOnStart, newPi);
+                    } else {
+                        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFireOnStart, newPi);
+                    }
                 }
             }
         }

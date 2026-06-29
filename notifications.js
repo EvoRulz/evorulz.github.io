@@ -1,4 +1,4 @@
-// @version 1554
+// @version 1555
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -271,7 +271,7 @@ window.notifLoadScheduleUI = function() {
   _updateAutoTargetToggleUI();
   if (window.notifLoadStartOffsetUI) window.notifLoadStartOffsetUI();
   const btn = document.getElementById('notif-save-schedule-btn');
-  if (btn) btn.textContent = 'Saved';
+  if (btn) btn.textContent = 'Save Schedule';
   const _until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
   _ndtBuild();
   if (_until > Date.now()) {
@@ -813,16 +813,23 @@ window.notifMarkDone = function(dateKey, done) {
 window.notifLoadSoundName = function() {
   const nameEl = document.getElementById('notif-sound-name');
   if (!nameEl) return;
+  const _lsSoundName = localStorage.getItem('_notifSoundName') || '';
   if (window.AndroidSettings && window.AndroidSettings.getNotifSound) {
     try {
       const s = JSON.parse(window.AndroidSettings.getNotifSound());
-      nameEl.textContent = s.name || 'Default';
-    } catch(e) { nameEl.textContent = 'Default'; }
+      const _n = s.name || _lsSoundName || 'Default';
+      nameEl.textContent = _n;
+      if (s.name) localStorage.setItem('_notifSoundName', s.name);
+    } catch(e) { nameEl.textContent = _lsSoundName || 'Default'; }
   } else {
     fetch('http://localhost:8765/currentsound')
       .then(r => r.json())
-      .then(s => { nameEl.textContent = s.name || 'Default'; })
-      .catch(() => { nameEl.textContent = 'Default'; });
+      .then(s => {
+        const _n = s.name || _lsSoundName || 'Default';
+        nameEl.textContent = _n;
+        if (s.name) localStorage.setItem('_notifSoundName', s.name);
+      })
+      .catch(() => { nameEl.textContent = _lsSoundName || 'Default'; });
   }
 };
 window.notifOpenSoundPicker = async function() {
@@ -925,6 +932,7 @@ window.notifOpenSoundPicker = async function() {
     } else {
       fetch('http://localhost:8765/setsound?uri=' + encodeURIComponent(selectedUri) + '&name=' + encodeURIComponent(selectedName)).catch(() => {});
     }
+    localStorage.setItem('_notifSoundName', selectedName || '');
     const nameEl = document.getElementById('notif-sound-name');
     if (nameEl) nameEl.textContent = selectedName || 'None';
     document.body.removeChild(overlay);
@@ -973,6 +981,10 @@ function _updateAutoTargetToggleUI() {
 window.notifToggleAutoTarget = function() {
   const s = _getAutoTargetSettings();
   s.enabled = !s.enabled;
+  const _stepElT = document.getElementById('notif-auto-step');
+  const _capElT  = document.getElementById('notif-auto-cap');
+  if (_stepElT !== null) s.step = parseInt(_stepElT.value || '0') || 0;
+  if (_capElT  !== null) s.cap  = parseInt(_capElT.value  || '0') || 0;
   localStorage.setItem('_notifAutoTarget', JSON.stringify(s));
   _updateAutoTargetToggleUI();
 };
