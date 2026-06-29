@@ -1,4 +1,4 @@
-// @version 1557
+// @version 1558
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -195,8 +195,8 @@ window.notifSaveStartOffset = function() {
   } else {
     _localNotifFetch('/setstartoffset?offset=' + offsetMs);
   }
-  const btn = document.getElementById('notif-save-start-offset-btn');
-  if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; setTimeout(() => btn.textContent = orig, 1200); }
+  _notifStartSavedSnap = _notifStartValues();
+  _notifCheckStartBtn();
 };
 window.notifLoadStartOffsetUI = function() {
   try {
@@ -244,8 +244,8 @@ window.notifSaveSchedule = function() {
   _ats.step = parseInt(document.getElementById('notif-auto-step')?.value || '0') || 0;
   _ats.cap  = parseInt(document.getElementById('notif-auto-cap')?.value  || '0') || 0;
   localStorage.setItem('_notifAutoTarget', JSON.stringify(_ats));
-  const btn = document.getElementById('notif-save-schedule-btn');
-  if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; setTimeout(() => btn.textContent = orig, 1200); }
+  _notifScheduleSavedSnap = _notifScheduleValues();
+  _notifCheckScheduleBtn();
 };
 window.notifLoadScheduleUI = function() {
   try {
@@ -270,8 +270,11 @@ window.notifLoadScheduleUI = function() {
   if (_capEl)  _capEl.value  = _atsLoad.cap  !== undefined ? _atsLoad.cap  : 100;
   _updateAutoTargetToggleUI();
   if (window.notifLoadStartOffsetUI) window.notifLoadStartOffsetUI();
-  const btn = document.getElementById('notif-save-schedule-btn');
-  if (btn) btn.textContent = 'Save Schedule';
+  _notifAddInputListener();
+  _notifScheduleSavedSnap = _notifScheduleValues();
+  _notifStartSavedSnap = _notifStartValues();
+  _notifCheckScheduleBtn();
+  _notifCheckStartBtn();
   const _until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
   _ndtBuild();
   if (_until > Date.now()) {
@@ -288,6 +291,54 @@ window.notifLoadScheduleUI = function() {
   }
   _notifUpdateInputColors();
 };
+let _notifScheduleSavedSnap = null;
+let _notifStartSavedSnap = null;
+let _notifInputListenerAdded = false;
+function _notifScheduleValues() {
+  const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  return JSON.stringify({
+    y: g('notif-years'), d: g('notif-days'), h: g('notif-hours'),
+    m: g('notif-minutes'), s: g('notif-seconds'), t: g('notif-target-reps'),
+    as: g('notif-auto-step'), ac: g('notif-auto-cap'),
+  });
+}
+function _notifStartValues() {
+  const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  return JSON.stringify({
+    y: g('notif-start-years'), d: g('notif-start-days'),
+    h: g('notif-start-hours'), m: g('notif-start-minutes'), s: g('notif-start-seconds'),
+  });
+}
+function _notifCheckScheduleBtn() {
+  const btn = document.getElementById('notif-save-schedule-btn');
+  if (!btn || _notifScheduleSavedSnap === null) return;
+  const changed = _notifScheduleValues() !== _notifScheduleSavedSnap;
+  btn.textContent = changed ? 'Save Schedule' : 'Saved';
+  btn.style.opacity = changed ? '' : '0.45';
+  btn.style.pointerEvents = changed ? '' : 'none';
+}
+function _notifCheckStartBtn() {
+  const btn = document.getElementById('notif-save-start-offset-btn');
+  if (!btn || _notifStartSavedSnap === null) return;
+  const changed = _notifStartValues() !== _notifStartSavedSnap;
+  btn.textContent = changed ? 'Save Start Time' : 'Saved';
+  btn.style.opacity = changed ? '' : '0.45';
+  btn.style.pointerEvents = changed ? '' : 'none';
+}
+function _notifAddInputListener() {
+  if (_notifInputListenerAdded) return;
+  const sg = document.getElementById('sg-notifications');
+  if (!sg) return;
+  _notifInputListenerAdded = true;
+  sg.addEventListener('input', function(e) {
+    const id = e.target && e.target.id;
+    if (!id) return;
+    if (['notif-years','notif-days','notif-hours','notif-minutes','notif-seconds',
+         'notif-target-reps','notif-auto-step','notif-auto-cap'].includes(id)) _notifCheckScheduleBtn();
+    if (['notif-start-years','notif-start-days','notif-start-hours',
+         'notif-start-minutes','notif-start-seconds'].includes(id)) _notifCheckStartBtn();
+  });
+}
 let _notifNextFireMs = 0;
 function _notifRefreshNextFire() {
   if (window.AndroidSettings && window.AndroidSettings.getNextFireTime) {
@@ -710,6 +761,7 @@ function _nostSyncToFields() {
   set('notif-start-hours', hours);
   set('notif-start-minutes', mins);
   set('notif-start-seconds', secs);
+  _notifCheckStartBtn();
 }
 function _nostRender() {
   const wrap = document.getElementById('notif-start-time-tumbler-wrap');
@@ -793,6 +845,7 @@ window.notifSyncStartFromFields = function() {
   );
   _nostSetTime(totalMs);
   if (_nostTumblerBuilt) _nostRender();
+  _notifCheckStartBtn();
 };
 let _notifMarkDoneLast = { date: null, done: null };
 window.notifMarkDone = function(dateKey, done) {
