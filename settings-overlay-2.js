@@ -1,4 +1,4 @@
-// @version 1558
+// @version 1559
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -607,7 +607,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div style="margin-top:12px;padding:10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <span style="font-size:12px;color:#888;">Today's rep read</span>
-          <button onclick="if(window.notifDebugRefresh)window.notifDebugRefresh();"
+          <button onclick="this.textContent='Done';this.style.color='#99ff99';if(window.notifDebugRefresh)window.notifDebugRefresh();setTimeout(()=>{this.textContent='Refresh';this.style.color='#aaa';},1000);"
                   style="padding:3px 10px;background:#2a2a2a;color:#aaa;border:1px solid #444;border-radius:4px;cursor:pointer;font-size:11px;">Refresh</button>
         </div>
         <div id="notif-debug-output" style="font-size:12px;line-height:1.8;color:#777;">(tap refresh)</div>
