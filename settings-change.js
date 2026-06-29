@@ -1,4 +1,4 @@
-// @version 1555
+// @version 1556
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -8,7 +8,13 @@ function settingsExport() {
     "_cfTuning":           localStorage.getItem("_cfTuning") || "{}",
     "_settingsGroupOrder": localStorage.getItem("_settingsGroupOrder") || "[]",
     "_sliderRowOrder":     localStorage.getItem("_sliderRowOrder")     || "[]",
-    "_trackerConfigs":    localStorage.getItem("_trackerConfigs")    || "[]",
+    "_trackerConfigs":   localStorage.getItem("_trackerConfigs")   || "[]",
+    "_notifEnabled":     localStorage.getItem("_notifEnabled")     || "",
+    "_notifSettings":    localStorage.getItem("_notifSettings")    || "{}",
+    "_notifStartOffset": localStorage.getItem("_notifStartOffset") || "{}",
+    "_notifOffUntil":    localStorage.getItem("_notifOffUntil")    || "",
+    "_notifSoundName":   localStorage.getItem("_notifSoundName")   || "",
+    "_notifAutoTarget":  localStorage.getItem("_notifAutoTarget")  || "{}",
   };
   const saveStyle = Object.assign({}, appStyle, { imgData: null });
   out["_appStyle"] = JSON.stringify(saveStyle);
@@ -138,6 +144,11 @@ function settingsImport(input) {
           localStorage.setItem("_trackerConfigs", data["_trackerConfigs"]);
         } catch{}
       }
+      [
+        "_notifEnabled","_notifSettings","_notifStartOffset",
+        "_notifOffUntil","_notifSoundName","_notifAutoTarget",
+      ].forEach(k=>{ if(data[k] != null && data[k] !== "") localStorage.setItem(k, data[k]); });
+      if (window._notifReschedule) window._notifReschedule();
       input.value = "";
     } catch{ alert("Invalid settings file."); }
   };
