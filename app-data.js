@@ -1,4 +1,4 @@
-// @version 1559
+// @version 1560
   // ── App-level export / import / clear ─────────────────────
 let APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id + ":");
 function appExport() {
@@ -16,7 +16,7 @@ function appExport() {
     "_appStyle","_cfTuning","_settingsGroupOrder",
     "_clockTumbler",
     "_notifEnabled","_notifSettings","_notifStartOffset",
-    "_notifOffUntil","_notifSoundName","_notifAutoTarget",
+    "_notifOffUntil","_notifSoundName","_notifSoundUri","_notifAutoTarget",
   ].forEach(k=>{ const v=localStorage.getItem(k); if (v!=null) out[k]=v; });
   out["_clockTumbler"] = JSON.stringify(clk.tumblerCfg);
   out["_appStyle"]     = JSON.stringify(saveStyle);
@@ -108,7 +108,7 @@ function appImport(input) {
       }
       [
         "_notifEnabled","_notifSettings","_notifStartOffset",
-        "_notifOffUntil","_notifSoundName","_notifAutoTarget",
+        "_notifOffUntil","_notifSoundName","_notifSoundUri","_notifAutoTarget",
       ].forEach(k=>{ if (data[k] != null) localStorage.setItem(k, data[k]); });
       if (window._notifReschedule) window._notifReschedule();
       input.value="";

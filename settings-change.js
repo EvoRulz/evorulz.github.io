@@ -1,4 +1,4 @@
-// @version 1559
+// @version 1560
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -14,6 +14,7 @@ function settingsExport() {
     "_notifStartOffset": localStorage.getItem("_notifStartOffset") || "{}",
     "_notifOffUntil":    localStorage.getItem("_notifOffUntil")    || "",
     "_notifSoundName":   localStorage.getItem("_notifSoundName")   || "",
+    "_notifSoundUri":    localStorage.getItem("_notifSoundUri")    || "",
     "_notifAutoTarget":  localStorage.getItem("_notifAutoTarget")  || "{}",
   };
   const saveStyle = Object.assign({}, appStyle, { imgData: null });
@@ -146,7 +147,7 @@ function settingsImport(input) {
       }
       [
         "_notifEnabled","_notifSettings","_notifStartOffset",
-        "_notifOffUntil","_notifSoundName","_notifAutoTarget",
+        "_notifOffUntil","_notifSoundName","_notifSoundUri","_notifAutoTarget",
       ].forEach(k=>{ if(data[k] != null && data[k] !== "") localStorage.setItem(k, data[k]); });
       if (window._notifReschedule) window._notifReschedule();
       input.value = "";
