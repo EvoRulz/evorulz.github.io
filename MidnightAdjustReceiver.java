@@ -11,7 +11,13 @@ public class MidnightAdjustReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences prefs = context.getSharedPreferences("notif", Context.MODE_PRIVATE);
         boolean enabled = prefs.getBoolean("autoTargetEnabled", false);
-        if (enabled) {
+        java.util.Calendar today = java.util.Calendar.getInstance();
+        String todayKey = String.format("%d-%02d-%02d",
+            today.get(java.util.Calendar.YEAR),
+            today.get(java.util.Calendar.MONTH) + 1,
+            today.get(java.util.Calendar.DAY_OF_MONTH));
+        String lastApplied = prefs.getString("autoTargetLastApplied", "");
+        if (enabled && !todayKey.equals(lastApplied)) {
             int step = prefs.getInt("autoTargetStep", 0);
             int cap = prefs.getInt("autoTargetCap", 0);
             int current = prefs.getInt("targetReps", 0);
@@ -24,6 +30,7 @@ public class MidnightAdjustReceiver extends BroadcastReceiver {
                     prefs.edit().putInt("targetReps", newVal).apply();
                 }
             }
+            prefs.edit().putString("autoTargetLastApplied", todayKey).apply();
         }
         scheduleNext(context);
     }

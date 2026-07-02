@@ -1,4 +1,4 @@
-// @version 1564
+// @version 1566
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -151,6 +151,7 @@ function _notifSyncDone() {
       } catch (e) {}
     }
     _notifSyncDone();
+    _applyAutoTargetAdjust();
     const _savedUri  = localStorage.getItem('_notifSoundUri');
     const _savedName = localStorage.getItem('_notifSoundName') || 'Default';
     if (_savedUri && window.AndroidSettings && window.AndroidSettings.getNotifSound) {
@@ -248,6 +249,7 @@ window.notifSaveSchedule = function() {
   localStorage.setItem('_notifSettings', JSON.stringify(s));
   if (window.AndroidSettings && window.AndroidSettings.setTargetReps) window.AndroidSettings.setTargetReps(s.targetReps);
   if (window._notifSyncDone) window._notifSyncDone();
+    _applyAutoTargetAdjust();
   if (window._notifReschedule) window._notifReschedule();
   const intervalMs = (
     (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
@@ -520,6 +522,7 @@ window.notifToggle = function() {
       window.AndroidSettings.setNotifEnabled(true);
     }
     if (window._notifSyncDone) window._notifSyncDone();
+    _applyAutoTargetAdjust();
     const s = JSON.parse(localStorage.getItem('_notifSettings') || '{}');
     const intervalMs = (
       (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
@@ -1069,17 +1072,52 @@ window.notifToggleAutoTarget = function() {
 function _applyAutoTargetAdjust() {
   const s = _getAutoTargetSettings();
   if (!s.enabled || !s.step) return;
+  const todayKey = (function() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  })();
+  let lastApplied = localStorage.getItem('_autoTargetLastApplied') || '';
+  if (window.AndroidSettings && window.AndroidSettings.getAutoTargetLastApplied) {
+    try {
+      const nativeLast = window.AndroidSettings.getAutoTargetLastApplied();
+      if (nativeLast && nativeLast > lastApplied) lastApplied = nativeLast;
+    } catch (e) {}
+  }
+  if (!lastApplied) {
+    localStorage.setItem('_autoTargetLastApplied', todayKey);
+    if (window.AndroidSettings && window.AndroidSettings.setAutoTargetLastApplied) {
+      try { window.AndroidSettings.setAutoTargetLastApplied(todayKey); } catch (e) {}
+    }
+    return;
+  }
+  if (lastApplied === todayKey) {
+    localStorage.setItem('_autoTargetLastApplied', todayKey);
+    return;
+  }
+  const lastDate = new Date(lastApplied + 'T00:00:00');
+  const todayDate = new Date(todayKey + 'T00:00:00');
+  let daysMissed = Math.round((todayDate - lastDate) / 86400000);
+  if (daysMissed < 1) { localStorage.setItem('_autoTargetLastApplied', todayKey); return; }
   let ns;
   try { ns = JSON.parse(localStorage.getItem('_notifSettings')) || {}; } catch { ns = {}; }
-  const current = ns.targetReps || 0;
-  if (s.step > 0 && current >= s.cap) return;
-  if (s.step < 0 && current <= s.cap) return;
-  let newVal = current + s.step;
-  if (s.step > 0) newVal = Math.min(newVal, s.cap);
-  if (s.step < 0) newVal = Math.max(newVal, s.cap);
-  ns.targetReps = newVal;
+  let current = ns.targetReps || 0;
+  for (let i = 0; i < daysMissed; i++) {
+    if (s.step > 0 && current >= s.cap) break;
+    if (s.step < 0 && current <= s.cap) break;
+    current = current + s.step;
+    if (s.step > 0) current = Math.min(current, s.cap);
+    if (s.step < 0) current = Math.max(current, s.cap);
+  }
+  ns.targetReps = current;
   localStorage.setItem('_notifSettings', JSON.stringify(ns));
+  localStorage.setItem('_autoTargetLastApplied', todayKey);
+  if (window.AndroidSettings && window.AndroidSettings.setAutoTargetLastApplied) {
+    try { window.AndroidSettings.setAutoTargetLastApplied(todayKey); } catch (e) {}
+  }
+  if (window.AndroidSettings && window.AndroidSettings.setTargetReps) {
+    try { window.AndroidSettings.setTargetReps(current); } catch (e) {}
+  }
   const el = document.getElementById('notif-target-reps');
-  if (el) el.value = newVal;
+  if (el) el.value = current;
 }
 

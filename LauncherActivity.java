@@ -1,4 +1,4 @@
-// @version 1564
+// @version 1566
 /*
  * Copyright 2020 Google Inc.
  *
@@ -166,6 +166,15 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             }
         }
         @JavascriptInterface
+        public String getAutoTargetLastApplied() {
+            return getSharedPreferences("notif", Context.MODE_PRIVATE).getString("autoTargetLastApplied", "");
+        }
+        @JavascriptInterface
+        public void setAutoTargetLastApplied(String dateKey) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                .putString("autoTargetLastApplied", dateKey).apply();
+        }
+        @JavascriptInterface
         public int getTargetReps() {
             return getSharedPreferences("notif", Context.MODE_PRIVATE).getInt("targetReps", 0);
         }
@@ -299,6 +308,11 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     }
                 }
             }
+        }
+        boolean _autoTargetOnStart = getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getBoolean("autoTargetEnabled", false);
+        if (_autoTargetOnStart) {
+            MidnightAdjustReceiver.scheduleNext(this);
         }
         super.onStart();
         android.view.View root = getWindow().getDecorView().getRootView();
