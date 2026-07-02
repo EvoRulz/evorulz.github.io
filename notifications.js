@@ -1,4 +1,4 @@
-// @version 1566
+// @version 1567
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -126,12 +126,27 @@ function _notifSyncDone() {
       } catch { setsStr = '(parse error)'; }
     }
     const done = target > 0 && total >= target;
+    const _atd = _getAutoTargetSettings();
+    let _atdLast = localStorage.getItem('_autoTargetLastApplied') || '';
+    if (window.AndroidSettings && window.AndroidSettings.getAutoTargetLastApplied) {
+      try {
+        const _atdNative = window.AndroidSettings.getAutoTargetLastApplied();
+        if (_atdNative && _atdNative > _atdLast) _atdLast = _atdNative;
+      } catch (e) {}
+    }
+    const _atdMidnight = new Date();
+    _atdMidnight.setHours(24, 0, 5, 0);
+    const _atdNext = (_atd.enabled && _atd.step) ? _atdMidnight.toLocaleString() : 'n/a';
     el.innerHTML =
       '<span style="color:#666;">key:</span> <span style="color:#aaa;font-family:monospace;">' + key + '</span><br>' +
       '<span style="color:#666;">sets:</span> <span style="color:#aaa;font-family:monospace;">' + setsStr + '</span><br>' +
       '<span style="color:#666;">total:</span> <span style="color:#aaa;">' + total +
       '</span>  <span style="color:#666;">target:</span> <span style="color:#aaa;">' + target + '</span><br>' +
-      '<span style="color:#666;">done (JS):</span> <span style="color:' + (done ? '#99ff99' : '#ff9999') + ';">' + done + '</span>';
+      '<span style="color:#666;">done (JS):</span> <span style="color:' + (done ? '#99ff99' : '#ff9999') + ';">' + done + '</span><br>' +
+      '<span style="color:#666;">auto-target:</span> <span style="color:' + (_atd.enabled ? '#99ff99' : '#ff9999') + ';">' + (_atd.enabled ? 'ON' : 'OFF') + '</span>' +
+      '  <span style="color:#666;">step/cap:</span> <span style="color:#aaa;">' + _atd.step + ' / ' + _atd.cap + '</span><br>' +
+      '<span style="color:#666;">last applied:</span> <span style="color:#aaa;">' + (_atdLast || '(never)') + '</span><br>' +
+      '<span style="color:#666;">next increment:</span> <span style="color:#aaa;">' + _atdNext + '</span>';
   };
   window._notifReschedule = function() {
     if (_notifInterval) clearInterval(_notifInterval);
