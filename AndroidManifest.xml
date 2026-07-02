@@ -1,4 +1,4 @@
-<!-- @version 1561 -->
+<!-- @version 1564 -->
 <!--
     Copyright 2019 Google Inc. All Rights Reserved.
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,7 @@
  -->
  <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
@@ -146,6 +146,7 @@
                                                                                             </service>
                                                                                             <activity android:name="com.google.androidbrowserhelper.trusted.NotificationPermissionRequestActivity" />
                                                                                             <receiver android:name=".NotificationReceiver" android:exported="true" />
+                                                                                            <receiver android:name=".MidnightAdjustReceiver" android:exported="true" />
                                                                                             <receiver android:name=".BootReceiver" android:exported="true">
                                                                                                 <intent-filter>
                                                                                                     <action android:name="android.intent.action.BOOT_COMPLETED" />

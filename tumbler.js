@@ -1,4 +1,4 @@
-// @version 1561
+// @version 1564
 // ── Clock tumbler ──────────────────────────────────────────
 (function(){
   const COLS = window._CLOCK_COLS;
@@ -396,7 +396,8 @@
         './LauncherActivity.java',
         './NotificationReceiver.java',
         './BootReceiver.java',
-        './AndroidManifest.xml'
+        './AndroidManifest.xml',
+        './MidnightAdjustReceiver.java'
       ];
       Promise.all(_files.map(f=>fetch(f+'?nocache='+Date.now(),{cache:'no-store'}).then(r=>r.text()).catch(()=>'')))
       .then(texts=>{
@@ -472,7 +473,7 @@
       './notifications.js',
       './slider-init.js',
       './color-picker-core.js',
-      './color-picker-sync.js',
+      './color-picker-sync.js', './BootReceiver.java',
       './app-data.js',
       './clock.js',
       './app.css',
@@ -481,6 +482,7 @@
       './NotificationReceiver.java',
       './BootReceiver.java',
       './AndroidManifest.xml',
+      './MidnightAdjustReceiver.java',
     ];
     return function() {
       if (_pending) return;

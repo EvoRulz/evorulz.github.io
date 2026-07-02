@@ -1,4 +1,4 @@
-// @version 1561
+// @version 1564
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -234,7 +234,7 @@ function onSelectChange(ds,el) {
   applyStatusColor(el);
   computeMaxStreaks();
   updateStreakAndTotal(); updateStats();
-  if (window.notifMarkDone) window.notifMarkDone(ds, el.value === 'yes');
+  if (window._notifSyncDone) window._notifSyncDone();
 }
 function onReasonInput(ds,el) {
   if (!store[ds]) store[ds]=getRow(ds);

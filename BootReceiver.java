@@ -1,4 +1,4 @@
-// @version 1561
+// @version 1564
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,6 +10,9 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) return;
+        boolean autoTargetEnabled = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getBoolean("autoTargetEnabled", false);
+        if (autoTargetEnabled) MidnightAdjustReceiver.scheduleNext(context);
         boolean notifEnabled = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
             .getBoolean("notifEnabled", true);
         if (!notifEnabled) return;

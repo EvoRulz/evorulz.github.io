@@ -1,4 +1,4 @@
-// @version 1561
+// @version 1564
 /*
  * Copyright 2020 Google Inc.
  *
@@ -154,6 +154,24 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         public void markHabitDone(String dateKey, boolean done) {
             getSharedPreferences("notif", Context.MODE_PRIVATE)
             .edit().putBoolean("done_" + dateKey, done).apply();
+        }
+        @JavascriptInterface
+        public void setAutoTargetConfig(boolean enabled, int step, int cap) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                .putBoolean("autoTargetEnabled", enabled).putInt("autoTargetStep", step).putInt("autoTargetCap", cap).apply();
+            if (enabled) {
+                MidnightAdjustReceiver.scheduleNext(LauncherActivity.this);
+            } else {
+                MidnightAdjustReceiver.cancel(LauncherActivity.this);
+            }
+        }
+        @JavascriptInterface
+        public int getTargetReps() {
+            return getSharedPreferences("notif", Context.MODE_PRIVATE).getInt("targetReps", 0);
+        }
+        @JavascriptInterface
+        public void setTargetReps(int reps) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE).edit().putInt("targetReps", reps).apply();
         }
         @JavascriptInterface
         public String getNotifSoundList() {

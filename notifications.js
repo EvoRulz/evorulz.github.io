@@ -1,4 +1,4 @@
-// @version 1561
+// @version 1564
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -138,6 +138,18 @@ function _notifSyncDone() {
     schedule();
   };
   setTimeout(() => {
+    if (window.AndroidSettings && window.AndroidSettings.getTargetReps) {
+      try {
+        const _nativeTarget = window.AndroidSettings.getTargetReps();
+        const _ns = JSON.parse(localStorage.getItem('_notifSettings')) || {};
+        if (_nativeTarget !== _ns.targetReps) {
+          _ns.targetReps = _nativeTarget;
+          localStorage.setItem('_notifSettings', JSON.stringify(_ns));
+          const _trEl = document.getElementById('notif-target-reps');
+          if (_trEl) _trEl.value = _nativeTarget;
+        }
+      } catch (e) {}
+    }
     _notifSyncDone();
     const _savedUri  = localStorage.getItem('_notifSoundUri');
     const _savedName = localStorage.getItem('_notifSoundName') || 'Default';
@@ -234,6 +246,7 @@ window.notifSaveSchedule = function() {
     targetReps: g('notif-target-reps'),
   };
   localStorage.setItem('_notifSettings', JSON.stringify(s));
+  if (window.AndroidSettings && window.AndroidSettings.setTargetReps) window.AndroidSettings.setTargetReps(s.targetReps);
   if (window._notifSyncDone) window._notifSyncDone();
   if (window._notifReschedule) window._notifReschedule();
   const intervalMs = (
@@ -256,6 +269,7 @@ window.notifSaveSchedule = function() {
   _ats.step = parseInt(document.getElementById('notif-auto-step')?.value || '0') || 0;
   _ats.cap  = parseInt(document.getElementById('notif-auto-cap')?.value  || '0') || 0;
   localStorage.setItem('_notifAutoTarget', JSON.stringify(_ats));
+  if (window.AndroidSettings && window.AndroidSettings.setAutoTargetConfig) window.AndroidSettings.setAutoTargetConfig(_ats.enabled, _ats.step, _ats.cap);
   _notifScheduleSavedSnap = _notifScheduleValues();
   _notifCheckScheduleBtn();
 };
@@ -1049,6 +1063,7 @@ window.notifToggleAutoTarget = function() {
   if (_stepElT !== null) s.step = parseInt(_stepElT.value || '0') || 0;
   if (_capElT  !== null) s.cap  = parseInt(_capElT.value  || '0') || 0;
   localStorage.setItem('_notifAutoTarget', JSON.stringify(s));
+  if (window.AndroidSettings && window.AndroidSettings.setAutoTargetConfig) window.AndroidSettings.setAutoTargetConfig(s.enabled, s.step, s.cap);
   _updateAutoTargetToggleUI();
 };
 function _applyAutoTargetAdjust() {
@@ -1067,9 +1082,4 @@ function _applyAutoTargetAdjust() {
   const el = document.getElementById('notif-target-reps');
   if (el) el.value = newVal;
 }
-(function _scheduleMidnightAdjust() {
-  const now = new Date();
-  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
-  setTimeout(function() { _applyAutoTargetAdjust(); _scheduleMidnightAdjust(); }, next - now);
-})();
 
