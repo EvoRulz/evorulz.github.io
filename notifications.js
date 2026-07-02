@@ -1,4 +1,4 @@
-// @version 1567
+// @version 1568
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 function _getStartOffsetMs() {
   try {
@@ -906,6 +906,17 @@ window.notifMarkDone = function(dateKey, done) {
   _notifMarkDoneLast = { date: dateKey, done: done };
   localStorage.setItem(_syncKey, _doneVal);
   _localNotifFetch('/markdone?date=' + encodeURIComponent(dateKey) + '&done=' + _doneVal);
+};
+window.notifSetDailyTotal = function(trackerId, dateKey, total) {
+  try {
+    const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.hasSets) : null;
+    if (!cfg || cfg.id !== trackerId) return;
+  } catch (e) { return; }
+  if (window.AndroidSettings && window.AndroidSettings.setDailyTotal) {
+    try { window.AndroidSettings.setDailyTotal(dateKey, total); } catch (e) {}
+    return;
+  }
+  _localNotifFetch('/settotal?date=' + encodeURIComponent(dateKey) + '&total=' + total);
 };
 window.notifLoadSoundName = function() {
   const nameEl = document.getElementById('notif-sound-name');

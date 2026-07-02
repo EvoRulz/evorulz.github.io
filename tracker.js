@@ -1,4 +1,4 @@
-// @version 1567
+// @version 1568
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -242,13 +242,9 @@ function onReasonInput(ds,el) {
 }
 function onInput(ds) {
   setRowFromDOM(ds);
-  if (hasSets && ds === dateStr(new Date())) {
+  if (hasSets) {
     const total = sum(store[ds]?.sets || []);
-    const target = (function() {
-      try { return JSON.parse(localStorage.getItem('_notifSettings'))?.targetReps || 0; } catch { return 0; }
-    })();
-    const done = target > 0 && total >= target;
-    if (window.notifMarkDone) window.notifMarkDone(ds, done);
+    if (window.notifSetDailyTotal) window.notifSetDailyTotal(id, ds, total);
   }
   if (autoStatus) {
     const ns=autoStatus(store[ds]);

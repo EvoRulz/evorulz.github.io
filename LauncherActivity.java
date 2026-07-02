@@ -1,4 +1,4 @@
-// @version 1567
+// @version 1568
 /*
  * Copyright 2020 Google Inc.
  *
@@ -154,6 +154,11 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         public void markHabitDone(String dateKey, boolean done) {
             getSharedPreferences("notif", Context.MODE_PRIVATE)
             .edit().putBoolean("done_" + dateKey, done).apply();
+        }
+        @JavascriptInterface
+        public void setDailyTotal(String dateKey, int total) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .edit().putInt("total_" + dateKey, total).apply();
         }
         @JavascriptInterface
         public void setAutoTargetConfig(boolean enabled, int step, int cap) {
@@ -433,6 +438,13 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 boolean done = "1".equals(params.containsKey("done") ? params.get("done") : "0");
                 if (!date.isEmpty()) {
                     getSharedPreferences("notif", MODE_PRIVATE).edit().putBoolean("done_" + date, done).apply();
+                }
+            } else if ("/settotal".equals(endpoint)) {
+                String totalDate = params.containsKey("date") ? params.get("date") : "";
+                int totalVal = 0;
+                try { totalVal = Integer.parseInt(params.containsKey("total") ? params.get("total") : "0"); } catch (Exception ignored) {}
+                if (!totalDate.isEmpty()) {
+                    getSharedPreferences("notif", MODE_PRIVATE).edit().putInt("total_" + totalDate, totalVal).apply();
                 }
             } else if ("/sounds".equals(endpoint)) {
                 try {

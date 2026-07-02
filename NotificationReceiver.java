@@ -1,4 +1,4 @@
-// @version 1567
+// @version 1568
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -70,8 +70,11 @@ public class NotificationReceiver extends BroadcastReceiver {
             cal.get(java.util.Calendar.YEAR),
             cal.get(java.util.Calendar.MONTH) + 1,
             cal.get(java.util.Calendar.DAY_OF_MONTH));
-        boolean isDone = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
-            .getBoolean("done_" + todayKey, false);
+        int _targetReps = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getInt("targetReps", 0);
+        int _todayTotal = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getInt("total_" + todayKey, 0);
+        boolean isDone = _targetReps > 0 && _todayTotal >= _targetReps;
         if (isDone) {
             long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
                 .getLong("intervalMs", 0);

@@ -1,4 +1,4 @@
-// @version 1567
+// @version 1568
 // ── Live clock ─────────────────────────────────────────────
 (function() {
   const dateEl = document.getElementById("live-date");
@@ -12,6 +12,7 @@
     // dayName options: 0=blank,1="",2="",3="",4="",5="Mon",6="Monday"  (indices map to DAY_OPTS below)
     // We encode choices per-column as indices into the column's options array.
   let tumblerCfg = TUMBLER_DEFAULTS.slice();
+let _lastTickDateStr = dateStr(new Date());
   try {
     const s = JSON.parse(localStorage.getItem("_clockTumbler"));
     if (Array.isArray(s) && s.length === 8) tumblerCfg = s;
@@ -95,6 +96,19 @@
     dateEl.dataset.text = dateLine;
     timeEl.textContent = timeLine;
     timeEl.dataset.text = timeLine;
+    const _todayKey = dateStr(now);
+    if (_todayKey !== _lastTickDateStr) {
+      _lastTickDateStr = _todayKey;
+      _handleMidnightRollover();
+    }
+  }
+  function _handleMidnightRollover() {
+    document.querySelectorAll(".today-row").forEach(r => r.classList.remove("today-row"));
+    document.querySelectorAll('#sections tr[data-date]').forEach(r => {
+      if (r.dataset.date === _lastTickDateStr) r.classList.add("today-row");
+    });
+    if (typeof _applyAutoTargetAdjust === "function") _applyAutoTargetAdjust();
+    if (window._notifSyncDone) window._notifSyncDone();
   }
   let _dateCycleStep = 0;
   dateEl.closest(".top-item").addEventListener("click", () => {
