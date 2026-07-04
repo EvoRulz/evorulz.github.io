@@ -1,4 +1,4 @@
-// @version 1571
+// @version 1572
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -208,6 +208,7 @@ window._notifMasterEnabled = function() {
         window.AndroidSettings.setHabitSchedule(hid, _notifIntervalMsFor(sched), effectiveEnabled, label);
       }
     });
+    if (typeof _notifRefreshNextFire === 'function') _notifRefreshNextFire();
   };
   setTimeout(() => {
     _notifSyncAllDone();
@@ -552,26 +553,21 @@ function _notifAddInputListener() {
          'notif-start-minutes','notif-start-seconds'].includes(id)) _notifCheckStartBtn();
   });
 }
-let _notifNextFireMs = 0;
+let _notifAllNextFire = {};
 function _notifRefreshNextFire() {
-  if (window.AndroidSettings && window.AndroidSettings.getNextFireTime) {
-    try { _notifNextFireMs = Number(window.AndroidSettings.getNextFireTime()); } catch(e) { _notifNextFireMs = 0; }
+  if (window.AndroidSettings && window.AndroidSettings.getAllNextFireTimes) {
+    try { _notifAllNextFire = JSON.parse(window.AndroidSettings.getAllNextFireTimes()) || {}; } catch(e) { _notifAllNextFire = {}; }
     _notifUpdateNextFireDisplay();
     return;
   }
-  fetch('http://localhost:8765/nextfiretime')
-    .then(r => r.text())
-    .then(t => { _notifNextFireMs = Number(t) || 0; _notifUpdateNextFireDisplay(); })
-    .catch(() => { _notifNextFireMs = 0; _notifUpdateNextFireDisplay(); });
+  fetch('http://localhost:8765/allnextfiretimes')
+    .then(r => r.json())
+    .then(j => { _notifAllNextFire = j || {}; _notifUpdateNextFireDisplay(); })
+    .catch(() => { _notifAllNextFire = {}; _notifUpdateNextFireDisplay(); });
 }
-function _notifUpdateNextFireDisplay() {
-  const el = document.getElementById('notif-next-fire-display');
-  if (!el) return;
-  const enabled = localStorage.getItem('_notifEnabled') === 'true';
-  if (!enabled || !_notifNextFireMs) { el.textContent = ''; return; }
-  const remaining = _notifNextFireMs - Date.now();
-  if (remaining <= 0) { el.textContent = 'Firing soon...'; return; }
-  const totalSec = Math.floor(remaining / 1000);
+function _notifFormatRemaining(ms) {
+  if (ms <= 0) return 'Firing soon...';
+  const totalSec = Math.floor(ms / 1000);
   const s = totalSec % 60;
   const totalMin = Math.floor(totalSec / 60);
   const m = totalMin % 60;
@@ -583,7 +579,22 @@ function _notifUpdateNextFireDisplay() {
   if (h) parts.push(h + 'h');
   if (m) parts.push(m + 'm');
   parts.push(s + 's');
-  el.textContent = 'Next notification in: ' + parts.join(' ');
+  return parts.join(' ');
+}
+function _notifUpdateNextFireDisplay() {
+  const el = document.getElementById('notif-next-fire-display');
+  if (!el) return;
+  const enabled = window._notifMasterEnabled();
+  if (!enabled) { el.textContent = ''; return; }
+  const entries = Object.keys(_notifAllNextFire || {}).map(hid => {
+    const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.id === hid) : null;
+    return { label: cfg ? cfg.label : hid, ms: _notifAllNextFire[hid] };
+  }).filter(e => e.ms > 0).sort((a, b) => a.ms - b.ms);
+  if (!entries.length) { el.textContent = 'No notifications queued.'; return; }
+  el.innerHTML = entries.map(e => {
+    const safeLabel = String(e.label).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    return `<div>${safeLabel}: ${_notifFormatRemaining(e.ms - Date.now())}</div>`;
+  }).join('');
 }
 function _notifUpdateToggleUI() {
   const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;

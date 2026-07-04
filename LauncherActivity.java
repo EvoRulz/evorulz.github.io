@@ -1,4 +1,4 @@
-// @version 1571
+// @version 1572
 /*
  * Copyright 2020 Google Inc.
  *
@@ -130,6 +130,20 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         public String getNextFireTime() {
             return String.valueOf(getSharedPreferences("notif", Context.MODE_PRIVATE)
                 .getLong("nextFireMs", 0));
+        }
+        @JavascriptInterface
+        public String getAllNextFireTimes() {
+            try {
+                SharedPreferences prefs = getSharedPreferences("notif", Context.MODE_PRIVATE);
+                java.util.Set<String> habitIds = prefs.getStringSet("habitIds", new java.util.HashSet<>());
+                JSONObject out = new JSONObject();
+                for (String habitId : habitIds) {
+                    if (!prefs.getBoolean("enabled_" + habitId, false)) continue;
+                    long nextFire = prefs.getLong("nextFire_" + habitId, 0);
+                    if (nextFire > 0) out.put(habitId, nextFire);
+                }
+                return out.toString();
+            } catch (Exception e) { return "{}"; }
         }
         @JavascriptInterface
         public void markHabitDone(String habitId, String dateKey, boolean done) {
@@ -536,6 +550,18 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             } else if ("/nextfiretime".equals(endpoint)) {
                 responseBody = String.valueOf(
                     getSharedPreferences("notif", MODE_PRIVATE).getLong("nextFireMs", 0));
+            } else if ("/allnextfiretimes".equals(endpoint)) {
+                try {
+                    SharedPreferences afPrefs = getSharedPreferences("notif", MODE_PRIVATE);
+                    java.util.Set<String> afIds = afPrefs.getStringSet("habitIds", new java.util.HashSet<>());
+                    JSONObject afOut = new JSONObject();
+                    for (String afId : afIds) {
+                        if (!afPrefs.getBoolean("enabled_" + afId, false)) continue;
+                        long afNext = afPrefs.getLong("nextFire_" + afId, 0);
+                        if (afNext > 0) afOut.put(afId, afNext);
+                    }
+                    responseBody = afOut.toString();
+                } catch (Exception e) { responseBody = "{}"; }
             } else if ("/setsound".equals(endpoint)) {
                 final String _sHabitId = params.containsKey("habit") ? params.get("habit") : "";
                 final String _sUri = params.containsKey("uri") ? params.get("uri") : "";
