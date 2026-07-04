@@ -1,4 +1,4 @@
-// @version 1568
+// @version 1569
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -234,7 +234,7 @@ function onSelectChange(ds,el) {
   applyStatusColor(el);
   computeMaxStreaks();
   updateStreakAndTotal(); updateStats();
-  if (window._notifSyncDone) window._notifSyncDone();
+  if (window._notifSyncDoneFor) window._notifSyncDoneFor(id, ds);
 }
 function onReasonInput(ds,el) {
   if (!store[ds]) store[ds]=getRow(ds);
@@ -242,10 +242,6 @@ function onReasonInput(ds,el) {
 }
 function onInput(ds) {
   setRowFromDOM(ds);
-  if (hasSets) {
-    const total = sum(store[ds]?.sets || []);
-    if (window.notifSetDailyTotal) window.notifSetDailyTotal(id, ds, total);
-  }
   if (autoStatus) {
     const ns=autoStatus(store[ds]);
     if (ns!==null) {
@@ -257,6 +253,7 @@ function onInput(ds) {
       }
     }
   }
+  if (window._notifSyncDoneFor) window._notifSyncDoneFor(id, ds);
   updateStreakAndTotal(); updateBars(); updateStats();
 }
 function onHeaderClick(key) {

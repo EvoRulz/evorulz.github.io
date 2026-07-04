@@ -1,4 +1,4 @@
-// @version 1568
+// @version 1569
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -16,19 +16,29 @@ public class BootReceiver extends BroadcastReceiver {
         boolean notifEnabled = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
             .getBoolean("notifEnabled", true);
         if (!notifEnabled) return;
-        long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
-            .getLong("intervalMs", 0);
-        if (intervalMs <= 0) return;
+        java.util.Set<String> habitIds = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getStringSet("habitIds", new java.util.HashSet<>());
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(context, NotificationReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        long _nextFire = System.currentTimeMillis() + intervalMs;
-        context.getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
-            .putLong("nextFireMs", _nextFire).apply();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
-        } else {
-            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
+        for (String habitId : habitIds) {
+            boolean habitEnabled = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .getBoolean("enabled_" + habitId, false);
+            if (!habitEnabled) continue;
+            long intervalMs = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .getLong("interval_" + habitId, 0);
+            if (intervalMs <= 0) continue;
+            Intent i = new Intent(context, NotificationReceiver.class);
+            i.putExtra("habitId", habitId);
+            int reqCode = habitId.hashCode();
+            PendingIntent pi = PendingIntent.getBroadcast(context, reqCode, i,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            long _nextFire = System.currentTimeMillis() + intervalMs;
+            context.getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                .putLong("nextFire_" + habitId, _nextFire).apply();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
+            } else {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
+            }
         }
     }
 }

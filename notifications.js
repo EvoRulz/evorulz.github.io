@@ -1,195 +1,305 @@
-// @version 1568
+// @version 1569
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
-function _getStartOffsetMs() {
-  try {
-    const s = JSON.parse(localStorage.getItem('_notifStartOffset'));
-    if (s) return (
+(function() {
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+  function _notifDefaultSchedule() {
+    return {
+      enabled: false,
+      column: 'status',
+      statusValue: 'yes',
+      threshold: 0,
+      years: 0, days: 0, hours: 1, minutes: 0, seconds: 0,
+      startOffset: { years: 0, days: 0, hours: 0, minutes: 0, seconds: 0 },
+      offUntil: 0,
+      soundUri: '', soundName: 'Default',
+      autoTarget: { enabled: false, step: 0, cap: 0, lastApplied: '' },
+    };
+  }
+  function _notifGetAllSchedules() {
+    try {
+      const s = JSON.parse(localStorage.getItem('_notifSchedules'));
+      if (s && typeof s === 'object') return s;
+    } catch {}
+    return {};
+  }
+  function getSchedule(habitId) {
+    const all = _notifGetAllSchedules();
+    return Object.assign({}, _notifDefaultSchedule(), all[habitId] || {});
+  }
+  function saveSchedule(habitId, patch) {
+    const all = _notifGetAllSchedules();
+    all[habitId] = Object.assign({}, _notifDefaultSchedule(), all[habitId] || {}, patch);
+    localStorage.setItem('_notifSchedules', JSON.stringify(all));
+    return all[habitId];
+  }
+  function _notifIntervalMsFor(sched) {
+    return (
+      (sched.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
+      (sched.days    || 0) * 24 * 60 * 60 * 1000 +
+      (sched.hours   || 0) * 60 * 60 * 1000 +
+      (sched.minutes || 0) * 60 * 1000 +
+      (sched.seconds || 0) * 1000
+      ) || 60 * 60 * 1000;
+  }
+  function _notifStartOffsetMsFor(sched) {
+    const s = sched.startOffset || {};
+    return (
       (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
       (s.days    || 0) * 24 * 60 * 60 * 1000 +
       (s.hours   || 0) * 60 * 60 * 1000 +
       (s.minutes || 0) * 60 * 1000 +
       (s.seconds || 0) * 1000
     );
-  } catch {}
-  return 0;
-}
-(function() {
-  function todayStr() {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   }
-  function getNotifSettings() {
-    try {
-      const s = JSON.parse(localStorage.getItem('_notifSettings'));
-      if (s) return s;
-    } catch {}
-    return { years: 0, days: 0, hours: 1, minutes: 0, seconds: 0, targetReps: 0 };
-  }
-  function getIntervalMs() {
-    const s = getNotifSettings();
-    return (
-      (s.years  || 0) * 365 * 24 * 60 * 60 * 1000 +
-      (s.days   || 0) * 24 * 60 * 60 * 1000 +
-      (s.hours  || 0) * 60 * 60 * 1000 +
-      (s.minutes|| 0) * 60 * 1000 +
-      (s.seconds|| 0) * 1000
-      ) || 60 * 60 * 1000;
-  }
-  function _notifTrackerPrefix() {
-    try {
-      const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.hasSets) : null;
-      return cfg ? cfg.id + ':' : 'pushups:';
-    } catch { return 'pushups:'; }
-  }
-  function isPushupsDone() {
-  try {
-    const raw = localStorage.getItem(_notifTrackerPrefix() + todayStr());
+  function isHabitDone(habitId, dateKey) {
+    const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.id === habitId) : null;
+    if (!cfg) return false;
+    const sched = getSchedule(habitId);
+    const raw = localStorage.getItem(habitId + ':' + dateKey);
     if (!raw) return false;
-    const data = JSON.parse(raw);
-    const target = getNotifSettings().targetReps || 0;
-    if (target === 0) return false;
-    const total = Array.isArray(data.sets) ? data.sets.reduce((a, b) => a + (b || 0), 0) : 0;
-    return total >= target;
-  } catch {}
-  return false;
-}
-function _notifSyncDone() {
-  try {
-    const ds = todayStr();
-    const raw = localStorage.getItem(_notifTrackerPrefix() + ds);
-    const target = getNotifSettings().targetReps || 0;
-    let done = false;
-    if (target > 0 && raw) {
-      const data = JSON.parse(raw);
-      const total = Array.isArray(data.sets) ? data.sets.reduce((a, b) => a + (b || 0), 0) : 0;
-      done = total >= target;
+    let data;
+    try { data = JSON.parse(raw); } catch { return false; }
+    if (sched.column === 'status') return data.status === (sched.statusValue || 'yes');
+    if (!cfg.hasSets) return false;
+    const sets = Array.isArray(data.sets) ? data.sets : [];
+    if (sched.column === 'total') {
+      const total = sets.reduce((a, b) => a + (b || 0), 0);
+      return (sched.threshold || 0) > 0 && total >= sched.threshold;
     }
-    if (window.notifMarkDone) window.notifMarkDone(ds, done);
+    if (sched.column && sched.column.indexOf('set:') === 0) {
+      const idx = parseInt(sched.column.slice(4), 10) - 1;
+      const val = sets[idx] || 0;
+      return (sched.threshold || 0) > 0 && val >= sched.threshold;
+    }
+    return false;
+  }
+  function _notifSyncDoneFor(habitId, dateKey) {
+    const done = isHabitDone(habitId, dateKey);
+    if (window.notifMarkDone) window.notifMarkDone(habitId, dateKey, done);
     return done;
-  } catch {}
-  return false;
-}
-  async function notify() {
-    if (localStorage.getItem('_notifEnabled') !== 'true') return;
-    if (isPushupsDone()) return;
+  }
+  function _notifSyncAllDone() {
+    const ds = todayStr();
+    const all = _notifGetAllSchedules();
+    Object.keys(all).forEach(habitId => { _notifSyncDoneFor(habitId, ds); });
+  }
+  async function notifyHabit(habitId) {
+    const sched = getSchedule(habitId);
+    if (!sched.enabled) return;
+    const ds = todayStr();
+    if (isHabitDone(habitId, ds)) return;
     const _n = new Date();
     const _msFromMidnight = (_n.getHours() * 3600 + _n.getMinutes() * 60 + _n.getSeconds()) * 1000;
-    if (_msFromMidnight < _getStartOffsetMs()) return;
+    if (_msFromMidnight < _notifStartOffsetMsFor(sched)) return;
+    const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.id === habitId) : null;
+    const label = cfg ? cfg.label : habitId;
     try {
       const reg = await navigator.serviceWorker.ready;
       await reg.showNotification('Habit Tracker', {
-        body: 'Pushups not done yet today.',
+        body: label + ' not done yet today.',
         icon: './icon-192.png',
         vibrate: [200],
         requireInteraction: false,
-        tag: 'habit-reminder'
+        tag: 'habit-reminder-' + habitId
       });
     } catch(e) {
       try {
         const a = document.createElement('a');
-        a.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Pushups not done yet today.');
+        a.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent(label + ' not done yet today.');
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
       } catch(e2) {}
     }
   }
-  let _notifInterval = null;
-  function schedule() {
-    if (_notifInterval) clearInterval(_notifInterval);
-    scheduleNextNotification();
+  let _notifIntervals = {};
+  function scheduleHabit(habitId) {
+    if (_notifIntervals[habitId]) { clearInterval(_notifIntervals[habitId]); delete _notifIntervals[habitId]; }
+    const sched = getSchedule(habitId);
+    if (!sched.enabled) return;
+    _notifIntervals[habitId] = setInterval(() => { notifyHabit(habitId); }, _notifIntervalMsFor(sched));
   }
-  function scheduleNextNotification() {
-    if (_notifInterval) clearInterval(_notifInterval);
-    if (localStorage.getItem('_notifEnabled') !== 'true') return;
-    _notifInterval = setInterval(() => {
-      notify();
-    }, getIntervalMs());
+  function scheduleAllHabits() {
+    Object.keys(_notifIntervals).forEach(hid => clearInterval(_notifIntervals[hid]));
+    _notifIntervals = {};
+    const all = _notifGetAllSchedules();
+    Object.keys(all).forEach(habitId => { if (all[habitId].enabled) scheduleHabit(habitId); });
   }
-  window._notifSyncDone = _notifSyncDone;
-  window.notifDebugRefresh = function() {
+  function _applyAutoTargetAdjustFor(habitId) {
+    const sched = getSchedule(habitId);
+    const at = sched.autoTarget || {};
+    if (!at.enabled || !at.step) return;
+    const todayKey = todayStr();
+    const lastApplied = at.lastApplied || '';
+    if (!lastApplied) { saveSchedule(habitId, { autoTarget: Object.assign({}, at, { lastApplied: todayKey }) }); return; }
+    if (lastApplied === todayKey) return;
+    const lastDate = new Date(lastApplied + 'T00:00:00');
+    const todayDate = new Date(todayKey + 'T00:00:00');
+    const daysMissed = Math.round((todayDate - lastDate) / 86400000);
+    if (daysMissed < 1) { saveSchedule(habitId, { autoTarget: Object.assign({}, at, { lastApplied: todayKey }) }); return; }
+    let current = sched.threshold || 0;
+    for (let i = 0; i < daysMissed; i++) {
+      if (at.step > 0 && current >= at.cap) break;
+      if (at.step < 0 && current <= at.cap) break;
+      current = current + at.step;
+      if (at.step > 0) current = Math.min(current, at.cap);
+      if (at.step < 0) current = Math.max(current, at.cap);
+    }
+    saveSchedule(habitId, { threshold: current, autoTarget: Object.assign({}, at, { lastApplied: todayKey }) });
+    if (window._notifUIRefresh) window._notifUIRefresh(habitId);
+  }
+  function _applyAutoTargetAdjust() {
+    Object.keys(_notifGetAllSchedules()).forEach(habitId => _applyAutoTargetAdjustFor(habitId));
+  }
+  window._notifSyncDone = _notifSyncAllDone;
+  window._notifGetSchedule = getSchedule;
+  window._notifSaveSchedule = saveSchedule;
+  window._notifIsHabitDone = isHabitDone;
+  window._notifSyncDoneFor = _notifSyncDoneFor;
+  window._notifScheduleHabit = scheduleHabit;
+  window._notifScheduleAll = scheduleAllHabits;
+  window._notifGetAllSchedules = _notifGetAllSchedules;
+  window._notifApplyAutoTargetFor = _applyAutoTargetAdjustFor;
+  window.notifDebugRefresh = function(habitId) {
     const el = document.getElementById('notif-debug-output');
     if (!el) return;
+    if (!habitId && window._notifCurrentHabitId) habitId = window._notifCurrentHabitId();
+    if (!habitId) { el.textContent = '(no habit selected)'; return; }
     const ds = todayStr();
-    const prefix = _notifTrackerPrefix();
-    const key = prefix + ds;
+    const key = habitId + ':' + ds;
     const raw = localStorage.getItem(key);
-    const target = getNotifSettings().targetReps || 0;
-    let total = 0;
+    const sched = getSchedule(habitId);
     let setsStr = '(no data)';
+    let statusStr = '(no data)';
     if (raw) {
       try {
         const data = JSON.parse(raw);
-        const sets = Array.isArray(data.sets) ? data.sets : [];
-        total = sets.reduce((a, b) => a + (b || 0), 0);
-        setsStr = '[' + sets.map(v => (v === null || v === undefined) ? '-' : v).join(', ') + ']';
+        statusStr = data.status || '(blank)';
+        const sets = Array.isArray(data.sets) ? data.sets : null;
+        if (sets) setsStr = '[' + sets.map(v => (v === null || v === undefined) ? '-' : v).join(', ') + ']';
       } catch { setsStr = '(parse error)'; }
     }
-    const done = target > 0 && total >= target;
-    const _atd = _getAutoTargetSettings();
-    let _atdLast = localStorage.getItem('_autoTargetLastApplied') || '';
-    if (window.AndroidSettings && window.AndroidSettings.getAutoTargetLastApplied) {
-      try {
-        const _atdNative = window.AndroidSettings.getAutoTargetLastApplied();
-        if (_atdNative && _atdNative > _atdLast) _atdLast = _atdNative;
-      } catch (e) {}
-    }
-    const _atdMidnight = new Date();
-    _atdMidnight.setHours(24, 0, 5, 0);
-    const _atdNext = (_atd.enabled && _atd.step) ? _atdMidnight.toLocaleString() : 'n/a';
-    el.innerHTML =
-      '<span style="color:#666;">key:</span> <span style="color:#aaa;font-family:monospace;">' + key + '</span><br>' +
-      '<span style="color:#666;">sets:</span> <span style="color:#aaa;font-family:monospace;">' + setsStr + '</span><br>' +
-      '<span style="color:#666;">total:</span> <span style="color:#aaa;">' + total +
-      '</span>  <span style="color:#666;">target:</span> <span style="color:#aaa;">' + target + '</span><br>' +
-      '<span style="color:#666;">done (JS):</span> <span style="color:' + (done ? '#99ff99' : '#ff9999') + ';">' + done + '</span><br>' +
-      '<span style="color:#666;">auto-target:</span> <span style="color:' + (_atd.enabled ? '#99ff99' : '#ff9999') + ';">' + (_atd.enabled ? 'ON' : 'OFF') + '</span>' +
-      '  <span style="color:#666;">step/cap:</span> <span style="color:#aaa;">' + _atd.step + ' / ' + _atd.cap + '</span><br>' +
-      '<span style="color:#666;">last applied:</span> <span style="color:#aaa;">' + (_atdLast || '(never)') + '</span><br>' +
-      '<span style="color:#666;">next increment:</span> <span style="color:#aaa;">' + _atdNext + '</span>';
+    const done = isHabitDone(habitId, ds);
+    el.innerHTML = `
+      <span style="color:#666;">key:</span> <span style="color:#aaa;font-family:monospace;">${key}</span><br>
+      <span style="color:#666;">status:</span> <span style="color:#aaa;font-family:monospace;">${statusStr}</span><br>
+      <span style="color:#666;">sets:</span> <span style="color:#aaa;font-family:monospace;">${setsStr}</span><br>
+      <span style="color:#666;">column:</span> <span style="color:#aaa;">${sched.column}</span>
+      <span style="color:#666;">threshold:</span> <span style="color:#aaa;">${sched.threshold}</span><br>
+      <span style="color:#666;">done (JS):</span> <span style="color:${done ? '#99ff99' : '#ff9999'};">${done}</span>`;
   };
-  window._notifReschedule = function() {
-    if (_notifInterval) clearInterval(_notifInterval);
-    schedule();
+  window._notifReschedule = function(habitId) {
+    if (habitId) scheduleHabit(habitId); else scheduleAllHabits();
+    var ids = habitId ? [habitId] : Object.keys(_notifGetAllSchedules());
+    ids.forEach(function(hid) {
+      var sched = getSchedule(hid);
+      var cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(function(c){ return c.id === hid; }) : null;
+      var label = cfg ? cfg.label : hid;
+      if (window.AndroidSettings && window.AndroidSettings.setHabitSchedule) {
+        window.AndroidSettings.setHabitSchedule(hid, _notifIntervalMsFor(sched), !!sched.enabled, label);
+      }
+    });
   };
   setTimeout(() => {
-    if (window.AndroidSettings && window.AndroidSettings.getTargetReps) {
-      try {
-        const _nativeTarget = window.AndroidSettings.getTargetReps();
-        const _ns = JSON.parse(localStorage.getItem('_notifSettings')) || {};
-        if (_nativeTarget !== _ns.targetReps) {
-          _ns.targetReps = _nativeTarget;
-          localStorage.setItem('_notifSettings', JSON.stringify(_ns));
-          const _trEl = document.getElementById('notif-target-reps');
-          if (_trEl) _trEl.value = _nativeTarget;
-        }
-      } catch (e) {}
-    }
-    _notifSyncDone();
-    _applyAutoTargetAdjust();
-    const _savedUri  = localStorage.getItem('_notifSoundUri');
-    const _savedName = localStorage.getItem('_notifSoundName') || 'Default';
-    if (_savedUri && window.AndroidSettings && window.AndroidSettings.getNotifSound) {
-      try {
-        const _cur = JSON.parse(window.AndroidSettings.getNotifSound());
-        if (!_cur.uri || _cur.uri === '') {
-          window.AndroidSettings.setNotifSound(_savedUri, _savedName);
-        }
-      } catch(e) {}
-    }
+    _notifSyncAllDone();
+    const all = _notifGetAllSchedules();
+    Object.keys(all).forEach(habitId => {
+      if (all[habitId].autoTarget && all[habitId].autoTarget.enabled) _applyAutoTargetAdjustFor(habitId);
+    });
   }, 3000);
   setTimeout(() => {
     if (!('Notification' in window)) return;
-    const _offUntil = parseInt(localStorage.getItem('_notifOffUntil') || '0');
-    if (_offUntil && Date.now() >= _offUntil) { localStorage.setItem('_notifEnabled', 'true'); localStorage.removeItem('_notifOffUntil'); }
-    if (localStorage.getItem('_notifEnabled') !== 'true') return;
+    const all = _notifGetAllSchedules();
+    let anyEnabled = false;
+    Object.keys(all).forEach(habitId => {
+      const sched = all[habitId];
+      if (sched.offUntil && Date.now() >= sched.offUntil) saveSchedule(habitId, { enabled: true, offUntil: 0 });
+      if (getSchedule(habitId).enabled) anyEnabled = true;
+    });
+    if (!anyEnabled) return;
     if (Notification.permission === 'granted') {
-      scheduleNextNotification();
+      scheduleAllHabits();
     } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission().then(p => { if (p === 'granted') scheduleNextNotification(); });
+      Notification.requestPermission().then(p => { if (p === 'granted') scheduleAllHabits(); });
     }
   }, 10000);
 })();
+// ── Per-habit notification settings UI state ──────────────
+let _notifSelectedHabitId = null;
+window._notifCurrentHabitId = function() { return _notifSelectedHabitId; };
+window.notifPopulateHabitSelect = function() {
+  const sel = document.getElementById('notif-habit-select');
+  if (!sel || typeof TRACKER_CONFIGS === 'undefined') return;
+  const prevValue = _notifSelectedHabitId;
+  sel.innerHTML = '';
+  TRACKER_CONFIGS.forEach(cfg => {
+    const opt = document.createElement('option');
+    opt.value = cfg.id;
+    opt.textContent = cfg.label;
+    sel.appendChild(opt);
+  });
+  const stillExists = TRACKER_CONFIGS.some(c => c.id === prevValue);
+  const targetId = stillExists ? prevValue : (TRACKER_CONFIGS[0] ? TRACKER_CONFIGS[0].id : null);
+  sel.value = targetId || '';
+  _notifSelectedHabitId = targetId;
+};
+window.notifSelectHabit = function(habitId) {
+  _notifSelectedHabitId = habitId;
+  window.notifLoadHabitForm(habitId);
+};
+window.notifLoadHabitForm = function(habitId) {
+  if (!habitId) return;
+  const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.id === habitId) : null;
+  if (!cfg) return;
+  const sched = window._notifGetSchedule(habitId);
+  const colSel = document.getElementById('notif-column-select');
+  if (colSel) {
+    const totalOpt = cfg.hasSets ? '<option value="total">Total</option>' : '';
+    const setOpts = cfg.hasSets
+      ? Array.from({ length: NUM_SETS }, (_, i) => `<option value="set:${i + 1}">Set ${i + 1}</option>`).join('')
+      : '';
+    colSel.innerHTML = `<option value="status">Status</option>${totalOpt}${setOpts}`;
+    colSel.value = sched.column || 'status';
+  }
+  const statusSel = document.getElementById('notif-status-value');
+  if (statusSel) {
+    statusSel.innerHTML = STATUSES.map(s => `<option value="${s}">${s}</option>`).join('');
+    statusSel.value = sched.statusValue || 'yes';
+  }
+  const thresholdEl = document.getElementById('notif-threshold');
+  if (thresholdEl) thresholdEl.value = sched.threshold || 0;
+  window.notifColumnChange(true);
+  if (window.notifLoadSoundName) window.notifLoadSoundName();
+  const g = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  g('notif-years', sched.years);
+  g('notif-days', sched.days);
+  g('notif-hours', sched.hours !== undefined ? sched.hours : 1);
+  g('notif-minutes', sched.minutes);
+  g('notif-seconds', sched.seconds);
+  const at = sched.autoTarget || { enabled: false, step: 0, cap: 0 };
+  const atStepEl = document.getElementById('notif-auto-step');
+  const atCapEl = document.getElementById('notif-auto-cap');
+  if (atStepEl) atStepEl.value = at.step !== undefined ? at.step : 0;
+  if (atCapEl) atCapEl.value = at.cap !== undefined ? at.cap : 0;
+  _updateAutoTargetToggleUI();
+  _notifUpdateToggleUI();
+  if (window.notifDebugRefresh) window.notifDebugRefresh(habitId);
+};
+window.notifColumnChange = function(skipSave) {
+  const colSel = document.getElementById('notif-column-select');
+  const isStatus = !colSel || colSel.value === 'status';
+  const statusRow = document.getElementById('notif-status-value-row');
+  const thresholdRow = document.getElementById('notif-threshold-row');
+  if (statusRow) statusRow.style.display = isStatus ? '' : 'none';
+  if (thresholdRow) thresholdRow.style.display = isStatus ? 'none' : '';
+  if (!skipSave) window.notifSaveSchedule();
+};
+window._notifUIRefresh = function(habitId) {
+  if (habitId === _notifSelectedHabitId) window.notifLoadHabitForm(habitId);
+};
 window.notifOpenSettings = function() {
   if (window.AndroidSettings) {
     window.AndroidSettings.openAppSettings();
@@ -220,6 +330,8 @@ window.notifRefreshPermission = function() {
   }
 };
 window.notifSaveStartOffset = function() {
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
   const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
   const s = {
     years:   g('notif-start-years'),
@@ -228,90 +340,72 @@ window.notifSaveStartOffset = function() {
     minutes: g('notif-start-minutes'),
     seconds: g('notif-start-seconds'),
   };
-  localStorage.setItem('_notifStartOffset', JSON.stringify(s));
-  const offsetMs = _getStartOffsetMs();
+  window._notifSaveSchedule(habitId, { startOffset: s });
+  const offsetMs = window._notifGetSchedule(habitId).startOffset ? _notifStartOffsetMsFor(window._notifGetSchedule(habitId)) : 0;
   if (window.AndroidSettings && window.AndroidSettings.setStartOffset) {
-    window.AndroidSettings.setStartOffset(offsetMs);
+    window.AndroidSettings.setStartOffset(habitId, offsetMs);
   } else {
-    _localNotifFetch('/setstartoffset?offset=' + offsetMs);
+    _localNotifFetch('/setstartoffset?habit=' + encodeURIComponent(habitId) + '&offset=' + offsetMs);
   }
   _notifStartSavedSnap = _notifStartValues();
   _notifCheckStartBtn();
 };
 window.notifLoadStartOffsetUI = function() {
-  try {
-    const s = JSON.parse(localStorage.getItem('_notifStartOffset')) || {};
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || 0; };
-    set('notif-start-years',   s.years);
-    set('notif-start-days',    s.days);
-    set('notif-start-hours',   s.hours !== undefined ? s.hours : 0);
-    set('notif-start-minutes', s.minutes);
-    set('notif-start-seconds', s.seconds);
-    _nostBuild();
-    window.notifSyncStartFromFields();
-  } catch {}
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
+  const s = window._notifGetSchedule(habitId).startOffset || {};
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || 0; };
+  set('notif-start-years',   s.years);
+  set('notif-start-days',    s.days);
+  set('notif-start-hours',   s.hours !== undefined ? s.hours : 0);
+  set('notif-start-minutes', s.minutes);
+  set('notif-start-seconds', s.seconds);
+  _nostBuild();
+  window.notifSyncStartFromFields();
 };
 window.notifSaveSchedule = function() {
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
   const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
-  const s = {
-    years:      g('notif-years'),
-    days:       g('notif-days'),
-    hours:      g('notif-hours'),
-    minutes:    g('notif-minutes'),
-    seconds:    g('notif-seconds'),
-    targetReps: g('notif-target-reps'),
+  const colSel = document.getElementById('notif-column-select');
+  const statusSel = document.getElementById('notif-status-value');
+  const thresholdEl = document.getElementById('notif-threshold');
+  const prevSched = window._notifGetSchedule(habitId);
+  const patch = {
+    column:      colSel ? colSel.value : 'status',
+    statusValue: statusSel ? statusSel.value : 'yes',
+    threshold:   thresholdEl ? (parseInt(thresholdEl.value) || 0) : 0,
+    years:       g('notif-years'),
+    days:        g('notif-days'),
+    hours:       g('notif-hours'),
+    minutes:     g('notif-minutes'),
+    seconds:     g('notif-seconds'),
+    autoTarget: Object.assign({}, prevSched.autoTarget || {}, {
+      step: parseInt(document.getElementById('notif-auto-step')?.value || '0') || 0,
+      cap:  parseInt(document.getElementById('notif-auto-cap')?.value  || '0') || 0,
+    }),
   };
-  localStorage.setItem('_notifSettings', JSON.stringify(s));
-  if (window.AndroidSettings && window.AndroidSettings.setTargetReps) window.AndroidSettings.setTargetReps(s.targetReps);
-  if (window._notifSyncDone) window._notifSyncDone();
-    _applyAutoTargetAdjust();
-  if (window._notifReschedule) window._notifReschedule();
-  const intervalMs = (
-    (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
-    (s.days    || 0) * 24 * 60 * 60 * 1000 +
-    (s.hours   || 0) * 60 * 60 * 1000 +
-    (s.minutes || 0) * 60 * 1000 +
-    (s.seconds || 0) * 1000
-    ) || 60 * 60 * 1000;
-  if (localStorage.getItem('_notifEnabled') === 'true') {
-    if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
-      window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
-    } else {
-      _localNotifFetch('/schedule?interval=' + intervalMs + '&enabled=1');
-    }
+  window._notifSaveSchedule(habitId, patch);
+  if (window._notifSyncDoneFor) window._notifSyncDoneFor(habitId, dateStr(new Date()));
+  if (window._notifApplyAutoTargetFor) window._notifApplyAutoTargetFor(habitId);
+  if (window._notifReschedule) window._notifReschedule(habitId);
+  const _updatedSched = window._notifGetSchedule(habitId);
+  if (window.AndroidSettings && window.AndroidSettings.setHabitAutoTarget) {
+    try {
+      window.AndroidSettings.setHabitAutoTarget(habitId, !!_updatedSched.autoTarget.enabled,
+        _updatedSched.autoTarget.step, _updatedSched.autoTarget.cap, _updatedSched.threshold);
+    } catch (e) {}
   }
-  console.log('[notif] scheduling interval ms:', intervalMs);
-  setTimeout(_notifRefreshNextFire, 800);
-  const _ats = _getAutoTargetSettings();
-  _ats.step = parseInt(document.getElementById('notif-auto-step')?.value || '0') || 0;
-  _ats.cap  = parseInt(document.getElementById('notif-auto-cap')?.value  || '0') || 0;
-  localStorage.setItem('_notifAutoTarget', JSON.stringify(_ats));
-  if (window.AndroidSettings && window.AndroidSettings.setAutoTargetConfig) window.AndroidSettings.setAutoTargetConfig(_ats.enabled, _ats.step, _ats.cap);
   _notifScheduleSavedSnap = _notifScheduleValues();
   _notifCheckScheduleBtn();
 };
 window.notifLoadScheduleUI = function() {
-  try {
-    const s = JSON.parse(localStorage.getItem('_notifSettings')) || {};
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || 0; };
-    set('notif-years',       s.years);
-    set('notif-days',        s.days);
-    set('notif-hours',       s.hours !== undefined ? s.hours : 1);
-    set('notif-minutes',     s.minutes);
-    set('notif-seconds',     s.seconds);
-    set('notif-target-reps', s.targetReps);
-  } catch {}
-  _notifUpdateToggleUI();
-  _notifTickCountdown();
+  window.notifPopulateHabitSelect();
+  if (window._notifCurrentHabitId && window._notifCurrentHabitId()) {
+    window.notifLoadHabitForm(window._notifCurrentHabitId());
+  }
   _notifRefreshNextFire();
-  if (window.notifDebugRefresh) window.notifDebugRefresh();
   if (window.notifLoadSoundName) window.notifLoadSoundName();
-  const _atsLoad = _getAutoTargetSettings();
-  const _stepEl = document.getElementById('notif-auto-step');
-  const _capEl  = document.getElementById('notif-auto-cap');
-  if (_stepEl) _stepEl.value = _atsLoad.step !== undefined ? _atsLoad.step : 1;
-  if (_capEl)  _capEl.value  = _atsLoad.cap  !== undefined ? _atsLoad.cap  : 100;
-  _updateAutoTargetToggleUI();
   if (window.notifLoadStartOffsetUI) window.notifLoadStartOffsetUI();
   _notifAddInputListener();
   _notifScheduleSavedSnap = _notifScheduleValues();
@@ -341,7 +435,7 @@ function _notifScheduleValues() {
   const g = id => { const el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
   return JSON.stringify({
     y: g('notif-years'), d: g('notif-days'), h: g('notif-hours'),
-    m: g('notif-minutes'), s: g('notif-seconds'), t: g('notif-target-reps'),
+    m: g('notif-minutes'), s: g('notif-seconds'),
     as: g('notif-auto-step'), ac: g('notif-auto-cap'),
   });
 }
@@ -377,7 +471,7 @@ function _notifAddInputListener() {
     const id = e.target && e.target.id;
     if (!id) return;
     if (['notif-years','notif-days','notif-hours','notif-minutes','notif-seconds',
-         'notif-target-reps','notif-auto-step','notif-auto-cap'].includes(id)) _notifCheckScheduleBtn();
+         'notif-auto-step','notif-auto-cap'].includes(id)) _notifCheckScheduleBtn();
     if (['notif-start-years','notif-start-days','notif-start-hours',
          'notif-start-minutes','notif-start-seconds'].includes(id)) _notifCheckStartBtn();
   });
@@ -416,7 +510,8 @@ function _notifUpdateNextFireDisplay() {
   el.textContent = 'Next notification in: ' + parts.join(' ');
 }
 function _notifUpdateToggleUI() {
-  const enabled = localStorage.getItem('_notifEnabled') === 'true';
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  const enabled = habitId ? window._notifGetSchedule(habitId).enabled : false;
   const wrap  = document.getElementById('notif-toggle-wrap');
   const switchEl  = document.getElementById('notif-toggle-switch');
   const offWrap = document.getElementById('notif-off-wrap');
@@ -435,29 +530,17 @@ function _notifUpdateToggleUI() {
 function _notifTickCountdown() {
   const el = document.getElementById('notif-countdown-display');
   if (!el) return;
-  const enabled = localStorage.getItem('_notifEnabled') === 'true';
-  if (enabled) { el.textContent = ''; return; }
-  const until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) { el.textContent = ''; return; }
+  const sched = window._notifGetSchedule(habitId);
+  if (sched.enabled) { el.textContent = ''; return; }
+  const until = sched.offUntil || 0;
   if (!until) { el.textContent = 'Off indefinitely'; return; }
   const remaining = until - Date.now();
   if (remaining <= 0) {
-    localStorage.setItem('_notifEnabled', 'true');
-    localStorage.removeItem('_notifOffUntil');
+    window._notifSaveSchedule(habitId, { enabled: true, offUntil: 0 });
     _notifUpdateToggleUI();
-    if (window._notifReschedule) window._notifReschedule();
-    const _s = JSON.parse(localStorage.getItem('_notifSettings') || '{}');
-    const _ms = (
-      (_s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
-      (_s.days    || 0) * 24 * 60 * 60 * 1000 +
-      (_s.hours   || 0) * 60 * 60 * 1000 +
-      (_s.minutes || 0) * 60 * 1000 +
-      (_s.seconds || 0) * 1000
-      ) || 60 * 60 * 1000;
-    if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
-      window.AndroidSettings.scheduleRepeatingNotification(_ms);
-    } else {
-      _localNotifFetch('/schedule?interval=' + _ms + '&enabled=1');
-    }
+    if (window._notifReschedule) window._notifReschedule(habitId);
     el.textContent = '';
     return;
   }
@@ -476,27 +559,17 @@ function _notifTickCountdown() {
   el.textContent = 'Enables in: ' + parts.join(' ');
 }
 setInterval(() => {
-  const until = parseInt(localStorage.getItem('_notifOffUntil') || '0');
-  if (until && Date.now() >= until && localStorage.getItem('_notifEnabled') !== 'true') {
-    localStorage.setItem('_notifEnabled', 'true');
-    localStorage.removeItem('_notifOffUntil');
-    _notifUpdateToggleUI();
-    if (window._notifReschedule) window._notifReschedule();
-    const _s2 = JSON.parse(localStorage.getItem('_notifSettings') || '{}');
-    const _ms2 = (
-      (_s2.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
-      (_s2.days    || 0) * 24 * 60 * 60 * 1000 +
-      (_s2.hours   || 0) * 60 * 60 * 1000 +
-      (_s2.minutes || 0) * 60 * 1000 +
-      (_s2.seconds || 0) * 1000
-      ) || 60 * 60 * 1000;
-    if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
-      window.AndroidSettings.scheduleRepeatingNotification(_ms2);
-    } else {
-      _localNotifFetch('/schedule?interval=' + _ms2 + '&enabled=1');
+  Object.keys(_notifGetAllSchedules()).forEach(hid => {
+    const sched = getSchedule(hid);
+    if (sched.offUntil && Date.now() >= sched.offUntil && !sched.enabled) {
+      saveSchedule(hid, { enabled: true, offUntil: 0 });
+      if (window._notifReschedule) window._notifReschedule(hid);
+      if (hid === (window._notifCurrentHabitId ? window._notifCurrentHabitId() : null)) {
+        _notifUpdateToggleUI();
+        _notifTargetMs = 0; _notifDateSource = null;
+      }
     }
-    _notifTargetMs = 0; _notifDateSource = null;
-  }
+  });
   _notifTickCountdown();
   _notifUpdateNextFireDisplay();
   if (_notifTargetMs > 0 && _notifTumblerBuilt) {
@@ -516,47 +589,19 @@ setInterval(() => {
   }
 }, 1000);
 window.notifToggle = function() {
-  const enabled = localStorage.getItem('_notifEnabled') === 'true';
-  if (enabled) {
-    localStorage.setItem('_notifEnabled', 'false');
-    localStorage.removeItem('_notifOffUntil');
-    if (window._notifReschedule) window._notifReschedule();
-    if (window.AndroidSettings && window.AndroidSettings.setNotifEnabled) {
-      window.AndroidSettings.setNotifEnabled(false);
-    }
-    if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
-      window.AndroidSettings.scheduleRepeatingNotification(0);
-    } else {
-      _localNotifFetch('/schedule?interval=0&enabled=0');
-    }
-  } else {
-    localStorage.setItem('_notifEnabled', 'true');
-    localStorage.removeItem('_notifOffUntil');
-    if (window._notifReschedule) window._notifReschedule();
-    if (window.AndroidSettings && window.AndroidSettings.setNotifEnabled) {
-      window.AndroidSettings.setNotifEnabled(true);
-    }
-    if (window._notifSyncDone) window._notifSyncDone();
-    _applyAutoTargetAdjust();
-    const s = JSON.parse(localStorage.getItem('_notifSettings') || '{}');
-    const intervalMs = (
-      (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
-      (s.days    || 0) * 24 * 60 * 60 * 1000 +
-      (s.hours   || 0) * 60 * 60 * 1000 +
-      (s.minutes || 0) * 60 * 1000 +
-      (s.seconds || 0) * 1000
-      ) || 60 * 60 * 1000;
-    if (window.AndroidSettings && window.AndroidSettings.scheduleRepeatingNotification) {
-      window.AndroidSettings.scheduleRepeatingNotification(intervalMs);
-    } else {
-      _localNotifFetch('/schedule?interval=' + intervalMs + '&enabled=1');
-    }
-  }
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
+  const sched = window._notifGetSchedule(habitId);
+  const enabled = !sched.enabled;
+  window._notifSaveSchedule(habitId, { enabled: enabled, offUntil: 0 });
+  if (window._notifReschedule) window._notifReschedule(habitId);
+  if (enabled && window._notifSyncDoneFor) window._notifSyncDoneFor(habitId, dateStr(new Date()));
+  if (enabled && window._notifApplyAutoTargetFor) window._notifApplyAutoTargetFor(habitId);
   _notifUpdateToggleUI();
-  _notifTickCountdown();
-  setTimeout(_notifRefreshNextFire, 800);
 };
 window.notifSetOffTimer = function() {
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
   let ms;
   if (_notifTargetMs > 0) {
     ms = _notifTargetMs - Date.now();
@@ -571,11 +616,13 @@ window.notifSetOffTimer = function() {
     );
   }
   if (!ms || ms <= 0) { window.notifSetOffForever(); return; }
-  localStorage.setItem('_notifOffUntil', String(Date.now() + ms));
+  window._notifSaveSchedule(habitId, { offUntil: Date.now() + ms });
   _notifTickCountdown();
 };
 window.notifSetOffForever = function() {
-  localStorage.removeItem('_notifOffUntil');
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
+  window._notifSaveSchedule(habitId, { offUntil: 0 });
   _notifTargetMs = 0;
   _notifDateSource = null;
   ['notif-off-years','notif-off-days','notif-off-hours','notif-off-mins','notif-off-secs']
@@ -891,71 +938,44 @@ window.notifSyncStartFromFields = function() {
   if (_nostTumblerBuilt) _nostRender();
   _notifCheckStartBtn();
 };
-let _notifMarkDoneLast = { date: null, done: null };
-window.notifMarkDone = function(dateKey, done) {
+let _notifMarkDoneLast = {};
+window.notifMarkDone = function(habitId, dateKey, done) {
   if (window.AndroidSettings && window.AndroidSettings.markHabitDone) {
-    try { window.AndroidSettings.markHabitDone(dateKey, done); } catch (e) {}
+    try { window.AndroidSettings.markHabitDone(habitId, dateKey, done); } catch (e) {}
     return;
   }
-  const _syncKey = '_nmdSync_' + dateKey;
+  const _syncKey = '_nmdSync_' + habitId + '_' + dateKey;
   const _lastSynced = localStorage.getItem(_syncKey);
   const _doneVal = done ? '1' : '0';
   const _needsSync = (done && _lastSynced !== '1') || (!done && _lastSynced === '1');
   if (!_needsSync) return;
-  if (dateKey === _notifMarkDoneLast.date && done === _notifMarkDoneLast.done) return;
-  _notifMarkDoneLast = { date: dateKey, done: done };
+  const _last = _notifMarkDoneLast[habitId];
+  if (_last && _last.date === dateKey && _last.done === done) return;
+  _notifMarkDoneLast[habitId] = { date: dateKey, done: done };
   localStorage.setItem(_syncKey, _doneVal);
-  _localNotifFetch('/markdone?date=' + encodeURIComponent(dateKey) + '&done=' + _doneVal);
-};
-window.notifSetDailyTotal = function(trackerId, dateKey, total) {
-  try {
-    const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.hasSets) : null;
-    if (!cfg || cfg.id !== trackerId) return;
-  } catch (e) { return; }
-  if (window.AndroidSettings && window.AndroidSettings.setDailyTotal) {
-    try { window.AndroidSettings.setDailyTotal(dateKey, total); } catch (e) {}
-    return;
-  }
-  _localNotifFetch('/settotal?date=' + encodeURIComponent(dateKey) + '&total=' + total);
+  _localNotifFetch('/markdone?habit=' + encodeURIComponent(habitId) + '&date=' + encodeURIComponent(dateKey) + '&done=' + _doneVal);
 };
 window.notifLoadSoundName = function() {
   const nameEl = document.getElementById('notif-sound-name');
   if (!nameEl) return;
-  const _lsSoundName = localStorage.getItem('_notifSoundName') || '';
-  if (window.AndroidSettings && window.AndroidSettings.getNotifSound) {
-    try {
-      const s = JSON.parse(window.AndroidSettings.getNotifSound());
-      const _n = s.name || _lsSoundName || 'Default';
-      nameEl.textContent = _n;
-      if (s.name) localStorage.setItem('_notifSoundName', s.name);
-    } catch(e) { nameEl.textContent = _lsSoundName || 'Default'; }
-  } else {
-    fetch('http://localhost:8765/currentsound')
-      .then(r => r.json())
-      .then(s => {
-        const _n = s.name || _lsSoundName || 'Default';
-        nameEl.textContent = _n;
-        if (s.name) localStorage.setItem('_notifSoundName', s.name);
-      })
-      .catch(() => { nameEl.textContent = _lsSoundName || 'Default'; });
-  }
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) { nameEl.textContent = 'Default'; return; }
+  const sched = window._notifGetSchedule(habitId);
+  nameEl.textContent = sched.soundName || 'Default';
 };
 window.notifOpenSoundPicker = async function() {
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
+  const sched = window._notifGetSchedule(habitId);
   let soundList;
-  let currentUri = '';
+  let currentUri = sched.soundUri || '';
   if (window.AndroidSettings && window.AndroidSettings.getNotifSoundList) {
     try { soundList = JSON.parse(window.AndroidSettings.getNotifSoundList()); }
     catch(e) { alert('Could not load sounds.'); return; }
-    try { const _cur = JSON.parse(window.AndroidSettings.getNotifSound()); currentUri = _cur.uri || ''; } catch(e) {}
   } else {
     try {
-      const [_lr, _cr] = await Promise.all([
-        fetch('http://localhost:8765/sounds'),
-        fetch('http://localhost:8765/currentsound')
-      ]);
+      const _lr = await fetch('http://localhost:8765/sounds');
       soundList = await _lr.json();
-      const _cur = await _cr.json();
-      currentUri = _cur.uri || '';
     } catch(e) { alert('Could not load sounds.'); return; }
   }
   let selectedUri = currentUri;
@@ -1035,15 +1055,14 @@ window.notifOpenSoundPicker = async function() {
     } else {
       fetch('http://localhost:8765/stoppreview').catch(() => {});
     }
+    window._notifSaveSchedule(habitId, { soundUri: selectedUri || '', soundName: selectedName || 'Default' });
     if (window.AndroidSettings && window.AndroidSettings.setNotifSound) {
-      window.AndroidSettings.setNotifSound(selectedUri, selectedName);
+      window.AndroidSettings.setNotifSound(habitId, selectedUri, selectedName);
     } else {
-      fetch('http://localhost:8765/setsound?uri=' + encodeURIComponent(selectedUri) + '&name=' + encodeURIComponent(selectedName)).catch(() => {});
+      fetch('http://localhost:8765/setsound?habit=' + encodeURIComponent(habitId) + '&uri=' + encodeURIComponent(selectedUri) + '&name=' + encodeURIComponent(selectedName)).catch(() => {});
     }
-    localStorage.setItem('_notifSoundUri', selectedUri || '');
-        localStorage.setItem('_notifSoundName', selectedName || '');
     const nameEl = document.getElementById('notif-sound-name');
-    if (nameEl) nameEl.textContent = selectedName || 'None';
+    if (nameEl) nameEl.textContent = selectedName || 'Default';
     document.body.removeChild(overlay);
   };
   btnRow.appendChild(cancelBtn);
@@ -1058,21 +1077,26 @@ window.notifOpenSoundPicker = async function() {
   if (_found) setTimeout(function() { _found.scrollIntoView({ block: 'center', behavior: 'instant' }); }, 80);
 };
 window.notifSendTest = async function() {
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
+  const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.id === habitId) : null;
+  const label = cfg ? cfg.label : habitId;
   const btn = document.getElementById('notif-send-test-btn');
   if (btn) { btn.textContent = 'Sent'; btn.disabled = true; setTimeout(() => { btn.textContent = 'Send Test'; btn.disabled = false; }, 1500); }
-  fetch('http://localhost:8765/notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent('Test notification.')).catch(() => {
+  if (window.AndroidSettings && window.AndroidSettings.showNotification) {
+    try { window.AndroidSettings.showNotification(habitId, 'Habit Tracker', label + ' — test notification.'); return; } catch (e) {}
+  }
+  fetch('http://localhost:8765/notify?habit=' + encodeURIComponent(habitId) + '&title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent(label + ' — test notification.')).catch(() => {
     navigator.serviceWorker && navigator.serviceWorker.ready
-      .then(reg => reg.showNotification('Habit Tracker', { body: 'Test notification.', icon: './icon-192.png', vibrate: [200], tag: 'habit-reminder' }))
+      .then(reg => reg.showNotification('Habit Tracker', { body: label + ' — test notification.', icon: './icon-192.png', vibrate: [200], tag: 'habit-reminder-' + habitId }))
       .catch(() => {});
   });
 };
 // ── Auto target adjust ─────────────────────────────────────
-function _getAutoTargetSettings() {
-  try { const s = JSON.parse(localStorage.getItem('_notifAutoTarget')); if (s) return s; } catch {}
-  return { enabled: false, step: 1, cap: 100 };
-}
 function _updateAutoTargetToggleUI() {
-  const s   = _getAutoTargetSettings();
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  const sched = habitId ? window._notifGetSchedule(habitId) : null;
+  const at = (sched && sched.autoTarget) || { enabled: false };
   const wrap = document.getElementById('notif-auto-target-toggle');
   const sw   = document.getElementById('notif-auto-target-switch');
   const _onBg     = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOnBg     || '#1a5a1aFF') : '#1a5a1a';
@@ -1081,69 +1105,22 @@ function _updateAutoTargetToggleUI() {
   const _switchOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOff || '#666666FF') : '#666666';
   const _borderOn  = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOn  || '#2a7a2aFF') : '#2a7a2a';
   const _borderOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOff || '#555555FF') : '#555555';
-  if (wrap) { wrap.style.background = s.enabled ? _onBg : _offBg; wrap.style.borderColor = s.enabled ? _borderOn : _borderOff; }
-  if (sw)   { sw.style.left = s.enabled ? '27px' : '3px'; sw.style.background = s.enabled ? _switchOn : _switchOff; }
+  if (wrap) { wrap.style.background = at.enabled ? _onBg : _offBg; wrap.style.borderColor = at.enabled ? _borderOn : _borderOff; }
+  if (sw)   { sw.style.left = at.enabled ? '27px' : '3px'; sw.style.background = at.enabled ? _switchOn : _switchOff; }
 }
 window.notifToggleAutoTarget = function() {
-  const s = _getAutoTargetSettings();
-  s.enabled = !s.enabled;
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  if (!habitId) return;
+  const sched = window._notifGetSchedule(habitId);
+  const at = Object.assign({ enabled: false, step: 0, cap: 0 }, sched.autoTarget || {});
+  at.enabled = !at.enabled;
   const _stepElT = document.getElementById('notif-auto-step');
   const _capElT  = document.getElementById('notif-auto-cap');
-  if (_stepElT !== null) s.step = parseInt(_stepElT.value || '0') || 0;
-  if (_capElT  !== null) s.cap  = parseInt(_capElT.value  || '0') || 0;
-  localStorage.setItem('_notifAutoTarget', JSON.stringify(s));
-  if (window.AndroidSettings && window.AndroidSettings.setAutoTargetConfig) window.AndroidSettings.setAutoTargetConfig(s.enabled, s.step, s.cap);
+  if (_stepElT) at.step = parseInt(_stepElT.value || '0') || 0;
+  if (_capElT)  at.cap  = parseInt(_capElT.value  || '0') || 0;
+  window._notifSaveSchedule(habitId, { autoTarget: at });
+  if (window.AndroidSettings && window.AndroidSettings.setHabitAutoTarget) {
+    try { window.AndroidSettings.setHabitAutoTarget(habitId, at.enabled, at.step, at.cap, sched.threshold || 0); } catch (e) {}
+  }
   _updateAutoTargetToggleUI();
 };
-function _applyAutoTargetAdjust() {
-  const s = _getAutoTargetSettings();
-  if (!s.enabled || !s.step) return;
-  const todayKey = (function() {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  })();
-  let lastApplied = localStorage.getItem('_autoTargetLastApplied') || '';
-  if (window.AndroidSettings && window.AndroidSettings.getAutoTargetLastApplied) {
-    try {
-      const nativeLast = window.AndroidSettings.getAutoTargetLastApplied();
-      if (nativeLast && nativeLast > lastApplied) lastApplied = nativeLast;
-    } catch (e) {}
-  }
-  if (!lastApplied) {
-    localStorage.setItem('_autoTargetLastApplied', todayKey);
-    if (window.AndroidSettings && window.AndroidSettings.setAutoTargetLastApplied) {
-      try { window.AndroidSettings.setAutoTargetLastApplied(todayKey); } catch (e) {}
-    }
-    return;
-  }
-  if (lastApplied === todayKey) {
-    localStorage.setItem('_autoTargetLastApplied', todayKey);
-    return;
-  }
-  const lastDate = new Date(lastApplied + 'T00:00:00');
-  const todayDate = new Date(todayKey + 'T00:00:00');
-  let daysMissed = Math.round((todayDate - lastDate) / 86400000);
-  if (daysMissed < 1) { localStorage.setItem('_autoTargetLastApplied', todayKey); return; }
-  let ns;
-  try { ns = JSON.parse(localStorage.getItem('_notifSettings')) || {}; } catch { ns = {}; }
-  let current = ns.targetReps || 0;
-  for (let i = 0; i < daysMissed; i++) {
-    if (s.step > 0 && current >= s.cap) break;
-    if (s.step < 0 && current <= s.cap) break;
-    current = current + s.step;
-    if (s.step > 0) current = Math.min(current, s.cap);
-    if (s.step < 0) current = Math.max(current, s.cap);
-  }
-  ns.targetReps = current;
-  localStorage.setItem('_notifSettings', JSON.stringify(ns));
-  localStorage.setItem('_autoTargetLastApplied', todayKey);
-  if (window.AndroidSettings && window.AndroidSettings.setAutoTargetLastApplied) {
-    try { window.AndroidSettings.setAutoTargetLastApplied(todayKey); } catch (e) {}
-  }
-  if (window.AndroidSettings && window.AndroidSettings.setTargetReps) {
-    try { window.AndroidSettings.setTargetReps(current); } catch (e) {}
-  }
-  const el = document.getElementById('notif-target-reps');
-  if (el) el.value = current;
-}
-

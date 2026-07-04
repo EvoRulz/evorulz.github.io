@@ -1,4 +1,4 @@
-// @version 1568
+// @version 1569
 /*
  * Copyright 2020 Google Inc.
  *
@@ -17,6 +17,7 @@
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.app.DownloadManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -131,29 +132,56 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 .getLong("nextFireMs", 0));
         }
         @JavascriptInterface
-        public void scheduleRepeatingNotification(long intervalMs) {
+        public void markHabitDone(String habitId, String dateKey, boolean done) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .edit().putBoolean("done_" + habitId + "_" + dateKey, done).apply();
+        }
+        @JavascriptInterface
+        public void setHabitSchedule(String habitId, long intervalMs, boolean enabled, String label) {
+            SharedPreferences prefs = getSharedPreferences("notif", Context.MODE_PRIVATE);
+            java.util.Set<String> ids = new java.util.HashSet<>(prefs.getStringSet("habitIds", new java.util.HashSet<>()));
+            ids.add(habitId);
+            SharedPreferences.Editor ed = prefs.edit();
+            ed.putStringSet("habitIds", ids);
+            ed.putLong("interval_" + habitId, intervalMs);
+            ed.putBoolean("enabled_" + habitId, enabled);
+            ed.putString("label_" + habitId, label);
+            ed.apply();
             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent i = new Intent(LauncherActivity.this, NotificationReceiver.class);
-            PendingIntent pi = PendingIntent.getBroadcast(LauncherActivity.this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            i.putExtra("habitId", habitId);
+            int reqCode = habitId.hashCode();
+            PendingIntent pi = PendingIntent.getBroadcast(LauncherActivity.this, reqCode, i,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             am.cancel(pi);
-            if (intervalMs > 0) {
-                long _nextFire = System.currentTimeMillis() + intervalMs;
-                LauncherActivity.this.getSharedPreferences("notif", Context.MODE_PRIVATE)
-                    .edit().putLong("intervalMs", intervalMs).putLong("nextFireMs", _nextFire).apply();
+            if (enabled && intervalMs > 0) {
+                long nextFire = System.currentTimeMillis() + intervalMs;
+                getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                    .putLong("nextFire_" + habitId, nextFire).apply();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextFire, pi);
                 } else {
-                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _nextFire, pi);
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextFire, pi);
                 }
             } else {
-                LauncherActivity.this.getSharedPreferences("notif", Context.MODE_PRIVATE)
-                    .edit().putLong("nextFireMs", 0).apply();
+                getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
+                    .putLong("nextFire_" + habitId, 0).apply();
             }
         }
         @JavascriptInterface
-        public void markHabitDone(String dateKey, boolean done) {
-            getSharedPreferences("notif", Context.MODE_PRIVATE)
-            .edit().putBoolean("done_" + dateKey, done).apply();
+        public void removeHabitSchedule(String habitId) {
+            SharedPreferences prefs = getSharedPreferences("notif", Context.MODE_PRIVATE);
+            java.util.Set<String> ids = new java.util.HashSet<>(prefs.getStringSet("habitIds", new java.util.HashSet<>()));
+            ids.remove(habitId);
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent i = new Intent(LauncherActivity.this, NotificationReceiver.class);
+            int reqCode = habitId.hashCode();
+            PendingIntent pi = PendingIntent.getBroadcast(LauncherActivity.this, reqCode, i,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            am.cancel(pi);
+            prefs.edit().putStringSet("habitIds", ids)
+                .remove("interval_" + habitId).remove("enabled_" + habitId)
+                .remove("label_" + habitId).remove("nextFire_" + habitId).apply();
         }
         @JavascriptInterface
         public void setDailyTotal(String dateKey, int total) {
@@ -165,6 +193,31 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
                 .putBoolean("autoTargetEnabled", enabled).putInt("autoTargetStep", step).putInt("autoTargetCap", cap).apply();
             if (enabled) {
+                MidnightAdjustReceiver.scheduleNext(LauncherActivity.this);
+            } else {
+                MidnightAdjustReceiver.cancel(LauncherActivity.this);
+            }
+        }
+        @JavascriptInterface
+        public void setHabitAutoTarget(String habitId, boolean enabled, int step, int cap, int threshold) {
+            SharedPreferences.Editor ed = getSharedPreferences("notif", Context.MODE_PRIVATE).edit();
+            ed.putBoolean("habitAutoTargetEnabled_" + habitId, enabled);
+            ed.putInt("habitAutoTargetStep_" + habitId, step);
+            ed.putInt("habitAutoTargetCap_" + habitId, cap);
+            ed.putInt("habitThreshold_" + habitId, threshold);
+            ed.apply();
+            boolean anyEnabled = enabled;
+            if (!anyEnabled) {
+                java.util.Set<String> ids = getSharedPreferences("notif", Context.MODE_PRIVATE)
+                    .getStringSet("habitIds", new java.util.HashSet<>());
+                for (String id : ids) {
+                    if (getSharedPreferences("notif", Context.MODE_PRIVATE).getBoolean("habitAutoTargetEnabled_" + id, false)) {
+                        anyEnabled = true;
+                        break;
+                    }
+                }
+            }
+            if (anyEnabled) {
                 MidnightAdjustReceiver.scheduleNext(LauncherActivity.this);
             } else {
                 MidnightAdjustReceiver.cancel(LauncherActivity.this);
@@ -225,37 +278,44 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             } catch (Exception e) {}
         }
         @JavascriptInterface
-        public void setNotifSound(String uriStr, String name) {
+        public void setNotifSound(String habitId, String uriStr, String name) {
             try {
                 if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
                 String _uri = uriStr == null ? "" : uriStr;
                 String _name = name == null ? "Default" : name;
                 getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
-                    .putString("soundUri", _uri).putString("soundName", _name).apply();
-                _createNotifChannel(_uri);
+                    .putString("soundUri_" + habitId, _uri).putString("soundName_" + habitId, _name).apply();
+                _createNotifChannel(habitId, _uri);
             } catch (Exception e) {}
         }
         @JavascriptInterface
-        public String getNotifSound() {
+        public String getNotifSound(String habitId) {
             try {
                 JSONObject obj = new JSONObject();
-                obj.put("uri", getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri", ""));
-                obj.put("name", getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundName", "Default"));
+                obj.put("uri", getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri_" + habitId, ""));
+                obj.put("name", getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundName_" + habitId, "Default"));
                 return obj.toString();
             } catch (Exception e) { return "{\"uri\":\"\",\"name\":\"Default\"}"; }
         }
         @JavascriptInterface
-        public void setStartOffset(long offsetMs) {
+        public void setStartOffset(String habitId, long offsetMs) {
             getSharedPreferences("notif", Context.MODE_PRIVATE)
-                .edit().putLong("startOffsetMs", offsetMs).apply();
+                .edit().putLong("startOffsetMs_" + habitId, offsetMs).apply();
         }
         @JavascriptInterface
-        public void showNotification(String title, String body) {
+        public void showNotification(String habitId, String title, String body) {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            String _chId = _getChannelId();
+            String _chId = _getChannelId(habitId);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 if (nm.getNotificationChannel(_chId) == null) {
+                    String _savedUri = getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri_" + habitId, null);
                     NotificationChannel ch = new NotificationChannel(_chId, "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                    if (_savedUri != null && !_savedUri.isEmpty()) {
+                        AudioAttributes _attrs = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                        ch.setSound(Uri.parse(_savedUri), _attrs);
+                    }
                     nm.createNotificationChannel(ch);
                 }
             }
@@ -268,10 +328,10 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 .setContentIntent(launchPi)
                 .setAutoCancel(true);
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                String _su = getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri", null);
+                String _su = getSharedPreferences("notif", Context.MODE_PRIVATE).getString("soundUri_" + habitId, null);
                 if (_su != null && !_su.isEmpty()) _nb.setSound(Uri.parse(_su));
             }
-            nm.notify((int) System.currentTimeMillis(), _nb.build());
+            nm.notify(habitId.hashCode(), _nb.build());
         }
     }
     public class OrientationBridge {
@@ -337,18 +397,18 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             _previewRingtone = null;
         }
     }
-    private String _getChannelId() {
+    private String _getChannelId(String habitId) {
         return getSharedPreferences("notif", Context.MODE_PRIVATE)
-            .getString("channelId", "habit_reminders");
+            .getString("channelId_" + habitId, "habit_reminders");
     }
-    private void _createNotifChannel(String uriStr) {
+    private void _createNotifChannel(String habitId, String uriStr) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
         NotificationManager _nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        _nm.deleteNotificationChannel(_getChannelId());
-        int _ver = getSharedPreferences("notif", Context.MODE_PRIVATE).getInt("channelVer", 0) + 1;
-        String _newId = "habit_v" + _ver;
+        _nm.deleteNotificationChannel(_getChannelId(habitId));
+        int _ver = getSharedPreferences("notif", Context.MODE_PRIVATE).getInt("channelVer_" + habitId, 0) + 1;
+        String _newId = "habit_" + habitId + "_v" + _ver;
         getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
-            .putInt("channelVer", _ver).putString("channelId", _newId).apply();
+            .putInt("channelVer_" + habitId, _ver).putString("channelId_" + habitId, _newId).apply();
         NotificationChannel _ch = new NotificationChannel(
             _newId, "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
         if (uriStr != null && !uriStr.isEmpty()) {
@@ -477,14 +537,15 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 responseBody = String.valueOf(
                     getSharedPreferences("notif", MODE_PRIVATE).getLong("nextFireMs", 0));
             } else if ("/setsound".equals(endpoint)) {
+                final String _sHabitId = params.containsKey("habit") ? params.get("habit") : "";
                 final String _sUri = params.containsKey("uri") ? params.get("uri") : "";
                 final String _sName = params.containsKey("name") ? params.get("name") : "Default";
                 runOnUiThread(() -> {
                     try {
                         if (_previewRingtone != null) { _previewRingtone.stop(); _previewRingtone = null; }
                         getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
-                            .putString("soundUri", _sUri).putString("soundName", _sName).apply();
-                        _createNotifChannel(_sUri);
+                            .putString("soundUri_" + _sHabitId, _sUri).putString("soundName_" + _sHabitId, _sName).apply();
+                        _createNotifChannel(_sHabitId, _sUri);
                     } catch (Exception e) {}
                 });
             } else if ("/previewsound".equals(endpoint)) {
@@ -505,24 +566,33 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     } catch (Exception e) {}
                 });
             } else if ("/setstartoffset".equals(endpoint)) {
+                    final String _oHabitId = params.containsKey("habit") ? params.get("habit") : "";
                     long _offsetMs = 0;
                     try { _offsetMs = Long.parseLong(params.containsKey("offset") ? params.get("offset") : "0"); }
                     catch (Exception ignored) {}
                     final long _fOffsetMs = _offsetMs;
                     runOnUiThread(() -> {
                         getSharedPreferences("notif", MODE_PRIVATE)
-                            .edit().putLong("startOffsetMs", _fOffsetMs).apply();
+                            .edit().putLong("startOffsetMs_" + _oHabitId, _fOffsetMs).apply();
                     });
                 } else if ("/notify".equals(endpoint)) {
+                    final String _nHabitId = params.containsKey("habit") ? params.get("habit") : "";
                     final String _nTitle = params.containsKey("title") ? params.get("title") : "Habit Tracker";
                     final String _nBody  = params.containsKey("body")  ? params.get("body")  : "Test notification.";
                     runOnUiThread(() -> {
                         NotificationManager _nm2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                        String _chId2 = getSharedPreferences("notif", MODE_PRIVATE).getString("channelId", "habit_reminders");
+                        String _chId2 = getSharedPreferences("notif", MODE_PRIVATE).getString("channelId_" + _nHabitId, "habit_reminders");
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             if (_nm2.getNotificationChannel(_chId2) == null) {
+                                String _savedUri2 = getSharedPreferences("notif", MODE_PRIVATE).getString("soundUri_" + _nHabitId, null);
                                 NotificationChannel _ch2 = new NotificationChannel(
                                     _chId2, "Habit Reminders", NotificationManager.IMPORTANCE_DEFAULT);
+                                if (_savedUri2 != null && !_savedUri2.isEmpty()) {
+                                    AudioAttributes _attrs2 = new AudioAttributes.Builder()
+                                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                                    _ch2.setSound(Uri.parse(_savedUri2), _attrs2);
+                                }
                                 _nm2.createNotificationChannel(_ch2);
                             }
                         }
@@ -536,10 +606,10 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                             .setContentIntent(_lpi2)
                             .setAutoCancel(true);
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                            String _su2 = getSharedPreferences("notif", MODE_PRIVATE).getString("soundUri", null);
+                            String _su2 = getSharedPreferences("notif", MODE_PRIVATE).getString("soundUri_" + _nHabitId, null);
                             if (_su2 != null && !_su2.isEmpty()) _nb2.setSound(Uri.parse(_su2));
                         }
-                        _nm2.notify((int) System.currentTimeMillis(), _nb2.build());
+                        _nm2.notify(_nHabitId.hashCode(), _nb2.build());
                     });
                 }
             }

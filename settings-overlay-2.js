@@ -1,4 +1,4 @@
-// @version 1568
+// @version 1569
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -454,6 +454,23 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       </div>
       </div>
     <div class="settings-group-content" id="sg-notifications">
+        <div class="settings-row">
+          <label>Habit</label>
+          <select id="notif-habit-select" onchange="notifSelectHabit(this.value)"></select>
+        </div>
+        <div class="settings-row">
+          <label>Trigger column</label>
+          <select id="notif-column-select" onchange="notifColumnChange()"></select>
+        </div>
+        <div class="settings-row" id="notif-status-value-row">
+          <label>Status equals</label>
+          <select id="notif-status-value" onchange="notifSaveSchedule()"></select>
+        </div>
+        <div class="settings-row" id="notif-threshold-row">
+          <label>Threshold (reps)</label>
+          <input id="notif-threshold" type="number" min="0" value="0" oninput="notifSaveSchedule()"
+            style="width:80px;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px 8px;font-size:13px;text-align:center;">
+        </div>
         <div class="settings-row" style="justify-content:space-between;gap:12px;">
         <label id="notif-enabled-label" style="font-size:13px;color:#bbb;">Notifications: OFF</label>
         <div id="notif-toggle-wrap" onclick="notifToggle()" style="width:48px;height:26px;border-radius:13px;background:#333;border:1px solid #555;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;touch-action:manipulation;">
@@ -577,10 +594,6 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
             <label style="font-size:10px;color:#666;">Secs</label>
             <input id="notif-seconds" type="number" min="0" value="0" style="width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px;font-size:13px;text-align:center;box-sizing:border-box;">
           </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:3px;">
-          <label style="font-size:13px;color:#bbb;">Target reps to stop notifying (0 = ignore)</label>
-          <input id="notif-target-reps" type="number" min="0" value="0" style="width:80px;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:4px 8px;font-size:13px;text-align:center;">
         </div>
         <div style="padding:10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">

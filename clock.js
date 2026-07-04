@@ -1,4 +1,4 @@
-// @version 1568
+// @version 1569
 // ── Live clock ─────────────────────────────────────────────
 (function() {
   const dateEl = document.getElementById("live-date");
@@ -107,7 +107,9 @@ let _lastTickDateStr = dateStr(new Date());
     document.querySelectorAll('#sections tr[data-date]').forEach(r => {
       if (r.dataset.date === _lastTickDateStr) r.classList.add("today-row");
     });
-    if (typeof _applyAutoTargetAdjust === "function") _applyAutoTargetAdjust();
+    if (window._notifGetAllSchedules && window._notifApplyAutoTargetFor) {
+      Object.keys(window._notifGetAllSchedules()).forEach(hid => window._notifApplyAutoTargetFor(hid));
+    }
     if (window._notifSyncDone) window._notifSyncDone();
   }
   let _dateCycleStep = 0;
@@ -179,6 +181,7 @@ function openMyFiles() { if (window.AndroidSettings && window.AndroidSettings.op
   // ── Service Worker ─────────────────────────────────────────
 if ('serviceWorker' in navigator && !location.hostname.includes('claudeusercontent.com')) {
   window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
     navigator.serviceWorker.addEventListener('message', ev => {
       const vEl = document.getElementById('app-version');
       if (!vEl) return;

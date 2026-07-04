@@ -10,27 +10,30 @@ public class MidnightAdjustReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         SharedPreferences prefs = context.getSharedPreferences("notif", Context.MODE_PRIVATE);
-        boolean enabled = prefs.getBoolean("autoTargetEnabled", false);
         java.util.Calendar today = java.util.Calendar.getInstance();
         String todayKey = String.format("%d-%02d-%02d",
             today.get(java.util.Calendar.YEAR),
             today.get(java.util.Calendar.MONTH) + 1,
             today.get(java.util.Calendar.DAY_OF_MONTH));
-        String lastApplied = prefs.getString("autoTargetLastApplied", "");
-        if (enabled && !todayKey.equals(lastApplied)) {
-            int step = prefs.getInt("autoTargetStep", 0);
-            int cap = prefs.getInt("autoTargetCap", 0);
-            int current = prefs.getInt("targetReps", 0);
+        java.util.Set<String> habitIds = prefs.getStringSet("habitIds", new java.util.HashSet<>());
+        for (String habitId : habitIds) {
+            boolean enabled = prefs.getBoolean("habitAutoTargetEnabled_" + habitId, false);
+            if (!enabled) continue;
+            String lastApplied = prefs.getString("habitAutoTargetLastApplied_" + habitId, "");
+            if (todayKey.equals(lastApplied)) continue;
+            int step = prefs.getInt("habitAutoTargetStep_" + habitId, 0);
+            int cap = prefs.getInt("habitAutoTargetCap_" + habitId, 0);
+            int current = prefs.getInt("habitThreshold_" + habitId, 0);
             if (step != 0) {
                 boolean canApply = (step > 0 && current < cap) || (step < 0 && current > cap);
                 if (canApply) {
                     int newVal = current + step;
                     if (step > 0) newVal = Math.min(newVal, cap);
                     if (step < 0) newVal = Math.max(newVal, cap);
-                    prefs.edit().putInt("targetReps", newVal).apply();
+                    prefs.edit().putInt("habitThreshold_" + habitId, newVal).apply();
                 }
             }
-            prefs.edit().putString("autoTargetLastApplied", todayKey).apply();
+            prefs.edit().putString("habitAutoTargetLastApplied_" + habitId, todayKey).apply();
         }
         scheduleNext(context);
     }

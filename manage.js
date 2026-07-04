@@ -1,4 +1,4 @@
-// @version 1568
+// @version 1569
 // ── Manage Habits ──────────────────────────────────────────
 function manageOpen() {
   manageRenderList();
@@ -96,6 +96,17 @@ function performHabitDelete(id) {
     const k = localStorage.key(i); if (k.startsWith(prefix)) keys.push(k);
   }
   keys.forEach(k => localStorage.removeItem(k));
+  if (window._notifGetAllSchedules) {
+    const _allSched = window._notifGetAllSchedules();
+    if (_allSched[id]) {
+      delete _allSched[id];
+      localStorage.setItem('_notifSchedules', JSON.stringify(_allSched));
+      if (window._notifReschedule) window._notifReschedule(id);
+    }
+    if (window.AndroidSettings && window.AndroidSettings.removeHabitSchedule) {
+      window.AndroidSettings.removeHabitSchedule(id);
+    }
+  }
     // Close & remove its section if open
   const section = document.getElementById(`section-${id}`);
   if (section) section.remove();
