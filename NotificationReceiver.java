@@ -1,4 +1,4 @@
-// @version 1569
+// @version 1570
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -128,3 +128,4 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 }
+

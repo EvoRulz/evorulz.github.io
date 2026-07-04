@@ -1,4 +1,4 @@
-// @version 1569
+// @version 1570
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 (function() {
   function todayStr() {
@@ -1124,3 +1124,4 @@ window.notifToggleAutoTarget = function() {
   }
   _updateAutoTargetToggleUI();
 };
+
