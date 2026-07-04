@@ -1,5 +1,8 @@
-// @version 1570
+// @version 1571
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
+window._notifMasterEnabled = function() {
+  return localStorage.getItem('_notifEnabled') !== 'false';
+};
 (function() {
   function todayStr() {
     const d = new Date();
@@ -87,6 +90,7 @@ function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(()
     Object.keys(all).forEach(habitId => { _notifSyncDoneFor(habitId, ds); });
   }
   async function notifyHabit(habitId) {
+    if (!window._notifMasterEnabled()) return;
     const sched = getSchedule(habitId);
     if (!sched.enabled) return;
     const ds = todayStr();
@@ -118,6 +122,7 @@ function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(()
   let _notifIntervals = {};
   function scheduleHabit(habitId) {
     if (_notifIntervals[habitId]) { clearInterval(_notifIntervals[habitId]); delete _notifIntervals[habitId]; }
+    if (!window._notifMasterEnabled()) return;
     const sched = getSchedule(habitId);
     if (!sched.enabled) return;
     _notifIntervals[habitId] = setInterval(() => { notifyHabit(habitId); }, _notifIntervalMsFor(sched));
@@ -199,7 +204,8 @@ function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(()
       var cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(function(c){ return c.id === hid; }) : null;
       var label = cfg ? cfg.label : hid;
       if (window.AndroidSettings && window.AndroidSettings.setHabitSchedule) {
-        window.AndroidSettings.setHabitSchedule(hid, _notifIntervalMsFor(sched), !!sched.enabled, label);
+        var effectiveEnabled = !!sched.enabled && window._notifMasterEnabled();
+        window.AndroidSettings.setHabitSchedule(hid, _notifIntervalMsFor(sched), effectiveEnabled, label);
       }
     });
   };
@@ -230,21 +236,90 @@ function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(()
 // ── Per-habit notification settings UI state ──────────────
 let _notifSelectedHabitId = null;
 window._notifCurrentHabitId = function() { return _notifSelectedHabitId; };
-window.notifPopulateHabitSelect = function() {
-  const sel = document.getElementById('notif-habit-select');
-  if (!sel || typeof TRACKER_CONFIGS === 'undefined') return;
-  const prevValue = _notifSelectedHabitId;
-  sel.innerHTML = '';
-  TRACKER_CONFIGS.forEach(cfg => {
-    const opt = document.createElement('option');
-    opt.value = cfg.id;
-    opt.textContent = cfg.label;
-    sel.appendChild(opt);
+function _notifHabitDotColor(habitId) {
+  const sched = window._notifGetSchedule(habitId);
+  const onColor = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOn || '#99ff99FF') : '#99ff99';
+  const offColor = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOff || '#666666FF') : '#666666';
+  return sched.enabled ? onColor : offColor;
+}
+window._notifRefreshHabitDots = function() {
+  document.querySelectorAll('#notif-habit-dropdown-list [data-habit-dot]').forEach(function(dot) {
+    dot.style.background = _notifHabitDotColor(dot.dataset.habitDot);
   });
-  const stillExists = TRACKER_CONFIGS.some(c => c.id === prevValue);
+  const trigDot = document.getElementById('notif-habit-trigger-dot');
+  if (trigDot && _notifSelectedHabitId) trigDot.style.background = _notifHabitDotColor(_notifSelectedHabitId);
+};
+function _notifBuildHabitDropdownRows() {
+  const list = document.getElementById('notif-habit-dropdown-list');
+  if (!list || typeof TRACKER_CONFIGS === 'undefined') return;
+  list.innerHTML = '';
+  TRACKER_CONFIGS.forEach(function(cfg) {
+    const row = document.createElement('div');
+    const isSel = cfg.id === _notifSelectedHabitId;
+    const baseCss = 'display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;font-size:13px;color:#fff;';
+    row.style.cssText = baseCss + (isSel ? 'background:#232323;' : '');
+    const dot = document.createElement('span');
+    dot.dataset.habitDot = cfg.id;
+    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;flex-shrink:0;background:' + _notifHabitDotColor(cfg.id) + ';';
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = cfg.label;
+    nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    row.appendChild(dot);
+    row.appendChild(nameSpan);
+    row.addEventListener('pointerenter', function() { row.style.background = '#2a2a2a'; });
+    row.addEventListener('pointerleave', function() { row.style.background = isSel ? '#232323' : ''; });
+    row.addEventListener('pointerdown', function(e) { e.preventDefault(); });
+    row.addEventListener('click', function() { window.notifChooseHabit(cfg.id); });
+    list.appendChild(row);
+  });
+}
+function _notifUpdateHabitTrigger(habitId) {
+  const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(function(c) { return c.id === habitId; }) : null;
+  const labelEl = document.getElementById('notif-habit-trigger-label');
+  const dotEl = document.getElementById('notif-habit-trigger-dot');
+  if (labelEl) labelEl.textContent = cfg ? cfg.label : 'Select habit';
+  if (dotEl && habitId) dotEl.style.background = _notifHabitDotColor(habitId);
+}
+function _notifHabitDropdownTapOut(e) {
+  const list = document.getElementById('notif-habit-dropdown-list');
+  const trigger = document.getElementById('notif-habit-trigger');
+  if (!list) return;
+  if (list.contains(e.target) || (trigger && trigger.contains(e.target))) return;
+  list.style.display = 'none';
+  document.removeEventListener('pointerdown', _notifHabitDropdownTapOut);
+}
+window.notifToggleHabitDropdown = function() {
+  const list = document.getElementById('notif-habit-dropdown-list');
+  const trigger = document.getElementById('notif-habit-trigger');
+  if (!list || !trigger) return;
+  if (list.style.display === 'block') {
+    list.style.display = 'none';
+    document.removeEventListener('pointerdown', _notifHabitDropdownTapOut);
+    return;
+  }
+  _notifBuildHabitDropdownRows();
+  const rect = trigger.getBoundingClientRect();
+  list.style.left = rect.left + 'px';
+  list.style.top = (rect.bottom + 2) + 'px';
+  list.style.width = rect.width + 'px';
+  list.style.display = 'block';
+  setTimeout(function() { document.addEventListener('pointerdown', _notifHabitDropdownTapOut); }, 0);
+};
+window.notifChooseHabit = function(habitId) {
+  const list = document.getElementById('notif-habit-dropdown-list');
+  if (list) list.style.display = 'none';
+  document.removeEventListener('pointerdown', _notifHabitDropdownTapOut);
+  notifSelectHabit(habitId);
+  _notifUpdateHabitTrigger(habitId);
+};
+window.notifPopulateHabitSelect = function() {
+  if (typeof TRACKER_CONFIGS === 'undefined') return;
+  const prevValue = _notifSelectedHabitId;
+  const stillExists = TRACKER_CONFIGS.some(function(c) { return c.id === prevValue; });
   const targetId = stillExists ? prevValue : (TRACKER_CONFIGS[0] ? TRACKER_CONFIGS[0].id : null);
-  sel.value = targetId || '';
   _notifSelectedHabitId = targetId;
+  _notifBuildHabitDropdownRows();
+  _notifUpdateHabitTrigger(targetId);
 };
 window.notifSelectHabit = function(habitId) {
   _notifSelectedHabitId = habitId;
@@ -400,6 +475,7 @@ window.notifSaveSchedule = function() {
   _notifCheckScheduleBtn();
 };
 window.notifLoadScheduleUI = function() {
+  _notifUpdateMasterToggleUI();
   window.notifPopulateHabitSelect();
   if (window._notifCurrentHabitId && window._notifCurrentHabitId()) {
     window.notifLoadHabitForm(window._notifCurrentHabitId());
@@ -527,6 +603,29 @@ function _notifUpdateToggleUI() {
   const labelEl = document.getElementById('notif-enabled-label');
   if (labelEl) labelEl.textContent = 'Notifications: ' + (enabled ? 'ON' : 'OFF');
 }
+function _notifUpdateMasterToggleUI() {
+  const enabled = window._notifMasterEnabled();
+  const wrap = document.getElementById('notif-master-toggle-wrap');
+  const switchEl = document.getElementById('notif-master-toggle-switch');
+  const _onBg = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOnBg || '#1a5a1aFF') : '#1a5a1a';
+  const _offBg = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleOffBg || '#333333FF') : '#333';
+  const _switchOn = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOn || '#99ff99FF') : '#99ff99';
+  const _switchOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOff || '#666666FF') : '#666';
+  const _borderOn = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOn || '#2a7a2aFF') : '#2a7a2a';
+  const _borderOff = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleBorderOff || '#555555FF') : '#555';
+  if (wrap) { wrap.style.background = enabled ? _onBg : _offBg; wrap.style.borderColor = enabled ? _borderOn : _borderOff; }
+  if (switchEl) { switchEl.style.left = enabled ? '27px' : '3px'; switchEl.style.background = enabled ? _switchOn : _switchOff; }
+  const masterLabelEl = document.getElementById('notif-master-enabled-label');
+  if (masterLabelEl) masterLabelEl.textContent = 'All Notifications: ' + (enabled ? 'ON' : 'OFF');
+}
+window.notifToggleMaster = function() {
+  const next = !window._notifMasterEnabled();
+  localStorage.setItem('_notifEnabled', next ? 'true' : 'false');
+  if (window._notifScheduleAll) window._notifScheduleAll();
+  if (window._notifReschedule) window._notifReschedule();
+  _notifUpdateMasterToggleUI();
+  if (window._notifRefreshHabitDots) window._notifRefreshHabitDots();
+};
 function _notifTickCountdown() {
   const el = document.getElementById('notif-countdown-display');
   if (!el) return;
@@ -598,6 +697,7 @@ window.notifToggle = function() {
   if (enabled && window._notifSyncDoneFor) window._notifSyncDoneFor(habitId, dateStr(new Date()));
   if (enabled && window._notifApplyAutoTargetFor) window._notifApplyAutoTargetFor(habitId);
   _notifUpdateToggleUI();
+  if (window._notifRefreshHabitDots) window._notifRefreshHabitDots();
 };
 window.notifSetOffTimer = function() {
   const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;

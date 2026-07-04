@@ -1,4 +1,4 @@
-// @version 1570
+// @version 1571
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -454,9 +454,31 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       </div>
       </div>
     <div class="settings-group-content" id="sg-notifications">
+        <div class="settings-row" style="justify-content:space-between;gap:12px;">
+          <label id="notif-master-enabled-label" style="font-size:13px;color:#bbb;">All Notifications: OFF</label>
+          <div id="notif-master-toggle-wrap" onclick="notifToggleMaster()"
+            style="width:48px;height:26px;border-radius:13px;background:#333;border:1px solid #555;cursor:pointer;
+            position:relative;transition:background 0.2s;flex-shrink:0;touch-action:manipulation;">
+            <div id="notif-master-toggle-switch"
+              style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#666;
+              transition:left 0.2s,background 0.2s;pointer-events:none;"></div>
+          </div>
+        </div>
         <div class="settings-row">
           <label>Habit</label>
-          <select id="notif-habit-select" onchange="notifSelectHabit(this.value)"></select>
+          <div id="notif-habit-dropdown-wrap" style="position:relative;flex:1;max-width:220px;">
+            <div id="notif-habit-trigger" onclick="notifToggleHabitDropdown()"
+              style="display:flex;align-items:center;gap:8px;background:#111;color:#fff;border:1px solid #555;
+              border-radius:4px;padding:6px 10px;font-size:13px;cursor:pointer;user-select:none;
+              -webkit-user-select:none;box-sizing:border-box;">
+              <span id="notif-habit-trigger-dot" style="width:8px;height:8px;border-radius:50%;background:#666;flex-shrink:0;"></span>
+              <span id="notif-habit-trigger-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Select habit</span>
+              <span style="font-size:10px;color:#777;flex-shrink:0;">&#9662;</span>
+            </div>
+            <div id="notif-habit-dropdown-list"
+              style="display:none;position:fixed;background:#1a1a1a;border:1px solid #555;border-radius:6px;
+              z-index:99999;overflow-y:auto;max-height:220px;box-shadow:0 4px 16px rgba(0,0,0,0.7);"></div>
+          </div>
         </div>
         <div class="settings-row">
           <label>Trigger column</label>
