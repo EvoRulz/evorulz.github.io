@@ -1,4 +1,4 @@
-// @version 1577
+// @version 1578
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -478,6 +478,7 @@ window.addEventListener('load', function() {
   document.addEventListener('pointerdown', function(e) {
     if (!_soEl.classList.contains('active')) return;
     if (e.target.closest('#sg-swatches')) return;
+    if (e.target.closest('#notif-habit-dropdown-list')) return;
     _soActive = !!e.target.closest('.settings-group-content, #settings-panel');
     if (_soActive) {
       _soLast = { x: e.clientX, y: e.clientY };

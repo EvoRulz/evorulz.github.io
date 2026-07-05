@@ -1,4 +1,4 @@
-// @version 1577
+// @version 1578
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -477,7 +477,7 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
             </div>
             <div id="notif-habit-dropdown-list"
               style="display:none;position:fixed;background:#1a1a1a;border:1px solid #555;border-radius:6px;
-              z-index:99999;overflow-y:auto;max-height:220px;box-shadow:0 4px 16px rgba(0,0,0,0.7);"></div>
+              z-index:99999;overflow-y:auto;max-height:330px;box-shadow:0 4px 16px rgba(0,0,0,0.7);"></div>
           </div>
         </div>
         <div class="settings-row">
