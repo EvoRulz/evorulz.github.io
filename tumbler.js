@@ -1,4 +1,4 @@
-// @version 1584
+// @version 1585
 // ── Clock tumbler ──────────────────────────────────────────
 (function(){
   const COLS = window._CLOCK_COLS;
@@ -528,7 +528,8 @@
           } else {
             const vers = stale.map(r => r.ver).filter(v => v > 0);
 const minVer = vers.length ? Math.min(...vers) : 0;
-            statsEl.innerHTML = 'CDN: v' + (minVer || '?') + '<br>' + stale.length + ' file' + (stale.length > 1 ? 's' : '') + ' stale';
+            const staleNames = stale.map(r => r.f.replace('./', '')).join(', ');
+            statsEl.innerHTML = `CDN: v${minVer || '?'}<br>${stale.length} file${stale.length > 1 ? 's' : ''} stale<br>${staleNames}`;
             statsEl.style.color = '#ffaa00';
             statsEl.style.opacity = '1';
             _pending = false;
