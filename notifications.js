@@ -1,4 +1,4 @@
-// @version 1576
+// @version 1577
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -243,14 +243,14 @@ function _notifHabitDotColor(habitId) {
   const offColor = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOff || '#666666FF') : '#666666';
   return sched.enabled ? onColor : offColor;
 }
-const _NOTIF_MINI_DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const _NOTIF_MINI_DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 function _notifBuildMiniSchedule(habitId) {
   const DAY_MS = 24 * 60 * 60 * 1000;
   const masterOn = window._notifMasterEnabled();
   const sched = window._notifGetSchedule(habitId);
   const info = _notifWeekTicksFor(sched);
   const active = masterOn && sched.enabled;
-  const todayIdx = new Date().getDay();
+  const todayIdx = (new Date().getDay() + 6) % 7;
   const wrap = document.createElement('div');
   wrap.dataset.habitMini = habitId;
   wrap.style.cssText = 'display:flex;flex-direction:column;gap:1px;width:100%;';
@@ -681,7 +681,7 @@ function _notifWeekTicksFor(sched) {
   while (t < DAY_MS) { result.ticks.push(t); t += intervalMs; }
   return result;
 }
-const _NOTIF_WEEK_DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const _NOTIF_WEEK_DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 function _notifBuildWeekSchedule() {
   const wrap = document.getElementById('notif-week-schedule-wrap');
   if (!wrap) return;
@@ -697,7 +697,7 @@ function _notifBuildWeekSchedule() {
   const sched = window._notifGetSchedule(habitId);
   const info = _notifWeekTicksFor(sched);
   const active = masterOn && sched.enabled;
-  const todayIdx = new Date().getDay();
+  const todayIdx = (new Date().getDay() + 6) % 7;
   const title = document.createElement('div');
   title.style.cssText = 'font-size:11px;color:#666;margin-bottom:2px;';
   if (!masterOn) {
