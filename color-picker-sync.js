@@ -1,4 +1,4 @@
-// @version 1578
+// @version 1579
 window._cpSyncUI = function () {
   if (typeof setColorValue !== 'function') return;
   const c = window._cpCfg();
