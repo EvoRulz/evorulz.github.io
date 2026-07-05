@@ -1,4 +1,4 @@
-// @version 1573
+// @version 1574
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -418,7 +418,12 @@ window.notifSaveStartOffset = function() {
     seconds: g('notif-start-seconds'),
   };
   window._notifSaveSchedule(habitId, { startOffset: s });
-  const offsetMs = window._notifGetSchedule(habitId).startOffset ? _notifStartOffsetMsFor(window._notifGetSchedule(habitId)) : 0;
+  const offsetMs =
+    (s.years   || 0) * 365 * 24 * 60 * 60 * 1000 +
+    (s.days    || 0) * 24 * 60 * 60 * 1000 +
+    (s.hours   || 0) * 60 * 60 * 1000 +
+    (s.minutes || 0) * 60 * 1000 +
+    (s.seconds || 0) * 1000;
   if (window.AndroidSettings && window.AndroidSettings.setStartOffset) {
     window.AndroidSettings.setStartOffset(habitId, offsetMs);
   } else {
@@ -786,9 +791,9 @@ function _notifTickCountdown() {
 }
 setInterval(() => {
   Object.keys(_notifGetAllSchedules()).forEach(hid => {
-    const sched = getSchedule(hid);
+    const sched = window._notifGetSchedule(hid);
     if (sched.offUntil && Date.now() >= sched.offUntil && !sched.enabled) {
-      saveSchedule(hid, { enabled: true, offUntil: 0 });
+      window._notifSaveSchedule(hid, { enabled: true, offUntil: 0 });
       if (window._notifReschedule) window._notifReschedule(hid);
       if (hid === (window._notifCurrentHabitId ? window._notifCurrentHabitId() : null)) {
         _notifUpdateToggleUI();
