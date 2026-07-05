@@ -1,4 +1,4 @@
-// @version 1579
+// @version 1580
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -778,7 +778,96 @@ function _notifBuildWeekSchedule() {
   legend.textContent = 'amber = start time, blue = notification, red = now';
   wrap.appendChild(legend);
 }
+function _notifBuildAllHabitsSchedule() {
+  const wrap = document.getElementById('notif-all-habits-schedule-wrap');
+  if (!wrap) return;
+  const overlay = document.getElementById('settings-overlay');
+  if (!overlay || !overlay.classList.contains('active')) return;
+  const groupEl = document.getElementById('sg-notifications');
+  if (!groupEl || !groupEl.classList.contains('open')) return;
+  wrap.innerHTML = '';
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const masterOn = window._notifMasterEnabled();
+  const allSched = window._notifGetAllSchedules();
+  const activeInfos = masterOn ? Object.keys(allSched).filter(hid => {
+    const stillExists = typeof TRACKER_CONFIGS !== 'undefined' && TRACKER_CONFIGS.some(c => c.id === hid);
+    return stillExists && allSched[hid].enabled;
+  }).map(hid => _notifWeekTicksFor(window._notifGetSchedule(hid))) : [];
+  const todayIdx = (new Date().getDay() + 6) % 7;
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:11px;color:#666;margin-bottom:2px;';
+  title.textContent = masterOn ? 'All habits schedule preview' : 'All habits schedule preview (all notifications off)';
+  wrap.appendChild(title);
+  const axisRow = document.createElement('div');
+  axisRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:2px;';
+  const axisSpacer = document.createElement('div');
+  axisSpacer.style.cssText = 'width:28px;flex-shrink:0;';
+  axisRow.appendChild(axisSpacer);
+  const axisBar = document.createElement('div');
+  axisBar.style.cssText = 'position:relative;flex:1;height:10px;';
+  [0, 6, 12, 18, 24].forEach(h => {
+    const mark = document.createElement('div');
+    mark.textContent = String(h);
+    let tx = 'translateX(-50%)';
+    if (h === 0) tx = 'translateX(0)';
+    if (h === 24) tx = 'translateX(-100%)';
+    mark.style.cssText = 'position:absolute;top:0;left:' + (h / 24 * 100) + '%;font-size:9px;color:#555;transform:' + tx + ';';
+    axisBar.appendChild(mark);
+  });
+  axisRow.appendChild(axisBar);
+  wrap.appendChild(axisRow);
+  _NOTIF_WEEK_DAY_LABELS.forEach((dayLabel, dayIdx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px;';
+    const isToday = dayIdx === todayIdx;
+    const label = document.createElement('div');
+    label.textContent = dayLabel;
+    label.style.cssText = 'width:28px;flex-shrink:0;font-size:11px;color:' + (isToday ? '#fff' : '#777') +
+      ';font-weight:' + (isToday ? '600' : '400') + ';';
+    row.appendChild(label);
+    const bar = document.createElement('div');
+    bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + (activeInfos.length ? '#111' : '#0a0a0a') +
+      ';border:1px solid ' + (isToday ? '#666' : '#333') + ';border-radius:3px;overflow:hidden;';
+    [6, 12, 18].forEach(h => {
+      const grid = document.createElement('div');
+      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,0.08);';
+      bar.appendChild(grid);
+    });
+    activeInfos.forEach(info => {
+      if (info.dense) {
+        const band = document.createElement('div');
+        band.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;right:0;' +
+          'background:repeating-linear-gradient(45deg,rgba(153,204,255,0.35),rgba(153,204,255,0.35) 2px,transparent 2px,transparent 4px);';
+        bar.appendChild(band);
+      } else {
+        info.ticks.forEach(ms => {
+          const tick = document.createElement('div');
+          tick.style.cssText = 'position:absolute;top:1px;bottom:1px;left:' + (ms / DAY_MS * 100) + '%;width:2px;background:#99ccff;';
+          bar.appendChild(tick);
+        });
+      }
+      const offsetMark = document.createElement('div');
+      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:2px;background:#ffcc66;';
+      bar.appendChild(offsetMark);
+    });
+    if (isToday) {
+      const now = new Date();
+      const msIntoDay = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
+      const live = document.createElement('div');
+      live.style.cssText = 'position:absolute;top:-2px;bottom:-2px;left:' + (msIntoDay / DAY_MS * 100) + '%;width:2px;' +
+        'background:#ff5555;box-shadow:0 0 4px 1px rgba(255,85,85,0.8);z-index:2;';
+      bar.appendChild(live);
+    }
+    row.appendChild(bar);
+    wrap.appendChild(row);
+  });
+  const legend = document.createElement('div');
+  legend.style.cssText = 'font-size:10px;color:#555;margin-top:4px;';
+  legend.textContent = 'amber = start time, blue = notification, red = now';
+  wrap.appendChild(legend);
+}
 setInterval(_notifBuildWeekSchedule, 1000);
+setInterval(_notifBuildAllHabitsSchedule, 1000);
 function _notifUpdateToggleUI() {
   const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
   const enabled = habitId ? window._notifGetSchedule(habitId).enabled : false;
