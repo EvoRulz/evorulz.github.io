@@ -1,4 +1,4 @@
-// @version 1574
+// @version 1575
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -243,6 +243,64 @@ function _notifHabitDotColor(habitId) {
   const offColor = (typeof btnStyle !== 'undefined') ? hex8ToCss(btnStyle.toggleSwitchOff || '#666666FF') : '#666666';
   return sched.enabled ? onColor : offColor;
 }
+const _NOTIF_MINI_DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+function _notifBuildMiniSchedule(habitId) {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const masterOn = window._notifMasterEnabled();
+  const sched = window._notifGetSchedule(habitId);
+  const info = _notifWeekTicksFor(sched);
+  const active = masterOn && sched.enabled;
+  const todayIdx = new Date().getDay();
+  const wrap = document.createElement('div');
+  wrap.dataset.habitMini = habitId;
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:1px;width:100%;';
+  _NOTIF_MINI_DAY_LABELS.forEach(function(dayLabel, dayIdx) {
+    const isToday = dayIdx === todayIdx;
+    const dayRow = document.createElement('div');
+    dayRow.style.cssText = 'display:flex;align-items:center;gap:3px;';
+    const label = document.createElement('div');
+    label.textContent = dayLabel;
+    label.style.cssText = 'width:8px;flex-shrink:0;font-size:7px;line-height:1;text-align:center;' +
+      'color:' + (isToday ? '#fff' : '#777') + ';font-weight:' + (isToday ? '600' : '400') + ';';
+    dayRow.appendChild(label);
+    const bar = document.createElement('div');
+    bar.style.cssText = 'position:relative;flex:1;height:4px;border-radius:1px;overflow:hidden;' +
+      'background:' + (active ? '#111' : '#0a0a0a') + ';border:1px solid ' + (isToday ? '#666' : '#333') + ';';
+    [6, 12, 18].forEach(function(h) {
+      const grid = document.createElement('div');
+      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,0.08);';
+      bar.appendChild(grid);
+    });
+    if (active) {
+      if (info.dense) {
+        const band = document.createElement('div');
+        band.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;right:0;' +
+          'background:repeating-linear-gradient(45deg,rgba(153,204,255,0.35),rgba(153,204,255,0.35) 1px,transparent 1px,transparent 2px);';
+        bar.appendChild(band);
+      } else {
+        info.ticks.forEach(function(ms) {
+          const tick = document.createElement('div');
+          tick.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (ms / DAY_MS * 100) + '%;width:1px;background:#99ccff;';
+          bar.appendChild(tick);
+        });
+      }
+      const offsetMark = document.createElement('div');
+      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:1px;background:#ffcc66;';
+      bar.appendChild(offsetMark);
+    }
+    if (isToday) {
+      const now = new Date();
+      const msIntoDay = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
+      const live = document.createElement('div');
+      live.style.cssText = 'position:absolute;top:-1px;bottom:-1px;left:' + (msIntoDay / DAY_MS * 100) + '%;width:1px;' +
+        'background:#ff5555;box-shadow:0 0 2px 1px rgba(255,85,85,0.8);z-index:2;';
+      bar.appendChild(live);
+    }
+    dayRow.appendChild(bar);
+    wrap.appendChild(dayRow);
+  });
+  return wrap;
+}
 window._notifRefreshHabitDots = function() {
   document.querySelectorAll('#notif-habit-dropdown-list [data-habit-dot]').forEach(function(dot) {
     dot.style.background = _notifHabitDotColor(dot.dataset.habitDot);
@@ -257,16 +315,20 @@ function _notifBuildHabitDropdownRows() {
   TRACKER_CONFIGS.forEach(function(cfg) {
     const row = document.createElement('div');
     const isSel = cfg.id === _notifSelectedHabitId;
-    const baseCss = 'display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;font-size:13px;color:#fff;';
+    const baseCss = 'display:flex;flex-direction:column;gap:5px;padding:7px 10px;cursor:pointer;font-size:13px;color:#fff;';
     row.style.cssText = baseCss + (isSel ? 'background:#232323;' : '');
+    const topRow = document.createElement('div');
+    topRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
     const dot = document.createElement('span');
     dot.dataset.habitDot = cfg.id;
     dot.style.cssText = 'width:8px;height:8px;border-radius:50%;flex-shrink:0;background:' + _notifHabitDotColor(cfg.id) + ';';
     const nameSpan = document.createElement('span');
     nameSpan.textContent = cfg.label;
     nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
-    row.appendChild(dot);
-    row.appendChild(nameSpan);
+    topRow.appendChild(dot);
+    topRow.appendChild(nameSpan);
+    row.appendChild(topRow);
+    row.appendChild(_notifBuildMiniSchedule(cfg.id));
     row.addEventListener('pointerenter', function() { row.style.background = '#2a2a2a'; });
     row.addEventListener('pointerleave', function() { row.style.background = isSel ? '#232323' : ''; });
     row.addEventListener('pointerdown', function(e) { e.preventDefault(); });
