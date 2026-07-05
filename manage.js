@@ -1,4 +1,4 @@
-// @version 1580
+// @version 1581
 // ── Manage Habits ──────────────────────────────────────────
 function manageOpen() {
   manageRenderList();
