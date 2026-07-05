@@ -1,4 +1,4 @@
-// @version 1581
+// @version 1582
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -330,9 +330,11 @@ function setupObservers() {
     for (let i=0;i<CHUNK;i++) {
       topDate=clamp(offsetDate(topDate,-1));
       if (topDate<=MIN_DATE) break;
-      frag.appendChild(makeRow(dateStr(new Date(topDate))));
+      frag.prepend(makeRow(dateStr(new Date(topDate))));
     }
+    const heightBeforeTop=container.scrollHeight;
     tbody.prepend(frag);
+    container.scrollTop+=(container.scrollHeight-heightBeforeTop);
     for (let i=0;i<CHUNK;i++) {
       const last=tbody.lastElementChild; if (!last) break;
       tbody.removeChild(last); bottomDate=clamp(offsetDate(bottomDate,-1));
@@ -348,10 +350,12 @@ function setupObservers() {
       frag.appendChild(makeRow(dateStr(new Date(bottomDate))));
     }
     tbody.append(frag);
+    const heightBeforeRemove=container.scrollHeight;
     for (let i=0;i<CHUNK;i++) {
       const first=tbody.firstElementChild; if (!first) break;
       tbody.removeChild(first); topDate=clamp(offsetDate(topDate,1));
     }
+    container.scrollTop-=(heightBeforeRemove-container.scrollHeight);
     updateBars();
   },opts).observe(sel(".sentinel-bottom"));
 }

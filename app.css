@@ -1,4 +1,4 @@
-/* @version 1581 */
+/* @version 1582 */
 * { -webkit-tap-highlight-color: transparent; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .color-settings-row { display:inline-flex; flex-direction:column; gap:4px; width:auto; vertical-align:top; }
@@ -206,6 +206,7 @@ h1 { margin-top: 0; }
   border: 1px solid #333;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overflow-anchor: none;
 }
 .scroll-container::-webkit-scrollbar { display: none; }
 table { border-collapse: collapse; width: 100%; }
