@@ -1,4 +1,4 @@
-// @version 1572
+// @version 1573
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -363,6 +363,7 @@ window.notifLoadHabitForm = function(habitId) {
   _updateAutoTargetToggleUI();
   _notifUpdateToggleUI();
   if (window.notifDebugRefresh) window.notifDebugRefresh(habitId);
+  _notifBuildWeekSchedule();
 };
 window.notifColumnChange = function(skipSave) {
   const colSel = document.getElementById('notif-column-select');
@@ -596,6 +597,121 @@ function _notifUpdateNextFireDisplay() {
     return `<div>${safeLabel}: ${_notifFormatRemaining(e.ms - Date.now())}</div>`;
   }).join('');
 }
+function _notifWeekTicksFor(sched) {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const s = sched.startOffset || {};
+  const offsetMsRaw = (s.years || 0) * 365 * DAY_MS + (s.days || 0) * DAY_MS + (s.hours || 0) * 3600000 +
+    (s.minutes || 0) * 60000 + (s.seconds || 0) * 1000;
+  const offsetMs = Math.max(0, Math.min(DAY_MS, offsetMsRaw));
+  const intervalMs = ((sched.years || 0) * 365 * DAY_MS + (sched.days || 0) * DAY_MS + (sched.hours || 0) * 3600000 +
+    (sched.minutes || 0) * 60000 + (sched.seconds || 0) * 1000) || 3600000;
+  const result = { offsetMs: offsetMs, intervalMs: intervalMs, ticks: [], dense: false };
+  if (!sched.enabled || intervalMs <= 0) return result;
+  const span = DAY_MS - offsetMs;
+  const count = Math.floor(span / intervalMs) + 1;
+  if (count > 150) { result.dense = true; return result; }
+  let t = offsetMs;
+  while (t < DAY_MS) { result.ticks.push(t); t += intervalMs; }
+  return result;
+}
+const _NOTIF_WEEK_DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+function _notifBuildWeekSchedule() {
+  const wrap = document.getElementById('notif-week-schedule-wrap');
+  if (!wrap) return;
+  const overlay = document.getElementById('settings-overlay');
+  if (!overlay || !overlay.classList.contains('active')) return;
+  const groupEl = document.getElementById('sg-notifications');
+  if (!groupEl || !groupEl.classList.contains('open')) return;
+  const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
+  wrap.innerHTML = '';
+  if (!habitId) return;
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const masterOn = window._notifMasterEnabled();
+  const sched = window._notifGetSchedule(habitId);
+  const info = _notifWeekTicksFor(sched);
+  const active = masterOn && sched.enabled;
+  const todayIdx = new Date().getDay();
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:11px;color:#666;margin-bottom:2px;';
+  if (!masterOn) {
+    title.textContent = 'Weekly schedule preview (all notifications off)';
+  } else if (!sched.enabled) {
+    title.textContent = (sched.offUntil && sched.offUntil > Date.now())
+      ? 'Weekly schedule preview (off until ' + new Date(sched.offUntil).toLocaleString() + ')'
+      : 'Weekly schedule preview (off)';
+  } else {
+    title.textContent = 'Weekly schedule preview';
+  }
+  wrap.appendChild(title);
+  const axisRow = document.createElement('div');
+  axisRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:2px;';
+  const axisSpacer = document.createElement('div');
+  axisSpacer.style.cssText = 'width:28px;flex-shrink:0;';
+  axisRow.appendChild(axisSpacer);
+  const axisBar = document.createElement('div');
+  axisBar.style.cssText = 'position:relative;flex:1;height:10px;';
+  [0, 6, 12, 18, 24].forEach(h => {
+    const mark = document.createElement('div');
+    mark.textContent = String(h);
+    let tx = 'translateX(-50%)';
+    if (h === 0) tx = 'translateX(0)';
+    if (h === 24) tx = 'translateX(-100%)';
+    mark.style.cssText = 'position:absolute;top:0;left:' + (h / 24 * 100) + '%;font-size:9px;color:#555;transform:' + tx + ';';
+    axisBar.appendChild(mark);
+  });
+  axisRow.appendChild(axisBar);
+  wrap.appendChild(axisRow);
+  _NOTIF_WEEK_DAY_LABELS.forEach((dayLabel, dayIdx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:2px;';
+    const isToday = dayIdx === todayIdx;
+    const label = document.createElement('div');
+    label.textContent = dayLabel;
+    label.style.cssText = 'width:28px;flex-shrink:0;font-size:11px;color:' + (isToday ? '#fff' : '#777') +
+      ';font-weight:' + (isToday ? '600' : '400') + ';';
+    row.appendChild(label);
+    const bar = document.createElement('div');
+    bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + (active ? '#111' : '#0a0a0a') +
+      ';border:1px solid ' + (isToday ? '#666' : '#333') + ';border-radius:3px;overflow:hidden;';
+    [6, 12, 18].forEach(h => {
+      const grid = document.createElement('div');
+      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,0.08);';
+      bar.appendChild(grid);
+    });
+    if (active) {
+      if (info.dense) {
+        const band = document.createElement('div');
+        band.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;right:0;' +
+          'background:repeating-linear-gradient(45deg,rgba(153,204,255,0.35),rgba(153,204,255,0.35) 2px,transparent 2px,transparent 4px);';
+        bar.appendChild(band);
+      } else {
+        info.ticks.forEach(ms => {
+          const tick = document.createElement('div');
+          tick.style.cssText = 'position:absolute;top:1px;bottom:1px;left:' + (ms / DAY_MS * 100) + '%;width:2px;background:#99ccff;';
+          bar.appendChild(tick);
+        });
+      }
+      const offsetMark = document.createElement('div');
+      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:2px;background:#ffcc66;';
+      bar.appendChild(offsetMark);
+    }
+    if (isToday) {
+      const now = new Date();
+      const msIntoDay = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
+      const live = document.createElement('div');
+      live.style.cssText = 'position:absolute;top:-2px;bottom:-2px;left:' + (msIntoDay / DAY_MS * 100) + '%;width:2px;' +
+        'background:#ff5555;box-shadow:0 0 4px 1px rgba(255,85,85,0.8);z-index:2;';
+      bar.appendChild(live);
+    }
+    row.appendChild(bar);
+    wrap.appendChild(row);
+  });
+  const legend = document.createElement('div');
+  legend.style.cssText = 'font-size:10px;color:#555;margin-top:4px;';
+  legend.textContent = 'amber = start time, blue = notification, red = now';
+  wrap.appendChild(legend);
+}
+setInterval(_notifBuildWeekSchedule, 1000);
 function _notifUpdateToggleUI() {
   const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
   const enabled = habitId ? window._notifGetSchedule(habitId).enabled : false;
