@@ -1,4 +1,4 @@
-// @version 1586
+// @version 1587
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -168,6 +168,7 @@ window._notifMasterEnabled = function() {
   window._notifScheduleAll = scheduleAllHabits;
   window._notifGetAllSchedules = _notifGetAllSchedules;
   window._notifApplyAutoTargetFor = _applyAutoTargetAdjustFor;
+  window._notifFireNow = notifyHabit;
   window.notifDebugRefresh = function(habitId) {
     const el = document.getElementById('notif-debug-output');
     if (!el) return;
@@ -463,16 +464,25 @@ window.notifRefreshPermission = function() {
   if (window.AndroidSettings && window.AndroidSettings.getPermissionStatus) {
     try {
       const s = JSON.parse(window.AndroidSettings.getPermissionStatus());
-      el.innerHTML =
-      'Web: <span style="color:' + webColor + '">' + webPerm + '</span>' +
-      '<br>Notifications: <span style="color:' + (s.notifications ? '#99ff99' : '#ff9999') + '">' + (s.notifications ? 'granted' : 'denied') + '</span>' +
-      '<br>Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>' +
-      '<br>Battery: <span style="color:' + (s.battery ? '#99ff99' : '#ff9999') + '">' + (s.battery ? 'unrestricted' : 'optimized') + '</span>';
+      const exactColor = s.exactAlarm ? '#99ff99' : '#ff9999';
+      const battColor = s.battery ? '#99ff99' : '#ff9999';
+      el.innerHTML = `
+        Web: <span style="color:${webColor}">${webPerm}</span><br>
+        Notifications: <span style="color:${s.notifications ? '#99ff99' : '#ff9999'}">${s.notifications ? 'granted' : 'denied'}</span><br>
+        Exact alarm: <span style="color:${exactColor}">${s.exactAlarm ? 'granted' : 'denied'}</span><br>
+        <span style="font-size:11px;color:#777;">Exact alarm lets reminders fire at the precise minute they are due.
+        Without it Android may delay reminders by several minutes to save battery.
+        Tap Alarm Permission below to grant it.</span><br>
+        Battery: <span style="color:${battColor}">${s.battery ? 'unrestricted' : 'optimized'}</span><br>
+        <span style="font-size:11px;color:#777;">Optimized means Android may pause this app in the background and
+        delay or drop reminders, especially after long idle periods (Doze mode, not fully handled by this app yet).
+        Tap Battery Settings below and choose Unrestricted or Don't optimize.</span>
+      `;
     } catch {
-      el.innerHTML = 'Web: <span style="color:' + webColor + '">' + webPerm + '</span>';
+      el.innerHTML = `Web: <span style="color:${webColor}">${webPerm}</span>`;
     }
   } else {
-    el.innerHTML = 'Web: <span style="color:' + webColor + '">' + webPerm + '</span>';
+    el.innerHTML = `Web: <span style="color:${webColor}">${webPerm}</span>`;
   }
 };
 window.notifSaveStartOffset = function() {
@@ -986,6 +996,7 @@ window.notifToggle = function() {
   if (window._notifReschedule) window._notifReschedule(habitId);
   if (enabled && window._notifSyncDoneFor) window._notifSyncDoneFor(habitId, dateStr(new Date()));
   if (enabled && window._notifApplyAutoTargetFor) window._notifApplyAutoTargetFor(habitId);
+  if (enabled && window._notifFireNow) window._notifFireNow(habitId);
   _notifUpdateToggleUI();
   if (window._notifRefreshHabitDots) window._notifRefreshHabitDots();
 };
