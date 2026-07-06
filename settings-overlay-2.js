@@ -1,4 +1,4 @@
-// @version 1585
+// @version 1586
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -548,6 +548,8 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
         <button onclick="notifOpenSettings()" style="padding:7px 16px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Open App Settings</button>
         <button onclick="notifOpenAlarmSettings()" style="padding:7px 16px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Alarm Permission</button>
+        <button onclick="notifOpenBatterySettings()"
+          style="padding:7px 16px;background:#1a2a3a;color:#99ccff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Battery Settings</button>
         <button id="notif-send-test-btn" onclick="notifSendTest()" style="padding:7px 16px;background:#1a3a1a;color:#99ff99;border:none;border-radius:4px;cursor:pointer;font-size:13px;">Send Test</button>
       </div>
       <div id="notif-status-msg" style="font-size:12px;color:#888;min-height:16px;margin-top:6px;"></div>

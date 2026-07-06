@@ -1,4 +1,4 @@
-// @version 1585
+// @version 1586
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -212,6 +212,7 @@ window._notifMasterEnabled = function() {
   };
   setTimeout(() => {
     _notifSyncAllDone();
+    if (window._notifReschedule) window._notifReschedule();
     const all = _notifGetAllSchedules();
     Object.keys(all).forEach(habitId => {
       if (all[habitId].autoTarget && all[habitId].autoTarget.enabled) _applyAutoTargetAdjustFor(habitId);
@@ -449,6 +450,11 @@ window.notifOpenSettings = function() {
 window.notifOpenAlarmSettings = function() {
   window.location.href = 'habitnotify://alarmsettings';
 };
+window.notifOpenBatterySettings = function() {
+  if (window.AndroidSettings && window.AndroidSettings.openBatterySettings) {
+    window.AndroidSettings.openBatterySettings();
+  }
+};
 window.notifRefreshPermission = function() {
   const el = document.getElementById('notif-permission-status');
   if (!el) return;
@@ -460,7 +466,8 @@ window.notifRefreshPermission = function() {
       el.innerHTML =
       'Web: <span style="color:' + webColor + '">' + webPerm + '</span>' +
       '<br>Notifications: <span style="color:' + (s.notifications ? '#99ff99' : '#ff9999') + '">' + (s.notifications ? 'granted' : 'denied') + '</span>' +
-      '<br>Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>';
+      '<br>Exact alarm: <span style="color:' + (s.exactAlarm ? '#99ff99' : '#ff9999') + '">' + (s.exactAlarm ? 'granted' : 'denied') + '</span>' +
+      '<br>Battery: <span style="color:' + (s.battery ? '#99ff99' : '#ff9999') + '">' + (s.battery ? 'unrestricted' : 'optimized') + '</span>';
     } catch {
       el.innerHTML = 'Web: <span style="color:' + webColor + '">' + webPerm + '</span>';
     }

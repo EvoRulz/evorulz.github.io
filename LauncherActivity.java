@@ -1,4 +1,4 @@
-// @version 1585
+// @version 1586
 /*
  * Copyright 2020 Google Inc.
  *
@@ -26,6 +26,7 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.webkit.JavascriptInterface;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -85,7 +86,12 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             }
             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
             boolean alarm = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || am.canScheduleExactAlarms();
-            return "{\"notifications\":" + notif + ",\"exactAlarm\":" + alarm + "}";
+            boolean battery = true;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+                battery = pm.isIgnoringBatteryOptimizations("io.github.evorulz.twa");
+            }
+            return "{\"notifications\":" + notif + ",\"exactAlarm\":" + alarm + ",\"battery\":" + battery + "}";
         }
         @JavascriptInterface
         public void openMyFiles() {
@@ -113,6 +119,12 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }
+        }
+        @JavascriptInterface
+        public void openBatterySettings() {
+            Intent i = new Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
         }
         @JavascriptInterface
         public void openAppSettings() {
