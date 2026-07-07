@@ -1,8 +1,75 @@
-// @version 1589
+// @version 1590
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
 };
+window._sunTimes = null;
+try {
+  const _stRaw = JSON.parse(localStorage.getItem('_sunTimes'));
+  if (_stRaw && _stRaw.date === dateStr(new Date())) window._sunTimes = _stRaw;
+} catch {}
+function _notifParseHHMM(iso) {
+  const m = /T(\d{2}):(\d{2})/.exec(iso || '');
+  return m ? (parseInt(m[1], 10) * 60 + parseInt(m[2], 10)) : null;
+}
+function _notifRenderSunConsumers() {
+  _notifBuildWeekSchedule();
+  _notifBuildAllHabitsSchedule();
+  const _list = document.getElementById('notif-habit-dropdown-list');
+  if (_list && _list.style.display === 'block') _notifBuildHabitDropdownRows();
+}
+function _notifFetchSunTimes(lat, lon) {
+  const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
+    '&daily=sunrise,sunset&timezone=auto&forecast_days=1';
+  fetch(url).then(r => r.json()).then(data => {
+    const sunriseMin = _notifParseHHMM(data && data.daily && data.daily.sunrise && data.daily.sunrise[0]);
+    const sunsetMin  = _notifParseHHMM(data && data.daily && data.daily.sunset  && data.daily.sunset[0]);
+    if (sunriseMin == null || sunsetMin == null) return;
+    window._sunTimes = { date: dateStr(new Date()), sunriseMin, sunsetMin };
+    localStorage.setItem('_sunTimes', JSON.stringify(window._sunTimes));
+    _notifRenderSunConsumers();
+  }).catch(() => {});
+}
+function _notifRefreshSunTimes() {
+  if (window._sunTimes && window._sunTimes.date === dateStr(new Date())) return;
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    pos => _notifFetchSunTimes(pos.coords.latitude, pos.coords.longitude),
+    () => {},
+    { enableHighAccuracy: false, maximumAge: 3600000, timeout: 10000 }
+  );
+}
+function _notifSkyGradient(isActive) {
+  if (!isActive) return '#0a0a0a';
+  const DAY_MIN = 1440, TW = 40;
+  const st = window._sunTimes;
+  let sr = (st && st.sunriseMin != null) ? st.sunriseMin : 390;
+  let ss = (st && st.sunsetMin  != null) ? st.sunsetMin  : 1170;
+  sr = Math.max(0, Math.min(DAY_MIN, sr));
+  ss = Math.max(0, Math.min(DAY_MIN, ss));
+  const raw = [
+    [0,             '#05070f'],
+    [sr - TW * 2,   '#0b1330'],
+    [sr - TW,       '#3a3f6b'],
+    [sr,            '#ff9d6c'],
+    [sr + TW,       '#bfe3ff'],
+    [sr + TW * 3,   '#69b3ee'],
+    [ss - TW * 3,   '#69b3ee'],
+    [ss - TW,       '#ffb26b'],
+    [ss,            '#ff6a4d'],
+    [ss + TW,       '#3a2a5c'],
+    [ss + TW * 2,   '#0b1330'],
+    [DAY_MIN,       '#05070f'],
+  ];
+  let prevM = -1;
+  const parts = raw.map(pair => {
+    let m = Math.max(0, Math.min(DAY_MIN, pair[0]));
+    if (m < prevM) m = prevM;
+    prevM = m;
+    return pair[1] + ' ' + (m / DAY_MIN * 100).toFixed(2) + '%';
+  });
+  return 'linear-gradient(to right,' + parts.join(',') + ')';
+}
 (function() {
   function todayStr() {
     const d = new Date();
@@ -271,7 +338,7 @@ function _notifBuildMiniSchedule(habitId) {
     dayRow.appendChild(label);
     const bar = document.createElement('div');
     bar.style.cssText = 'position:relative;flex:1;height:4px;border-radius:1px;overflow:hidden;' +
-      'background:' + (active ? '#111' : '#0a0a0a') + ';border:1px solid ' + (isToday ? '#666' : '#333') + ';';
+      'background:' + _notifSkyGradient(active) + ';border:1px solid ' + (isToday ? '#666' : '#333') + ';';
     [6, 12, 18].forEach(function(h) {
       const grid = document.createElement('div');
       grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,0.08);';
@@ -573,6 +640,7 @@ window.notifSaveSchedule = function() {
   _notifCheckScheduleBtn();
 };
 window.notifLoadScheduleUI = function() {
+  _notifRefreshSunTimes();
   _notifUpdateMasterToggleUI();
   window.notifPopulateHabitSelect();
   if (window._notifCurrentHabitId && window._notifCurrentHabitId()) {
@@ -767,7 +835,7 @@ function _notifBuildWeekSchedule() {
       ';font-weight:' + (isToday ? '600' : '400') + ';';
     row.appendChild(label);
     const bar = document.createElement('div');
-    bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + (active ? '#111' : '#0a0a0a') +
+    bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + _notifSkyGradient(active) +
       ';border:1px solid ' + (isToday ? '#666' : '#333') + ';border-radius:3px;overflow:hidden;';
     [6, 12, 18].forEach(h => {
       const grid = document.createElement('div');
@@ -855,7 +923,7 @@ function _notifBuildAllHabitsSchedule() {
       ';font-weight:' + (isToday ? '600' : '400') + ';';
     row.appendChild(label);
     const bar = document.createElement('div');
-    bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + (activeInfos.length ? '#111' : '#0a0a0a') +
+    bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + _notifSkyGradient(activeInfos.length) +
       ';border:1px solid ' + (isToday ? '#666' : '#333') + ';border-radius:3px;overflow:hidden;';
     [6, 12, 18].forEach(h => {
       const grid = document.createElement('div');
