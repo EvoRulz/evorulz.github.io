@@ -1,4 +1,4 @@
-// @version 1590
+// @version 1591
 /*
  * Copyright 2020 Google Inc.
  *
@@ -182,6 +182,22 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
             am.cancel(pi);
             if (enabled && intervalMs > 0) {
                 long nextFire = System.currentTimeMillis() + intervalMs;
+                long startOffsetMs = getSharedPreferences("notif", Context.MODE_PRIVATE).getLong("startOffsetMs_" + habitId, 0);
+                if (startOffsetMs > 0) {
+                    java.util.Calendar nowCal = java.util.Calendar.getInstance();
+                    long msFromMidnight = (nowCal.get(java.util.Calendar.HOUR_OF_DAY) * 3600L
+                        + nowCal.get(java.util.Calendar.MINUTE) * 60L
+                        + nowCal.get(java.util.Calendar.SECOND)) * 1000L;
+                    if (msFromMidnight < startOffsetMs) {
+                        java.util.Calendar startToday = java.util.Calendar.getInstance();
+                        startToday.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                        startToday.set(java.util.Calendar.MINUTE, 0);
+                        startToday.set(java.util.Calendar.SECOND, 0);
+                        startToday.set(java.util.Calendar.MILLISECOND, 0);
+                        long offsetFireToday = startToday.getTimeInMillis() + startOffsetMs;
+                        if (nextFire < offsetFireToday) nextFire = offsetFireToday;
+                    }
+                }
                 getSharedPreferences("notif", Context.MODE_PRIVATE).edit()
                     .putLong("nextFire_" + habitId, nextFire).apply();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
@@ -523,7 +539,10 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 String date = params.containsKey("date") ? params.get("date") : "";
                 boolean done = "1".equals(params.containsKey("done") ? params.get("done") : "0");
                 if (!date.isEmpty()) {
-                    getSharedPreferences("notif", MODE_PRIVATE).edit().putBoolean("done_" + date, done).apply();
+                    String markDoneHabitId = params.containsKey("habit") ? params.get("habit") : "";
+                    if (!markDoneHabitId.isEmpty()) {
+                        getSharedPreferences("notif", MODE_PRIVATE).edit().putBoolean("done_" + markDoneHabitId + "_" + date, done).apply();
+                    }
                 }
             } else if ("/settotal".equals(endpoint)) {
                 String totalDate = params.containsKey("date") ? params.get("date") : "";
@@ -639,6 +658,22 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                         _shAm.cancel(_shPi);
                         if (_shEnabled && _shIv > 0) {
                             long _shNextFire = System.currentTimeMillis() + _shIv;
+                            long _shStartOffsetMs = getSharedPreferences("notif", MODE_PRIVATE).getLong("startOffsetMs_" + _shHabitId, 0);
+                            if (_shStartOffsetMs > 0) {
+                                java.util.Calendar _shNowCal = java.util.Calendar.getInstance();
+                                long _shMsFromMidnight = (_shNowCal.get(java.util.Calendar.HOUR_OF_DAY) * 3600L
+                                    + _shNowCal.get(java.util.Calendar.MINUTE) * 60L
+                                    + _shNowCal.get(java.util.Calendar.SECOND)) * 1000L;
+                                if (_shMsFromMidnight < _shStartOffsetMs) {
+                                    java.util.Calendar _shStartToday = java.util.Calendar.getInstance();
+                                    _shStartToday.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                                    _shStartToday.set(java.util.Calendar.MINUTE, 0);
+                                    _shStartToday.set(java.util.Calendar.SECOND, 0);
+                                    _shStartToday.set(java.util.Calendar.MILLISECOND, 0);
+                                    long _shOffsetFireToday = _shStartToday.getTimeInMillis() + _shStartOffsetMs;
+                                    if (_shNextFire < _shOffsetFireToday) _shNextFire = _shOffsetFireToday;
+                                }
+                            }
                             getSharedPreferences("notif", MODE_PRIVATE).edit().putLong("nextFire_" + _shHabitId, _shNextFire).apply();
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !_shAm.canScheduleExactAlarms()) {
                                 _shAm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _shNextFire, _shPi);

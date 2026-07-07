@@ -1,4 +1,4 @@
-// @version 1590
+// @version 1591
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -1433,8 +1433,9 @@ window.notifMarkDone = function(habitId, dateKey, done) {
   const _last = _notifMarkDoneLast[habitId];
   if (_last && _last.date === dateKey && _last.done === done) return;
   _notifMarkDoneLast[habitId] = { date: dateKey, done: done };
-  localStorage.setItem(_syncKey, _doneVal);
-  _localNotifFetch('/markdone?habit=' + encodeURIComponent(habitId) + '&date=' + encodeURIComponent(dateKey) + '&done=' + _doneVal);
+  fetch('http://localhost:8765/markdone?habit=' + encodeURIComponent(habitId) + '&date=' + encodeURIComponent(dateKey) + '&done=' + _doneVal)
+    .then(() => { localStorage.setItem(_syncKey, _doneVal); })
+    .catch(() => { delete _notifMarkDoneLast[habitId]; });
 };
 window.notifLoadSoundName = function() {
   const nameEl = document.getElementById('notif-sound-name');
