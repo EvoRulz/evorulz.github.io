@@ -1,4 +1,4 @@
-// @version 1591
+// @version 1592
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -99,6 +99,131 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-row" data-clock-row="timeradius:">
         <label>Time corner radius <span id="s-clock-time-radius-val">6px</span></label>
         <input type="range" class="alpha-slider" id="s-clock-time-radius" min="0" max="50" value="6" oninput="document.getElementById('s-clock-time-radius-val').textContent=this.value+'px';settingsChange()">
+      </div>
+      <div data-clock-row="schedDemo" style="display:flex;flex-direction:column;gap:6px;padding-top:12px;margin-top:4px;border-top:1px solid #444;">
+        <label style="font-size:13px;color:#bbb;">Notification schedule preview (demo data)</label>
+        <div id="clock-sched-demo-wrap"></div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedskynight">
+        <label>Schedule sky: night color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-sky-night" oninput="onColorPickerChange('s-sched-sky-night')">
+          <input type="range" class="alpha-slider" id="s-sched-sky-night-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-sky-night')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-sky-night-hex" maxlength="9" oninput="onHexInput('s-sched-sky-night')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-sky-night',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedskytwilight">
+        <label>Schedule sky: twilight color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-sky-twilight" oninput="onColorPickerChange('s-sched-sky-twilight')">
+          <input type="range" class="alpha-slider" id="s-sched-sky-twilight-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-sky-twilight')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-sky-twilight-hex" maxlength="9" oninput="onHexInput('s-sched-sky-twilight')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-sky-twilight',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedskyhorizon">
+        <label>Schedule sky: sunrise/sunset color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-sky-horizon" oninput="onColorPickerChange('s-sched-sky-horizon')">
+          <input type="range" class="alpha-slider" id="s-sched-sky-horizon-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-sky-horizon')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-sky-horizon-hex" maxlength="9" oninput="onHexInput('s-sched-sky-horizon')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-sky-horizon',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedskyday">
+        <label>Schedule sky: daytime color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-sky-day" oninput="onColorPickerChange('s-sched-sky-day')">
+          <input type="range" class="alpha-slider" id="s-sched-sky-day-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-sky-day')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-sky-day-hex" maxlength="9" oninput="onHexInput('s-sched-sky-day')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-sky-day',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedoff">
+        <label>Schedule off/inactive color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-off" oninput="onColorPickerChange('s-sched-off')">
+          <input type="range" class="alpha-slider" id="s-sched-off-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-off')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-off-hex" maxlength="9" oninput="onHexInput('s-sched-off')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-off',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedtick">
+        <label>Schedule tick color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-tick" oninput="onColorPickerChange('s-sched-tick')">
+          <input type="range" class="alpha-slider" id="s-sched-tick-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-tick')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-tick-hex" maxlength="9" oninput="onHexInput('s-sched-tick')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-tick',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedoffset">
+        <label>Schedule start-offset marker color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-offset" oninput="onColorPickerChange('s-sched-offset')">
+          <input type="range" class="alpha-slider" id="s-sched-offset-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-offset')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-offset-hex" maxlength="9" oninput="onHexInput('s-sched-offset')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-offset',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schednow">
+        <label>Schedule "now" line color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-now" oninput="onColorPickerChange('s-sched-now')">
+          <input type="range" class="alpha-slider" id="s-sched-now-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-now')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-now-hex" maxlength="9" oninput="onHexInput('s-sched-now')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-now',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedgrid">
+        <label>Schedule hour-grid color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-grid" oninput="onColorPickerChange('s-sched-grid')">
+          <input type="range" class="alpha-slider" id="s-sched-grid-alpha" min="0" max="255" value="20" oninput="onAlphaChange('s-sched-grid')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-grid-hex" maxlength="9" oninput="onHexInput('s-sched-grid')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-grid',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedborder">
+        <label>Schedule row border color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-border" oninput="onColorPickerChange('s-sched-border')">
+          <input type="range" class="alpha-slider" id="s-sched-border-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-border')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-border-hex" maxlength="9" oninput="onHexInput('s-sched-border')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-border',this)">Copy</button>
+        </div>
+      </div>
+      <div class="color-settings-row" data-clock-row="schedbordertoday">
+        <label>Schedule row border (today) color</label>
+        <div class="color-picker-row">
+          <input type="color" id="s-sched-border-today" oninput="onColorPickerChange('s-sched-border-today')">
+          <input type="range" class="alpha-slider" id="s-sched-border-today-alpha" min="0" max="255" value="255" oninput="onAlphaChange('s-sched-border-today')">
+        </div>
+        <div class="hex-copy-row">
+          <input type="text" class="hex-input" id="s-sched-border-today-hex" maxlength="9" oninput="onHexInput('s-sched-border-today')" spellcheck="false" autocomplete="off">
+          <button class="copy-btn" onclick="copyHex('s-sched-border-today',this)">Copy</button>
+        </div>
       </div>
       </div>
     <div class="settings-group-content" id="sg-checkboxes">

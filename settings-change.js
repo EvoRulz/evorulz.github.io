@@ -1,4 +1,4 @@
-// @version 1591
+// @version 1592
 function settingsExport() {
   const clk = window._clockGet();
   const out = {
@@ -306,6 +306,20 @@ function settingsChange() {
   btnStyle.checkboxMark    = getColorValue('s-checkbox-mark');
   btnStyle.checkboxBorder  = getColorValue('s-checkbox-border');
   btnStyle.checkboxBg      = getColorValue('s-checkbox-bg');
+  btnStyle.schedSkyNight    = getColorValue('s-sched-sky-night');
+  btnStyle.schedSkyTwilight = getColorValue('s-sched-sky-twilight');
+  btnStyle.schedSkyHorizon  = getColorValue('s-sched-sky-horizon');
+  btnStyle.schedSkyDay      = getColorValue('s-sched-sky-day');
+  btnStyle.schedOff         = getColorValue('s-sched-off');
+  btnStyle.schedTick        = getColorValue('s-sched-tick');
+  btnStyle.schedOffset      = getColorValue('s-sched-offset');
+  btnStyle.schedNow         = getColorValue('s-sched-now');
+  btnStyle.schedGrid        = getColorValue('s-sched-grid');
+  btnStyle.schedBorder      = getColorValue('s-sched-border');
+  btnStyle.schedBorderToday = getColorValue('s-sched-border-today');
+  if (window._schedDemoRender) window._schedDemoRender();
+  if (window._notifBuildWeekSchedule) window._notifBuildWeekSchedule();
+  if (window._notifBuildAllHabitsSchedule) window._notifBuildAllHabitsSchedule();
   btnStyle.toggleOffBg     = getColorValue('s-toggle-off-bg');
   btnStyle.toggleOnBg      = getColorValue('s-toggle-on-bg');
   btnStyle.toggleSwitchOff   = getColorValue('s-toggle-switch-off');
@@ -439,6 +453,17 @@ async function settingsReset() {
   setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
   setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
   setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
+  setColorValue('s-sched-sky-night',    btnStyle.schedSkyNight    || '#05070fFF');
+  setColorValue('s-sched-sky-twilight', btnStyle.schedSkyTwilight || '#3a3f6bFF');
+  setColorValue('s-sched-sky-horizon',  btnStyle.schedSkyHorizon  || '#ff9d6cFF');
+  setColorValue('s-sched-sky-day',      btnStyle.schedSkyDay      || '#69b3eeFF');
+  setColorValue('s-sched-off',          btnStyle.schedOff         || '#0a0a0aFF');
+  setColorValue('s-sched-tick',         btnStyle.schedTick        || '#99ccffFF');
+  setColorValue('s-sched-offset',       btnStyle.schedOffset      || '#ffcc66FF');
+  setColorValue('s-sched-now',          btnStyle.schedNow         || '#ff5555FF');
+  setColorValue('s-sched-grid',         btnStyle.schedGrid        || '#FFFFFF14');
+  setColorValue('s-sched-border',       btnStyle.schedBorder      || '#333333FF');
+  setColorValue('s-sched-border-today', btnStyle.schedBorderToday || '#666666FF');
   setColorValue('s-toggle-off-bg',     BTN_STYLE_DEFAULTS.toggleOffBg);
   setColorValue('s-toggle-on-bg',      BTN_STYLE_DEFAULTS.toggleOnBg);
   setColorValue('s-toggle-switch-off',   BTN_STYLE_DEFAULTS.toggleSwitchOff);

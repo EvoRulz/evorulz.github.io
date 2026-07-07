@@ -1,4 +1,4 @@
-// @version 1591
+// @version 1592
 // ── Settings open/close/save/cancel/reset/export/import ───
 let _appStyleSnapshot = null;
 let _clockSnapshot    = null;
@@ -27,6 +27,7 @@ function toggleSettingsGroup(groupId) {
   if (groupId === 'sg-clock' && isOpen) {
     setColorValue('s-clock-date-color', _btnStyles['top-date']?.fg || btnStyle.clockDateColor);
     updateAlphaSliderBg('s-clock-date-color');
+    if (window._schedDemoRender) window._schedDemoRender();
   }
   const item = document.querySelector(`#settings-groups-grid [data-group="${groupId}"]`);
   if (item) item.classList.toggle('sg-active', isOpen);
@@ -121,6 +122,17 @@ function _syncSettingsPanelUI() {
   setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
   setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
   setColorValue('s-checkbox-bg',      btnStyle.checkboxBg);
+  setColorValue('s-sched-sky-night',    btnStyle.schedSkyNight    || '#05070fFF');
+  setColorValue('s-sched-sky-twilight', btnStyle.schedSkyTwilight || '#3a3f6bFF');
+  setColorValue('s-sched-sky-horizon',  btnStyle.schedSkyHorizon  || '#ff9d6cFF');
+  setColorValue('s-sched-sky-day',      btnStyle.schedSkyDay      || '#69b3eeFF');
+  setColorValue('s-sched-off',          btnStyle.schedOff         || '#0a0a0aFF');
+  setColorValue('s-sched-tick',         btnStyle.schedTick        || '#99ccffFF');
+  setColorValue('s-sched-offset',       btnStyle.schedOffset      || '#ffcc66FF');
+  setColorValue('s-sched-now',          btnStyle.schedNow         || '#ff5555FF');
+  setColorValue('s-sched-grid',         btnStyle.schedGrid        || '#FFFFFF14');
+  setColorValue('s-sched-border',       btnStyle.schedBorder      || '#333333FF');
+  setColorValue('s-sched-border-today', btnStyle.schedBorderToday || '#666666FF');
   setColorValue('s-toggle-off-bg',     btnStyle.toggleOffBg    || '#333333FF');
   setColorValue('s-toggle-on-bg',      btnStyle.toggleOnBg     || '#1a5a1aFF');
   setColorValue('s-toggle-switch-off',   btnStyle.toggleSwitchOff  || '#666666FF');
@@ -281,6 +293,17 @@ function settingsOpen() {
     setColorValue('s-checkbox-mark',    btnStyle.checkboxMark);
     setColorValue('s-checkbox-border',  btnStyle.checkboxBorder);
     setColorValue('s-checkbox-bg', btnStyle.checkboxBg);
+    setColorValue('s-sched-sky-night',    btnStyle.schedSkyNight    || '#05070fFF');
+    setColorValue('s-sched-sky-twilight', btnStyle.schedSkyTwilight || '#3a3f6bFF');
+    setColorValue('s-sched-sky-horizon',  btnStyle.schedSkyHorizon  || '#ff9d6cFF');
+    setColorValue('s-sched-sky-day',      btnStyle.schedSkyDay      || '#69b3eeFF');
+    setColorValue('s-sched-off',          btnStyle.schedOff         || '#0a0a0aFF');
+    setColorValue('s-sched-tick',         btnStyle.schedTick        || '#99ccffFF');
+    setColorValue('s-sched-offset',       btnStyle.schedOffset      || '#ffcc66FF');
+    setColorValue('s-sched-now',          btnStyle.schedNow         || '#ff5555FF');
+    setColorValue('s-sched-grid',         btnStyle.schedGrid        || '#FFFFFF14');
+    setColorValue('s-sched-border',       btnStyle.schedBorder      || '#333333FF');
+    setColorValue('s-sched-border-today', btnStyle.schedBorderToday || '#666666FF');
     setColorValue('s-toggle-off-bg',     btnStyle.toggleOffBg    || '#333333FF');
     setColorValue('s-toggle-on-bg',      btnStyle.toggleOnBg     || '#1a5a1aFF');
     setColorValue('s-toggle-switch-off', btnStyle.toggleSwitchOff || '#666666FF');

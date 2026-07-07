@@ -1,4 +1,4 @@
-// @version 1591
+// @version 1592
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -39,27 +39,88 @@ function _notifRefreshSunTimes() {
     { enableHighAccuracy: false, maximumAge: 3600000, timeout: 10000 }
   );
 }
+const _SCHED_DEMO_TICKS = [7 * 3600000, 10 * 3600000, 13 * 3600000, 16 * 3600000, 19 * 3600000, 21 * 3600000];
+const _SCHED_DEMO_OFFSET = 7 * 3600000;
+function _schedAlpha(hex8, a) {
+  const c = hex8ToComponents(hex8);
+  return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + a + ')';
+}
+function _schedDemoRender() {
+  const wrap = document.getElementById('clock-sched-demo-wrap');
+  if (!wrap) return;
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  wrap.innerHTML = '';
+  const axisRow = document.createElement('div');
+  axisRow.style.cssText = 'position:relative;height:12px;margin-bottom:2px;';
+  [0, 6, 12, 18, 24].forEach(function(h) {
+    const mark = document.createElement('div');
+    mark.textContent = String(h);
+    let tx = 'translateX(-50%)';
+    if (h === 0) tx = 'translateX(0)';
+    if (h === 24) tx = 'translateX(-100%)';
+    mark.style.cssText = 'position:absolute;top:0;left:' + (h / 24 * 100) + '%;font-size:9px;color:#555;transform:' + tx + ';';
+    axisRow.appendChild(mark);
+  });
+  wrap.appendChild(axisRow);
+  const bar = document.createElement('div');
+  const borderCol = hex8ToCss(btnStyle.schedBorderToday || '#666666FF');
+  bar.style.cssText = 'position:relative;height:20px;border-radius:4px;overflow:hidden;background:' +
+    _notifSkyGradient(true) + ';border:1px solid ' + borderCol + ';';
+  [6, 12, 18].forEach(function(h) {
+    const grid = document.createElement('div');
+    grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:' +
+      hex8ToCss(btnStyle.schedGrid || '#FFFFFF14') + ';';
+    bar.appendChild(grid);
+  });
+  _SCHED_DEMO_TICKS.forEach(function(ms) {
+    const tick = document.createElement('div');
+    tick.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (ms / DAY_MS * 100) + '%;width:2px;background:' +
+      hex8ToCss(btnStyle.schedTick || '#99ccffFF') + ';';
+    bar.appendChild(tick);
+  });
+  const offsetMark = document.createElement('div');
+  offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (_SCHED_DEMO_OFFSET / DAY_MS * 100) + '%;width:2px;background:' +
+    hex8ToCss(btnStyle.schedOffset || '#ffcc66FF') + ';';
+  bar.appendChild(offsetMark);
+  const now = new Date();
+  const msIntoDay = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
+  const live = document.createElement('div');
+  const nowCol = hex8ToCss(btnStyle.schedNow || '#ff5555FF');
+  live.style.cssText = 'position:absolute;top:-2px;bottom:-2px;left:' + (msIntoDay / DAY_MS * 100) + '%;width:2px;background:' +
+    nowCol + ';box-shadow:0 0 4px 1px ' + _schedAlpha(btnStyle.schedNow || '#ff5555FF', 0.8) + ';z-index:2;';
+  bar.appendChild(live);
+  wrap.appendChild(bar);
+  const legend = document.createElement('div');
+  legend.style.cssText = 'font-size:10px;color:#555;margin-top:4px;';
+  legend.textContent = 'amber = start time, blue = notification, red = now (demo data)';
+  wrap.appendChild(legend);
+}
+window._schedDemoRender = _schedDemoRender;
 function _notifSkyGradient(isActive) {
-  if (!isActive) return '#0a0a0a';
+  if (!isActive) return hex8ToCss(btnStyle.schedOff || '#0a0a0aFF');
   const DAY_MIN = 1440, TW = 40;
   const st = window._sunTimes;
   let sr = (st && st.sunriseMin != null) ? st.sunriseMin : 390;
   let ss = (st && st.sunsetMin  != null) ? st.sunsetMin  : 1170;
   sr = Math.max(0, Math.min(DAY_MIN, sr));
   ss = Math.max(0, Math.min(DAY_MIN, ss));
+  const night    = hex8ToCss(btnStyle.schedSkyNight    || '#05070fFF');
+  const twilight = hex8ToCss(btnStyle.schedSkyTwilight || '#3a3f6bFF');
+  const horizon  = hex8ToCss(btnStyle.schedSkyHorizon  || '#ff9d6cFF');
+  const day      = hex8ToCss(btnStyle.schedSkyDay      || '#69b3eeFF');
   const raw = [
-    [0,             '#05070f'],
-    [sr - TW * 2,   '#0b1330'],
-    [sr - TW,       '#3a3f6b'],
-    [sr,            '#ff9d6c'],
-    [sr + TW,       '#bfe3ff'],
-    [sr + TW * 3,   '#69b3ee'],
-    [ss - TW * 3,   '#69b3ee'],
-    [ss - TW,       '#ffb26b'],
-    [ss,            '#ff6a4d'],
-    [ss + TW,       '#3a2a5c'],
-    [ss + TW * 2,   '#0b1330'],
-    [DAY_MIN,       '#05070f'],
+    [0,             night],
+    [sr - TW * 2,   twilight],
+    [sr - TW,       twilight],
+    [sr,            horizon],
+    [sr + TW,       day],
+    [sr + TW * 3,   day],
+    [ss - TW * 3,   day],
+    [ss - TW,       horizon],
+    [ss,            horizon],
+    [ss + TW,       twilight],
+    [ss + TW * 2,   twilight],
+    [DAY_MIN,       night],
   ];
   let prevM = -1;
   const parts = raw.map(pair => {
@@ -324,6 +385,14 @@ function _notifBuildMiniSchedule(habitId) {
   const info = _notifWeekTicksFor(sched);
   const active = masterOn && sched.enabled;
   const todayIdx = (new Date().getDay() + 6) % 7;
+  const gridCss    = hex8ToCss(btnStyle.schedGrid || '#FFFFFF14');
+  const borderCss  = hex8ToCss(btnStyle.schedBorder || '#333333FF');
+  const borderTCss = hex8ToCss(btnStyle.schedBorderToday || '#666666FF');
+  const tickCss    = hex8ToCss(btnStyle.schedTick || '#99ccffFF');
+  const tickBandCss = _schedAlpha(btnStyle.schedTick || '#99ccffFF', 0.35);
+  const offsetCss  = hex8ToCss(btnStyle.schedOffset || '#ffcc66FF');
+  const nowCss     = hex8ToCss(btnStyle.schedNow || '#ff5555FF');
+  const nowGlowCss = _schedAlpha(btnStyle.schedNow || '#ff5555FF', 0.8);
   const wrap = document.createElement('div');
   wrap.dataset.habitMini = habitId;
   wrap.style.cssText = 'display:flex;flex-direction:column;gap:1px;width:100%;';
@@ -338,27 +407,27 @@ function _notifBuildMiniSchedule(habitId) {
     dayRow.appendChild(label);
     const bar = document.createElement('div');
     bar.style.cssText = 'position:relative;flex:1;height:4px;border-radius:1px;overflow:hidden;' +
-      'background:' + _notifSkyGradient(active) + ';border:1px solid ' + (isToday ? '#666' : '#333') + ';';
+      'background:' + _notifSkyGradient(active) + ';border:1px solid ' + (isToday ? borderTCss : borderCss) + ';';
     [6, 12, 18].forEach(function(h) {
       const grid = document.createElement('div');
-      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,0.08);';
+      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:' + gridCss + ';';
       bar.appendChild(grid);
     });
     if (active) {
       if (info.dense) {
         const band = document.createElement('div');
         band.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;right:0;' +
-          'background:repeating-linear-gradient(45deg,rgba(153,204,255,0.35),rgba(153,204,255,0.35) 1px,transparent 1px,transparent 2px);';
+          'background:repeating-linear-gradient(45deg,' + tickBandCss + ',' + tickBandCss + ' 1px,transparent 1px,transparent 2px);';
         bar.appendChild(band);
       } else {
         info.ticks.forEach(function(ms) {
           const tick = document.createElement('div');
-          tick.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (ms / DAY_MS * 100) + '%;width:1px;background:#99ccff;';
+          tick.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (ms / DAY_MS * 100) + '%;width:1px;background:' + tickCss + ';';
           bar.appendChild(tick);
         });
       }
       const offsetMark = document.createElement('div');
-      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:1px;background:#ffcc66;';
+      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:1px;background:' + offsetCss + ';';
       bar.appendChild(offsetMark);
     }
     if (isToday) {
@@ -366,7 +435,7 @@ function _notifBuildMiniSchedule(habitId) {
       const msIntoDay = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
       const live = document.createElement('div');
       live.style.cssText = 'position:absolute;top:-1px;bottom:-1px;left:' + (msIntoDay / DAY_MS * 100) + '%;width:1px;' +
-        'background:#ff5555;box-shadow:0 0 2px 1px rgba(255,85,85,0.8);z-index:2;';
+        'background:' + nowCss + ';box-shadow:0 0 2px 1px ' + nowGlowCss + ';z-index:2;';
       bar.appendChild(live);
     }
     dayRow.appendChild(bar);
@@ -795,6 +864,14 @@ function _notifBuildWeekSchedule() {
   const info = _notifWeekTicksFor(sched);
   const active = masterOn && sched.enabled;
   const todayIdx = (new Date().getDay() + 6) % 7;
+  const gridCss    = hex8ToCss(btnStyle.schedGrid || '#FFFFFF14');
+  const borderCss  = hex8ToCss(btnStyle.schedBorder || '#333333FF');
+  const borderTCss = hex8ToCss(btnStyle.schedBorderToday || '#666666FF');
+  const tickCss    = hex8ToCss(btnStyle.schedTick || '#99ccffFF');
+  const tickBandCss = _schedAlpha(btnStyle.schedTick || '#99ccffFF', 0.35);
+  const offsetCss  = hex8ToCss(btnStyle.schedOffset || '#ffcc66FF');
+  const nowCss     = hex8ToCss(btnStyle.schedNow || '#ff5555FF');
+  const nowGlowCss = _schedAlpha(btnStyle.schedNow || '#ff5555FF', 0.8);
   const title = document.createElement('div');
   title.style.cssText = 'font-size:11px;color:#666;margin-bottom:2px;';
   if (!masterOn) {
@@ -836,27 +913,27 @@ function _notifBuildWeekSchedule() {
     row.appendChild(label);
     const bar = document.createElement('div');
     bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + _notifSkyGradient(active) +
-      ';border:1px solid ' + (isToday ? '#666' : '#333') + ';border-radius:3px;overflow:hidden;';
+      ';border:1px solid ' + (isToday ? borderTCss : borderCss) + ';border-radius:3px;overflow:hidden;';
     [6, 12, 18].forEach(h => {
       const grid = document.createElement('div');
-      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,0.08);';
+      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:' + gridCss + ';';
       bar.appendChild(grid);
     });
     if (active) {
       if (info.dense) {
         const band = document.createElement('div');
         band.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;right:0;' +
-          'background:repeating-linear-gradient(45deg,rgba(153,204,255,0.35),rgba(153,204,255,0.35) 2px,transparent 2px,transparent 4px);';
+          'background:repeating-linear-gradient(45deg,' + tickBandCss + ',' + tickBandCss + ' 2px,transparent 2px,transparent 4px);';
         bar.appendChild(band);
       } else {
         info.ticks.forEach(ms => {
           const tick = document.createElement('div');
-          tick.style.cssText = 'position:absolute;top:1px;bottom:1px;left:' + (ms / DAY_MS * 100) + '%;width:2px;background:#99ccff;';
+          tick.style.cssText = 'position:absolute;top:1px;bottom:1px;left:' + (ms / DAY_MS * 100) + '%;width:2px;background:' + tickCss + ';';
           bar.appendChild(tick);
         });
       }
       const offsetMark = document.createElement('div');
-      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:2px;background:#ffcc66;';
+      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:2px;background:' + offsetCss + ';';
       bar.appendChild(offsetMark);
     }
     if (isToday) {
@@ -864,7 +941,7 @@ function _notifBuildWeekSchedule() {
       const msIntoDay = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
       const live = document.createElement('div');
       live.style.cssText = 'position:absolute;top:-2px;bottom:-2px;left:' + (msIntoDay / DAY_MS * 100) + '%;width:2px;' +
-        'background:#ff5555;box-shadow:0 0 4px 1px rgba(255,85,85,0.8);z-index:2;';
+        'background:' + nowCss + ';box-shadow:0 0 4px 1px ' + nowGlowCss + ';z-index:2;';
       bar.appendChild(live);
     }
     row.appendChild(bar);
@@ -891,6 +968,14 @@ function _notifBuildAllHabitsSchedule() {
     return stillExists && allSched[hid].enabled;
   }).map(hid => _notifWeekTicksFor(window._notifGetSchedule(hid))) : [];
   const todayIdx = (new Date().getDay() + 6) % 7;
+  const gridCss    = hex8ToCss(btnStyle.schedGrid || '#FFFFFF14');
+  const borderCss  = hex8ToCss(btnStyle.schedBorder || '#333333FF');
+  const borderTCss = hex8ToCss(btnStyle.schedBorderToday || '#666666FF');
+  const tickCss    = hex8ToCss(btnStyle.schedTick || '#99ccffFF');
+  const tickBandCss = _schedAlpha(btnStyle.schedTick || '#99ccffFF', 0.35);
+  const offsetCss  = hex8ToCss(btnStyle.schedOffset || '#ffcc66FF');
+  const nowCss     = hex8ToCss(btnStyle.schedNow || '#ff5555FF');
+  const nowGlowCss = _schedAlpha(btnStyle.schedNow || '#ff5555FF', 0.8);
   const title = document.createElement('div');
   title.style.cssText = 'font-size:11px;color:#666;margin-bottom:2px;';
   title.textContent = masterOn ? 'All habits schedule preview' : 'All habits schedule preview (all notifications off)';
@@ -924,27 +1009,27 @@ function _notifBuildAllHabitsSchedule() {
     row.appendChild(label);
     const bar = document.createElement('div');
     bar.style.cssText = 'position:relative;flex:1;height:14px;background:' + _notifSkyGradient(activeInfos.length) +
-      ';border:1px solid ' + (isToday ? '#666' : '#333') + ';border-radius:3px;overflow:hidden;';
+      ';border:1px solid ' + (isToday ? borderTCss : borderCss) + ';border-radius:3px;overflow:hidden;';
     [6, 12, 18].forEach(h => {
       const grid = document.createElement('div');
-      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:rgba(255,255,255,0.08);';
+      grid.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (h / 24 * 100) + '%;width:1px;background:' + gridCss + ';';
       bar.appendChild(grid);
     });
     activeInfos.forEach(info => {
       if (info.dense) {
         const band = document.createElement('div');
         band.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;right:0;' +
-          'background:repeating-linear-gradient(45deg,rgba(153,204,255,0.35),rgba(153,204,255,0.35) 2px,transparent 2px,transparent 4px);';
+          'background:repeating-linear-gradient(45deg,' + tickBandCss + ',' + tickBandCss + ' 2px,transparent 2px,transparent 4px);';
         bar.appendChild(band);
       } else {
         info.ticks.forEach(ms => {
           const tick = document.createElement('div');
-          tick.style.cssText = 'position:absolute;top:1px;bottom:1px;left:' + (ms / DAY_MS * 100) + '%;width:2px;background:#99ccff;';
+          tick.style.cssText = 'position:absolute;top:1px;bottom:1px;left:' + (ms / DAY_MS * 100) + '%;width:2px;background:' + tickCss + ';';
           bar.appendChild(tick);
         });
       }
       const offsetMark = document.createElement('div');
-      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:2px;background:#ffcc66;';
+      offsetMark.style.cssText = 'position:absolute;top:0;bottom:0;left:' + (info.offsetMs / DAY_MS * 100) + '%;width:2px;background:' + offsetCss + ';';
       bar.appendChild(offsetMark);
     });
     if (isToday) {
@@ -952,7 +1037,7 @@ function _notifBuildAllHabitsSchedule() {
       const msIntoDay = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
       const live = document.createElement('div');
       live.style.cssText = 'position:absolute;top:-2px;bottom:-2px;left:' + (msIntoDay / DAY_MS * 100) + '%;width:2px;' +
-        'background:#ff5555;box-shadow:0 0 4px 1px rgba(255,85,85,0.8);z-index:2;';
+        'background:' + nowCss + ';box-shadow:0 0 4px 1px ' + nowGlowCss + ';z-index:2;';
       bar.appendChild(live);
     }
     row.appendChild(bar);
@@ -965,6 +1050,13 @@ function _notifBuildAllHabitsSchedule() {
 }
 setInterval(_notifBuildWeekSchedule, 1000);
 setInterval(_notifBuildAllHabitsSchedule, 1000);
+setInterval(function() {
+  const _sdOverlay = document.getElementById('settings-overlay');
+  if (!_sdOverlay || !_sdOverlay.classList.contains('active')) return;
+  const _sdGroup = document.getElementById('sg-clock');
+  if (!_sdGroup || !_sdGroup.classList.contains('open')) return;
+  if (window._schedDemoRender) window._schedDemoRender();
+}, 1000);
 function _notifUpdateToggleUI() {
   const habitId = window._notifCurrentHabitId ? window._notifCurrentHabitId() : null;
   const enabled = habitId ? window._notifGetSchedule(habitId).enabled : false;
