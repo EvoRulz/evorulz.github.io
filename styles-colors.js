@@ -1,4 +1,4 @@
-// @version 1588
+// @version 1589
 // ── Settings panel logic ───────────────────────────────────
 function onColorPickerChange(id) {
   const picker = document.getElementById(id);

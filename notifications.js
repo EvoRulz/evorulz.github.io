@@ -1,4 +1,4 @@
-// @version 1588
+// @version 1589
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -204,9 +204,13 @@ window._notifMasterEnabled = function() {
       var sched = getSchedule(hid);
       var cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(function(c){ return c.id === hid; }) : null;
       var label = cfg ? cfg.label : hid;
+      var effectiveEnabled = !!sched.enabled && window._notifMasterEnabled();
       if (window.AndroidSettings && window.AndroidSettings.setHabitSchedule) {
-        var effectiveEnabled = !!sched.enabled && window._notifMasterEnabled();
         window.AndroidSettings.setHabitSchedule(hid, _notifIntervalMsFor(sched), effectiveEnabled, label);
+      } else {
+        var _shQ = '/schedulehabit?habit=' + encodeURIComponent(hid) + '&interval=' + _notifIntervalMsFor(sched) +
+          '&enabled=' + (effectiveEnabled ? '1' : '0') + '&label=' + encodeURIComponent(label);
+        _localNotifFetch(_shQ);
       }
     });
     if (typeof _notifRefreshNextFire === 'function') _notifRefreshNextFire();
@@ -454,6 +458,8 @@ window.notifOpenAlarmSettings = function() {
 window.notifOpenBatterySettings = function() {
   if (window.AndroidSettings && window.AndroidSettings.openBatterySettings) {
     window.AndroidSettings.openBatterySettings();
+  } else {
+    window.location.href = 'habitnotify://batterysettings';
   }
 };
 window.notifRefreshPermission = function() {
@@ -461,28 +467,34 @@ window.notifRefreshPermission = function() {
   if (!el) return;
   const webPerm = ('Notification' in window) ? Notification.permission : 'unavailable';
   const webColor = webPerm === 'granted' ? '#99ff99' : '#ff9999';
+  const _renderNativePerm = (s) => {
+    const exactColor = s.exactAlarm ? '#99ff99' : '#ff9999';
+    const battColor = s.battery ? '#99ff99' : '#ff9999';
+    el.innerHTML = `
+      Web: <span style="color:${webColor}">${webPerm}</span><br>
+      Notifications: <span style="color:${s.notifications ? '#99ff99' : '#ff9999'}">${s.notifications ? 'granted' : 'denied'}</span><br>
+      Exact alarm: <span style="color:${exactColor}">${s.exactAlarm ? 'granted' : 'denied'}</span><br>
+      <span style="font-size:11px;color:#777;">Exact alarm lets reminders fire at the precise minute they are due.
+      Without it Android may delay reminders by several minutes to save battery.
+      Tap Alarm Permission below to grant it.</span><br>
+      Battery: <span style="color:${battColor}">${s.battery ? 'unrestricted' : 'optimized'}</span><br>
+      <span style="font-size:11px;color:#777;">Optimized means Android may pause this app in the background and
+      delay or drop reminders, especially after long idle periods (Doze mode, not fully handled by this app yet).
+      Tap Battery Settings below and choose Unrestricted or Don't optimize.</span>
+    `;
+  };
   if (window.AndroidSettings && window.AndroidSettings.getPermissionStatus) {
     try {
-      const s = JSON.parse(window.AndroidSettings.getPermissionStatus());
-      const exactColor = s.exactAlarm ? '#99ff99' : '#ff9999';
-      const battColor = s.battery ? '#99ff99' : '#ff9999';
-      el.innerHTML = `
-        Web: <span style="color:${webColor}">${webPerm}</span><br>
-        Notifications: <span style="color:${s.notifications ? '#99ff99' : '#ff9999'}">${s.notifications ? 'granted' : 'denied'}</span><br>
-        Exact alarm: <span style="color:${exactColor}">${s.exactAlarm ? 'granted' : 'denied'}</span><br>
-        <span style="font-size:11px;color:#777;">Exact alarm lets reminders fire at the precise minute they are due.
-        Without it Android may delay reminders by several minutes to save battery.
-        Tap Alarm Permission below to grant it.</span><br>
-        Battery: <span style="color:${battColor}">${s.battery ? 'unrestricted' : 'optimized'}</span><br>
-        <span style="font-size:11px;color:#777;">Optimized means Android may pause this app in the background and
-        delay or drop reminders, especially after long idle periods (Doze mode, not fully handled by this app yet).
-        Tap Battery Settings below and choose Unrestricted or Don't optimize.</span>
-      `;
+      _renderNativePerm(JSON.parse(window.AndroidSettings.getPermissionStatus()));
     } catch {
       el.innerHTML = `Web: <span style="color:${webColor}">${webPerm}</span>`;
     }
   } else {
     el.innerHTML = `Web: <span style="color:${webColor}">${webPerm}</span>`;
+    fetch('http://localhost:8765/permissionstatus')
+      .then(r => r.json())
+      .then(s => { if (s && s.notifications !== undefined) _renderNativePerm(s); })
+      .catch(() => {});
   }
 };
 window.notifSaveStartOffset = function() {

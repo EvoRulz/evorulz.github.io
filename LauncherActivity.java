@@ -1,4 +1,4 @@
-// @version 1588
+// @version 1589
 /*
  * Copyright 2020 Google Inc.
  *
@@ -613,6 +613,57 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                         getSharedPreferences("notif", MODE_PRIVATE)
                             .edit().putLong("startOffsetMs_" + _oHabitId, _fOffsetMs).apply();
                     });
+                } else if ("/schedulehabit".equals(endpoint)) {
+                    final String _shHabitId = params.containsKey("habit") ? params.get("habit") : "";
+                    final String _shLabel = params.containsKey("label") ? params.get("label") : _shHabitId;
+                    long _shIntervalMs = 0;
+                    try { _shIntervalMs = Long.parseLong(params.containsKey("interval") ? params.get("interval") : "0"); } catch (Exception ignored) {}
+                    final long _shIv = _shIntervalMs;
+                    final boolean _shEnabled = "1".equals(params.containsKey("enabled") ? params.get("enabled") : "0");
+                    runOnUiThread(() -> {
+                        SharedPreferences _shPrefs = getSharedPreferences("notif", MODE_PRIVATE);
+                        java.util.Set<String> _shIds = new java.util.HashSet<>(_shPrefs.getStringSet("habitIds", new java.util.HashSet<>()));
+                        _shIds.add(_shHabitId);
+                        SharedPreferences.Editor _shEd = _shPrefs.edit();
+                        _shEd.putStringSet("habitIds", _shIds);
+                        _shEd.putLong("interval_" + _shHabitId, _shIv);
+                        _shEd.putBoolean("enabled_" + _shHabitId, _shEnabled);
+                        _shEd.putString("label_" + _shHabitId, _shLabel);
+                        _shEd.apply();
+                        AlarmManager _shAm = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        Intent _shI = new Intent(LauncherActivity.this, NotificationReceiver.class);
+                        _shI.putExtra("habitId", _shHabitId);
+                        int _shReqCode = _shHabitId.hashCode();
+                        PendingIntent _shPi = PendingIntent.getBroadcast(LauncherActivity.this, _shReqCode, _shI,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                        _shAm.cancel(_shPi);
+                        if (_shEnabled && _shIv > 0) {
+                            long _shNextFire = System.currentTimeMillis() + _shIv;
+                            getSharedPreferences("notif", MODE_PRIVATE).edit().putLong("nextFire_" + _shHabitId, _shNextFire).apply();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !_shAm.canScheduleExactAlarms()) {
+                                _shAm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _shNextFire, _shPi);
+                            } else {
+                                _shAm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, _shNextFire, _shPi);
+                            }
+                        } else {
+                            getSharedPreferences("notif", MODE_PRIVATE).edit().putLong("nextFire_" + _shHabitId, 0).apply();
+                        }
+                    });
+                } else if ("/permissionstatus".equals(endpoint)) {
+                    try {
+                        boolean _psNotif = true;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            _psNotif = checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+                        }
+                        AlarmManager _psAm = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        boolean _psAlarm = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || _psAm.canScheduleExactAlarms();
+                        boolean _psBattery = true;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            PowerManager _psPm = (PowerManager) getSystemService(POWER_SERVICE);
+                            _psBattery = _psPm.isIgnoringBatteryOptimizations("io.github.evorulz.twa");
+                        }
+                        responseBody = "{\"notifications\":" + _psNotif + ",\"exactAlarm\":" + _psAlarm + ",\"battery\":" + _psBattery + "}";
+                    } catch (Exception e) { responseBody = "{}"; }
                 } else if ("/notify".equals(endpoint)) {
                     final String _nHabitId = params.containsKey("habit") ? params.get("habit") : "";
                     final String _nTitle = params.containsKey("title") ? params.get("title") : "Habit Tracker";
@@ -758,6 +809,11 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     i2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i2);
                 }
+                return;
+            } else if ("batterysettings".equals(host)) {
+                Intent i2 = new Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                i2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i2);
                 return;
             } else if ("markdone".equals(host)) {
                 String dateParam = data.getQueryParameter("date");
