@@ -1,4 +1,4 @@
-// @version 1592
+// @version 1593
   // ── App-level export / import / clear ─────────────────────
 let APP_PREFIXES = TRACKER_CONFIGS.map(c => c.id + ":");
 function appExport() {

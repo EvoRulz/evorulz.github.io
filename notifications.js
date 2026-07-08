@@ -1,4 +1,4 @@
-// @version 1592
+// @version 1593
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -333,6 +333,13 @@ function _notifSkyGradient(isActive) {
       var cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(function(c){ return c.id === hid; }) : null;
       var label = cfg ? cfg.label : hid;
       var effectiveEnabled = !!sched.enabled && window._notifMasterEnabled();
+      var offsetMs = _notifStartOffsetMsFor(sched);
+      if (window.AndroidSettings && window.AndroidSettings.setStartOffset) {
+        window.AndroidSettings.setStartOffset(hid, offsetMs);
+      } else {
+        _localNotifFetch('/setstartoffset?habit=' + encodeURIComponent(hid) + '&offset=' + offsetMs);
+      }
+      _notifSyncDoneFor(hid, todayStr());
       if (window.AndroidSettings && window.AndroidSettings.setHabitSchedule) {
         window.AndroidSettings.setHabitSchedule(hid, _notifIntervalMsFor(sched), effectiveEnabled, label);
       } else {
@@ -656,6 +663,7 @@ window.notifSaveStartOffset = function() {
   } else {
     _localNotifFetch('/setstartoffset?habit=' + encodeURIComponent(habitId) + '&offset=' + offsetMs);
   }
+  if (window._notifReschedule) window._notifReschedule(habitId);
   _notifStartSavedSnap = _notifStartValues();
   _notifCheckStartBtn();
 };
