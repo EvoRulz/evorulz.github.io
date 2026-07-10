@@ -1,4 +1,4 @@
-// @version 1593
+// @version 1594
 /*
  * Copyright 2020 Google Inc.
  *
@@ -345,6 +345,12 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 .edit().putLong("startOffsetMs_" + habitId, offsetMs).apply();
         }
         @JavascriptInterface
+        public void setNotifMessage(String habitId, String title, String body) {
+            getSharedPreferences("notif", Context.MODE_PRIVATE)
+                .edit().putString("notifTitle_" + habitId, title == null ? "" : title)
+                .putString("notifBody_" + habitId, body == null ? "" : body).apply();
+        }
+        @JavascriptInterface
         public void showNotification(String habitId, String title, String body) {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             String _chId = _getChannelId(habitId);
@@ -631,6 +637,15 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     runOnUiThread(() -> {
                         getSharedPreferences("notif", MODE_PRIVATE)
                             .edit().putLong("startOffsetMs_" + _oHabitId, _fOffsetMs).apply();
+                    });
+                } else if ("/setnotifmessage".equals(endpoint)) {
+                    final String _mHabitId = params.containsKey("habit") ? params.get("habit") : "";
+                    final String _mTitle = params.containsKey("title") ? params.get("title") : "";
+                    final String _mBody = params.containsKey("body") ? params.get("body") : "";
+                    runOnUiThread(() -> {
+                        getSharedPreferences("notif", MODE_PRIVATE).edit()
+                            .putString("notifTitle_" + _mHabitId, _mTitle)
+                            .putString("notifBody_" + _mHabitId, _mBody).apply();
                     });
                 } else if ("/schedulehabit".equals(endpoint)) {
                     final String _shHabitId = params.containsKey("habit") ? params.get("habit") : "";

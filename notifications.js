@@ -1,4 +1,4 @@
-// @version 1593
+// @version 1594
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -12,6 +12,12 @@ function _notifParseHHMM(iso) {
   const m = /T(\d{2}):(\d{2})/.exec(iso || '');
   return m ? (parseInt(m[1], 10) * 60 + parseInt(m[2], 10)) : null;
 }
+function _notifResolveMessage(sched, label) {
+  const titleTpl = (sched.notifTitle && sched.notifTitle.trim()) ? sched.notifTitle : 'Habit Tracker';
+  const bodyTpl = (sched.notifBody && sched.notifBody.trim()) ? sched.notifBody : '{habit} not done yet today.';
+  return { title: titleTpl.split('{habit}').join(label), body: bodyTpl.split('{habit}').join(label) };
+}
+window._notifResolveMessage = _notifResolveMessage;
 function _notifRenderSunConsumers() {
   _notifBuildWeekSchedule();
   _notifBuildAllHabitsSchedule();
@@ -146,6 +152,7 @@ function _notifSkyGradient(isActive) {
       startOffset: { years: 0, days: 0, hours: 0, minutes: 0, seconds: 0 },
       offUntil: 0,
       soundUri: '', soundName: 'Default',
+      notifTitle: '', notifBody: '',
       autoTarget: { enabled: false, step: 0, cap: 0, lastApplied: '' },
     };
   }
@@ -228,10 +235,11 @@ function _notifSkyGradient(isActive) {
     if (_msFromMidnight < _notifStartOffsetMsFor(sched)) return;
     const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.id === habitId) : null;
     const label = cfg ? cfg.label : habitId;
+    const msg = _notifResolveMessage(sched, label);
     try {
       const reg = await navigator.serviceWorker.ready;
-      await reg.showNotification('Habit Tracker', {
-        body: label + ' not done yet today.',
+      await reg.showNotification(msg.title, {
+        body: msg.body,
         icon: './icon-192.png',
         vibrate: [200],
         requireInteraction: false,
@@ -240,7 +248,7 @@ function _notifSkyGradient(isActive) {
     } catch(e) {
       try {
         const a = document.createElement('a');
-        a.href = 'habitnotify://notify?title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent(label + ' not done yet today.');
+        a.href = 'habitnotify://notify?title=' + encodeURIComponent(msg.title) + '&body=' + encodeURIComponent(msg.body);
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -338,6 +346,13 @@ function _notifSkyGradient(isActive) {
         window.AndroidSettings.setStartOffset(hid, offsetMs);
       } else {
         _localNotifFetch('/setstartoffset?habit=' + encodeURIComponent(hid) + '&offset=' + offsetMs);
+      }
+      var _msgTitle = sched.notifTitle || '';
+      var _msgBody = sched.notifBody || '';
+      if (window.AndroidSettings && window.AndroidSettings.setNotifMessage) {
+        window.AndroidSettings.setNotifMessage(hid, _msgTitle, _msgBody);
+      } else {
+        _localNotifFetch('/setnotifmessage?habit=' + encodeURIComponent(hid) + '&title=' + encodeURIComponent(_msgTitle) + '&body=' + encodeURIComponent(_msgBody));
       }
       _notifSyncDoneFor(hid, todayStr());
       if (window.AndroidSettings && window.AndroidSettings.setHabitSchedule) {
@@ -558,6 +573,10 @@ window.notifLoadHabitForm = function(habitId) {
   }
   const thresholdEl = document.getElementById('notif-threshold');
   if (thresholdEl) thresholdEl.value = sched.threshold || 0;
+  const msgTitleEl = document.getElementById('notif-msg-title');
+  if (msgTitleEl) msgTitleEl.value = sched.notifTitle || '';
+  const msgBodyEl = document.getElementById('notif-msg-body');
+  if (msgBodyEl) msgBodyEl.value = sched.notifBody || '';
   window.notifColumnChange(true);
   if (window.notifLoadSoundName) window.notifLoadSoundName();
   const g = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
@@ -687,6 +706,8 @@ window.notifSaveSchedule = function() {
   const colSel = document.getElementById('notif-column-select');
   const statusSel = document.getElementById('notif-status-value');
   const thresholdEl = document.getElementById('notif-threshold');
+  const msgTitleEl = document.getElementById('notif-msg-title');
+  const msgBodyEl = document.getElementById('notif-msg-body');
   const prevSched = window._notifGetSchedule(habitId);
   const patch = {
     column:      colSel ? colSel.value : 'status',
@@ -697,6 +718,8 @@ window.notifSaveSchedule = function() {
     hours:       g('notif-hours'),
     minutes:     g('notif-minutes'),
     seconds:     g('notif-seconds'),
+    notifTitle:  msgTitleEl ? msgTitleEl.value : '',
+    notifBody:   msgBodyEl ? msgBodyEl.value : '',
     autoTarget: Object.assign({}, prevSched.autoTarget || {}, {
       step: parseInt(document.getElementById('notif-auto-step')?.value || '0') || 0,
       cap:  parseInt(document.getElementById('notif-auto-cap')?.value  || '0') || 0,
@@ -1663,14 +1686,16 @@ window.notifSendTest = async function() {
   if (!habitId) return;
   const cfg = typeof TRACKER_CONFIGS !== 'undefined' ? TRACKER_CONFIGS.find(c => c.id === habitId) : null;
   const label = cfg ? cfg.label : habitId;
+  const sched = window._notifGetSchedule(habitId);
+  const msg = _notifResolveMessage(sched, label);
   const btn = document.getElementById('notif-send-test-btn');
   if (btn) { btn.textContent = 'Sent'; btn.disabled = true; setTimeout(() => { btn.textContent = 'Send Test'; btn.disabled = false; }, 1500); }
   if (window.AndroidSettings && window.AndroidSettings.showNotification) {
-    try { window.AndroidSettings.showNotification(habitId, 'Habit Tracker', label + ' — test notification.'); return; } catch (e) {}
+    try { window.AndroidSettings.showNotification(habitId, msg.title, msg.body); return; } catch (e) {}
   }
-  fetch('http://localhost:8765/notify?habit=' + encodeURIComponent(habitId) + '&title=' + encodeURIComponent('Habit Tracker') + '&body=' + encodeURIComponent(label + ' — test notification.')).catch(() => {
+  fetch('http://localhost:8765/notify?habit=' + encodeURIComponent(habitId) + '&title=' + encodeURIComponent(msg.title) + '&body=' + encodeURIComponent(msg.body)).catch(() => {
     navigator.serviceWorker && navigator.serviceWorker.ready
-      .then(reg => reg.showNotification('Habit Tracker', { body: label + ' — test notification.', icon: './icon-192.png', vibrate: [200], tag: 'habit-reminder-' + habitId }))
+      .then(reg => reg.showNotification(msg.title, { body: msg.body, icon: './icon-192.png', vibrate: [200], tag: 'habit-reminder-' + habitId }))
       .catch(() => {});
   });
 };

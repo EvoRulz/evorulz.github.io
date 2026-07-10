@@ -1,4 +1,4 @@
-// @version 1593
+// @version 1594
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -55,6 +55,14 @@ public class NotificationReceiver extends BroadcastReceiver {
             .getString("channelId_" + habitId, "habit_reminders");
         String habitLabel = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
             .getString("label_" + habitId, habitId);
+        String _notifTitle = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getString("notifTitle_" + habitId, "");
+        String _notifBodyTpl = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+            .getString("notifBody_" + habitId, "");
+        if (_notifTitle == null || _notifTitle.trim().isEmpty()) _notifTitle = "Habit Tracker";
+        if (_notifBodyTpl == null || _notifBodyTpl.trim().isEmpty()) _notifBodyTpl = "{habit} not done yet today.";
+        _notifTitle = _notifTitle.replace("{habit}", habitLabel);
+        String _notifBody = _notifBodyTpl.replace("{habit}", habitLabel);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (nm.getNotificationChannel(_chId) == null) {
                 String _savedUri = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
@@ -102,8 +110,8 @@ public class NotificationReceiver extends BroadcastReceiver {
         PendingIntent launchPi = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder _nb = new NotificationCompat.Builder(context, _chId)
             .setSmallIcon(R.drawable.ic_notification_icon)
-            .setContentTitle("Habit Tracker")
-            .setContentText(habitLabel + " not done yet today.")
+            .setContentTitle(_notifTitle)
+            .setContentText(_notifBody)
             .setContentIntent(launchPi)
             .setAutoCancel(true);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {

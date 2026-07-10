@@ -1,4 +1,4 @@
-// @version 1593
+// @version 1594
 document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
       <div class="settings-group-content" id="sg-clock">
       <div id="clock-tumbler-wrap" data-clock-row="tumbler"></div>
@@ -607,6 +607,17 @@ document.getElementById('settings-panel').insertAdjacentHTML('beforeend', `
               z-index:99999;overflow-y:auto;max-height:330px;box-shadow:0 4px 16px rgba(0,0,0,0.7);"></div>
           </div>
         </div>
+        <div class="settings-row">
+          <label>Notification title</label>
+          <input id="notif-msg-title" type="text" placeholder="Habit Tracker" oninput="notifSaveSchedule()" spellcheck="false" autocomplete="off"
+            style="flex:1;max-width:220px;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:6px 10px;font-size:13px;box-sizing:border-box;">
+        </div>
+        <div class="settings-row">
+          <label>Notification message</label>
+          <input id="notif-msg-body" type="text" placeholder="{habit} not done yet today." oninput="notifSaveSchedule()" spellcheck="false" autocomplete="off"
+            style="flex:1;max-width:220px;background:#111;color:#fff;border:1px solid #444;border-radius:4px;padding:6px 10px;font-size:13px;box-sizing:border-box;">
+        </div>
+        <div style="font-size:11px;color:#666;margin-top:-6px;">Use {habit} to insert the habit name in either field. Leave blank for the defaults shown above.</div>
         <div class="settings-row">
           <label>Trigger column</label>
           <select id="notif-column-select" onchange="notifColumnChange()"></select>
