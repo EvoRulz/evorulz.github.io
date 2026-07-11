@@ -1,4 +1,4 @@
-// @version 1594
+// @version 1595
 /*
  * Copyright 2020 Google Inc.
  *
@@ -165,6 +165,9 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         @JavascriptInterface
         public void setHabitSchedule(String habitId, long intervalMs, boolean enabled, String label) {
             SharedPreferences prefs = getSharedPreferences("notif", Context.MODE_PRIVATE);
+            long prevIntervalMs = prefs.getLong("interval_" + habitId, -1);
+            boolean prevEnabled = prefs.getBoolean("enabled_" + habitId, false);
+            long prevNextFire = prefs.getLong("nextFire_" + habitId, 0);
             java.util.Set<String> ids = new java.util.HashSet<>(prefs.getStringSet("habitIds", new java.util.HashSet<>()));
             ids.add(habitId);
             SharedPreferences.Editor ed = prefs.edit();
@@ -181,9 +184,10 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             am.cancel(pi);
             if (enabled && intervalMs > 0) {
-                long nextFire = System.currentTimeMillis() + intervalMs;
+                boolean scheduleUnchanged = prevEnabled && prevIntervalMs == intervalMs && prevNextFire > System.currentTimeMillis();
+                long nextFire = scheduleUnchanged ? prevNextFire : System.currentTimeMillis() + intervalMs;
                 long startOffsetMs = getSharedPreferences("notif", Context.MODE_PRIVATE).getLong("startOffsetMs_" + habitId, 0);
-                if (startOffsetMs > 0) {
+                if (!scheduleUnchanged && startOffsetMs > 0) {
                     java.util.Calendar nowCal = java.util.Calendar.getInstance();
                     long msFromMidnight = (nowCal.get(java.util.Calendar.HOUR_OF_DAY) * 3600L
                         + nowCal.get(java.util.Calendar.MINUTE) * 60L

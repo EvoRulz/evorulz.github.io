@@ -1,4 +1,4 @@
-// @version 1594
+// @version 1595
 // ── Clock tumbler ──────────────────────────────────────────
 (function(){
   const COLS = window._CLOCK_COLS;
