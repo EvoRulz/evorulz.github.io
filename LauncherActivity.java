@@ -1,4 +1,4 @@
-// @version 1595
+// @version 1596
 /*
  * Copyright 2020 Google Inc.
  *
@@ -662,6 +662,9 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                         SharedPreferences _shPrefs = getSharedPreferences("notif", MODE_PRIVATE);
                         java.util.Set<String> _shIds = new java.util.HashSet<>(_shPrefs.getStringSet("habitIds", new java.util.HashSet<>()));
                         _shIds.add(_shHabitId);
+                        long _shPrevIntervalMs = _shPrefs.getLong("interval_" + _shHabitId, -1);
+                        boolean _shPrevEnabled = _shPrefs.getBoolean("enabled_" + _shHabitId, false);
+                        long _shPrevNextFire = _shPrefs.getLong("nextFire_" + _shHabitId, 0);
                         SharedPreferences.Editor _shEd = _shPrefs.edit();
                         _shEd.putStringSet("habitIds", _shIds);
                         _shEd.putLong("interval_" + _shHabitId, _shIv);
@@ -676,9 +679,10 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                         _shAm.cancel(_shPi);
                         if (_shEnabled && _shIv > 0) {
-                            long _shNextFire = System.currentTimeMillis() + _shIv;
+                            boolean _shUnchanged = _shPrevEnabled && _shPrevIntervalMs == _shIv && _shPrevNextFire > System.currentTimeMillis();
+                            long _shNextFire = _shUnchanged ? _shPrevNextFire : System.currentTimeMillis() + _shIv;
                             long _shStartOffsetMs = getSharedPreferences("notif", MODE_PRIVATE).getLong("startOffsetMs_" + _shHabitId, 0);
-                            if (_shStartOffsetMs > 0) {
+                            if (!_shUnchanged && _shStartOffsetMs > 0) {
                                 java.util.Calendar _shNowCal = java.util.Calendar.getInstance();
                                 long _shMsFromMidnight = (_shNowCal.get(java.util.Calendar.HOUR_OF_DAY) * 3600L
                                     + _shNowCal.get(java.util.Calendar.MINUTE) * 60L

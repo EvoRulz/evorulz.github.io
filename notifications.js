@@ -1,4 +1,4 @@
-// @version 1595
+// @version 1596
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -154,6 +154,7 @@ function _notifSkyGradient(isActive) {
       soundUri: '', soundName: 'Default',
       notifTitle: '', notifBody: '',
       autoTarget: { enabled: false, step: 0, cap: 0, lastApplied: '' },
+      nextFireLocal: 0,
     };
   }
   function _notifGetAllSchedules() {
@@ -257,14 +258,25 @@ function _notifSkyGradient(isActive) {
   }
   let _notifIntervals = {};
   function scheduleHabit(habitId) {
-    if (_notifIntervals[habitId]) { clearInterval(_notifIntervals[habitId]); delete _notifIntervals[habitId]; }
+    if (_notifIntervals[habitId]) { clearTimeout(_notifIntervals[habitId]); delete _notifIntervals[habitId]; }
     if (!window._notifMasterEnabled()) return;
     const sched = getSchedule(habitId);
     if (!sched.enabled) return;
-    _notifIntervals[habitId] = setInterval(() => { notifyHabit(habitId); }, _notifIntervalMsFor(sched));
+    const intervalMs = _notifIntervalMsFor(sched);
+    const now = Date.now();
+    let nextFire = sched.nextFireLocal;
+    if (!nextFire || nextFire <= now) nextFire = now + intervalMs;
+    if (nextFire !== sched.nextFireLocal) saveSchedule(habitId, { nextFireLocal: nextFire });
+    const delay = Math.max(0, nextFire - now);
+    _notifIntervals[habitId] = setTimeout(() => {
+      notifyHabit(habitId);
+      const freshSched = getSchedule(habitId);
+      saveSchedule(habitId, { nextFireLocal: Date.now() + _notifIntervalMsFor(freshSched) });
+      scheduleHabit(habitId);
+    }, delay);
   }
   function scheduleAllHabits() {
-    Object.keys(_notifIntervals).forEach(hid => clearInterval(_notifIntervals[hid]));
+    Object.keys(_notifIntervals).forEach(hid => clearTimeout(_notifIntervals[hid]));
     _notifIntervals = {};
     const all = _notifGetAllSchedules();
     Object.keys(all).forEach(habitId => { if (all[habitId].enabled) scheduleHabit(habitId); });
@@ -709,15 +721,19 @@ window.notifSaveSchedule = function() {
   const msgTitleEl = document.getElementById('notif-msg-title');
   const msgBodyEl = document.getElementById('notif-msg-body');
   const prevSched = window._notifGetSchedule(habitId);
+  const newYears = g('notif-years'), newDays = g('notif-days'), newHours = g('notif-hours');
+  const newMinutes = g('notif-minutes'), newSeconds = g('notif-seconds');
+  const intervalChanged = newYears !== (prevSched.years || 0) || newDays !== (prevSched.days || 0) ||
+    newHours !== (prevSched.hours || 0) || newMinutes !== (prevSched.minutes || 0) || newSeconds !== (prevSched.seconds || 0);
   const patch = {
     column:      colSel ? colSel.value : 'status',
     statusValue: statusSel ? statusSel.value : 'yes',
     threshold:   thresholdEl ? (parseInt(thresholdEl.value) || 0) : 0,
-    years:       g('notif-years'),
-    days:        g('notif-days'),
-    hours:       g('notif-hours'),
-    minutes:     g('notif-minutes'),
-    seconds:     g('notif-seconds'),
+    years:       newYears,
+    days:        newDays,
+    hours:       newHours,
+    minutes:     newMinutes,
+    seconds:     newSeconds,
     notifTitle:  msgTitleEl ? msgTitleEl.value : '',
     notifBody:   msgBodyEl ? msgBodyEl.value : '',
     autoTarget: Object.assign({}, prevSched.autoTarget || {}, {
@@ -725,6 +741,7 @@ window.notifSaveSchedule = function() {
       cap:  parseInt(document.getElementById('notif-auto-cap')?.value  || '0') || 0,
     }),
   };
+  if (intervalChanged) patch.nextFireLocal = 0;
   window._notifSaveSchedule(habitId, patch);
   if (window._notifSyncDoneFor) window._notifSyncDoneFor(habitId, dateStr(new Date()));
   if (window._notifApplyAutoTargetFor) window._notifApplyAutoTargetFor(habitId);
@@ -1195,7 +1212,7 @@ window.notifToggle = function() {
   if (!habitId) return;
   const sched = window._notifGetSchedule(habitId);
   const enabled = !sched.enabled;
-  window._notifSaveSchedule(habitId, { enabled: enabled, offUntil: 0 });
+  window._notifSaveSchedule(habitId, { enabled: enabled, offUntil: 0, nextFireLocal: 0 });
   if (window._notifReschedule) window._notifReschedule(habitId);
   if (enabled && window._notifSyncDoneFor) window._notifSyncDoneFor(habitId, dateStr(new Date()));
   if (enabled && window._notifApplyAutoTargetFor) window._notifApplyAutoTargetFor(habitId);
