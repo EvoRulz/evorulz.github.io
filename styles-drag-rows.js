@@ -1,4 +1,4 @@
-// @version 1606
+// @version 1607
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -265,7 +265,7 @@ makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 makeRowsDraggable('sg-toggles', 'data-toggle-row', '_toggleRowOrder');
 makeRowsDraggable('sg-tables', 'data-app-row', '_tablesRowOrder');
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
   history.pushState({panel:'base'}, '');
   var _goingForward = false;
   window.addEventListener('popstate', function() {
