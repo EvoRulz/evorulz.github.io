@@ -1,4 +1,4 @@
-// @version 1600
+// @version 1601
 // ── Tracker configs (dynamic) ──────────────────────────────
 const CONFIG_DEFAULTS = [
   { id: "pushups", label: "Pushups", type: "sets"   },
@@ -60,6 +60,7 @@ function onReasonInput(id,ds,el)  { trackers[id].onReasonInput(ds,el); }
 function onSetInput(id,ds)         { trackers[id].onInput(ds); }
 function onHeaderClick(id,key)     { trackers[id].onHeaderClick(key); }
 function onFilterChange(id,val)   { trackers[id].onFilterChange(val); }
+function onDateCellClick(id,ds)    { trackers[id].onDateCellClick(ds); }
 function jumpToToday(id)           { trackers[id].jumpToToday(); }
 function exportData(id)             { trackers[id].exportData(); }
 function importData(id,el)          { trackers[id].importData(el); }
@@ -78,6 +79,7 @@ function createTracker(config) {
     }
   }
   let sortKey="date", sortDir=1, filterStatus="", viewDates=null, topDate, bottomDate;
+let selectedDates=new Set();
   function sel(q)    { return document.querySelector(`#section-${id} ${q}`); }
   function selAll(q) { return document.querySelectorAll(`#section-${id} ${q}`); }
   function loadAll() {
@@ -109,6 +111,63 @@ function createTracker(config) {
       store[ds]={status,reason};
     }
     save(ds);
+  }
+  function _dateRangeChron(a, b) {
+    let start = new Date(a), end = new Date(b);
+    if (start > end) { const t = start; start = end; end = t; }
+    const out = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) out.push(dateStr(new Date(d)));
+    return out;
+  }
+  function _syncRowDOM(ds) {
+    const row = sel(`tr[data-date="${ds}"]`);
+    if (!row) return;
+    const data = store[ds]; if (!data) return;
+    const cells = row.querySelectorAll("td");
+    const selectEl = cells[1] && cells[1].querySelector("select");
+    if (selectEl) { selectEl.value = data.status || ""; applyStatusColor(selectEl); }
+    const textareaEl = cells[2] && cells[2].querySelector("textarea");
+    if (textareaEl) textareaEl.value = data.reason || "";
+    if (hasSets) {
+      for (let s = 0; s < NUM_SETS; s++) {
+        const cell = cells[5 + s];
+        const inp = cell && cell.querySelector("input");
+        if (inp) {
+          const val = data.sets ? data.sets[s] : null;
+          inp.value = (val === null || val === undefined) ? "" : val;
+        }
+      }
+    }
+  }
+  function _applySelectionClasses() {
+    const tbody = sel("tbody"); if (!tbody) return;
+    [...tbody.querySelectorAll("tr[data-date]")].forEach(tr => {
+      tr.classList.toggle("row-selected", selectedDates.has(tr.dataset.date));
+    });
+  }
+  function _mirrorEdit(sourceDs, mutate) {
+    if (!(selectedDates.has(sourceDs) && selectedDates.size > 1)) return [];
+    const affected = [];
+    selectedDates.forEach(td => {
+      if (td === sourceDs) return;
+      if (!store[td]) store[td] = getRow(td);
+      mutate(store[td]);
+      save(td);
+      affected.push(td);
+      _syncRowDOM(td);
+    });
+    return affected;
+  }
+  function onDateCellClick(ds) {
+    if (selectedDates.size === 1 && selectedDates.has(ds)) {
+      selectedDates = new Set();
+    } else if (selectedDates.size === 1) {
+      const anchor = [...selectedDates][0];
+      selectedDates = new Set(_dateRangeChron(anchor, ds));
+    } else {
+      selectedDates = new Set([ds]);
+    }
+    _applySelectionClasses();
   }
   function computeStreak(ds) {
     let n=0, curr=new Date(ds);
@@ -147,9 +206,10 @@ function createTracker(config) {
     STATUSES.map(s=>`<option value="${s}"${saved.status===s?" selected":""}>${s}</option>`).join("");
     const tr=document.createElement("tr");
     if (ds === dateStr(new Date())) tr.classList.add('today-row');
+    if (selectedDates.has(ds)) tr.classList.add('row-selected');
     tr.dataset.date=ds;
     let html=`
-        <td>${displayDate(ds)}</td>
+        <td class="date-cell" onclick="onDateCellClick('${id}','${ds}')">${displayDate(ds)}</td>
         <td style="padding:0"><select onchange="onSelectChange('${id}','${ds}',this)">${statusOpts}</select></td>
         <td style="padding:0"><textarea oninput="onReasonInput('${id}','${ds}',this)">${saved.reason||""}</textarea></td>
         <td class="set-cell">
@@ -232,13 +292,16 @@ function onSelectChange(ds,el) {
   if (!store[ds]) store[ds]=getRow(ds);
   store[ds].status=el.value; save(ds);
   applyStatusColor(el);
+  const mirrored=_mirrorEdit(ds, row => { row.status=el.value; });
   computeMaxStreaks();
   updateStreakAndTotal(); updateStats();
   if (window._notifSyncDoneFor) window._notifSyncDoneFor(id, ds);
+  mirrored.forEach(td => { if (window._notifSyncDoneFor) window._notifSyncDoneFor(id, td); });
 }
 function onReasonInput(ds,el) {
   if (!store[ds]) store[ds]=getRow(ds);
   store[ds].reason=el.value; save(ds);
+  _mirrorEdit(ds, row => { row.reason=el.value; });
 }
 function onInput(ds) {
   setRowFromDOM(ds);
@@ -253,7 +316,17 @@ function onInput(ds) {
       }
     }
   }
+  const sourceSets=store[ds].sets ? store[ds].sets.slice() : null;
+  const mirrored=_mirrorEdit(ds, row => {
+    if (sourceSets) row.sets=sourceSets.slice();
+    if (autoStatus) {
+      const mns=autoStatus(row);
+      if (mns!==null) row.status=mns;
+    }
+  });
+  if (mirrored.length) computeMaxStreaks();
   if (window._notifSyncDoneFor) window._notifSyncDoneFor(id, ds);
+  mirrored.forEach(td => { if (window._notifSyncDoneFor) window._notifSyncDoneFor(id, td); });
   updateStreakAndTotal(); updateBars(); updateStats();
 }
 function onHeaderClick(key) {
@@ -433,6 +506,6 @@ function init() {
 }
 function reload() { loadAll(); computeMaxStreaks(); buildView(); rerenderTable(); updateStats(); }
 return { init, reload, onSelectChange, onReasonInput, onInput,
- onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData };
+ onHeaderClick, onFilterChange, jumpToToday, exportData, importData, clearData, onDateCellClick };
 }
 
