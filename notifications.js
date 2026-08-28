@@ -1,4 +1,4 @@
-// @version 1604
+// @version 1605
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -1713,7 +1713,13 @@ window.notifSendTest = async function() {
   }
   fetch('http://localhost:8765/notify?habit=' + encodeURIComponent(habitId) + '&title=' + encodeURIComponent(msg.title) + '&body=' + encodeURIComponent(msg.body)).catch(() => {
     navigator.serviceWorker && navigator.serviceWorker.ready
-      .then(reg => reg.showNotification(msg.title, { body: msg.body, icon: './icon-192.png', vibrate: [200], tag: 'habit-reminder-' + habitId }))
+      .then(reg => reg.showNotification(msg.title, {
+        body: msg.body,
+        icon: './icon-192.png',
+        vibrate: [200],
+        tag: 'habit-reminder-' + habitId,
+        data: { habitId: habitId }
+      }))
       .catch(() => {});
   });
 };

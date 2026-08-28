@@ -1,4 +1,4 @@
-// @version 1604
+// @version 1605
 /*
  * Copyright 2020 Google Inc.
  *
@@ -480,17 +480,27 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     private void startLocalServer() {
         if (_localServerThread != null && _localServerThread.isAlive()) return;
         _localServerThread = new Thread(() -> {
-            try {
-                _localServer = new ServerSocket(LOCAL_NOTIF_PORT);
-                while (!Thread.currentThread().isInterrupted() && _localServer != null && !_localServer.isClosed()) {
-                    try {
-                        Socket client = _localServer.accept();
-                        new Thread(() -> handleLocalRequest(client)).start();
-                    } catch (Exception e) {
-                        if (_localServer == null || _localServer.isClosed()) break;
-                    }
+            int attempts = 0;
+            while (attempts < 15 && (_localServer == null || _localServer.isClosed())) {
+                try {
+                    _localServer = new ServerSocket();
+                    _localServer.setReuseAddress(true);
+                    _localServer.bind(new java.net.InetSocketAddress(LOCAL_NOTIF_PORT));
+                } catch (Exception e) {
+                    _localServer = null;
+                    attempts++;
+                    try { Thread.sleep(250); } catch (InterruptedException ie) { return; }
                 }
-            } catch (Exception e) {}
+            }
+            if (_localServer == null) return;
+            while (!Thread.currentThread().isInterrupted() && _localServer != null && !_localServer.isClosed()) {
+                try {
+                    Socket client = _localServer.accept();
+                    new Thread(() -> handleLocalRequest(client)).start();
+                } catch (Exception e) {
+                    if (_localServer == null || _localServer.isClosed()) break;
+                }
+            }
         });
         _localServerThread.setDaemon(true);
         _localServerThread.start();
