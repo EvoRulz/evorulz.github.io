@@ -1,4 +1,4 @@
-<!-- @version 1601 -->
+<!-- @version 1602 -->
 <!--
     Copyright 2019 Google Inc. All Rights Reserved.
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,7 +97,7 @@
                                                                                     <category android:name="android.intent.category.BROWSABLE"/>
                                                                                     <data android:scheme="https"
                                                                                         android:host="@string/hostName"
-                                                                                        android:pathPrefix="/evorulz.github.io/"
+                                                                                        android:pathPrefix="/"
                                                                                         />
                                                                                     </intent-filter>
                                                                                     <!-- Handles myfiles:// URLs from the web app to launch Samsung My Files natively -->
