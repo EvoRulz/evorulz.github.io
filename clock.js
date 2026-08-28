@@ -1,4 +1,4 @@
-// @version 1599
+// @version 1600
 // ── Live clock ─────────────────────────────────────────────
 (function() {
   const dateEl = document.getElementById("live-date");
@@ -183,6 +183,9 @@ if ('serviceWorker' in navigator && !location.hostname.includes('claudeuserconte
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js').catch(() => {});
     navigator.serviceWorker.addEventListener('message', ev => {
+      if (ev.data && ev.data.type === 'openHabit' && window._openHabitFromNotification) {
+        window._openHabitFromNotification(ev.data.habitId);
+      }
       const vEl = document.getElementById('app-version');
       if (!vEl) return;
       if (ev.data.type === 'sw-installing') {

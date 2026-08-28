@@ -1,4 +1,4 @@
-// @version 1599
+// @version 1600
   // ── Bootstrap ──────────────────────────────────────────────
 const buttonsEl  = document.getElementById("buttons");
 const sectionsEl = document.getElementById("sections");
@@ -40,6 +40,15 @@ function setActiveSection(targetId) {
     }
     setTimeout(() => { sectionEls[targetId].scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
   }
+  function _openHabitFromNotification(habitId) {
+    const config = TRACKER_CONFIGS.find(c => c.id === habitId);
+    if (!config) return;
+    setActiveSection(habitId);
+    setTimeout(() => {
+      if (trackers[habitId] && trackers[habitId].jumpToToday) trackers[habitId].jumpToToday();
+    }, 200);
+  }
+  window._openHabitFromNotification = _openHabitFromNotification;
   // ── Button order persistence ───────────────────────────────
   function loadButtonOrder() {
     try {

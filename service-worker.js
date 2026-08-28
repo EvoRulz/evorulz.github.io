@@ -1,43 +1,47 @@
-// @version 1599
-const CACHE = "habit-tracker-v1599";
+// @version 1600
+const CACHE = "habit-tracker-v1600";
 const ASSETS = [
-  "./index.html?v=1599",
-  "./manifest.json?v=1599",
-  "./icons/icon-192.png?v=1599",
-  "./icons/icon-512.png?v=1599",
-  "./settings-overlay-1.js?v=1599",
-  "./settings-overlay-2.js?v=1599",
-  "./utils.js?v=1599",
-  "./clock.js?v=1599",
-  "./tracker.js?v=1599",
-  "./app-data.js?v=1599",
-  "./styles-app.js?v=1599",
-  "./styles-btn.js?v=1599",
-  "./styles-colors.js?v=1599",
-  "./settings-panel.js?v=1599",
-  "./settings-change.js?v=1599",
-  "./styles-drag-rows.js?v=1599",
-  "./coverflow.js?v=1599",
-  "./drag.js?v=1599",
-  "./manage.js?v=1599",
-  "./tumbler.js?v=1599",
-  "./bootstrap.js?v=1599",
-  "./font.js?v=1599",
-  "./notifications.js?v=1599",
-  "./slider-init.js?v=1599",
-  "./color-picker-core.js?v=1599",
-  "./color-picker-sync.js?v=1599",
-  "./app.css?v=1599",
-  "./settings-ui.css?v=1599"
+  "./index.html?v=1600",
+  "./manifest.json?v=1600",
+  "./icons/icon-192.png?v=1600",
+  "./icons/icon-512.png?v=1600",
+  "./settings-overlay-1.js?v=1600",
+  "./settings-overlay-2.js?v=1600",
+  "./utils.js?v=1600",
+  "./clock.js?v=1600",
+  "./tracker.js?v=1600",
+  "./app-data.js?v=1600",
+  "./styles-app.js?v=1600",
+  "./styles-btn.js?v=1600",
+  "./styles-colors.js?v=1600",
+  "./settings-panel.js?v=1600",
+  "./settings-change.js?v=1600",
+  "./styles-drag-rows.js?v=1600",
+  "./coverflow.js?v=1600",
+  "./drag.js?v=1600",
+  "./manage.js?v=1600",
+  "./tumbler.js?v=1600",
+  "./bootstrap.js?v=1600",
+  "./font.js?v=1600",
+  "./notifications.js?v=1600",
+  "./slider-init.js?v=1600",
+  "./color-picker-core.js?v=1600",
+  "./color-picker-sync.js?v=1600",
+  "./app.css?v=1600",
+  "./settings-ui.css?v=1600"
 ];
 self.addEventListener("notificationclick", e => {
   e.notification.close();
+  const habitId = e.notification.data && e.notification.data.habitId;
   e.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
       for (const c of list) {
-        if (c.url && "focus" in c) return c.focus();
+        if (c.url && "focus" in c) {
+          if (habitId && "postMessage" in c) c.postMessage({ type: "openHabit", habitId: habitId });
+          return c.focus();
+        }
       }
-      if (clients.openWindow) return clients.openWindow("./");
+      if (clients.openWindow) return clients.openWindow(habitId ? "./?openHabit=" + encodeURIComponent(habitId) : "./");
     })
     );
 });

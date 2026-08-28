@@ -1,4 +1,4 @@
-// @version 1599
+// @version 1600
 package io.github.evorulz.twa;
 import android.app.AlarmManager;
 import android.os.Build;
@@ -106,8 +106,12 @@ public class NotificationReceiver extends BroadcastReceiver {
             }
             return;
         }
-        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-        PendingIntent launchPi = PendingIntent.getActivity(context, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        String _launchBaseUrl = context.getString(R.string.launchUrl);
+        String _launchTargetUrl = _launchBaseUrl + (_launchBaseUrl.contains("?") ? "&" : "?") + "openHabit=" + Uri.encode(habitId);
+        Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(_launchTargetUrl));
+        launchIntent.setPackage(context.getPackageName());
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent launchPi = PendingIntent.getActivity(context, habitId.hashCode(), launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder _nb = new NotificationCompat.Builder(context, _chId)
             .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(_notifTitle)

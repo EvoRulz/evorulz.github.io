@@ -1,4 +1,4 @@
-// @version 1599
+// @version 1600
 /*
  * Copyright 2020 Google Inc.
  *
@@ -371,8 +371,12 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                     nm.createNotificationChannel(ch);
                 }
             }
-            Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-            PendingIntent launchPi = PendingIntent.getActivity(LauncherActivity.this, 1, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            String _launchBaseUrl = getString(R.string.launchUrl);
+            String _launchTargetUrl = _launchBaseUrl + (_launchBaseUrl.contains("?") ? "&" : "?") + "openHabit=" + Uri.encode(habitId);
+            Intent launchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(_launchTargetUrl));
+            launchIntent.setPackage(getPackageName());
+            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent launchPi = PendingIntent.getActivity(LauncherActivity.this, habitId.hashCode(), launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             NotificationCompat.Builder _nb = new NotificationCompat.Builder(LauncherActivity.this, _chId)
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(title)
@@ -743,8 +747,12 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
                                 _nm2.createNotificationChannel(_ch2);
                             }
                         }
-                        Intent _li2 = getPackageManager().getLaunchIntentForPackage(getPackageName());
-                        PendingIntent _lpi2 = PendingIntent.getActivity(LauncherActivity.this, 1, _li2,
+                        String _launchBaseUrl2 = getString(R.string.launchUrl);
+                        String _launchTargetUrl2 = _launchBaseUrl2 + (_launchBaseUrl2.contains("?") ? "&" : "?") + "openHabit=" + Uri.encode(_nHabitId);
+                        Intent _li2 = new Intent(Intent.ACTION_VIEW, Uri.parse(_launchTargetUrl2));
+                        _li2.setPackage(getPackageName());
+                        _li2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        PendingIntent _lpi2 = PendingIntent.getActivity(LauncherActivity.this, _nHabitId.hashCode(), _li2,
                             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                         NotificationCompat.Builder _nb2 = new NotificationCompat.Builder(LauncherActivity.this, _chId2)
                             .setSmallIcon(R.drawable.ic_notification_icon)
@@ -789,6 +797,11 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
+        if (data != null && "https".equals(data.getScheme()) && data.getQueryParameter("openHabit") != null) {
+            setIntent(intent);
+            super.onNewIntent(intent);
+            return;
+        }
         if (data != null && "appsettings".equals(data.getScheme())) {
             Intent settingsIntent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             settingsIntent.setData(Uri.parse("package:io.github.evorulz.twa"));

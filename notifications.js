@@ -1,4 +1,4 @@
-// @version 1599
+// @version 1600
 function _localNotifFetch(path) { fetch('http://localhost:8765' + path).catch(() => {}); }
 window._notifMasterEnabled = function() {
   return localStorage.getItem('_notifEnabled') !== 'false';
@@ -244,7 +244,8 @@ function _notifSkyGradient(isActive) {
         icon: './icon-192.png',
         vibrate: [200],
         requireInteraction: false,
-        tag: 'habit-reminder-' + habitId
+        tag: 'habit-reminder-' + habitId,
+        data: { habitId: habitId }
       });
     } catch(e) {
       try {
@@ -1748,4 +1749,11 @@ window.notifToggleAutoTarget = function() {
   }
   _updateAutoTargetToggleUI();
 };
+(function _handleOpenHabitParam() {
+  const params = new URLSearchParams(location.search);
+  const habitId = params.get('openHabit');
+  if (!habitId) return;
+  history.replaceState(null, '', location.pathname);
+  setTimeout(() => { if (window._openHabitFromNotification) window._openHabitFromNotification(habitId); }, 300);
+})();
 
