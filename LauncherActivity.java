@@ -1,4 +1,4 @@
-// @version 1603
+// @version 1604
 /*
  * Copyright 2020 Google Inc.
  *
@@ -799,7 +799,8 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         Uri data = intent.getData();
         if (data != null && "https".equals(data.getScheme()) && data.getQueryParameter("openHabit") != null) {
             setIntent(intent);
-            super.onNewIntent(intent);
+            finish();
+            startActivity(intent);
             return;
         }
         if (data != null && "appsettings".equals(data.getScheme())) {
