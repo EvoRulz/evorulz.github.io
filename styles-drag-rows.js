@@ -1,4 +1,4 @@
-// @version 1607
+// @version 1608
 var _srGlowStyle = document.createElement('style');
 _srGlowStyle.textContent = '.sr-drag-ready { box-shadow: 0 0 12px 4px rgba(255,255,255,0.7) !important; transition: box-shadow 0.2s; }';
 document.head.appendChild(_srGlowStyle);
@@ -265,31 +265,34 @@ makeRowsDraggable('sg-clock', 'data-clock-row', '_clockRowOrder');
 makeRowsDraggable('sg-checkboxes', 'data-checkbox-row', '_checkboxRowOrder');
 makeRowsDraggable('sg-toggles', 'data-toggle-row', '_toggleRowOrder');
 makeRowsDraggable('sg-tables', 'data-app-row', '_tablesRowOrder');
+function _closeTopUiLayer() {
+  if (document.getElementById('cp-popup')) { window._cpClose(); return true; }
+  if (document.getElementById('manage-overlay').classList.contains('active')) { manageClose(); return true; }
+  if (document.getElementById('settings-overlay').classList.contains('active')) {
+    var openGroup = null;
+    document.querySelectorAll('.settings-group-content').forEach(function(el) {
+      if (el.classList.contains('open')) openGroup = el;
+    });
+    if (openGroup) {
+      openGroup.classList.remove('open');
+      var btn = document.querySelector('[data-group="' + openGroup.id + '"]');
+      if (btn) btn.classList.remove('sg-active');
+    } else {
+      settingsCancel();
+    }
+    return true;
+  }
+  if (typeof getActiveSectionId === 'function' && getActiveSectionId()) { setActiveSection(null); return true; }
+  if (typeof habitsVisible !== 'undefined' && habitsVisible) { toggleHabits(); return true; }
+  return false;
+}
+window._closeTopUiLayer = _closeTopUiLayer;
 document.addEventListener('DOMContentLoaded', function() {
   history.pushState({panel:'base'}, '');
   var _goingForward = false;
   window.addEventListener('popstate', function() {
     if (_goingForward) { _goingForward = false; return; }
-    if (document.getElementById('cp-popup')) { window._cpClose(); _goingForward = true; history.go(1); return; }
-    if (document.getElementById('manage-overlay').classList.contains('active')) {
-      manageClose();
-    } else if (document.getElementById('settings-overlay').classList.contains('active')) {
-      var openGroup = null;
-      document.querySelectorAll('.settings-group-content').forEach(function(el) {
-        if (el.classList.contains('open')) openGroup = el;
-      });
-      if (openGroup) {
-        openGroup.classList.remove('open');
-        var btn = document.querySelector('[data-group="' + openGroup.id + '"]');
-        if (btn) btn.classList.remove('sg-active');
-      } else {
-        settingsCancel();
-      }
-    } else if (typeof getActiveSectionId === 'function' && getActiveSectionId()) {
-      setActiveSection(null);
-    } else if (typeof habitsVisible !== 'undefined' && habitsVisible) {
-      toggleHabits();
-    }
+    _closeTopUiLayer();
     _goingForward = true;
     history.go(1);
   });
