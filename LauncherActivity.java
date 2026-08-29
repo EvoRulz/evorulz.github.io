@@ -1,4 +1,4 @@
-// @version 1608
+// @version 1609
 /*
  * Copyright 2020 Google Inc.
  *
@@ -55,7 +55,7 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     private Ringtone _previewRingtone = null;
     private ServerSocket _localServer = null;
     private Thread _localServerThread = null;
-    private WebView _webView = null;
+    private boolean _hasResumedBefore = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -439,12 +439,20 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
         super.onStart();
         android.view.View root = getWindow().getDecorView().getRootView();
         WebView wv = findWebView(root);
-        _webView = wv;
         if (wv != null) {
             wv.addJavascriptInterface(new OrientationBridge(), "AndroidOrientation");
             wv.addJavascriptInterface(new SettingsBridge(), "AndroidSettings");
         }
         startLocalServer();
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (_hasResumedBefore) {
+            moveTaskToBack(true);
+            return;
+        }
+        _hasResumedBefore = true;
     }
     @Override
     protected void onDestroy() {
@@ -913,12 +921,7 @@ extends com.google.androidbrowserhelper.trusted.LauncherActivity {
     }
     @Override
     public void onBackPressed() {
-        if (_webView != null) {
-            _webView.evaluateJavascript(
-                "(function(){try{return window._closeTopUiLayer ? !!window._closeTopUiLayer() : false;}catch(e){return false;}})();",
-                value -> {}
-            );
-        }
+        moveTaskToBack(true);
     }
     @Override
     protected Uri getLaunchingUrl() {
